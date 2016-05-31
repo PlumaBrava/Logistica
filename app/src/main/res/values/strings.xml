@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Logistica</string>
+
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!--Menu Options-->
+    <string name="action_settings">Settings</string>
+    <string name="products">Products</string>
+    <string name="customs">Customs</string>
+    <string name="title_product_list">Products</string>
+    <string name="title_product_detail">Product Detail</string>
+
+
+    <!--Products List Activity List-->
+    <string name="empty_product_list">No Products to Show</string>
+
+    <!--Products Detail Activity-->
+
+    <string name="product_Id_text">Product Number:</string>
+    <string name="product_name_text">Name:</string>
+    <string name="product_price_text">Price:</string>
+    <string name="enter_price_message">Enter Price</string>
+    <string name="product_photo_text">Picture</string>
+    <string name="product_description_text">Description:</string>
+    <string name="product_description_hint_text">Product Description</string>
+
+</resources>
