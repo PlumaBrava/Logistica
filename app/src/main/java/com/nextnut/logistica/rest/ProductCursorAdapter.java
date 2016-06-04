@@ -1,15 +1,18 @@
 package com.nextnut.logistica.rest;
 
+import android.animation.Animator;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -100,27 +103,74 @@ implements ItemTouchHelperAdapter, View.OnClickListener{
 
     @Override
     public void onClick(View view) {
-        view.setBackgroundColor(Color.RED);
+        view.get
         if(listener != null)
             listener.onClick(view);
+        boolean isRed=isRed= !true;
+        final int radius =(int)Math.hypot(view.getWidth()/2,view.getHeight()/2);
+        view.setBackgroundColor(Color.RED);
+        if(isRed){
+            view.setBackgroundColor(Color.GRAY);
+
+        } else {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                Animator anim =ViewAnimationUtils.createCircularReveal(view,view.getWidth()/2,view.getHeight()/2,0,radius);
+                view.setBackgroundColor(Color.GREEN);
+                anim.start();
+            }
+        }
+
+//        Log.i("TouchHelper:","Adapter onItemDismiss ");
+////        long cursorId = getItemId(mVh.getChildPosition(view));
+//        Cursor c = getCursor();
+//        ContentValues cv = new ContentValues();
+//        cv.put(ProductsColumns._ID_PRODUCTO,c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
+//        cv.put(ProductsColumns.DESCRIPCION_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
+//        cv.put(ProductsColumns.IMAGEN_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
+//        cv.put(ProductsColumns.PRECIO_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+//
+//        Intent intent=new Intent(mContext,ProductDetailActivity.class);
+//        intent.putExtra("PRODUCT_MODIFICACION",true);
+//        intent.putExtra("_ID_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
+//        intent.putExtra("DESCRIPCION_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
+//        intent.putExtra("IMAGEN_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
+//        intent.putExtra("PRECIO_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+//
+//        mContext.startActivity(intent);
+
+//        mContext.getContentResolver().delete(PlanetProvider.Planets.withId(cursorId),
+//                null, null);
+//        mContext.getContentResolver().insert(PlanetProvider.ArchivedPlanets.withId(cursorId),
+//                cv);
+        notifyDataSetChanged();
     }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor){
         DatabaseUtils.dumpCursor(cursor);
 
-        Picasso.with(viewHolder.mphotoProducto.getContext())
-                .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
-                .into(viewHolder.mphotoProducto);
+    Picasso.with(viewHolder.mphotoProducto.getContext())
+
+             .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
+            .resize(96, 96)
+            .placeholder(R.drawable.art_clear)
+            .centerCrop()
+            .into(viewHolder.mphotoProducto);
 
         viewHolder.mTextViewNombre.setText(cursor.getString(cursor.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
         viewHolder.mTextViewPrecio.setText(cursor.getString(cursor.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
         viewHolder.mTextViewDescition.setText(cursor.getString(cursor.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
 
 
+
+
+
+
+    }
+
 //        viewHolder.mImageview.setImageResource(cursor.getInt(cursor.getColumnIndex(
 //                                PlanetColumns.IMAGE_RESOURCE)));
-    }
+
 
 //    @Override
 //    public void onClick(View v) {

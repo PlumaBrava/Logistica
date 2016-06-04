@@ -3,6 +3,7 @@ package com.nextnut.logistica;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,9 +66,10 @@ public class ProductDetailFragment extends Fragment {
     private EditText mProductPrice;
     private EditText mProductDescription;
     private ImageView mImageProducto;
-    String mCurrentPhotoPath;
+    String mCurrentPhotoPath=null;
     private Button button;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1888;
+    private static final int REQUEST_IMAGE_GET = 1889;
 
 
     /**
@@ -109,35 +112,24 @@ public class ProductDetailFragment extends Fragment {
         button = ((Button) rootView.findViewById(R.id.product_imagen_button));
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            mProductName.setText("name");
+//            mProductName.setText("name");
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    selectImage();
 
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-//                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-//                        // Create the File where the photo should go
-//                        File photoFile = null;
-//                        try {
-//                            photoFile = createImageFile();
-//                        } catch (IOException ex) {
-//                            // Error occurred while creating the File
-////                            ...
-//                        }
-//
-//
-//                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
-//                                Uri.fromFile(photoFile));
-                    startActivityForResult(intent,
-                            CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 
                 }
 //                }
             });
 
-
+            if(mCurrentPhotoPath==null) {
+                Log.i("prdDetFrament","mCurrentPhotoPath=null");
+                mImageProducto.setImageResource(R.drawable.art_clear);
+            }else {
+                Log.i("prdDetFrament","mCurrentPhotoPath!=null");
+            }
             mProductId.setText("ID:28");
 //            ((TextView) rootView.findViewById(R.id.product_detail)).setText(mItem);
         }
@@ -159,53 +151,79 @@ public class ProductDetailFragment extends Fragment {
         return file;
     }
 
+
+
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+
             if (resultCode == Activity.RESULT_OK) {
 
-                Bitmap bmp = (Bitmap) data.getExtras().get("data");
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
 
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
 
-                // convert byte array to Bitmap
+                    Bitmap bmp = (Bitmap) data.getExtras().get("data");
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-                Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
-                        byteArray.length);
+                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+
+                    // convert byte array to Bitmap
+
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
+                            byteArray.length);
 //
 //                 mImageProducto.setImageBitmap(bitmap);
 
-                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                String filename = "Product_"+timeStamp;
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    String filename = "Product_" + timeStamp;
 //                String filename = "myfile";
 //                String string = "Hello world!";
-                File file = new File(getContext().getFilesDir(), filename);
+                    File file = new File(getContext().getFilesDir(), filename);
 
-                FileOutputStream outputStream;
+                    FileOutputStream outputStream;
 
-                try {
-                    outputStream = getContext().openFileOutput(filename, Context.MODE_PRIVATE);
+                    try {
+                        outputStream = getContext().openFileOutput(filename, Context.MODE_PRIVATE);
 //                    outputStream.write(string.getBytes());
-                    outputStream.write(byteArray);
-                    outputStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                        outputStream.write(byteArray);
+                        outputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-                mCurrentPhotoPath = "file:" + file.getAbsolutePath();
+                    mCurrentPhotoPath = "file:" + file.getAbsolutePath();
 
-
-                Picasso.with(getContext())
-                        .load(mCurrentPhotoPath)
-                        .into(mImageProducto);
+                    Picasso.with(getContext())
+                            .load(mCurrentPhotoPath)
+                            .placeholder(R.drawable.art_clear)
+                            .into(mImageProducto);
 
 //                mProductId.setText(mCurrentPhotoPath);
 
 
+                } else if (requestCode == REQUEST_IMAGE_GET) {
+                    Bitmap bm = null;
+                    if (data != null) {
+                        try {
+                            bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), data.getData());
+                            mCurrentPhotoPath = String.valueOf(data.getData());
+                            Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
+
+                            Picasso.with(getContext())
+                                    .load(data.getData())
+                                    .into(mImageProducto);
+
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                }
             }
-        }
     }
 
     public void verificationAndsave() {
@@ -238,4 +256,45 @@ public class ProductDetailFragment extends Fragment {
 
         return true;
     }
+
+    private void selectImage() {
+        final CharSequence[] items = { "Take Photo", "Choose from Library",
+                "Cancel" };
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Add Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+
+                Log.e(LOG_TAG, "dialog:"+dialog+" item: "+ item);
+//                boolean result=getContext().
+//                        Utility.checkPermission(this);
+                if (items[item].equals("Take Photo")) {
+
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                } else if (items[item].equals("Choose from Library")) {
+
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("image/*");
+                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                        startActivityForResult(intent, REQUEST_IMAGE_GET);}
+
+//                    Intent intent = new Intent();
+//                    intent.setType("image/*");
+//                    intent.setAction(Intent.ACTION_GET_CONTENT);//
+//                    startActivityForResult(Intent.createChooser(intent, "Select File"),SELECT_FILE);
+
+
+//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                    startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
 }

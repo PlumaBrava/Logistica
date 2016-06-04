@@ -26,17 +26,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
+
 import android.view.MenuItem;
 
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
-import com.nextnut.logistica.dummy.DummyContent;
+
 import com.nextnut.logistica.rest.ProductCursorAdapter;
 import com.nextnut.logistica.rest.Products;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
+import com.nextnut.logistica.Util.DividerItemDecoration;
 
 import java.util.ArrayList;
-import java.util.List;
+
 
 /**
  * An activity representing a list of Products. This activity
@@ -118,6 +120,9 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
         recyclerView.setAdapter(mCursorAdapter);
 
 
+
+//        recyclerView.addItemDecoration(
+//                new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST));
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
