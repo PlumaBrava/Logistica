@@ -19,7 +19,8 @@ import android.view.MenuItem;
  * in a {@link ProductListActivity}.
  */
 public class ProductDetailActivity extends AppCompatActivity {
-
+    private static final String LOG_TAG = ProductDetailActivity.class.getSimpleName();
+    private int mAction;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,19 +28,36 @@ public class ProductDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab_save = (FloatingActionButton) findViewById(R.id.fab_save);
+        fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Save", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 ProductDetailFragment productDetailFragment=(ProductDetailFragment)
                 getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
                 if(productDetailFragment!=null){
                     productDetailFragment.verificationAndsave();
-                    Log.i("prdDetActivity","no null fragment");
+                    Log.i(LOG_TAG,"no null fragment");
                 }else {
-                    Log.i("prdDetActivity","null fragment");
+                    Log.i(LOG_TAG,"null fragment");
+                }
+            }
+        });
+
+        FloatingActionButton fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
+        fab_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Delete", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
+                if(productDetailFragment!=null){
+                    productDetailFragment.deleteProduct();
+                    Log.i(LOG_TAG,"no null fragment");
+                }else {
+                    Log.i(LOG_TAG,"null fragment");
                 }
             }
         });
@@ -63,10 +81,21 @@ public class ProductDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(ProductDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(ProductDetailFragment.ARG_ITEM_ID));
+            arguments.putInt(ProductDetailFragment.ARG_ITEM_ID, getIntent().getIntExtra(ProductDetailFragment.ARG_ITEM_ID,0));
+            mAction= getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION,ProductDetailFragment.PRODUCT_SELECTION);
+            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION,mAction);
+
             ProductDetailFragment fragment = new ProductDetailFragment();
             fragment.setArguments(arguments);
+            if(mAction==ProductDetailFragment.PRODUCT_NEW){
+                fab_delete.setVisibility(View.GONE);
+                fab_save.setVisibility(View.VISIBLE);
+            }else {
+                fab_delete.setVisibility(View.VISIBLE);
+                fab_save.setVisibility(View.VISIBLE);
+            }
+
+            Log.i(LOG_TAG,"PRODUCT_ACTION"+ getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION,ProductDetailFragment.PRODUCT_SELECTION));
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.product_detail_container, fragment)
                     .commit();

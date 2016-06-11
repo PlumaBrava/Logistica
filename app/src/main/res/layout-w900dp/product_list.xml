@@ -22,6 +22,7 @@
         android:id="@+id/product_list"
         android:name="com.nextnut.logistica.ProductListFragment"
         android:layout_width="@dimen/item_width"
+        android:layout_weight="3"
         android:layout_height="match_parent"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"

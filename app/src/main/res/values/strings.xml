@@ -23,5 +23,9 @@
     <string name="product_photo_text">Picture</string>
     <string name="product_description_text">Description:</string>
     <string name="product_description_hint_text">Product Description</string>
+    <string name="detail_icon_transition_name" translatable="false">TN_DetailName</string>
+    <string name="detail_icon_transition_price" translatable="false">TN_DetailPrice</string>
+    <string name="detail_icon_transition_imagen" translatable="false">TN_DetailIcon</string>
+    <string name="pruductDetailBar_NEW_PRODUCT" translatable="false">New Product</string>
 
 </resources>

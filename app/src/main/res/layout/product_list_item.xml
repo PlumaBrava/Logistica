@@ -27,7 +27,7 @@
         android:layout_margin="@dimen/text_margin"
         android:maxHeight="96dp"
         android:maxWidth="96dp"
-
+        android:transitionName="@string/detail_icon_transition_name"
         android:layout_gravity="center_vertical"/>
 
     <LinearLayout

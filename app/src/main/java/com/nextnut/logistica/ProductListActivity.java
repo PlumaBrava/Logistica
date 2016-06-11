@@ -1,17 +1,24 @@
 package com.nextnut.logistica;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,12 +30,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.TextView;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 
 import android.view.MenuItem;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
 
@@ -51,25 +63,88 @@ import java.util.ArrayList;
 public class ProductListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = ProductListActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 0;
+    private int mItem=0;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "ProductList Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.nextnut.logistica/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "ProductList Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.nextnut.logistica/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemClicked(int id, ProductCursorAdapter.ViewHolder vh);
+    }
+
     private ProductCursorAdapter mCursorAdapter;
+
 
     private ItemTouchHelper mItemTouchHelper;
 
-    Products[] products ={
-            new Products("Mercury","imagen 1",1.2),
-            new Products("Venus", "imagen 2",2.5),
-            new Products("Earth", "imagen 3",3.31),
-            new Products("Mars", "imagen 4",4.44),
-            new Products("Ceres", "imagen 5",5.55),
-            new Products("Jupiter", "imagen 6",6.66),
-            new Products("Saturn", "imagen 7",7.77),
-            new Products("Uranus", "imagen 8",8.88),
-            new Products("Neptune", "imagen 9",9.99),
-            new Products("Pluto", "imagen 10",10.10),
-            new Products("Eris", "imagen 11",11.11)
+    Products[] products = {
+            new Products("Mercury", "imagen 1", 1.2),
+            new Products("Venus", "imagen 2", 2.5),
+            new Products("Earth", "imagen 3", 3.31),
+            new Products("Mars", "imagen 4", 4.44),
+            new Products("Ceres", "imagen 5", 5.55),
+            new Products("Jupiter", "imagen 6", 6.66),
+            new Products("Saturn", "imagen 7", 7.77),
+            new Products("Uranus", "imagen 8", 8.88),
+            new Products("Neptune", "imagen 9", 9.99),
+            new Products("Pluto", "imagen 10", 10.10),
+            new Products("Eris", "imagen 11", 11.11)
     };
     private RecyclerView recyclerView;
-    ;
+    private FloatingActionButton fab_new;
+    private FloatingActionButton fab_save;
+    private FloatingActionButton fab_delete;
+
     private ArrayList<ContentProviderOperation> batchOperations;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -87,36 +162,134 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+
+        fab_new = (FloatingActionButton) findViewById(R.id.fab_new);
+        fab_new.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "New Product", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 //                Context context = getContext();
-                        Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
-                        intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, "New Product");
-
-                        startActivity(intent);
+                Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
+                intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, 0);
+                intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_NEW);
+                Log.i(LOG_TAG,"PRODUCT_MODIFICACION"+ false);
+                fab_new.setVisibility(View.VISIBLE);
+                fab_save.setVisibility(View.GONE);
+                fab_delete.setVisibility(View.GONE);
+                startActivity(intent);
             }
         });
+
+        fab_save = (FloatingActionButton) findViewById(R.id.fab_save);
+        fab_save.setVisibility(View.GONE);
+                fab_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Save product", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
+                if(productDetailFragment!=null){
+                    productDetailFragment.verificationAndsave();
+                    fab_new.setVisibility(View.VISIBLE);
+                    fab_save.setVisibility(View.GONE);
+                    fab_delete.setVisibility(View.GONE);
+                    Log.i(LOG_TAG,"no null fragment");
+                }else {
+                    Log.i(LOG_TAG,"null fragment");
+                }
+            }
+
+        });
+
+        fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
+        fab_delete.setVisibility(View.GONE);
+        fab_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Delete Product", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
+                if(productDetailFragment!=null){
+                    productDetailFragment.deleteProduct();
+                    fab_new.setVisibility(View.VISIBLE);
+                    fab_save.setVisibility(View.GONE);
+                    fab_delete.setVisibility(View.GONE);
+                    Log.i(LOG_TAG,"no null fragment");
+                }else {
+                    Log.i(LOG_TAG,"null fragment");
+                }
+            }
+        });
+
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         View emptyView = findViewById(R.id.recyclerview_product_empty);
-        recyclerView = (RecyclerView)findViewById(R.id.product_list);
-//        assert recyclerView != null;
-//        setupRecyclerView((RecyclerView) recyclerView);
+        recyclerView = (RecyclerView) findViewById(R.id.product_list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+
+        mCursorAdapter = new ProductCursorAdapter(this, null, emptyView, new ProductCursorAdapter.ProductCursorAdapterOnClickHandler() {
+
+            @Override
+            public void onClick(int id, ProductCursorAdapter.ViewHolder vh) {
+                Log.i("ProductListActivity", "clicked id: " + id);
+                Log.i("ProductListActivity", "mTwoPane: " + mTwoPane);
 
 
-//        **************************
-//        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.productos_list);
-        recyclerView.setLayoutManager(
-                new LinearLayoutManager(recyclerView.getContext()));
+                if (mTwoPane) {
+                    Bundle arguments = new Bundle();
+                    mItem=id; // when rotate the screen the selecction of the second Screen is conserved.
+                    arguments.putInt(ProductDetailFragment.ARG_ITEM_ID, id);
+                    arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
 
-        mCursorAdapter = new ProductCursorAdapter(this, null,emptyView);
+                    ProductDetailFragment fragment = new ProductDetailFragment();
+                    fragment.setArguments(arguments);
+                    getSupportFragmentManager().beginTransaction()
+
+//                            .setTransition(R.anim.slide_in_left)
+//
+//                            .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                            .addToBackStack(null)
+                            .replace(R.id.product_detail_container, fragment)
+                            .commit();
+//                    animateViewsIn();
+
+                    fab_new.setVisibility(View.GONE);
+                    fab_save.setVisibility(View.VISIBLE);
+                    fab_delete.setVisibility(View.VISIBLE);
+
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
+                    intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
+                    intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, id);
+                    fab_new.setVisibility(View.VISIBLE);
+                    fab_save.setVisibility(View.GONE);
+                    fab_delete.setVisibility(View.GONE);
+//                intent.putExtra("DESCRIPCION_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
+//                intent.putExtra("IMAGEN_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
+//                intent.putExtra("PRECIO_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Log.i("ProductListActivity", "makeSceneTransitionAnimation");
+//                        Pair<View,String> p= new Pair<View, String>(vh.mphotoProducto, getString(R.string.detail_icon_transition_name));
+                        Pair<View, String> p1 = Pair.create((View) vh.mphotoProducto, getString(R.string.detail_icon_transition_imagen));
+                        Pair<View, String> p2 = Pair.create((View) vh.mTextViewPrecio, getString(R.string.detail_icon_transition_price));
+                        Pair<View, String> p3 = Pair.create((View) vh.mTextViewNombre, getString(R.string.detail_icon_transition_name));
+                        ActivityOptionsCompat activityOptions =
+                                ActivityOptionsCompat.makeSceneTransitionAnimation(ProductListActivity.this,   p1,p2,p3);
+                        startActivity(intent, activityOptions.toBundle());
+
+                    } else {
+                        Log.i("ProductListActivity", "makeSceneTransitionAnimation Normal");
+                        startActivity(intent);
+                    }
+                }
+            }
+        });
         recyclerView.setAdapter(mCursorAdapter);
 
 
@@ -128,13 +301,59 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
 
-//        **************************
+
         if (findViewById(R.id.product_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
+
+
+            Bundle arguments = new Bundle();
+            arguments.putInt(ProductDetailFragment.ARG_ITEM_ID, mItem);// Fragmet load de last ID.
+            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_DOUBLE_SCREEN);
+            Log.i(LOG_TAG,"PRODUCT_MODIFICACION"+ false);
+            ProductDetailFragment fragment = new ProductDetailFragment();
+            fragment.setArguments(arguments);
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.product_detail_container, fragment)
+                    .commit();
+//            animateViewsIn();
+        }
+
+//        **************************
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+
+
+    private void animateViewsIn() {
+        ViewGroup root = (ViewGroup) findViewById(R.id.product_detail_container);
+        int count = root.getChildCount();
+        float offset = getResources().getDimensionPixelSize(R.dimen.offset_y);
+        Interpolator interpolator =
+                AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in);
+
+        // loop over the children setting an increasing translation y but the same animation
+        // duration + interpolation
+        for (int i = 0; i < count; i++) {
+            View view = root.getChildAt(i);
+            view.setVisibility(View.VISIBLE);
+            view.setTranslationY(offset);
+            view.setAlpha(0.85f);
+            // then animate back to natural position
+            view.animate()
+                    .translationY(0f)
+                    .alpha(1f)
+                    .setInterpolator(interpolator)
+                    .setDuration(1000L)
+                    .start();
+            // increase the offset distance for the next view
+            offset *= 1.5f;
         }
     }
 
@@ -167,7 +386,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        Cursor c =this.getContentResolver().query(LogisticaProvider.Products.CONTENT_URI,
+        Cursor c = this.getContentResolver().query(LogisticaProvider.Products.CONTENT_URI,
                 null, null, null, null);
 
         if (c == null || c.getCount() == 0) {
@@ -175,16 +394,15 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 //            insertData();
         }
 
-        getSupportLoaderManager().initLoader(CURSOR_LOADER_ID,null,this);
+        getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         super.onPostCreate(savedInstanceState);
     }
 
 
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this,LogisticaProvider.Products.CONTENT_URI,
+        return new CursorLoader(this, LogisticaProvider.Products.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -203,9 +421,6 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
     }
 
 
-
-
-
     public void insertData() {
         Log.d(LOG_TAG, "insert");
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(products.length);
@@ -220,7 +435,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
         }
 
         try {
-            this.getContentResolver().applyBatch( LogisticaProvider.AUTHORITY, batchOperations);
+            this.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
         } catch (RemoteException | OperationApplicationException e) {
             Log.e(LOG_TAG, "Error applying batch insert", e);
         }

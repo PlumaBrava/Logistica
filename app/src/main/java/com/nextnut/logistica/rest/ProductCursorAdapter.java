@@ -25,6 +25,8 @@ import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.swipe_helper.*;
 import com.squareup.picasso.Picasso;
 
+import java.text.NumberFormat;
+
 //import com.sam_chordas.android.schematicplanets.R;
 //import com.sam_chordas.android.schematicplanets.data.ArchivedPlanetColumns;
 //import com.sam_chordas.android.schematicplanets.data.PlanetColumns;
@@ -40,29 +42,35 @@ import com.squareup.picasso.Picasso;
  */
 
 public class ProductCursorAdapter extends CursorRecyclerViewAdapter<ProductCursorAdapter.ViewHolder>
-implements ItemTouchHelperAdapter, View.OnClickListener{
+implements ItemTouchHelperAdapter{
 //    final private ForecastAdapterOnClickHandler mClickHandler ;
     Context mContext;
     ViewHolder mVh;
-    private View.OnClickListener listener;
-    public ProductCursorAdapter(Context context, Cursor cursor,View empltyView){
+    final private ProductCursorAdapterOnClickHandler mClickHandler;
+
+//    private View.OnClickListener listener;
+    public ProductCursorAdapter(Context context, Cursor cursor,View empltyView,ProductCursorAdapterOnClickHandler dh){
         super(context, cursor,empltyView);
         mContext = context;
+        mClickHandler = dh;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder
-    implements ItemTouchHelperViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder
+    implements ItemTouchHelperViewHolder, View.OnClickListener {
+        public int mcursorId ;
+        public String mphotString;
         public ImageView mphotoProducto;
         public TextView mTextViewNombre;
         public TextView mTextViewPrecio;
         public TextView mTextViewDescition;
 
 
-
-//        public CircleImageView mImageview;
-        public ViewHolder(View view){
+        //        public CircleImageView mImageview;
+        public ViewHolder(View view) {
             super(view);
-            mphotoProducto=(ImageView)view.findViewById(R.id.photoProducto);
+            view.setOnClickListener(this);
+
+            mphotoProducto = (ImageView) view.findViewById(R.id.photoProducto);
             mTextViewNombre = (TextView) view.findViewById(R.id.nombreProducto);
             mTextViewPrecio = (TextView) view.findViewById(R.id.precioProducto);
             mTextViewDescition = (TextView) view.findViewById(R.id.descriptionProducto);
@@ -74,51 +82,58 @@ implements ItemTouchHelperAdapter, View.OnClickListener{
 
         @Override
         public void onItemSelected() {
-            Log.i("TouchHelper:","Adapter onItemSelected(): ");
+            Log.i("TouchHelper:", "Adapter onItemSelected(): ");
             itemView.setBackgroundColor(Color.LTGRAY);
         }
 
         @Override
         public void onItemClear() {
 
-            Log.i("TouchHelper:","Adapter onItemClear(): ");
+            Log.i("TouchHelper:", "Adapter onItemClear(): ");
             itemView.setBackgroundColor(0);
         }
-    }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.product_list_item, parent, false);
+        @Override
+        public void onClick(View view) {
 
-        itemView.setOnClickListener(this);
-        ViewHolder vh = new ViewHolder(itemView);
-        mVh = vh;
-        return vh;
-    }
-
-    public void setOnClickListener(View.OnClickListener listener) {
-        this.listener = listener;
-    }
-
-    @Override
-    public void onClick(View view) {
-        view.get
-        if(listener != null)
-            listener.onClick(view);
-        boolean isRed=isRed= !true;
-        final int radius =(int)Math.hypot(view.getWidth()/2,view.getHeight()/2);
-        view.setBackgroundColor(Color.RED);
-        if(isRed){
-            view.setBackgroundColor(Color.GRAY);
-
-        } else {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                Animator anim =ViewAnimationUtils.createCircularReveal(view,view.getWidth()/2,view.getHeight()/2,0,radius);
-                view.setBackgroundColor(Color.GREEN);
-                anim.start();
-            }
+            Log.i("onClick", "onClick " + getPosition() + " " + getAdapterPosition());
+            Log.i("onClick", "cursorID " + mcursorId);
+            Log.i("onClick", "PhotoString " + mphotString);
+            mClickHandler.onClick(mcursorId, this);
+//            if(listener != null)
+//                listener.onClick(view);
+//            boolean isRed = isRed = !true;
+//            final int radius = (int) Math.hypot(view.getWidth() / 2, view.getHeight() / 2);
+//            view.setBackgroundColor(Color.RED);
+//            if (isRed) {
+//                view.setBackgroundColor(Color.GRAY);
+//
+//            } else {
+//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+//                    Animator anim = ViewAnimationUtils.createCircularReveal(view, view.getWidth() / 2, view.getHeight() / 2, 0, radius);
+//                    view.setBackgroundColor(Color.GREEN);
+//                    anim.start();
+//                }
+//            }
         }
+    }
+
+            @Override
+            public ViewHolder onCreateViewHolder (ViewGroup parent,int viewType){
+                View itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.product_list_item, parent, false);
+
+//                itemView.setOnClickListener(mContext);
+                ViewHolder vh = new ViewHolder(itemView);
+                mVh = vh;
+                return vh;
+            }
+
+
+//    public void setOnClickListener(View.OnClickListener listener) {
+//        this.listener = listener;
+//    }
+
 
 //        Log.i("TouchHelper:","Adapter onItemDismiss ");
 ////        long cursorId = getItemId(mVh.getChildPosition(view));
@@ -142,31 +157,28 @@ implements ItemTouchHelperAdapter, View.OnClickListener{
 //                null, null);
 //        mContext.getContentResolver().insert(PlanetProvider.ArchivedPlanets.withId(cursorId),
 //                cv);
-        notifyDataSetChanged();
-    }
 
-    @Override
-    public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor){
-        DatabaseUtils.dumpCursor(cursor);
+            @Override
+            public void onBindViewHolder (ViewHolder viewHolder, Cursor cursor){
+                DatabaseUtils.dumpCursor(cursor);
+                viewHolder.mcursorId=cursor.getInt(cursor.getColumnIndex(ProductsColumns._ID_PRODUCTO));
+                viewHolder.mphotString=cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO));
+                Picasso.with(viewHolder.mphotoProducto.getContext())
 
-    Picasso.with(viewHolder.mphotoProducto.getContext())
+                        .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
+                        .resize(96, 96)
+                        .placeholder(R.drawable.art_clear)
+                        .centerCrop()
+                        .into(viewHolder.mphotoProducto);
 
-             .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
-            .resize(96, 96)
-            .placeholder(R.drawable.art_clear)
-            .centerCrop()
-            .into(viewHolder.mphotoProducto);
+                viewHolder.mTextViewNombre.setText(cursor.getString(cursor.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
+                NumberFormat format = NumberFormat.getCurrencyInstance();
 
-        viewHolder.mTextViewNombre.setText(cursor.getString(cursor.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
-        viewHolder.mTextViewPrecio.setText(cursor.getString(cursor.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
-        viewHolder.mTextViewDescition.setText(cursor.getString(cursor.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-
-
-
+                viewHolder.mTextViewPrecio.setText(format.format(cursor.getDouble(cursor.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO))));
+                viewHolder.mTextViewDescition.setText(cursor.getString(cursor.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
 
 
-
-    }
+            }
 
 //        viewHolder.mImageview.setImageResource(cursor.getInt(cursor.getColumnIndex(
 //                                PlanetColumns.IMAGE_RESOURCE)));
@@ -182,33 +194,38 @@ implements ItemTouchHelperAdapter, View.OnClickListener{
 //        void onClick( ProductCursorAdapter vh);
 //    }
 
-    @Override
-    public void onItemDismiss(int position) {
-        Log.i("TouchHelper:","Adapter onItemDismiss ");
-        long cursorId = getItemId(position);
-        Cursor c = getCursor();
-        ContentValues cv = new ContentValues();
-        cv.put(ProductsColumns._ID_PRODUCTO,c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
-        cv.put(ProductsColumns.DESCRIPCION_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-        cv.put(ProductsColumns.IMAGEN_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
-        cv.put(ProductsColumns.PRECIO_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
 
-        Intent intent=new Intent(mContext,ProductDetailActivity.class);
-        intent.putExtra("PRODUCT_MODIFICACION",true);
-        intent.putExtra("_ID_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
-        intent.putExtra("DESCRIPCION_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-        intent.putExtra("IMAGEN_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
-        intent.putExtra("PRECIO_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+    public static interface ProductCursorAdapterOnClickHandler {
+        void onClick(int id, ViewHolder vh);
+    }
 
-        mContext.startActivity(intent);
+            @Override
+            public void onItemDismiss ( int position){
+                Log.i("TouchHelper:", "Adapter onItemDismiss ");
+                long cursorId = getItemId(position);
+                Cursor c = getCursor();
+                ContentValues cv = new ContentValues();
+                cv.put(ProductsColumns._ID_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
+                cv.put(ProductsColumns.DESCRIPCION_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
+                cv.put(ProductsColumns.IMAGEN_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
+                cv.put(ProductsColumns.PRECIO_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+
+                Intent intent = new Intent(mContext, ProductDetailActivity.class);
+                intent.putExtra("PRODUCT_MODIFICACION", true);
+                intent.putExtra("_ID_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
+                intent.putExtra("DESCRIPCION_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
+                intent.putExtra("IMAGEN_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
+                intent.putExtra("PRECIO_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+
+                mContext.startActivity(intent);
 
 //        mContext.getContentResolver().delete(PlanetProvider.Planets.withId(cursorId),
 //                null, null);
 //        mContext.getContentResolver().insert(PlanetProvider.ArchivedPlanets.withId(cursorId),
 //                cv);
-        notifyDataSetChanged();
+                notifyDataSetChanged();
 //        notifyItemRemoved(position);
+            }
+
+
     }
-
-
-}
