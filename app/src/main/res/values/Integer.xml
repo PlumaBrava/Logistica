@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="productoNameMaxLength" >15</integer>
+    <integer name="productoPriceMaxLength" >15</integer>
+    <integer name="productoDescritionMaxLength" >20</integer>
+
+    </resources>

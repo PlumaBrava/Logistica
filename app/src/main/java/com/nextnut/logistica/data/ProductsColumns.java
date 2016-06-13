@@ -23,4 +23,5 @@ public class ProductsColumns {
 
     @DataType(DataType.Type.TEXT)
     public static final String NOMBRE_PRODUCTO = "nombreProducto";
+
 }

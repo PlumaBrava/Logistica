@@ -27,5 +27,18 @@
     <string name="detail_icon_transition_price" translatable="false">TN_DetailPrice</string>
     <string name="detail_icon_transition_imagen" translatable="false">TN_DetailIcon</string>
     <string name="pruductDetailBar_NEW_PRODUCT" translatable="false">New Product</string>
+    <string name="productoNameMaxLength" translatable="false">New Product</string>
+    <string name="productoPriceMaxLength" translatable="false">New Product</string>
+
+
+        <!--Verifications Message In Product-->
+    <string name="theproducNametExist" translatable="true">The product already Exist</string>
+    <string name="theproducNametcantbenull" translatable="true">The product cant not be null</string>
+    <string name="theproductNameToLong" translatable="true">The product name is too long</string>
+
+    <string name="theproductdesccantbenull" translatable="true">Description can not be null</string>
+    <string name="theproductdescToLong" translatable="true">Descrition name is too long</string>
+
+    <string name="priceError" translatable="true">The price must be > 0 </string>
 
 </resources>

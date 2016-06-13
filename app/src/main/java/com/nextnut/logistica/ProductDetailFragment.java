@@ -9,8 +9,6 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Environment;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -23,11 +21,9 @@ import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,10 +32,10 @@ import android.widget.TextView;
 
 import com.nextnut.logistica.Util.CurrencyToDouble;
 import com.nextnut.logistica.Util.NumberTextWatcher;
-import com.nextnut.logistica.data.LogisticaDataBase;
+import com.nextnut.logistica.Util.DialogAlerta;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
-import com.nextnut.logistica.dummy.DummyContent;
+import com.nextnut.logistica.Util.YesNoDialog;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -57,7 +53,7 @@ import java.util.Date;
  * in two-pane mode (on tablets) or a {@link ProductDetailActivity}
  * on handsets.
  */
-public class ProductDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class ProductDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, YesNoDialog.EditNameDialogListener {
 
 
     /**
@@ -75,21 +71,23 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     private static final int NAME_PRODUCT_LOADER = 2;
     private static final String LOG_TAG = ProductDetailFragment.class.getSimpleName();
 
-    /**
-     * The dummy content this fragment is presenting.
-     */
-//    private DummyContent.DummyItem mItem;
-    private int mItem=0;
+
+    private int mItem = 0;
     private TextView mProductId;
     private EditText mProductName;
     private EditText mProductPrice;
     private EditText mProductDescription;
-    private ImageView mImageProducto;
-    private int mAction;
-    String mCurrentPhotoPath=null;
     private Button button;
+    private ImageView mImageProducto;
+    String mCurrentPhotoPath = null;
+
+
+    private int mAction;
+
+
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1888;
     private static final int REQUEST_IMAGE_GET = 1889;
+
     CollapsingToolbarLayout appBarLayout;
 
 
@@ -105,27 +103,24 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
-//            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+
             mItem = getArguments().getInt(ARG_ITEM_ID);
-            Log.i(LOG_TAG,"ARG_ITEM_ID:"+ mItem);
+            Log.i(LOG_TAG, "ARG_ITEM_ID:" + mItem);
             Activity activity = this.getActivity();
             appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
 
 
             if (appBarLayout != null) {
-                if (mAction==PRODUCT_NEW) {
+                if (mAction == PRODUCT_NEW) {
                     appBarLayout.setTitle(getResources().getString(R.string.pruductDetailBar_NEW_PRODUCT));
-                } else {appBarLayout.setTitle("TITLE");}
+                }
             }
 
         }
-//        if (getArguments().containsKey(PRODUCT_MODIFICACION)) {
-            mAction=getArguments().getInt(PRODUCT_ACTION);
-            Log.i(LOG_TAG,"PRODUCT_ACTION"+ mAction);
-//        }
+        if (getArguments().containsKey(PRODUCT_ACTION)) {
+            mAction = getArguments().getInt(PRODUCT_ACTION);
+            Log.i(LOG_TAG, "PRODUCT_ACTION" + mAction);
+        }
     }
 
     @Override
@@ -135,141 +130,82 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
 
         mProductId = (TextView) rootView.findViewById(R.id.product_Id_text);
         mProductName = (EditText) rootView.findViewById(R.id.product_name_text);
-        Log.i(LOG_TAG,"OnEditorActionListener check10");
+        Log.i(LOG_TAG, "OnEditorActionListener existeProductName test10");
         mProductName.addTextChangedListener(new TextWatcher() {
                                                 public void afterTextChanged(Editable s) {
-                                                    Log.i(LOG_TAG,"OnEditorActionListener afterTextChanged s: "+s.toString());
-
-
+                                                    Log.i(LOG_TAG, "OnEditorActionListener afterTextChanged s: " + s.toString());
                                                 }
 
                                                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                                                    Log.i(LOG_TAG,"OnEditorActionListener beforeTextChanged s:"+s.toString());
-                                                    Log.i(LOG_TAG,"OnEditorActionListener beforeTextChanged, start: "+start);
-                                                    Log.i(LOG_TAG,"OnEditorActionListener beforeTextChanged, after:"+after);
-        /*This method is called to notify you that, within s, the count characters beginning at start are about to be replaced by new text with length after. It is an error to attempt to make changes to s from this callback.*/
                                                 }
 
                                                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                                                    Log.i(LOG_TAG,"OnEditorActionListener onTextChanged s:"+s.toString());
-                                                    Log.i(LOG_TAG,"OnEditorActionListener onTextChanged, start: "+start);
-                                                    Log.i(LOG_TAG,"OnEditorActionListener onTextChanged, before: "+before);
-                                                    Log.i(LOG_TAG,"OnEditorActionListener onTextChanged, count:"+count);
-                                                    Boolean modifyText=false;
+                                                    Boolean modifyText = false;
                                                     StringBuilder b = new StringBuilder();
 
-                                                    for(int i =0 ; i < s.length(); i++) {
-                                                        if(s.charAt(i)=='\n'){
-                                                            Log.i(LOG_TAG,"OnEditorActionListener onTextChanged, Enter detected");
-                                                            modifyText=true;
-                                                        }
-                                                        else {
+
+                                                    for (int i = 0; i < s.length(); i++) {
+                                                        if (s.charAt(i) == '\n') {
+                                                            Log.i(LOG_TAG, "OnEditorActionListener onTextChanged,-existeProductName Enter detected");
+                                                            modifyText = true;
+                                                        } else {
                                                             b.append(s.charAt(i));
                                                         }
 
-                                                        if (modifyText){
-                                                                        // hide keyboard before calling the done action
-            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
-                    Context.INPUT_METHOD_SERVICE);
-            View view = getActivity().getCurrentFocus();
-            if (view != null) {
-                inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            }
+                                                        if (modifyText) {
+                                                            // hide keyboard before calling the done action
+                                                            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
+                                                                    Context.INPUT_METHOD_SERVICE);
+                                                            View view = getActivity().getCurrentFocus();
+                                                            if (view != null) {
+                                                                inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                                                            }
+                                                            verifyName(b.toString());
 
-                                                            checkProductName(b.toString());
                                                             mProductName.setText(b.toString());
                                                         }
-
-
-
-
-                                                   }
+                                                    }
                                                 }
                                             }
-            );
-
-//        mProductName.setOnKeyListener(new View.OnKeyListener() {
-//
-////
-////            // hide keyboard before calling the done action
-////            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
-////                    Context.INPUT_METHOD_SERVICE);
-////            View view = getActivity().getCurrentFocus();
-////            if (view != null) {
-////                inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-////            }
-//
-//
-//            @Override
-//            public boolean onKey(View v, int actionId,
-//                                          KeyEvent event) {
-//                Log.i(LOG_TAG,"OnEditorActionListener TextView v"+v.toString());
-//                Log.i(LOG_TAG,"OnEditorActionListener actionId: "+actionId);
-//                Log.i(LOG_TAG,"OnEditorActionListener event"+event.toString());
-//                boolean handled = false;
-//                if (actionId == EditorInfo.IME_ACTION_DONE || event != null && (event.getAction() == KeyEvent.ACTION_DOWN &&
-//                        event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-//                    Log.i(LOG_TAG,"OnEditorActionListener KEYCODE_ENTER");
-//                        return true;
-//                    }
-//
-//                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-//                    Log.i(LOG_TAG,"OnEditorActionListener KEYCODE_ENTER");
-//                    handled = true;
-//                }
-//                return handled;
-//            }
-//        });
+        );
 
 
         mProductPrice = (EditText) rootView.findViewById(R.id.product_price);
 
         mProductPrice.addTextChangedListener(new NumberTextWatcher(mProductPrice));
         mProductDescription = (EditText) rootView.findViewById(R.id.product_description);
-        Log.i(LOG_TAG,"checkProductName, Enter chck2");
-        Log.i(LOG_TAG,"checkProductName, Enter detected");
+
         mProductDescription.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
-            Log.i(LOG_TAG,"OnEditorActionListener afterTextChanged s: "+s.toString());
-             }
+                Log.i(LOG_TAG, "OnEditorActionListener afterTextChanged s: " + s.toString());
+            }
+
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                                                           Log.i(LOG_TAG,"OnEditorActionListener beforeTextChanged s:"+s.toString());
-                                                           Log.i(LOG_TAG,"OnEditorActionListener beforeTextChanged, start: "+start);
-                                                           Log.i(LOG_TAG,"OnEditorActionListener beforeTextChanged, after:"+after);
-        /*This method is called to notify you that, within s, the count characters beginning at start are about to be replaced by new text with length after. It is an error to attempt to make changes to s from this callback.*/
             }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.i(LOG_TAG,"OnEditorActionListener onTextChanged s:"+s.toString());
-                Log.i(LOG_TAG,"OnEditorActionListener onTextChanged, start: "+start);
-                Log.i(LOG_TAG,"OnEditorActionListener onTextChanged, before: "+before);
-                Log.i(LOG_TAG,"OnEditorActionListener onTextChanged, count:"+count);
-                Boolean modifyText=false;
+                Boolean modifyText = false;
                 StringBuilder b = new StringBuilder();
-                Log.i(LOG_TAG,"checkProductName, onTextChanged");
-                    for(int i =0 ; i < s.length(); i++) {
-                    Log.i(LOG_TAG,"jj, "+i);
-                       if(s.charAt(i)=='\n'){
-                         modifyText=true;
-                         Log.i(LOG_TAG,"OnEditorActionListener onTextChanged, Enter detected");
-                         Log.i(LOG_TAG,"jj, Enter detected");
-                       }
-                       else {
+                Log.i(LOG_TAG, "existeProductName, onTextChanged");
+                for (int i = 0; i < s.length(); i++) {
+                    if (s.charAt(i) == '\n') {
+                        modifyText = true;
+                        Log.i(LOG_TAG, "OnEditorActionListener onTextChanged, Enter detected");
+                    } else {
                         b.append(s.charAt(i));
-                        }
                     }
-                    if (modifyText){
-                    Log.i(LOG_TAG,"OnEditorActionListener onTextChanged, Enter Modify");
-                     // hide keyboard before calling the done action
-                        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                          View view = getActivity().getCurrentFocus();
-                          if (view != null) {
-                          inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-                          }
-                          checkProductName(b.toString());
-                          mProductDescription.setText(b.toString());
+                }
+                if (modifyText) {
+                    Log.i(LOG_TAG, "OnEditorActionListener onTextChanged, Enter Modify");
+                    // hide keyboard before calling the done action
+                    InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    View view = getActivity().getCurrentFocus();
+                    if (view != null) {
+                        inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     }
+                    isDescriptionMaxLengthCorrect(b.toString());
+                    mProductDescription.setText(b.toString());
+                }
             }
         });
         mImageProducto = ((ImageView) rootView.findViewById(R.id.product_imagen));
@@ -277,23 +213,23 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
         // Show the dummy content as text in a TextView.
 
 
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    selectImage();
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectImage();
 
 
-                }
-
-            });
-
-            if(mCurrentPhotoPath==null) {
-                Log.i("prdDetFrament","mCurrentPhotoPath=null");
-                mImageProducto.setImageResource(R.drawable.art_clear);
-            }else {
-                Log.i("prdDetFrament","mCurrentPhotoPath!=null");
             }
-        if (mAction==PRODUCT_NEW) {
+
+        });
+
+        if (mCurrentPhotoPath == null) {
+            Log.i("prdDetFrament", "mCurrentPhotoPath=null");
+            mImageProducto.setImageResource(R.drawable.art_clear);
+        } else {
+            Log.i("prdDetFrament", "mCurrentPhotoPath!=null");
+        }
+        if (mAction == PRODUCT_NEW) {
             if (appBarLayout != null) {
                 appBarLayout.setTitle(getResources().getString(R.string.pruductDetailBar_NEW_PRODUCT));
             }
@@ -301,49 +237,24 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
         }
 
 
-
         return rootView;
     }
 
-    public boolean checkProductName (String productName){
-
-        Log.e(LOG_TAG, "jj");
-
-        String select = "((" + ProductsColumns.NOMBRE_PRODUCTO + " NOTNULL) AND ("
-                + ProductsColumns.NOMBRE_PRODUCTO+ " =?))";
-
-
-        String projection []= {ProductsColumns.NOMBRE_PRODUCTO, "sum("+ ProductsColumns.PRECIO_PRODUCTO
-                + " * " + ProductsColumns.PRECIO_PRODUCTO
-                +")"};
-        String arg[]={productName};
-
-        Cursor c=getActivity().getContentResolver().query(LogisticaProvider.Products.CONTENT_URI,
-                null,
-                select,
-                arg,
-                null);
-
-        Log.e(LOG_TAG, "jj Cursor:"+ c.getCount());
-
-        return true;
-    }
 
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
         switch (mAction) {
-            case  PRODUCT_DOUBLE_SCREEN:
-                if( mItem == 0) {
-                Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-default DETAIL_PRODUCT_LOADER");
-                getLoaderManager().initLoader(DEFAULT_DETAIL_PRODUCT_LOADER, null, this);
+            case PRODUCT_DOUBLE_SCREEN:
+                if (mItem == 0) {
+                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-default DETAIL_PRODUCT_LOADER");
+                    getLoaderManager().initLoader(DEFAULT_DETAIL_PRODUCT_LOADER, null, this);
+                } else {
+                    getLoaderManager().initLoader(DETAIL_PRODUCT_LOADER, null, this);
+                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-DETAIL_PRODUCT_LOADER");
                 }
-                else {
-                getLoaderManager().initLoader(DETAIL_PRODUCT_LOADER, null, this);
-                Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-DETAIL_PRODUCT_LOADER");
-                }
-            break;
+                break;
             case PRODUCT_SELECTION:
                 getLoaderManager().initLoader(DETAIL_PRODUCT_LOADER, null, this);
                 Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
@@ -358,10 +269,85 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     }
 
 
+
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("FragmentAlertDialog", "onActivityResul -requestCode:" + requestCode + "-resultCode:" + resultCode);
+
+        if (resultCode == Activity.RESULT_OK) {
+
+            if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+
+
+                Bitmap bmp = (Bitmap) data.getExtras().get("data");
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+
+                // convert byte array to Bitmap
+
+                Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
+                        byteArray.length);
+
+
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                String filename = "Product_" + timeStamp;
+
+                File file = new File(getContext().getFilesDir(), filename);
+
+                FileOutputStream outputStream;
+
+                try {
+                    outputStream = getContext().openFileOutput(filename, Context.MODE_PRIVATE);
+//                    outputStream.write(string.getBytes());
+                    outputStream.write(byteArray);
+                    outputStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                mCurrentPhotoPath = "file:" + file.getAbsolutePath();
+
+                Picasso.with(getContext())
+                        .load(mCurrentPhotoPath)
+                        .placeholder(R.drawable.art_clear)
+                        .into(mImageProducto);
+
+//                mProductId.setText(mCurrentPhotoPath);
+
+
+            } else if (requestCode == REQUEST_IMAGE_GET) {
+                Bitmap bm = null;
+                if (data != null) {
+                    try {
+                        bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), data.getData());
+                        mCurrentPhotoPath = String.valueOf(data.getData());
+                        Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
+
+                        Picasso.with(getContext())
+                                .load(data.getData())
+                                .into(mImageProducto);
+
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String filename = "Product_"+timeStamp;
+        String filename = "Product_" + timeStamp;
         File file = new File(getContext().getFilesDir(), filename);
 
         // Save a file: path for use with ACTION_VIEW intents
@@ -370,154 +356,16 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     }
 
 
-
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-                if (resultCode == Activity.RESULT_OK) {
-
-                    if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-
-
-                        Bitmap bmp = (Bitmap) data.getExtras().get("data");
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-                        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        byte[] byteArray = stream.toByteArray();
-
-                        // convert byte array to Bitmap
-
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
-                                byteArray.length);
-
-
-                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                        String filename = "Product_" + timeStamp;
-
-                        File file = new File(getContext().getFilesDir(), filename);
-
-                        FileOutputStream outputStream;
-
-                        try {
-                            outputStream = getContext().openFileOutput(filename, Context.MODE_PRIVATE);
-//                    outputStream.write(string.getBytes());
-                            outputStream.write(byteArray);
-                            outputStream.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        mCurrentPhotoPath = "file:" + file.getAbsolutePath();
-
-                        Picasso.with(getContext())
-                                .load(mCurrentPhotoPath)
-                                .placeholder(R.drawable.art_clear)
-                                .into(mImageProducto);
-
-//                mProductId.setText(mCurrentPhotoPath);
-
-
-                    } else if (requestCode == REQUEST_IMAGE_GET) {
-                        Bitmap bm = null;
-                        if (data != null) {
-                            try {
-                                bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), data.getData());
-                                mCurrentPhotoPath = String.valueOf(data.getData());
-                                Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
-
-                                Picasso.with(getContext())
-                                        .load(data.getData())
-                                        .into(mImageProducto);
-
-
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                    }
-
-        }
-    }
-
-    public void deleteProduct() {
-
-        Log.i(LOG_TAG,"deleteProduct");
-        Log.i(LOG_TAG,"mAction"+mAction);
-        Log.i(LOG_TAG," mItem"+ mItem);
-        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-        if (mAction==PRODUCT_SELECTION && mItem!=0) {
-
-            Log.i(LOG_TAG,"entro");
-//            ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete();
-//            batchOperations.add(builder.build());
-            getActivity().getContentResolver().delete(
-                    LogisticaProvider.Products.withId(mItem), null, null);
-            getActivity().onBackPressed();
-        }
-
-    }
-
-    public void verificationAndsave() {
-
-    Log.i(LOG_TAG,"save");
-        if(verification()) {
-            ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-            if (mAction==PRODUCT_NEW && mItem==0) {
-
-
-                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.Products.CONTENT_URI);
-                builder.withValue(ProductsColumns.NOMBRE_PRODUCTO, mProductName.getText().toString());
-                builder.withValue(ProductsColumns.DESCRIPCION_PRODUCTO, mProductDescription.getText().toString());
-                builder.withValue(ProductsColumns.IMAGEN_PRODUCTO, mCurrentPhotoPath);
-                CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
-                builder.withValue(ProductsColumns.PRECIO_PRODUCTO,price.convert());
-                batchOperations.add(builder.build());
-            } else
-//            if      (mAction==PRODUCT_SAVE )
-            {
-
-
-                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.Products.withId(mItem));
-                builder.withValue(ProductsColumns.NOMBRE_PRODUCTO, mProductName.getText().toString());
-                builder.withValue(ProductsColumns.DESCRIPCION_PRODUCTO, mProductDescription.getText().toString());
-                builder.withValue(ProductsColumns.IMAGEN_PRODUCTO, mCurrentPhotoPath);
-                CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
-                builder.withValue(ProductsColumns.PRECIO_PRODUCTO,price.convert());
-                batchOperations.add(builder.build());
-
-            }
-
-            try {
-//
-//            getApplicationContext().getContentResolver().insert(
-//                    DistributionProvider.Productos.withId(_id), cv);
-                getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-            } catch (RemoteException | OperationApplicationException e) {
-                Log.e(LOG_TAG, "Error applying batch insert", e);
-            }
-            getActivity().onBackPressed();
-        }
-    }
-
-    public boolean verification(){
-
-        return true;
-    }
-
     private void selectImage() {
-        final CharSequence[] items = { "Take Photo", "Choose from Library",
-                "Cancel" };
+        final CharSequence[] items = {"Take Photo", "Choose from Library",
+                "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
 
-                Log.e(LOG_TAG, "dialog:"+dialog+" item: "+ item);
+                Log.e(LOG_TAG, "dialog:" + dialog + " item: " + item);
 //                boolean result=getContext().
 //                        Utility.checkPermission(this);
                 if (items[item].equals("Take Photo")) {
@@ -529,7 +377,8 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                     intent.setType("image/*");
                     if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                        startActivityForResult(intent, REQUEST_IMAGE_GET);}
+                        startActivityForResult(intent, REQUEST_IMAGE_GET);
+                    }
 
 //                    Intent intent = new Intent();
 //                    intent.setType("image/*");
@@ -549,24 +398,22 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     }
 
 
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.e(LOG_TAG, "onCreateLoader" +id);
+        Log.e(LOG_TAG, "onCreateLoader" + id);
         switch (id) {
             case DETAIL_PRODUCT_LOADER:
                 Log.e(LOG_TAG, "onCreateLoader-DETAIL_PRODUCT_LOADER");
 
-                    // Now create and return a CursorLoader that will take care of
-                    // creating a Cursor for the data being displayed.
-                    return new CursorLoader(
-                            getActivity(),
-                            LogisticaProvider.Products.withId(mItem),
-                            null,
-                            null,
-                            null,
-                            null);
-
+                // Now create and return a CursorLoader that will take care of
+                // creating a Cursor for the data being displayed.
+                return new CursorLoader(
+                        getActivity(),
+                        LogisticaProvider.Products.withId(mItem),
+                        null,
+                        null,
+                        null,
+                        null);
 
 
             case DEFAULT_DETAIL_PRODUCT_LOADER:
@@ -588,13 +435,13 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                 // Now create and return a CursorLoader that will take care of
                 // creating a Cursor for the data being displayed.
                 String select = "((" + ProductsColumns.NOMBRE_PRODUCTO + " NOTNULL) AND ("
-                        + ProductsColumns.NOMBRE_PRODUCTO+ " ='mate'))";
+                        + ProductsColumns.NOMBRE_PRODUCTO + " ='mate'))";
 //                AND ("
 //                        + Contacts.DISPLAY_NAME + " != '' ))";
 
-                String proyection []= {ProductsColumns.NOMBRE_PRODUCTO, "sum("+ ProductsColumns.PRECIO_PRODUCTO
+                String proyection[] = {ProductsColumns.NOMBRE_PRODUCTO, "sum(" + ProductsColumns.PRECIO_PRODUCTO
                         + " * " + ProductsColumns.PRECIO_PRODUCTO
-                        +")"};
+                        + ")"};
                 return new CursorLoader(
                         getActivity(),
                         LogisticaProvider.Products.CONTENT_URI,//uri
@@ -615,45 +462,45 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.e(LOG_TAG, "onLoadFinished");
         if (data != null && data.moveToFirst()) {
-        switch (loader.getId()) {
-            case DETAIL_PRODUCT_LOADER:
-                if (data != null && data.moveToFirst()) {
-                    Log.e(LOG_TAG, "DETAIL_PRODUCT_LOADER data != null && data.moveToFirst() cantidad" + data.getCount());
+            switch (loader.getId()) {
+                case DETAIL_PRODUCT_LOADER:
+                    if (data != null && data.moveToFirst()) {
+                        Log.e(LOG_TAG, "DETAIL_PRODUCT_LOADER data != null && data.moveToFirst() cantidad" + data.getCount());
+                    }
+                    break;
+                case DEFAULT_DETAIL_PRODUCT_LOADER:
+                    if (data != null && data.moveToFirst()) {
+                        Log.e(LOG_TAG, "DEFAULT_DETAIL_PRODUCT_LOADERdata != null && data.moveToFirst() cantidad" + data.getCount());
+                    }
+                    break;
+
+                case NAME_PRODUCT_LOADER:
+                    if (data != null && data.moveToFirst()) {
+                        Log.e(LOG_TAG, "NAME_PRODUCT_LOADERdata != null && data.moveToFirst() cantidad de mate" + data.getCount());
+                        Log.e(LOG_TAG, "NAME_PRODUCT_LOADERdata != null && data.moveToFirst() Producto" + data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
+
+                        Log.e(LOG_TAG, "NAME_PRODUCT_LOADERdata != null && data.moveToFirst() suma" + Double.toString(data.getDouble(1)));
+                    }
+            }
+            mProductId.setText(Integer.toString(data.getInt(data.getColumnIndex(ProductsColumns._ID_PRODUCTO))));
+            mProductName.setText(data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
+            NumberFormat format = NumberFormat.getCurrencyInstance();
+
+            mProductPrice.setText(format.format(data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO))));
+
+            mProductDescription.setText(data.getString(data.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
+
+            mCurrentPhotoPath = data.getString(data.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO));
+            Picasso.with(getContext())
+                    .load(mCurrentPhotoPath)
+                    .into(mImageProducto);
+
+            if (appBarLayout != null) {
+                {
+                    appBarLayout.setTitle(data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
                 }
-                break;
-            case DEFAULT_DETAIL_PRODUCT_LOADER:
-                if (data != null && data.moveToFirst()) {
-                    Log.e(LOG_TAG, "DEFAULT_DETAIL_PRODUCT_LOADERdata != null && data.moveToFirst() cantidad" + data.getCount());
-                }
-                break;
-
-            case NAME_PRODUCT_LOADER:
-                if (data != null && data.moveToFirst()) {
-                    Log.e(LOG_TAG, "NAME_PRODUCT_LOADERdata != null && data.moveToFirst() cantidad de mate" + data.getCount());
-                    Log.e(LOG_TAG, "NAME_PRODUCT_LOADERdata != null && data.moveToFirst() Producto" + data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
-
-                    Log.e(LOG_TAG, "NAME_PRODUCT_LOADERdata != null && data.moveToFirst() suma" +Double.toString(data.getDouble(1)));
-                }
-        }
-        mProductId.setText(Integer.toString(data.getInt(data.getColumnIndex(ProductsColumns._ID_PRODUCTO))));
-        mProductName.setText(data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
-        NumberFormat format = NumberFormat.getCurrencyInstance();
-
-        mProductPrice.setText(format.format(data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO))));
-
-        mProductDescription.setText(data.getString(data.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-
-        mCurrentPhotoPath = data.getString(data.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO));
-        Picasso.with(getContext())
-                .load(mCurrentPhotoPath)
-                .into(mImageProducto);
-
-        if (appBarLayout != null) {
-            {
-                appBarLayout.setTitle(data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
             }
         }
-    }
 
 
     }
@@ -663,4 +510,252 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
         Log.e(LOG_TAG, "onLoaderReset");
 
     }
+
+    public void doPositiveClick() {
+        // Do stuff here.
+        Log.i("FragmentAlertDialog", "Positive click!");
+    }
+
+    public void doNegativeClick() {
+        // Do stuff here.
+        Log.i("FragmentAlertDialog", "Negative click!");
+    }
+
+    @Override
+    public void onFinishEditDialog(String inputText) {
+        Log.i("FragmentAlertDialog", "onFinishEditDialog: " + inputText);
+
+    }
+
+    public void deleteProduct() {
+
+        Log.i(LOG_TAG, "deleteProduct");
+        Log.i(LOG_TAG, "mAction" + mAction);
+        Log.i(LOG_TAG, " mItem" + mItem);
+        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+        if (mAction == PRODUCT_SELECTION && mItem != 0) {
+
+            Log.i(LOG_TAG, "entro");
+//            ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete();
+//            batchOperations.add(builder.build());
+            getActivity().getContentResolver().delete(
+                    LogisticaProvider.Products.withId(mItem), null, null);
+            getActivity().onBackPressed();
+        }
+
+    }
+
+    public void verificationAndsave() {
+
+        Log.i(LOG_TAG, "save");
+        if (verification()) {
+            ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+            if (mAction == PRODUCT_NEW && mItem == 0) {
+
+
+                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.Products.CONTENT_URI);
+                builder.withValue(ProductsColumns.NOMBRE_PRODUCTO, mProductName.getText().toString());
+                builder.withValue(ProductsColumns.DESCRIPCION_PRODUCTO, mProductDescription.getText().toString());
+                builder.withValue(ProductsColumns.IMAGEN_PRODUCTO, mCurrentPhotoPath);
+                CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
+                builder.withValue(ProductsColumns.PRECIO_PRODUCTO, price.convert());
+                batchOperations.add(builder.build());
+            } else
+//            if      (mAction==PRODUCT_SAVE )
+            {
+
+
+                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.Products.withId(mItem));
+                builder.withValue(ProductsColumns.NOMBRE_PRODUCTO, mProductName.getText().toString());
+                builder.withValue(ProductsColumns.DESCRIPCION_PRODUCTO, mProductDescription.getText().toString());
+                builder.withValue(ProductsColumns.IMAGEN_PRODUCTO, mCurrentPhotoPath);
+                CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
+                builder.withValue(ProductsColumns.PRECIO_PRODUCTO, price.convert());
+                batchOperations.add(builder.build());
+
+            }
+
+            try {
+//
+//            getApplicationContext().getContentResolver().insert(
+//                    DistributionProvider.Productos.withId(_id), cv);
+                getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+            } catch (RemoteException | OperationApplicationException e) {
+                Log.e(LOG_TAG, "Error applying batch insert", e);
+            }
+            getActivity().onBackPressed();
+        }
+    }
+
+
+
+
+    /// Validations!!!!
+
+
+    public boolean verification() {
+
+        if (!verifyName(mProductName.getText().toString())) {
+            return false;
+        } else if (!isthePriceCorrect()) {
+
+            return false;
+        }
+        if (!isDescriptionMaxLengthCorrect(mProductDescription.getText().toString())) {
+            return false;
+        } else return true;
+    }
+
+
+    public boolean verifyName(String name) {
+        if (!isNameMaxLengthCorrect(name)) {
+            return false;
+        } else if (existeProductName(name)) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    public boolean existeProductName(String productName) {
+//return true if the product exist or can not be saved because its a modification, else false
+        if (productName.equals("")) {
+            Log.e(LOG_TAG, "productName.equals(");
+            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproducNametcantbenull));
+            // Show DialogFragment
+            dFragment.show(getFragmentManager(), "Dialog Fragment");
+            mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
+            return true;
+        }
+
+        Log.e(LOG_TAG, "existeProductName ");
+
+        String select = "((" + ProductsColumns.NOMBRE_PRODUCTO + " NOTNULL) AND ("
+                + ProductsColumns.NOMBRE_PRODUCTO + " =?))";
+
+//
+//        String projection []= {ProductsColumns.NOMBRE_PRODUCTO, "sum("+ ProductsColumns.PRECIO_PRODUCTO
+//                + " * " + ProductsColumns.PRECIO_PRODUCTO
+//                +")"};
+        String projection[] = {ProductsColumns.NOMBRE_PRODUCTO, ProductsColumns._ID_PRODUCTO};
+        String arg[] = {productName};
+
+        Cursor c = getActivity().getContentResolver().query(LogisticaProvider.Products.CONTENT_URI,
+                null,
+                select,
+                arg,
+                null);
+        if (c == null || c.getCount() == 0) {
+            return false;
+        } else {
+            c.moveToFirst();
+            Log.e(LOG_TAG, "c.getInt:" + c.getInt(0));
+
+            Log.e(LOG_TAG, "existeProductName mAction:" + mAction + "c.getCount() " + c.getCount() + "c.getInt(1) " + c.getInt(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)) + "mItem " + mItem);
+            if (mAction == PRODUCT_NEW && c.getCount() != 0) {
+                //its a new producto and the product name exist
+                Log.e(LOG_TAG, "existeProductName mAction==PRODUCT_NEW && c.getCount()!=0:" + c.getCount());
+                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproducNametExist));
+                // Show DialogFragment
+                dFragment.show(getFragmentManager(), "Dialog Fragment");
+                mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                return true;
+            } else if (mAction == PRODUCT_SELECTION && c.getCount() >= 1 && c.getInt(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)) != mItem) {
+                //its a Modification producto and the product name exist in other register
+                Log.e(LOG_TAG, "existeProductName mAction==PRODUCT_SELECTION && c.c.getCount()>1:" + c.getCount());
+                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproducNametExist));
+                // Show DialogFragment
+                dFragment.show(getFragmentManager(), "Dialog Fragment");
+                mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                return true;
+
+            } else {
+                mProductName.setTextColor(getResources().getColor(R.color.ValidationOK));
+                return false;
+            }
+
+
+        }
+    }
+
+    public boolean isNameMaxLengthCorrect(String name) {
+        if (name.length() > getResources().getInteger(R.integer.productoNameMaxLength)) {
+
+            Log.e(LOG_TAG, "isNameMaxLengthCorrect :" + name.length());
+            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproductNameToLong));
+            // Show DialogFragment
+            dFragment.show(getFragmentManager(), "Dialog Fragment");
+            mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
+            return false;
+        } else {
+            mProductName.setTextColor(getResources().getColor(R.color.ValidationOK));
+            return true;
+        }
+    }
+
+    public boolean isDescriptionMaxLengthCorrect(String desc) {
+        if (desc.equals("")) {
+            Log.e(LOG_TAG, "isDescriptionMaxLengthCorrect :" + desc.length());
+            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproductdesccantbenull));
+            // Show DialogFragment
+            dFragment.show(getFragmentManager(), "Dialog Fragment");
+            mProductDescription.setTextColor(getResources().getColor(R.color.ValidationERROR));
+            return false;
+        }
+
+        if (desc.length() > getResources().getInteger(R.integer.productoNameMaxLength)) {
+
+            Log.e(LOG_TAG, "isDescriptionMaxLengthCorrect :" + desc.length());
+            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproductdescToLong));
+            // Show DialogFragment
+            dFragment.show(getFragmentManager(), "Dialog Fragment");
+            mProductDescription.setTextColor(getResources().getColor(R.color.ValidationERROR));
+            return false;
+        } else {
+            mProductDescription.setTextColor(getResources().getColor(R.color.ValidationOK));
+            return true;
+        }
+    }
+
+
+    public boolean isthePriceCorrect() {
+        Double price = null;
+        if (mProductPrice.getText().toString() == null) {
+
+            Log.e(LOG_TAG, "isthePriceCorrect :ProductPrice.getText().toString() == nul" + price);
+            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+            // Show DialogFragment
+            dFragment.show(getFragmentManager(), "Dialog Fragment");
+            mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
+            return false;
+
+        } else {
+            price = ((CurrencyToDouble) new CurrencyToDouble(mProductPrice.getText().toString())).convert();
+            Log.e(LOG_TAG, "isthePriceCorrect :price" + price);
+
+            if (price == null) {
+
+                Log.e(LOG_TAG, "isthePriceCorrect :price Null" + price);
+                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+                // Show DialogFragment
+                dFragment.show(getFragmentManager(), "Dialog Fragment");
+                mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                return false;
+            } else if (price <= 0) {
+
+                Log.e(LOG_TAG, "isthePriceCorrect : price<=0" + price);
+                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+                // Show DialogFragment
+                dFragment.show(getFragmentManager(), "Dialog Fragment");
+                mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                return false;
+            } else {
+                Log.e(LOG_TAG, "isthePriceCorrect : price ok" + price);
+                mProductName.setTextColor(getResources().getColor(R.color.ValidationOK));
+                return true;
+            }
+        }
+    }
+
 }

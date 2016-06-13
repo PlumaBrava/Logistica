@@ -99,11 +99,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_gravity="right"
+
             android:transitionName="@string/detail_icon_transition_name"
         android:padding="8dp"
         android:hint="@string/product_name_text" />
     </LinearLayout>
-
+    <!--android:maxLength="@integer/productoNameMaxLength"-->
 
     <LinearLayout
 
@@ -130,7 +131,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_gravity="left"
-        android:maxLength="10"
+        android:maxLength="@integer/productoPriceMaxLength"
         android:hint="@string/enter_price_message"
         android:inputType="number|numberDecimal"
             android:transitionName="@string/detail_icon_transition_price"

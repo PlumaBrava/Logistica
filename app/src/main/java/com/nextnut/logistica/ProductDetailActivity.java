@@ -102,6 +102,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -118,4 +120,21 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-}
+
+    public void doPositiveClick() {
+        // Do stuff here.
+        Log.i("FragmentAlertDialog", "ProductoDetaiActivity-Positive click!");
+    }
+
+    public void doNegativeClick() {
+        // Do stuff here.
+        Log.i("FragmentAlertDialog", "ProductoDetaiActivity-Negative click!");
+    }
+
+
+
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        super.startActivityForResult(intent, requestCode);
+    }
+    }
