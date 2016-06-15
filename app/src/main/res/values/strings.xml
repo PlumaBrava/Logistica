@@ -27,11 +27,10 @@
     <string name="detail_icon_transition_price" translatable="false">TN_DetailPrice</string>
     <string name="detail_icon_transition_imagen" translatable="false">TN_DetailIcon</string>
     <string name="pruductDetailBar_NEW_PRODUCT" translatable="false">New Product</string>
-    <string name="productoNameMaxLength" translatable="false">New Product</string>
-    <string name="productoPriceMaxLength" translatable="false">New Product</string>
 
 
-        <!--Verifications Message In Product-->
+
+    <!--Verifications Message In Product-->
     <string name="theproducNametExist" translatable="true">The product already Exist</string>
     <string name="theproducNametcantbenull" translatable="true">The product cant not be null</string>
     <string name="theproductNameToLong" translatable="true">The product name is too long</string>
@@ -40,5 +39,31 @@
     <string name="theproductdescToLong" translatable="true">Descrition name is too long</string>
 
     <string name="priceError" translatable="true">The price must be > 0 </string>
+    <string name="title_custom_list">Customs</string>
+    <string name="title_custom_detail">Custom Detail</string>
+
+
+    <!--Custom Detail Activity-->
+
+    <string name="custom_Id_text">Custom Number:</string>
+    <string name="custom_name_text">Name:</string>
+    <string name="custom_name_text_hint_text">Name</string>
+    <string name="custom_last_text">Surename:</string>
+    <string name="custom_last_hint_text">Surename</string>
+
+    <string name="custom_photo_text">Picture</string>
+    <string name="custom_delivery_address_text">Delivey Address:</string>
+    <string name="custom_delivery_address_hint_text">Delivey Address:</string>
+    <string name="custom_city_text">City:</string>
+    <string name="custom_city_hint_text">City</string>
+    <string name="custom_icon_transition_name" translatable="false">TN_CustomName</string>
+    <string name="custom_icon_transition_surname" translatable="false">TN_CustomSurname</string>
+    <string name="custom_icon_transition_imagen" translatable="false">TN_CustomIcon</string>
+
+    <!--Verificar si se usa-->
+    <string name="custom_DetailBar_NEW_PRODUCT" translatable="false">New Product</string>
+
+    <!--Products List Activity List-->
+    <string name="empty_custom_list">No Customrs to Show</string>
 
 </resources>

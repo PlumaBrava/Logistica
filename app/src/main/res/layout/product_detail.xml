@@ -24,7 +24,9 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginStart="@dimen/product_cardViewMarginLeft"
     android:layout_marginLeft="@dimen/product_cardViewMarginLeft"
+    android:layout_marginEnd="@dimen/product_cardViewMarginRight"
     android:layout_marginRight="@dimen/product_cardViewMarginRight"
     android:layout_marginTop="@dimen/product_cardViewtMarginTop"
     android:layout_marginBottom="@dimen/product_cardViewMarginBottom"
@@ -58,6 +60,7 @@
         android:layout_height="wrap_content"
         app:layout_gravity="left"
             android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
         android:textStyle="bold"
         android:text="@string/product_Id_text"/>
         <!--style="?android:attr/listPreferredItemHeight"-->
@@ -82,13 +85,11 @@
         <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-            android:imeOptions="actionSend"
-            android:inputType="text"
             style="?android:attr/titleTextStyle"
         app:layout_gravity="left"
         app:layout_columnWeight="1"
             android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
         android:padding="16dp"
         android:textStyle="bold"
         android:text="@string/product_name_text"/>
@@ -120,6 +121,7 @@
         app:layout_gravity="left"
         app:layout_columnWeight="1"
             android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
         android:padding="16dp"
             android:textStyle="bold"
         android:text="@string/product_price_text"/>
@@ -162,6 +164,7 @@
 
             android:padding="16dp"
             android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
          />
 
         <!--android:padding="16dp"-->
@@ -193,7 +196,10 @@
         app:layout_gravity="left"
         app:layout_columnWeight="1"
         android:paddingLeft="16dp"
-        android:layout_marginLeft="16dp"
+        android:paddingStart="16dp"
+        android:paddingRight="16dp"
+        android:paddingEnd="16dp"
+
         android:textStyle="bold"
         android:text="@string/product_description_text"/>
     <EditText
@@ -205,11 +211,11 @@
         android:hint="@string/product_description_hint_text"
 
         />
-    <!--style="?android:attr/textAppearanceLarge"-->
+
 
     </LinearLayout>
 
 </LinearLayout>
 
     </android.support.v7.widget.CardView>
-    <!--</android.support.v7.widget.GridLayout>-->
+

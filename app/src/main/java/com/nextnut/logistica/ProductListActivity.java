@@ -237,13 +237,13 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
             @Override
             public void onClick(int id, ProductCursorAdapter.ViewHolder vh) {
-                Log.i("ProductListActivity", "clicked id: " + id);
-                Log.i("ProductListActivity", "mTwoPane: " + mTwoPane);
+                Log.i(LOG_TAG, "clicked id: " + id);
+                Log.i(LOG_TAG, "mTwoPane: " + mTwoPane);
 
-
+                mItem=id;
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    mItem=id; // when rotate the screen the selecction of the second Screen is conserved.
+                     // when rotate the screen the selecction of the second Screen is conserved.
                     arguments.putInt(ProductDetailFragment.ARG_ITEM_ID, id);
                     arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
 
@@ -374,10 +374,10 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-//        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-    }
+//    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+////        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+//        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+//    }
 //
 //    RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.productos_list);
 //    recyclerView.setLayoutManager(

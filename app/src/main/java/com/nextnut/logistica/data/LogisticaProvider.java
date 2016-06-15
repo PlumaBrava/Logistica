@@ -68,14 +68,14 @@ public class LogisticaProvider {
             @ContentUri(
                     path = Path.CUSTOMS,
                     type = "vnd.android.cursor.dir/clientes",
-                    defaultSort = CustomColumns.ID_CLIENTE + " DESC")//OJO CON Desc lo escribi...
+                    defaultSort = CustomColumns.ID_CUSTOM + " DESC")//OJO CON Desc lo escribi...
             public static final Uri CONTENT_URI = buildUri(Path.CUSTOMS);
 
             @InexactContentUri(
                     name = "CLIENTES_ID",
                     path = Path.CUSTOMS + "/#",
                     type = "vnd.android.cursor.item/clientes",
-                    whereColumn = CustomColumns.ID_CLIENTE,
+                    whereColumn = CustomColumns.ID_CUSTOM,
                     pathSegment = 1)
 
             public static Uri withId(long id) {

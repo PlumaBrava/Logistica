@@ -40,12 +40,33 @@
         <provider
             android:name=".data.generated.LogisticaProvider"
             android:authorities="com.nextnut.logistica.data.LogisticaProvider"
-            android:exported="false" /><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
-     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+            android:exported="false" />
+        <!--
+ ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
+        -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <activity
+            android:name=".CustomListActivity"
+            android:label="@string/title_custom_list"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nextnut.logistica.MainActivity" />
+        </activity>
+        <activity
+            android:name=".CustomDetailActivity"
+            android:label="@string/title_custom_detail"
+            android:parentActivityName=".CustomListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nextnut.logistica.CustomListActivity" />
+        </activity>
     </application>
 
 </manifest>

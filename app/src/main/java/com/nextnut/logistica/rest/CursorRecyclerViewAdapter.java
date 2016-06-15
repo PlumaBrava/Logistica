@@ -7,12 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
-/**
- * Written by sam_chordas on 8/11/15.
- * Credit to skyfishjy gist:
- *    https://gist.github.com/skyfishjy/443b7448f59be978bc59
- * for the CursorRecyclerViewApater.java file
- */
+
 public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHolder>
 extends RecyclerView.Adapter<VH>
 {

@@ -10,33 +10,45 @@ import net.simonvt.schematic.annotation.PrimaryKey;
 public class CustomColumns {
     @DataType(DataType.Type.INTEGER) @PrimaryKey
     @AutoIncrement
-    public static final String  ID_CLIENTE ="_idCliente";
+    public static final String  ID_CUSTOM ="_id";
 
     @DataType(DataType.Type.TEXT)
-    public static final String  NOMBRE_CLIENTE = "nombreCliente";
+    public static final String  NAME_CUSTOM = "nameCustom";
 
     @DataType(DataType.Type.TEXT)
-    public static final String APELLIDO_CLIENTE = "apellidoCliente";
+    public static final String LASTNAME_CUSTOM = "lastNameCustom";
 
     @DataType(DataType.Type.TEXT)
-    public static final String RAZON_SOCIAL_CLIENTE ="razonSocialCliente";
-
-
-    @DataType(DataType.Type.TEXT)
-    public static final String CALLE_CLIENTE = "calleCliente";
+    public static final String DELIIVERY_ADDRES_CUSTOM = "deliveryAddressCustom";
 
     @DataType(DataType.Type.TEXT)
-    public static final String NUMERO_CLIENTE = "numeroCliente";
+    public static final String DELIVERY_CITY_CUSTOM = "deliveryCitysCustom";
 
     @DataType(DataType.Type.TEXT)
-    public static final String CIUDAD_CLIENTE = "ciudadCliente";
+    public static final String IMAGEN_CUSTOM = "ImagenCustome";
 
     @DataType(DataType.Type.TEXT)
-    public static final String PROVINCIA_CLIENTE= "provinciaCliente";
+    public static final String REFERENCE_CUSTOM = "ContactReferenceCustom";
 
-    @DataType(DataType.Type.TEXT)
-    public static final String CUIT_CLIENTE= "cuitCliente";
-
-    @DataType(DataType.Type.INTEGER)
-    public static final String IVA_CLIENTE= "ivaCliente";
+//    @DataType(DataType.Type.TEXT)
+//    public static final String RAZON_SOCIAL_CUSTOM ="razonSocialCliente";
+//
+//
+//    @DataType(DataType.Type.TEXT)
+//    public static final String CALLE_CUSTOM = "calleCliente";
+//
+//    @DataType(DataType.Type.TEXT)
+//    public static final String NUMERO_CUSTOM = "numeroCliente";
+//
+//    @DataType(DataType.Type.TEXT)
+//    public static final String CIUDAD_CUSTOM = "ciudadCliente";
+//
+//    @DataType(DataType.Type.TEXT)
+//    public static final String PROVINCIA_CUSTOM= "provinciaCliente";
+//
+//    @DataType(DataType.Type.TEXT)
+//    public static final String CUIT_CUSTOM= "cuitCliente";
+//
+//    @DataType(DataType.Type.INTEGER)
+//    public static final String IVA_CUSTOM= "ivaCliente";
 }

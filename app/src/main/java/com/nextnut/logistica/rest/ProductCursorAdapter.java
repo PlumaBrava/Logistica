@@ -43,7 +43,7 @@ import java.text.NumberFormat;
 
 public class ProductCursorAdapter extends CursorRecyclerViewAdapter<ProductCursorAdapter.ViewHolder>
 implements ItemTouchHelperAdapter{
-//    final private ForecastAdapterOnClickHandler mClickHandler ;
+
     Context mContext;
     ViewHolder mVh;
     final private ProductCursorAdapterOnClickHandler mClickHandler;

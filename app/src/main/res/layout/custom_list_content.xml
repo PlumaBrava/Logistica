@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:orientation="horizontal">-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/id"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="@dimen/text_margin"-->
+        <!--android:textAppearance="?attr/textAppearanceListItem" />-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/content"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="@dimen/text_margin"-->
+        <!--android:textAppearance="?attr/textAppearanceListItem" />-->
+<!--</LinearLayout>-->
+
+<android.support.v7.widget.CardView
+xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginLeft="@dimen/custom_cardViewMarginLeft"
+android:layout_marginStart="@dimen/custom_cardViewMarginLeft"
+android:layout_marginRight="@dimen/custom_cardViewMarginRight"
+android:layout_marginEnd="@dimen/custom_cardViewMarginRight"
+android:layout_marginTop="@dimen/custom_cardViewtMarginTop"
+android:layout_marginBottom="@dimen/custom_cardViewMarginBottom"
+android:elevation="@dimen/custom_cardViewElevation"
+android:clickable="true"
+android:focusable="true"
+android:foreground="?selectableItemBackground">
+
+<LinearLayout
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:divider="#FFCC00">
+
+    <ImageView
+        android:id="@+id/photocustom_listContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:maxHeight="96dp"
+        android:maxWidth="96dp"
+        android:transitionName="@string/custom_icon_transition_imagen"
+        android:layout_gravity="center_vertical"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/nameCustom_listContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:layout_gravity="center_vertical"
+                android:textStyle="bold"
+                android:transitionName="@string/custom_icon_transition_name"
+                />
+            <!--android:layout_weight="1"-->
+
+            <TextView
+                android:id="@+id/surenameCustom_listContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:layout_gravity="center_vertical"
+                android:textStyle="bold"
+                android:transitionName="@string/custom_icon_transition_surname"
+                />
+            <!--android:layout_weight="1"-->
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/cityCustom_listContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/text_margin"
+                android:layout_weight="1"></TextView>
+
+        <TextView
+            android:id="@+id/deliveryAddress_listContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/text_margin"
+            android:layout_weight="1"
+            />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>
+
+</android.support.v7.widget.CardView>

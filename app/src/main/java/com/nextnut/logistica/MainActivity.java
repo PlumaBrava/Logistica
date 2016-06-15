@@ -99,10 +99,15 @@ public class MainActivity extends AppCompatActivity {
             ActivityOptionsCompat activityOptions =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(this);
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
+
             return true;
         }
         if (id == R.id.customs) {
             Toast.makeText(MainActivity.this, "Customs", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this,CustomListActivity.class);
+            ActivityOptionsCompat activityOptions =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
             return true;
         }
 

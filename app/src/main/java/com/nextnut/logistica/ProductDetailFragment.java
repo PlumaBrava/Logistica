@@ -61,6 +61,8 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
+
+
     public static final String PRODUCT_ACTION = "product_action";
     public static final int PRODUCT_NEW = 0;
     public static final int PRODUCT_DOUBLE_SCREEN = 1;
@@ -69,8 +71,9 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     private static final int DETAIL_PRODUCT_LOADER = 0;
     private static final int DEFAULT_DETAIL_PRODUCT_LOADER = 1;
     private static final int NAME_PRODUCT_LOADER = 2;
-    private static final String LOG_TAG = ProductDetailFragment.class.getSimpleName();
 
+
+    private static final String LOG_TAG = ProductDetailFragment.class.getSimpleName();
 
     private int mItem = 0;
     private TextView mProductId;
@@ -79,6 +82,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     private EditText mProductDescription;
     private Button button;
     private ImageView mImageProducto;
+
     String mCurrentPhotoPath = null;
 
 
