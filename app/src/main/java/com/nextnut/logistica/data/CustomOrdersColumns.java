@@ -13,25 +13,25 @@ public class CustomOrdersColumns {
     @AutoIncrement
     public static final String  ID_CUSTOM_ORDER ="_id";
 
-    @DataType(DataType.Type.INTEGER)
-    @NotNull
-    public static final String  REF_CUSTOMER_CUSTOM_ORDER = "refCustomerCustomOrder";
-
     @DataType(DataType.Type.TEXT)
     public static final String CREATION_DATE_CUSTOM_ORDER = "creationDateCustomOrder";
 
-    @DataType(DataType.Type.INTEGER)
+    @DataType(DataType.Type.INTEGER) @NotNull
+    public static final String  REF_CUSTOM_CUSTOM_ORDER = "refCustomer";
 
-    public static final String STATUS_CUSTOM_ORDER = "statusCustomOrder";
 
-    @DataType(DataType.Type.INTEGER)
+
+    @DataType(DataType.Type.TEXT)
     public static final String DATE_OF_PICKING_ASIGNATION_CUSTOM_ORDER = "dateOfPickingAsignationCustomOrder";
 
-    @DataType(DataType.Type.INTEGER)
+    @DataType(DataType.Type.TEXT)
     public static final String DATE_OF_DELIVEY_CUSTOM_ORDER = "dateOfDeliveyCustomOrder";
 
     @DataType(DataType.Type.REAL)
     public static final String TOTAL_PRICE_CUSTOM_ORDER = "totalPriceCustomOrder";
+
+    @DataType(DataType.Type.INTEGER)
+    public static final String STATUS_CUSTOM_ORDER = "statusCustomOrder";
 
 
 

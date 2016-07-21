@@ -26,7 +26,7 @@
     <!--Customs Dimens-->
 
     <!--<dimen name="custom_detail_view_padding_vertical">-->
-        <!--@dimen/abc_list_item_padding_horizontal_material-->
+    <!--@dimen/abc_list_item_padding_horizontal_material-->
     <!--</dimen>-->
     <dimen name="custom_cardViewElevation">2dp</dimen>
     <dimen name="custom_cardViewMarginLeft">4dp</dimen>
@@ -37,6 +37,9 @@
 
     <!--<dimen name="offset_y">300dp</dimen>-->
 
+    <!--Dimens of Custom Selection Activity-->
+    <dimen name="content_custom_selection_margin">16dp</dimen>
+    <dimen name="content_custom_selection_text_size">24sp</dimen>
 
 
 </resources>

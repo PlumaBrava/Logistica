@@ -38,8 +38,7 @@ import android.support.v7.app.ActionBar;
 
 import android.view.MenuItem;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
+
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
@@ -47,7 +46,7 @@ import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.rest.ProductCursorAdapter;
 import com.nextnut.logistica.rest.Products;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
-import com.nextnut.logistica.Util.DividerItemDecoration;
+
 
 import java.util.ArrayList;
 
@@ -63,7 +62,7 @@ import java.util.ArrayList;
 public class ProductListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = ProductListActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 0;
-    private int mItem=0;
+    private long mItem=0;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -76,18 +75,18 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "ProductList Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://com.nextnut.logistica/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(client, viewAction);
+//        client.connect();
+//        RecyclerView.SmoothScroller.Action viewAction = RecyclerView.SmoothScroller.Action.newAction(
+//                RecyclerView.SmoothScroller.Action.TYPE_VIEW, // TODO: choose an action type.
+//                "ProductList Page", // TODO: Define a title for the content shown.
+//                // TODO: If you have web page content that matches this app activity's content,
+//                // make sure this auto-generated web page URL is correct.
+//                // Otherwise, set the URL to null.
+//                Uri.parse("http://host/path"),
+//                // TODO: Make sure this auto-generated app URL is correct.
+//                Uri.parse("android-app://com.nextnut.logistica/http/host/path")
+//        );
+//        AppIndex.AppIndexApi.start(client, viewAction);
     }
 
     @Override
@@ -96,18 +95,18 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "ProductList Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://com.nextnut.logistica/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
+//        Action viewAction = Action.newAction(
+//                Action.TYPE_VIEW, // TODO: choose an action type.
+//                "ProductList Page", // TODO: Define a title for the content shown.
+//                // TODO: If you have web page content that matches this app activity's content,
+//                // make sure this auto-generated web page URL is correct.
+//                // Otherwise, set the URL to null.
+//                Uri.parse("http://host/path"),
+//                // TODO: Make sure this auto-generated app URL is correct.
+//                Uri.parse("android-app://com.nextnut.logistica/http/host/path")
+//        );
+//        AppIndex.AppIndexApi.end(client, viewAction);
+//        client.disconnect();
     }
 
     /**
@@ -236,7 +235,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
         mCursorAdapter = new ProductCursorAdapter(this, null, emptyView, new ProductCursorAdapter.ProductCursorAdapterOnClickHandler() {
 
             @Override
-            public void onClick(int id, ProductCursorAdapter.ViewHolder vh) {
+            public void onClick(long id, ProductCursorAdapter.ViewHolder vh) {
                 Log.i(LOG_TAG, "clicked id: " + id);
                 Log.i(LOG_TAG, "mTwoPane: " + mTwoPane);
 
@@ -244,7 +243,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
                      // when rotate the screen the selecction of the second Screen is conserved.
-                    arguments.putInt(ProductDetailFragment.ARG_ITEM_ID, id);
+                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
                     arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
 
                     ProductDetailFragment fragment = new ProductDetailFragment();
@@ -311,7 +310,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
 
             Bundle arguments = new Bundle();
-            arguments.putInt(ProductDetailFragment.ARG_ITEM_ID, mItem);// Fragmet load de last ID.
+            arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, mItem);// Fragmet load de last ID.
             arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_DOUBLE_SCREEN);
             Log.i(LOG_TAG,"PRODUCT_MODIFICACION"+ false);
             ProductDetailFragment fragment = new ProductDetailFragment();
@@ -326,7 +325,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+//        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
 

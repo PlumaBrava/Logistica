@@ -13,10 +13,13 @@ public class LogisticaDataBase {
     private LogisticaDataBase() {}
 
     @Table(ProductsColumns.class) public static final String PRODUCTS = "products";
-    //    @Table(PreciosColumns.class)public static final String PRECIOS = "precios";
     @Table(CustomColumns.class)public static final String CUSTOMS = "customs";
-//    @Table(PedidosColumns.class)public static final String PEDIDOS = "pedidos";
-//    @Table(DetallePedidosColumns.class)public static final String DETALLEPEDIDOS = "detallepedidos";
-//    @Table(EntregasColumns.class)public static final String ENTREGAS = "entregas";
-//    @Table(PagosColumns.class)public static final String PAGOS = "pagos";
+    @Table(CustomOrdersColumns.class)public static final String CUSTOM_ORDERS = "custom_orders";
+
+    @Table(CustomOrdersDetailColumns.class)public static final String CUSTOM_ORDERS_DETAIL = "custom_orders_detail";
+
+    @Table(PickingOrdersColumns.class)public static final String PICKING_ORDERS = "picking_orders";
+
+    @Table(PickingOrdersDetailColumns.class)public static final String PICKING_ORDERS_DETAIL = "picking_orders_detail";
+
 }

@@ -42,7 +42,7 @@ implements ItemTouchHelperAdapter{
 
     public class ViewHolder extends RecyclerView.ViewHolder
     implements ItemTouchHelperViewHolder, View.OnClickListener {
-        public int mcursorId ;
+        public long mcursorId ;
         public String mphotString;
 
 
@@ -143,7 +143,7 @@ implements ItemTouchHelperAdapter{
 
 
     public static interface CustomsCursorAdapterOnClickHandler {
-        void onClick(int id, ViewHolder vh);
+        void onClick(long id, ViewHolder vh);
     }
 
             @Override
@@ -174,5 +174,10 @@ implements ItemTouchHelperAdapter{
 //        notifyItemRemoved(position);
             }
 
+    @Override
+    public void onItemAcepted(int position) {
 
     }
+
+
+}

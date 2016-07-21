@@ -57,7 +57,7 @@ implements ItemTouchHelperAdapter{
 
     public class ViewHolder extends RecyclerView.ViewHolder
     implements ItemTouchHelperViewHolder, View.OnClickListener {
-        public int mcursorId ;
+        public Long mcursorId ;
         public String mphotString;
         public ImageView mphotoProducto;
         public TextView mTextViewNombre;
@@ -161,7 +161,7 @@ implements ItemTouchHelperAdapter{
             @Override
             public void onBindViewHolder (ViewHolder viewHolder, Cursor cursor){
                 DatabaseUtils.dumpCursor(cursor);
-                viewHolder.mcursorId=cursor.getInt(cursor.getColumnIndex(ProductsColumns._ID_PRODUCTO));
+                viewHolder.mcursorId=cursor.getLong(cursor.getColumnIndex(ProductsColumns._ID_PRODUCTO));
                 viewHolder.mphotString=cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO));
                 Picasso.with(viewHolder.mphotoProducto.getContext())
 
@@ -196,7 +196,7 @@ implements ItemTouchHelperAdapter{
 
 
     public static interface ProductCursorAdapterOnClickHandler {
-        void onClick(int id, ViewHolder vh);
+        void onClick(long id, ViewHolder vh);
     }
 
             @Override
@@ -227,5 +227,10 @@ implements ItemTouchHelperAdapter{
 //        notifyItemRemoved(position);
             }
 
+    @Override
+    public void onItemAcepted(int position) {
 
     }
+
+
+}

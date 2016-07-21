@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:orientation="vertical" android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content">-->
+
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/custom_cardViewMarginLeft"
+    android:layout_marginStart="@dimen/custom_cardViewMarginLeft"
+    android:layout_marginRight="@dimen/custom_cardViewMarginRight"
+    android:layout_marginEnd="@dimen/custom_cardViewMarginRight"
+    android:layout_marginTop="@dimen/custom_cardViewtMarginTop"
+    android:layout_marginBottom="@dimen/custom_cardViewMarginBottom"
+    android:elevation="@dimen/custom_cardViewElevation"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?selectableItemBackground">
+
+<TextView android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textStyle="bold"
+    android:textSize="@dimen/content_custom_selection_text_size"
+
+    android:ems="10"
+    android:id="@+id/customNameSpinner"
+    android:layout_gravity="start"
+
+
+
+     />
+
+    </android.support.v7.widget.CardView>
+<!--</LinearLayout>-->
+    <!--android:backgroundTint="@color/abc_color_highlight_material"-->

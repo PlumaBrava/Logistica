@@ -5,7 +5,8 @@
     <color name="colorAccent">#FF4081</color>
 
     <!--Verification Colors-->
-    <color name="ValidationOK">#59ff40</color>
+    <color name="ValidationOK">#f25bf96b</color>
     <color name="ValidationERROR">#ff4043</color>
+    <color name="Card_background">#f25ab5b3</color>
 
 </resources>

@@ -75,7 +75,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
 
     private static final String LOG_TAG = ProductDetailFragment.class.getSimpleName();
 
-    private int mItem = 0;
+    private long mItem = 0;
     private TextView mProductId;
     private EditText mProductName;
     private EditText mProductPrice;
@@ -108,7 +108,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
 
-            mItem = getArguments().getInt(ARG_ITEM_ID);
+            mItem = getArguments().getLong(ARG_ITEM_ID);
             Log.i(LOG_TAG, "ARG_ITEM_ID:" + mItem);
             Activity activity = this.getActivity();
             appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);

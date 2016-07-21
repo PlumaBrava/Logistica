@@ -80,7 +80,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     CollapsingToolbarLayout appBarLayout;
 
 
-    private int mItem = 0;
+    private long mItem = 0;
 
     private static final String LOG_TAG = CustomDetailFragment.class.getSimpleName();
 
@@ -97,8 +97,8 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
 
-            mItem = getArguments().getInt(ARG_ITEM_ID);
-            Log.i(LOG_TAG, "ARG_ITEM_ID" + mItem);
+            mItem = (long)getArguments().getLong(ARG_ITEM_ID);
+            Log.i(LOG_TAG, "ARG_ITEM_IDfrag: " + mItem);
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
@@ -210,7 +210,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
             {
 
                 Log.i(LOG_TAG, "save Modification");
-                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.Customs.withId(mItem));
+                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.Customs.withId(mItem));
                 builder.withValue(CustomColumns.NAME_CUSTOM, mCustomName.getText().toString());
                 builder.withValue(CustomColumns.LASTNAME_CUSTOM, mLastName.getText().toString());
                 builder.withValue(CustomColumns.DELIIVERY_ADDRES_CUSTOM, mDeliveyAddress.getText().toString());

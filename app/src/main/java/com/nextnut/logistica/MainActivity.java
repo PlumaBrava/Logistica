@@ -1,6 +1,10 @@
 package com.nextnut.logistica;
 
+import android.content.ContentProviderOperation;
 import android.content.Intent;
+import android.content.OperationApplicationException;
+import android.os.Build;
+import android.os.RemoteException;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,6 +19,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +28,14 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.nextnut.logistica.data.CustomOrdersColumns;
+import com.nextnut.logistica.data.LogisticaProvider;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +54,15 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    public int mCurrentFragmet;
+    public static final int CUSTOM_ORDER_FRAGMENT=0;
+    public static final int PICKING_FRAGMENT=1;
+    public static final int DELIVERY_FRAGMENT=2;
+
+    private static final int REQUEST_CUSTOMER = 1234;
+
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +78,16 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        // Eliminar si no se usa la interfase.
+
+        CustomOrderListFragment.DataChangeNotification a= new CustomOrderListFragment.DataChangeNotification() {
+            @Override
+            public void onStepModification(int step) {
+
+            }
+        }
+
+                ;
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
@@ -65,11 +97,97 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                Log.i(LOG_TAG,"mCurrentFragmet"+mViewPager.getCurrentItem());
+
+                switch (mViewPager.getCurrentItem()) {
+                    case CUSTOM_ORDER_FRAGMENT: {
+                        Log.i(LOG_TAG,"mCurrentFragmet CUSTOM_ORDER_FRAGMENT "+mViewPager.getCurrentItem());
+                        Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
+                        startActivityForResult(intent, REQUEST_CUSTOMER);
+
+//                        Intent intent = new Intent(MainActivity.this, CustomOrderDetailActivity.class);
+//                        intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//                        ActivityOptionsCompat activityOptions =
+//                                ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
+//                        ActivityCompat.startActivity(MainActivity.this, intent, activityOptions.toBundle());
+
+                        break;
+                    }
+                    case PICKING_FRAGMENT: {
+                        break;
+                    }
+                    case DELIVERY_FRAGMENT: {
+                        break;
+                    }
+                    default:
+                }
             }
         });
 
+
+
     }
 
+    @Override
+    public void onActivityResult(int requestCode,
+                                 int resultCode, Intent data) {
+        Log.i(LOG_TAG, "LLego resyktado ok" );
+        if (requestCode == REQUEST_CUSTOMER && resultCode == RESULT_OK) {
+            String res = data.getExtras().getString("resultado");
+            Log.i(LOG_TAG, "LLego resyktado ok" + res);
+            long customRef = data.getExtras().getLong("resultado");
+
+
+
+            if (customRef != 0) {
+//            if ( mItem != 0) {
+                Log.i(LOG_TAG, "save New");
+                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrders.CONTENT_URI);
+                builder.withValue(CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER, customRef);
+                SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
+                String formattedDate = df.format(new Date());
+                Log.i(LOG_TAG, "formattedDate:" + formattedDate);
+                builder.withValue(CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER, formattedDate);
+                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, CustomOrderDetailFragment.STATUS_ORDER_INICIAL);
+
+                batchOperations.add(builder.build());
+            try {
+
+                getApplicationContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+            } catch (RemoteException | OperationApplicationException e) {
+                Log.e(LOG_TAG, "Error applying batch insert", e);
+            }
+
+            }
+            Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
+            intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+            Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + customRef);
+            Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//            intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, customRef);
+//                            fab_new.setVisibility(View.VISIBLE);
+//                            fab_save.setVisibility(View.GONE);
+//                            fab_delete.setVisibility(View.GONE);
+
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+////                Log.i("ProductListActivity", "makeSceneTransitionAnimation");
+//
+////                                Pair<View, String> p1 = Pair.create((View) vh.mphotoCustomer, getString(R.string.custom_icon_transition_imagen));
+////                Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
+////                                Pair<View, String> p3 = Pair.create((View) vh.mSurename, getString(R.string.custom_icon_transition_surname));
+//                ActivityOptionsCompat activityOptions =
+//                        ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p2);
+//                startActivity(intent, activityOptions.toBundle());
+//
+//            } else {
+            Log.i("ProductListActivity", "makeSceneTransitionAnimation Normal");
+            startActivity(intent);
+//            }
+
+        }
+
+
+        }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -88,14 +206,16 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Toast.makeText(MainActivity.this, "Action Sttings", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this,LoginActivity.class);
+            ActivityOptionsCompat activityOptions =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
             return true;
         }
 
         if (id == R.id.productos) {
             Toast.makeText(MainActivity.this, "Productos", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this,ProductListActivity.class);
-//                    .setData(contentUri);
-
             ActivityOptionsCompat activityOptions =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(this);
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
@@ -105,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.customs) {
             Toast.makeText(MainActivity.this, "Customs", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this,CustomListActivity.class);
+
             ActivityOptionsCompat activityOptions =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(this);
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
@@ -153,17 +274,59 @@ public class MainActivity extends AppCompatActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter  {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
+
+
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            Log.i("Main:", "getItem" + position);
+            switch (position) {
+
+                case CUSTOM_ORDER_FRAGMENT:
+                   return new CustomOrderListFragment();
+//                   return new CustomOrderListFragment(new CustomOrderListFragment.DataChangeNotification() {
+//                       @Override
+//                       public void onStepModification(int step) {
+//                           Log.i("Main:", "onStepModification" + step);
+//                        View view = mViewPager.getChildAt(1);
+//                           if (view != null) {
+//                               mViewPager.removeView(view);
+//
+//                               instantiateItem(mViewPager, 1);
+//                           }
+//                           mSectionsPagerAdapter.destroyItem(mViewPager,1, new PickingListFragment());
+//                           mViewPager.destroyDrawingCache();
+//                           mSectionsPagerAdapter.notifyDataSetChanged();
+
+//                           View view = mViewPager.getChildAt(1);
+//                           if (view != null) {
+//                               mViewPager.removeView(view);
+//                               getItem(1);
+////                               mSectionsPagerAdapter.notifyDataSetChanged();
+//                                                        }
+//
+////
+//                       }
+//                   });
+                case PICKING_FRAGMENT:
+                    return new PickingListFragment();
+
+                default:
+                // getItem is called to instantiate the fragment for the given page.
+                // Return a PlaceholderFragment (defined as a static inner class below).
+                return PlaceholderFragment.newInstance(position + 1);
+            }
+        }
+
+        @Override
+        public void startUpdate(ViewGroup container) {
+            Log.i("Main:", "startUpdate" );
+            super.startUpdate(container);
         }
 
         @Override
@@ -174,15 +337,18 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
+            Log.i("Main:", "getPageTitle: "+position );
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return getResources().getString(R.string.title_custom_orders);
                 case 1:
-                    return "SECTION 2";
+                    return getResources().getString(R.string.title_picking);
                 case 2:
-                    return "SECTION 3";
+                    return getResources().getString(R.string.title_delivery);
             }
             return null;
         }
+
+
     }
 }

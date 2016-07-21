@@ -13,52 +13,71 @@ import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
 /**
- * An activity representing a single Product detail screen. This
+ * An activity representing a single CustomOrder detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a {@link ProductListActivity}.
+ * in a {@link CustomOrderListFragment}.
  */
-public class ProductDetailActivity extends AppCompatActivity {
-    private static final String LOG_TAG = ProductDetailActivity.class.getSimpleName();
+public class CustomOrderDetailActivity extends AppCompatActivity {
+
+    private static final String LOG_TAG = CustomOrderDetailActivity.class.getSimpleName();
+
     private int mAction;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_product_detail);
+        setContentView(R.layout.activity_customorder_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
+
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//
+//            }
+//        });
 
         FloatingActionButton fab_save = (FloatingActionButton) findViewById(R.id.fab_save);
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Save", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
-                getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
-                if(productDetailFragment!=null){
-                    productDetailFragment.verificationAndsave();
+
+                CustomOrderDetailFragment customOrderDetailFragment=(CustomOrderDetailFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+                if (customOrderDetailFragment!=null){
+                    customOrderDetailFragment.SaveCustomOrder();
                     Log.i(LOG_TAG,"no null fragment");
                 }else {
                     Log.i(LOG_TAG,"null fragment");
                 }
+
             }
+
         });
 
         FloatingActionButton fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
         fab_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Delete", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "fab_delete:Replace with your own detail action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
-                if(productDetailFragment!=null){
-                    productDetailFragment.deleteProduct();
+
+                CustomOrderDetailFragment customOrderDetailFragment=(CustomOrderDetailFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+                if (customOrderDetailFragment!=null){
+                    customOrderDetailFragment.deleteCustomOrder();
                     Log.i(LOG_TAG,"no null fragment");
                 }else {
                     Log.i(LOG_TAG,"null fragment");
                 }
+
+
+
+
             }
         });
 
@@ -81,13 +100,17 @@ public class ProductDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(ProductDetailFragment.ARG_ITEM_ID,0));
-            mAction= getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION,ProductDetailFragment.PRODUCT_SELECTION);
-            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION,mAction);
-            Log.i(LOG_TAG, "CUSTOM_ACTION" + mAction);
-            ProductDetailFragment fragment = new ProductDetailFragment();
+            arguments.putLong(CustomOrderDetailFragment.ARG_ITEM_ID,
+                    getIntent().getLongExtra(CustomOrderDetailFragment.ARG_ITEM_ID,0));
+            mAction= getIntent().getIntExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
+            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,mAction);
+            CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
+
             fragment.setArguments(arguments);
-            if(mAction==ProductDetailFragment.PRODUCT_NEW){
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.customorder_detail_container, fragment)
+                    .commit();
+            if(mAction==CustomDetailFragment.CUSTOM_NEW){
                 fab_delete.setVisibility(View.GONE);
                 fab_save.setVisibility(View.VISIBLE);
             }else {
@@ -95,14 +118,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                 fab_save.setVisibility(View.VISIBLE);
             }
 
-            Log.i(LOG_TAG,"PRODUCT_ACTION"+ getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION,ProductDetailFragment.PRODUCT_SELECTION));
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.product_detail_container, fragment)
-                    .commit();
         }
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -115,26 +132,9 @@ public class ProductDetailActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            NavUtils.navigateUpTo(this, new Intent(this, ProductListActivity.class));
+            NavUtils.navigateUpTo(this, new Intent(this, CustomOrderListFragment.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
-    public void doPositiveClick() {
-        // Do stuff here.
-        Log.i("FragmentAlertDialog", "ProductoDetaiActivity-Positive click!");
-    }
-
-    public void doNegativeClick() {
-        // Do stuff here.
-        Log.i("FragmentAlertDialog", "ProductoDetaiActivity-Negative click!");
-    }
-
-
-
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-        super.startActivityForResult(intent, requestCode);
-    }
-    }
+}

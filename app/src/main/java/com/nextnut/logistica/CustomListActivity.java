@@ -54,7 +54,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
     private FloatingActionButton fab_save;
     private FloatingActionButton fab_delete;
     private static final int CURSOR_LOADER_ID = 0;
-    private int mItem = 0;
+    private long mItem = 0;
 
     private static final String LOG_TAG = CustomListActivity.class.getSimpleName();
     /**
@@ -155,13 +155,13 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
 
         mCursorAdapter = new CustomsCursorAdapter(this, null, emptyView, new CustomsCursorAdapter.CustomsCursorAdapterOnClickHandler() {
             @Override
-            public void onClick(int id, CustomsCursorAdapter.ViewHolder vh) {
+            public void onClick(long id, CustomsCursorAdapter.ViewHolder vh) {
                 Log.i(LOG_TAG, "onclicka:" + id);
                 mItem = id; // when rotate the screen the selecction of the second Screen is conserved.
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
-                    arguments.putInt(CustomDetailFragment.ARG_ITEM_ID, id);
+                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
                     Log.i(LOG_TAG, "ARG_ITEM_ID2 :" + id);
                     arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
 
@@ -178,17 +178,20 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
 
 
                 }else {
+                    Bundle arguments = new Bundle();
+
+                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
+                    arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
                     Intent intent = new Intent(getApplicationContext(), CustomDetailActivity.class);
-                    intent.putExtra(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
-                    Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + id);
+                    intent.putExtras(arguments);
+//                    intent.putExtra(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
+                    Log.i(LOG_TAG, "ARG_ITEM_ID1-: " + mItem );
                     Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomDetailFragment.CUSTOM_SELECTION);
-                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
+//                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, mItem);
                     fab_new.setVisibility(View.VISIBLE);
                     fab_save.setVisibility(View.GONE);
                     fab_delete.setVisibility(View.GONE);
-//                intent.putExtra("DESCRIPCION_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-//                intent.putExtra("IMAGEN_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
-//                intent.putExtra("PRECIO_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         Log.i("ProductListActivity", "makeSceneTransitionAnimation");
 //                        Pair<View,String> p= new Pair<View, StrinTextViewPreciog>(vh.mphotoProducto, getString(R.string.detail_icon_transition_name));
@@ -226,7 +229,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
             mTwoPane = true;
 
             Bundle arguments = new Bundle();
-            arguments.putInt(CustomDetailFragment.ARG_ITEM_ID, mItem);// Fragmet load de last ID.
+            arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);// Fragmet load de last ID.
             arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_DOUBLE_SCREEN);
             Log.i(LOG_TAG, "Custom_MODIFICACION" + false);
             CustomDetailFragment fragment = new CustomDetailFragment();

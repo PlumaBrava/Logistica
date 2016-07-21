@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 /**
  * Created by perez.juan.jose on 12/06/2016.
@@ -58,23 +59,27 @@ public class YesNoDialog extends DialogFragment
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-//
+                        Log.i("YesNoDialog:", "setPositiveButton " );
                         sendBackResult();
+
 //                        getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
 //                        getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, null);
 
 
                     }
                 })
-//                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener()
-//                {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which)
-//                    {
-//                        ((ProductDetailFragment)getTargetFragment()).doNegativeClick();
-////                        getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+
+                        Log.i("YesNoDialog:", "setNegativeButton " );
 //                    }
-//                })
+//                        ((ProductDetailFragment)getTargetFragment()).doNegativeClick();
+//                        getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, null);
+                    }
+                })
                 .create();
     }
 
@@ -98,6 +103,7 @@ public class YesNoDialog extends DialogFragment
     // Call this method to send the data back to the parent fragment
     public void sendBackResult() {
         // Notice the use of `getTargetFragment` which will be set when the dialog is displayed
+        Log.i("YesNoDialog:", "sendBackResult " );
         EditNameDialogListener listener = (EditNameDialogListener) getTargetFragment();
         listener.onFinishEditDialog("juan JJ");
         dismiss();
