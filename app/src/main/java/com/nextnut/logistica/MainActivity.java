@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PickingListFragment.PickingOrdersHandler {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -62,6 +62,16 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CUSTOMER = 1234;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    public static long mPickingOrderSelected=0;
+
+    public static long    getmPickingOrderSelected(){
+        return mPickingOrderSelected;
+    }
+
+    public void setmPickingOrderSelected(long orderSelected){
+       mPickingOrderSelected=orderSelected;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +124,17 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     }
                     case PICKING_FRAGMENT: {
-                        break;
+
+
+                        PickingListFragment fragmentpicking = (PickingListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
+
+                        if (fragmentpicking != null) {
+                            Log.i(LOG_TAG,"Picking Frament Not Null");
+                            fragmentpicking.saveNewPickingOrder();
+                            break;
+                        }else {
+                            Log.i(LOG_TAG, "Picking Frament  Null");
+                        }
                     }
                     case DELIVERY_FRAGMENT: {
                         break;
@@ -124,8 +144,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
     }
 
     @Override
@@ -133,11 +151,26 @@ public class MainActivity extends AppCompatActivity {
                                  int resultCode, Intent data) {
         Log.i(LOG_TAG, "LLego resyktado ok" );
         if (requestCode == REQUEST_CUSTOMER && resultCode == RESULT_OK) {
-            String res = data.getExtras().getString("resultado");
-            Log.i(LOG_TAG, "LLego resyktado ok" + res);
-            long customRef = data.getExtras().getLong("resultado");
+            Bundle bundle = data.getExtras();
+
+            if (bundle == null){ Log.i(LOG_TAG, "LLego resyktado ok" + "bundleNULL");}
+            else {Log.i(LOG_TAG, "LLego resyktado ok" + "bundle ok: " + bundle.toString());
+
+                for (String key : bundle.keySet()) {
+                    Object value = bundle.get(key);
+                    Log.i("resyktado", String.format("%s %s (%s)", key,
+                            value.toString(), value.getClass().getName()));
+                }
 
 
+            }
+
+            String res = bundle .getString("resultado");
+            Log.i(LOG_TAG, "LLego resyktado ok " + res);
+            Log.i(LOG_TAG, "LLego resyktado ok int " + bundle .getInt("resultado"));
+            long customRef = bundle.getLong("resultado");
+
+            Log.i(LOG_TAG, "LLego resyktado ok long " + customRef);
 
             if (customRef != 0) {
 //            if ( mItem != 0) {
@@ -235,6 +268,12 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onPickingOrderSelected(long pickingOrderID) {
+        mPickingOrderSelected = pickingOrderID;
+        Log.i("Main:", "mPickingOrderSelected " +mPickingOrderSelected);
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -289,32 +328,18 @@ public class MainActivity extends AppCompatActivity {
 
                 case CUSTOM_ORDER_FRAGMENT:
                    return new CustomOrderListFragment();
-//                   return new CustomOrderListFragment(new CustomOrderListFragment.DataChangeNotification() {
-//                       @Override
-//                       public void onStepModification(int step) {
-//                           Log.i("Main:", "onStepModification" + step);
-//                        View view = mViewPager.getChildAt(1);
-//                           if (view != null) {
-//                               mViewPager.removeView(view);
-//
-//                               instantiateItem(mViewPager, 1);
-//                           }
-//                           mSectionsPagerAdapter.destroyItem(mViewPager,1, new PickingListFragment());
-//                           mViewPager.destroyDrawingCache();
-//                           mSectionsPagerAdapter.notifyDataSetChanged();
 
-//                           View view = mViewPager.getChildAt(1);
-//                           if (view != null) {
-//                               mViewPager.removeView(view);
-//                               getItem(1);
-////                               mSectionsPagerAdapter.notifyDataSetChanged();
-//                                                        }
-//
-////
-//                       }
-//                   });
                 case PICKING_FRAGMENT:
-                    return new PickingListFragment();
+                    PickingListFragment a= new PickingListFragment();
+
+                    Log.i("Main:", "Fragmet ID " +a.getId());
+                    return a;
+
+                case DELIVERY_FRAGMENT:
+                    DeliveryListFragment b= new DeliveryListFragment();
+
+                    Log.i("Main:", "Fragmet ID " +b.getId());
+                    return b;
 
                 default:
                 // getItem is called to instantiate the fragment for the given page.

@@ -52,6 +52,8 @@ implements ItemTouchHelperAdapter{
     Context mContext;
     ViewHolder mVh;
     Boolean mfavoriteVisibe = true;
+    Boolean mDeliveryState = false;
+
     final private ProductCursorAdapterOnClickHandler mClickHandler;
 
 //    private View.OnClickListener listener;
@@ -75,6 +77,9 @@ implements ItemTouchHelperAdapter{
         this.mfavoriteVisibe=false;
     }
 
+    public void setDeliveryState() {this.mDeliveryState=true;}
+    public void resetDeliveryState() {this.mDeliveryState=false;}
+
     public class ViewHolder extends RecyclerView.ViewHolder
     implements ItemTouchHelperViewHolder, View.OnClickListener {
         public Long mDetalleOrderId ;
@@ -83,9 +88,15 @@ implements ItemTouchHelperAdapter{
         public String mphotString;
         public ImageView mphotoProducto;
         public TextView mTextViewNombre;
+
         public TextView mTextViewPrecio;
         public TextView mTextcantidad;
         public TextView mTextToal;
+
+        public TextView mTextViewPrecioDelivery;
+        public TextView mTextcantidadDelivery;
+        public TextView mTextToalDelivery;
+
         public TextView mTextViewDescition;
         public CheckBox mfavorito;
 
@@ -98,11 +109,20 @@ implements ItemTouchHelperAdapter{
             Log.i("OrderDetailCursorAda:", "ViewHolder");
             mphotoProducto = (ImageView) view.findViewById(R.id.photoProducto);
             mTextViewNombre = (TextView) view.findViewById(R.id.nombreProducto);
-            mTextViewPrecio = (TextView) view.findViewById(R.id.precioProducto);
             mTextViewDescition = (TextView) view.findViewById(R.id.descriptionProducto);
+
+            mTextViewPrecio = (TextView) view.findViewById(R.id.precioProducto);
             mTextcantidad = (TextView) view.findViewById(R.id.cantidad);
             mTextToal = (TextView) view.findViewById(R.id.total);
+
+            mTextViewPrecioDelivery = (TextView) view.findViewById(R.id.precioProductoDelivery);
+            mTextcantidadDelivery = (TextView) view.findViewById(R.id.cantidadDelivery);
+            mTextToalDelivery = (TextView) view.findViewById(R.id.totalDelivery);
+
+
+
             mfavorito = (CheckBox) view.findViewById(R.id.favorito);
+
            mfavorito.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -114,8 +134,20 @@ implements ItemTouchHelperAdapter{
 
                 }
             });
-            mfavorito.setVisibility(mfavoriteVisibe ? View.VISIBLE : View.GONE);
 
+
+            mfavorito.setVisibility(mfavoriteVisibe ? View.VISIBLE : View.GONE);
+            if(mDeliveryState){
+                mTextViewPrecioDelivery.setVisibility(View.VISIBLE);
+                mTextcantidadDelivery.setVisibility(View.VISIBLE);
+                mTextToalDelivery.setVisibility(View.VISIBLE);
+                mfavorito.setVisibility(View.GONE);
+            } else {
+                mTextViewPrecioDelivery.setVisibility(View.GONE);
+                mTextcantidadDelivery.setVisibility(View.GONE);
+                mTextToalDelivery.setVisibility(View.GONE);
+
+            }
         }
 
         @Override
@@ -194,11 +226,18 @@ implements ItemTouchHelperAdapter{
 
                 viewHolder.mDetalleOrderId=cursor.getLong(0);
                 viewHolder.mphotString=cursor.getString(7);
+
+
+                if (cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO))==null){
+                    viewHolder.mphotoProducto.setBackgroundColor(Color.BLUE);
+                }
+
+
                 Picasso.with(viewHolder.mphotoProducto.getContext())
 
                         .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
                         .resize(96, 96)
-                        .placeholder(R.drawable.art_clear)
+                        .placeholder(R.drawable.ic_action_action_redeem)
                         .centerCrop()
                         .into(viewHolder.mphotoProducto);
 
@@ -206,16 +245,30 @@ implements ItemTouchHelperAdapter{
                 NumberFormat format = NumberFormat.getCurrencyInstance();
 
                 viewHolder.mTextViewPrecio.setText(format.format(cursor.getDouble(4)));
-                viewHolder.mTextcantidad.setText(Double.toString(cursor.getDouble(5)));
+                viewHolder.mTextcantidad.setText(Integer.toString(cursor.getInt(5)));
                 viewHolder.mTextToal.setText(format.format(
                         cursor.getDouble(4)
-                        * cursor.getDouble(5)
+                        * cursor.getInt(5)
                         ));
+
+                if(Integer.toString(cursor.getInt(10))!=null) { //revisar
+                    viewHolder.mTextViewPrecioDelivery.setText(format.format(cursor.getDouble(4)));
+
+                    viewHolder.mTextcantidadDelivery.setText(Integer.toString(cursor.getInt(10)));
+                    viewHolder.mTextToalDelivery.setText(format.format(
+                            cursor.getDouble(4)
+                                    * cursor.getInt(10)
+                    ));
+
+                }
+
                 viewHolder.mTextViewDescition.setText(cursor.getString(8));
                 viewHolder.mfavorito.setChecked(new BoolIntConverter().intToBool(cursor.getInt(3)));
 
                 viewHolder.mRefProduct =cursor.getLong(1) ;
                 viewHolder.mRefCustomer =cursor.getLong(9) ;
+
+
                  }
 
 
@@ -223,34 +276,12 @@ implements ItemTouchHelperAdapter{
     public static interface ProductCursorAdapterOnClickHandler {
         void onClick(long id, ViewHolder vh);
         void onFavorite(long id, ViewHolder vh);
+        void onProductDismiss(long id);
     }
 
             @Override
             public void onItemDismiss ( int position){
-                Log.i("TouchHelper:", "Adapter onItemDismiss ");
-//                long cursorId = getItemId(position);
-//                Cursor c = getCursor();
-//                ContentValues cv = new ContentValues();
-//                cv.put(ProductsColumns._ID_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
-//                cv.put(ProductsColumns.DESCRIPCION_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-//                cv.put(ProductsColumns.IMAGEN_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
-//                cv.put(ProductsColumns.PRECIO_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
-//
-//                Intent intent = new Intent(mContext, ProductDetailActivity.class);
-//                intent.putExtra("PRODUCT_MODIFICACION", true);
-//                intent.putExtra("_ID_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
-//                intent.putExtra("DESCRIPCION_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-//                intent.putExtra("IMAGEN_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
-//                intent.putExtra("PRECIO_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
-//
-//                mContext.startActivity(intent);
-
-//        mContext.getContentResolver().delete(PlanetProvider.Planets.withId(cursorId),
-//                null, null);
-//        mContext.getContentResolver().insert(PlanetProvider.ArchivedPlanets.withId(cursorId),
-//                cv);
-//                notifyDataSetChanged();
-//        notifyItemRemoved(position);
+            mClickHandler.onProductDismiss(getItemId(position));
             }
 
     @Override

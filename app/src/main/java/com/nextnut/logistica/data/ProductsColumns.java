@@ -21,6 +21,9 @@ public class ProductsColumns {
     @DataType(DataType.Type.REAL)
     public static final String PRECIO_PRODUCTO = "precioProducto";
 
+    @DataType(DataType.Type.REAL)
+    public static final String PRECIO_SPECIAL_PRODUCTO = "precioSpecialProducto";
+
     @DataType(DataType.Type.TEXT)
     public static final String NOMBRE_PRODUCTO = "nombreProducto";
 

@@ -36,6 +36,7 @@ public class LogisticaProvider {
             String JOINPRODUCTCUSTOMORDER = "joinProuct_CustomOrder";
             String JOINPRODUCTDETAILORDER = "join_Product_Detail_order";
             String JOINCUSTOMORDERDETAILPRODUCTOCUSTOMER = "join_customorderDetail_Product_Customer";
+            String JOINCUSTOMORDERDETAILPRODUCTOCUSTOMERPICKING = "join_customorderDetail_Product_Customer_picking";
 
         }
 
@@ -348,4 +349,54 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
 
         public static final Uri CONTENT_URI = buildUri(Path.JOINCUSTOMORDERDETAILPRODUCTOCUSTOMER );
     }
+
+    @TableEndpoint(table =  LogisticaDataBase.PRODUCTS )
+    public static class join_customorderDetail_Product_Customer_picking {
+
+
+
+        @ContentUri(
+
+                path = Path.JOINCUSTOMORDERDETAILPRODUCTOCUSTOMERPICKING ,
+
+                type = "vnd.android.cursor.item/join_customorderDetail_Product_Customer_picking",
+
+
+                join = "  JOIN " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + " ON " + LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO + " = " +
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." +  CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL
+
+                        +
+
+                        " JOIN " + LogisticaDataBase.CUSTOM_ORDERS  + " ON " +
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." +  CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL +" = "
+                        + LogisticaDataBase.CUSTOM_ORDERS + "." +CustomOrdersColumns.ID_CUSTOM_ORDER
+
+                        +  " left JOIN " + LogisticaDataBase.PICKING_ORDERS_DETAIL
+
+                        + " ON " + " ( "
+                        +
+
+                LogisticaDataBase.PICKING_ORDERS_DETAIL + "." +  PickingOrdersDetailColumns.REF_PICKING_ORDER_PICKING_ORDERS_DETAIL +" = "
+                + LogisticaDataBase.CUSTOM_ORDERS + "." +CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER
+
+                        +" AND "
+
+                + LogisticaDataBase.PICKING_ORDERS_DETAIL  + "." +PickingOrdersDetailColumns.REF_PRODUCT_PICKING_ORDERS_DETAIL+" = "
+               +  LogisticaDataBase.PRODUCTS+ "." + ProductsColumns._ID_PRODUCTO
+
+ + " ) "
+
+                   ,
+
+                groupBy = LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
+//                        + " , "+
+//
+//                        LogisticaDataBase.PICKING_ORDERS_DETAIL + "." +  PickingOrdersDetailColumns.REF_PICKING_ORDER_PICKING_ORDERS_DETAIL
+
+        )
+
+
+        public static final Uri CONTENT_URI = buildUri(Path.JOINCUSTOMORDERDETAILPRODUCTOCUSTOMERPICKING );
+    }
+
 }

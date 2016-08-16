@@ -25,6 +25,8 @@
     <string name="product_name_text">Name:</string>
     <string name="product_price_text">Price:</string>
     <string name="enter_price_message">Enter Price</string>
+    <string name="product_priceSpecal_text">Special Price:</string>
+    <string name="enter_priceSpecia_message">Enter Special Price</string>
     <string name="product_photo_text">Picture</string>
     <string name="product_description_text">Description:</string>
     <string name="product_description_hint_text">Product Description</string>
@@ -47,19 +49,28 @@
     <string name="title_custom_detail">Custom Detail</string>
 
 
+
+
+
     <!--Custom Detail Activity-->
 
     <string name="custom_Id_text">Custom Number:</string>
     <string name="custom_name_text">Name:</string>
     <string name="custom_name_text_hint_text">Name</string>
     <string name="custom_last_text">Lastname:</string>
-    <string name="custom_last_hint_text">Surename</string>
+    <string name="custom_last_hint_text">lastname</string>
 
-    <string name="custom_photo_text">Picture</string>
+    <string name="custom_photo_text">Contacto Agendado</string>
     <string name="custom_delivery_address_text">Delivey Address:</string>
     <string name="custom_delivery_address_hint_text">Delivey Address:</string>
     <string name="custom_city_text">City:</string>
     <string name="custom_city_hint_text">City</string>
+    <string name="custom_Special_text">Special</string>
+    <!--<string name="custom_city_hint_text">City</string>-->
+    <string name="custom_Cuit_text">Cuit:</string>
+    <string name="custom_Cuit_hint_text">00-00000000-0</string>
+    <string name="custom_IVA_text">iva:</string>
+    <string name="custom_IVA_hint_text">21</string>
     <string name="custom_icon_transition_name" translatable="false">TN_CustomName</string>
     <string name="custom_icon_transition_surname" translatable="false">TN_CustomSurname</string>
     <string name="custom_icon_transition_imagen" translatable="false">TN_CustomIcon</string>
@@ -72,10 +83,13 @@
     <string name="title_customorder_list">CustomOrders</string>
     <string name="title_customorder_detail">CustomOrder Detail</string>
 
+    <!--Custom Order List Fragment-->
+    <string name="selectPickingOrderToAssing">Select a Picking order to this order</string>
+
 
     <!--Custom Order Detail Activity-->
     <string name="title_New_Order">New Order</string>
-    <string name="title_Order_Number">Order Number: </string>
+    <string name="title_Order_Number">Order: </string>
 
 
     <string name="customOrder_Id_text">Custom Order Number:</string>
@@ -95,10 +109,19 @@
     <!-- Custome Order Detail  -->
     <string name="boton_select_customer">Select a Customer</string>
     <string name="boton_select_product">Select a Product</string>
+    <string name="boton_conectPrinter">Conectar Impresora</string>
+    <string name="boton_Print">Imprimir</string>
 
     <!--Custom ORDER CARD (customorder_list_contet.xml-->
     <string name="custom_card_order_number">ORDER: </string>
     <string name="custom_card_empty_custom_list">No Order to Display </string>
+
+    <!--Picking ORDER CARD (customorder_list_contet.xml-->
+    <string name="pickng_card_order_number">PICKING ORDER</string>
+    <string name="picking_card_empty_custom_list">No Pincking Order to Display </string>
+    <string name="picking_card_Text_Coment">Enter your comment </string>
+
+
 
     <!--Custom ORDER DETAIL ITEM (order_detail_item.xml-->
     <string name="favorito">Favorite</string>
@@ -118,7 +141,12 @@
     </string>
 
 
-
+    <!-- Picking Orders -->
+    <string name="detete_picking_order">Do you want delete this Picking Order?</string>
+    <string name="detete_picking_order_cancel">Cancel</string>
+    <string name="detete_picking_order_ok">OK</string>
+    <string name="detete_picking_order_Existen_CustomOrders_Asigned">There are Custom Orders Asigned</string>
+    <string name="detete_picking_order_NO_Existen_CustomOrders_Asigned">There are NO Custom Orders Asigned</string>
 
 
 

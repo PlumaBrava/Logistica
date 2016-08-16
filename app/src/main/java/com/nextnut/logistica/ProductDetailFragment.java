@@ -9,6 +9,8 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -40,6 +42,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -79,6 +82,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     private TextView mProductId;
     private EditText mProductName;
     private EditText mProductPrice;
+    private EditText mProductPriceSpecial;
     private EditText mProductDescription;
     private Button button;
     private ImageView mImageProducto;
@@ -175,8 +179,11 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
 
 
         mProductPrice = (EditText) rootView.findViewById(R.id.product_price);
-
         mProductPrice.addTextChangedListener(new NumberTextWatcher(mProductPrice));
+
+        mProductPriceSpecial = (EditText) rootView.findViewById(R.id.product_pricespecial);
+        mProductPriceSpecial.addTextChangedListener(new NumberTextWatcher(mProductPriceSpecial));
+
         mProductDescription = (EditText) rootView.findViewById(R.id.product_description);
 
         mProductDescription.addTextChangedListener(new TextWatcher() {
@@ -314,7 +321,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                 }
 
                 mCurrentPhotoPath = "file:" + file.getAbsolutePath();
-
+                Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
                 Picasso.with(getContext())
                         .load(mCurrentPhotoPath)
                         .placeholder(R.drawable.art_clear)
@@ -328,14 +335,60 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                 if (data != null) {
                     try {
                         bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), data.getData());
-                        mCurrentPhotoPath = String.valueOf(data.getData());
-                        Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
 
+
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+                        bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        byte[] byteArray = stream.toByteArray();
+
+                        // convert byte array to Bitmap
+
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
+                                byteArray.length);
+
+
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        String filename = "Product_" + timeStamp;
+
+                        File file = new File(getContext().getFilesDir(), filename);
+
+                        FileOutputStream outputStream;
+
+                        try {
+                            outputStream = getContext().openFileOutput(filename, Context.MODE_PRIVATE);
+//                    outputStream.write(string.getBytes());
+                            outputStream.write(byteArray);
+                            outputStream.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        mCurrentPhotoPath = "file:" + file.getAbsolutePath();
+                        Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
                         Picasso.with(getContext())
-                                .load(data.getData())
+                                .load(mCurrentPhotoPath)
+                                .placeholder(R.drawable.art_clear)
                                 .into(mImageProducto);
 
 
+
+
+
+                        ////////////////////////////////////
+//                        mCurrentPhotoPath = String.valueOf(data.getData());
+//
+//                        getBitmapFromUri(data.getData());
+//                        getRealPathFromURI(getContext(),data.getData());
+//                        Log.i("prdDetFrament", "mCurrentPhotoPath  getRelPath:" + getRealPathFromURI(getContext(),data.getData()));
+//
+//                        Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
+//
+//                        Picasso.with(getContext())
+//                                .load(data.getData())
+//                                .into(mImageProducto);
+//
+//
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -348,16 +401,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     }
 
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String filename = "Product_" + timeStamp;
-        File file = new File(getContext().getFilesDir(), filename);
 
-        // Save a file: path for use with ACTION_VIEW intents
-//        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-        return file;
-    }
 
 
     private void selectImage() {
@@ -491,6 +535,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
             NumberFormat format = NumberFormat.getCurrencyInstance();
 
             mProductPrice.setText(format.format(data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO))));
+            mProductPriceSpecial.setText(format.format(data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_SPECIAL_PRODUCTO))));
 
             mProductDescription.setText(data.getString(data.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
 
@@ -563,6 +608,8 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                 builder.withValue(ProductsColumns.IMAGEN_PRODUCTO, mCurrentPhotoPath);
                 CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
                 builder.withValue(ProductsColumns.PRECIO_PRODUCTO, price.convert());
+                CurrencyToDouble price1 = new CurrencyToDouble(mProductPriceSpecial.getText().toString());
+                builder.withValue(ProductsColumns.PRECIO_SPECIAL_PRODUCTO, price1.convert());
                 batchOperations.add(builder.build());
             } else
 //            if      (mAction==PRODUCT_SAVE )
@@ -575,6 +622,8 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                 builder.withValue(ProductsColumns.IMAGEN_PRODUCTO, mCurrentPhotoPath);
                 CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
                 builder.withValue(ProductsColumns.PRECIO_PRODUCTO, price.convert());
+                CurrencyToDouble price1 = new CurrencyToDouble(mProductPriceSpecial.getText().toString());
+                builder.withValue(ProductsColumns.PRECIO_SPECIAL_PRODUCTO, price1.convert());
                 batchOperations.add(builder.build());
 
             }

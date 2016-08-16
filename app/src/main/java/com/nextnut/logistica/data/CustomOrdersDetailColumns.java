@@ -24,6 +24,9 @@ public class CustomOrdersDetailColumns {
     @DataType(DataType.Type.INTEGER)
     public static final String QUANTITY_CUSTOM_ORDER_DETAIL = "quantityCustomOrderDetail";
 
+    @DataType(DataType.Type.INTEGER)
+    public static final String QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL = "quantityDeliverCustomOrderDetail";
+
     @DataType(DataType.Type.REAL)
     public static final String PRICE_CUSTOM_ORDER_DETAIL = "priceCustomOrderDetail";
 

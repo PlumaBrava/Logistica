@@ -1,40 +1,35 @@
 package com.nextnut.logistica.rest;
 
-import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.os.RemoteException;
-import android.support.v4.app.FragmentManager;
 
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.nextnut.logistica.CustomOrderListFragment;
+import com.nextnut.logistica.MainActivity;
 import com.nextnut.logistica.R;
-import com.nextnut.logistica.Util.YesNoDialog;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class CustomsOrdersCursorAdapter extends CursorRecyclerViewAdapter<CustomsOrdersCursorAdapter.ViewHolder>
@@ -43,7 +38,7 @@ implements ItemTouchHelperAdapter{
     Context mContext;
     ViewHolder mVh;
     final private CustomsOrdersCursorAdapterOnClickHandler mClickHandler;
-    final private CustomsOrdersCursorAdapteronDataChangekHandler mOnDataChangeHandler;
+
 
     int mProcesStep;
 
@@ -53,12 +48,11 @@ implements ItemTouchHelperAdapter{
 
 //    private View.OnClickListener listener;
     public CustomsOrdersCursorAdapter(Context context, Cursor cursor, View empltyView, CustomsOrdersCursorAdapterOnClickHandler dh,int procesStep
-                                    ,  CustomsOrdersCursorAdapteronDataChangekHandler                      dchangeH
+
     ){
         super(context, cursor,empltyView);
         mContext = context;
         mClickHandler = dh;
-        mOnDataChangeHandler=dchangeH;
         mProcesStep= procesStep;
 
     }
@@ -71,6 +65,8 @@ implements ItemTouchHelperAdapter{
         public TextView mOrderNumber;
         public TextView mName;
         public TextView mLastname;
+        public ImageButton mBottonPhoto;
+        public String mCustomerRefContacto;
 
         public TextView mTotalPrice;
         public TextView mDate;
@@ -86,6 +82,14 @@ implements ItemTouchHelperAdapter{
             mLastname = (TextView) view.findViewById(R.id.latNameOrderCard);
             mTotalPrice = (TextView) view.findViewById(R.id.totalPriceOrderCard);
             mDate = (TextView) view.findViewById(R.id.dateOrderCard);
+            mBottonPhoto = (ImageButton) view.findViewById(R.id.phoneClallButton);
+            mBottonPhoto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mClickHandler.onMakeACall(mCustomerRefContacto);
+                }
+            });
+
 
 
 
@@ -139,11 +143,18 @@ implements ItemTouchHelperAdapter{
 //          2  LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
 //          3  LogisticaDataBase.CUSTOMS+"."+ CustomColumns.NAME_CUSTOM,
 //          4  LogisticaDataBase.CUSTOMS+"."+ CustomColumns.LASTNAME_CUSTOM
+//          5  LogisticaDataBase.CUSTOMS + "." + CustomColumns.REFERENCE_CUSTOM
 
             @Override
             public void onBindViewHolder (ViewHolder viewHolder, Cursor cursor){
                 DatabaseUtils.dumpCursor(cursor);
 
+
+
+                if(cursor.getInt(cursor.getColumnIndex(CustomOrdersColumns.STATUS_CUSTOM_ORDER))==
+                        CustomOrderListFragment.ORDER_STATUS_DELIVERED){
+                    viewHolder.mOrderNumber.setTextColor(Color.GREEN);
+                }
                 viewHolder.mcursorId=cursor.getLong(0);
                 viewHolder.mOrderNumber.setText(Long.toString(cursor.getLong(0)));
                 viewHolder.mName.setText(cursor.getString(3));
@@ -151,9 +162,11 @@ implements ItemTouchHelperAdapter{
                 NumberFormat format = NumberFormat.getCurrencyInstance();
                 viewHolder.mTotalPrice.setText(format.format(cursor.getDouble(2)));
                 viewHolder.mDate.setText(cursor.getString(1));
+                viewHolder.mCustomerRefContacto=cursor.getString(5);
+                viewHolder.mBottonPhoto.setVisibility(viewHolder.mCustomerRefContacto!=null?View.VISIBLE:View.GONE);
 
 
-//                viewHolder.mcursorId=cursor.getInt(cursor.getColumnIndex(CustomColumns.ID_CUSTOM));
+//                viewHolder.mPickingOrderId=cursor.getInt(cursor.getColumnIndex(CustomColumns.ID_CUSTOM));
 //                viewHolder.mOrderNumber.setText(Integer.toString(cursor.getInt(cursor.getColumnIndex(CustomOrdersColumns.ID_CUSTOM_ORDER))));
 //                viewHolder.mName.setText("name");
 //                viewHolder.mLastname.setText("LastName");
@@ -197,11 +210,16 @@ implements ItemTouchHelperAdapter{
 
     public static interface CustomsOrdersCursorAdapterOnClickHandler {
         void onClick(long id, ViewHolder vh);
-    }
-
-    public static interface CustomsOrdersCursorAdapteronDataChangekHandler {
+        void onMakeACall(String ContactID);
+        void onDialogAlert(String message);
+        void onItemDismissCall(long cursorID);
+        void onItemAceptedCall ( long cursorID);
         void onDataChange();
     }
+
+//    public static interface CustomsOrdersCursorAdapteronDataChangekHandler {
+//
+//    }
 
 
 
@@ -214,68 +232,73 @@ implements ItemTouchHelperAdapter{
                     case STEP_CUSTOM_ORDER: {
 
                         Log.i("TouchHelper:", "Adapter onItemDismiss CUSTOM ORDER " + position);
+                        mClickHandler.onItemDismissCall(getItemId(position));
 
 
-                      cursorId = getItemId(position);
-                        AlertDialog.Builder alert = new AlertDialog.Builder((Activity)mContext);
-
-                        alert.setMessage("Do you want to delete?");
-                        alert.setNegativeButton("CANCEL",new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                Log.i("YesNoDialog:", "setNegativeButton" );
-                                mOnDataChangeHandler.onDataChange();
-                                dialog.cancel();
-                            }
-                        });
-                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                Log.i("YesNoDialog:", "setPositiveButton " );
-
-                                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(2);
-
-                                ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrdersDetail.withRefCustomOrder(cursorId));
-                                ContentProviderOperation.Builder builder1 = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrders.withId(cursorId));
-                                batchOperations.add(builder.build());
-                                batchOperations.add(builder1.build());
-
-                                try {
-
-                                    mContext.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-                                    notifyDataSetChanged();
-                                    mOnDataChangeHandler.onDataChange();
-
-//                    notifyItemRemoved(position);
-                                } catch (RemoteException | OperationApplicationException e) {
-                                    Log.e("TouchHelper:", "Error applying batch insert", e);
-
-                                }
-                            }
-                        });
-                        alert.create().show(); // btw show() creates and shows it..
-
+//                      cursorId = getItemId(position);
+//                        AlertDialog.Builder alert = new AlertDialog.Builder((Activity)mContext);
+//
+//                        alert.setMessage("Do you want to delete?");
+//                        alert.setNegativeButton("CANCEL",new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int whichButton) {
+//                                Log.i("YesNoDialog:", "setNegativeButton" );
+//                                mClickHandler.onDataChange();
+//
+//                                dialog.cancel();
+//                            }
+//                        });
+//                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int whichButton) {
+//                                Log.i("YesNoDialog:", "setPositiveButton " );
+//
+//                                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(2);
+//
+//                                ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrdersDetail.withRefCustomOrder(cursorId));
+//                                ContentProviderOperation.Builder builder1 = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrders.withId(cursorId));
+//                                batchOperations.add(builder.build());
+//                                batchOperations.add(builder1.build());
+//
+//                                try {
+//
+//                                    mContext.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//                                    notifyDataSetChanged();
+//                                    mClickHandler.onDataChange();
+//
+//
+////                    notifyItemRemoved(position);
+//                                } catch (RemoteException | OperationApplicationException e) {
+//                                    Log.e("TouchHelper:", "Error applying batch insert", e);
+//
+//                                }
+//                            }
+//                        });
+//                        alert.create().show(); // btw show() creates and shows it..
+//
                     }
                         break;
                     case STEP_PICKING :
                         Log.i("TouchHelper:", "Adapter onItemDismiss PICKIG --" + position);
-                        cursorId = getItemId(position);
-                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-                        ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(cursorId));
-                        builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, 0);
-                        batchOperations.add(builder.build());
-
-
-                        try {
-
-                            mContext.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-                            mOnDataChangeHandler.onDataChange();
-
-
-                        } catch (RemoteException | OperationApplicationException e) {
-                            Log.e("TouchHelper:", "Error applying batch insert", e);
-
-                        }
+                        mClickHandler.onItemDismissCall(getItemId(position));
+//                        Log.i("TouchHelper:", "Adapter onItemDismiss PICKIG --" + position);
+//                        cursorId = getItemId(position);
+//                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+//                        ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(cursorId));
+//                        builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, 0);
+//                        batchOperations.add(builder.build());
+//
+//
+//                        try {
+//
+//                            mContext.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//                            mClickHandler.onDataChange();
+//
+//
+//                        } catch (RemoteException | OperationApplicationException e) {
+//                            Log.e("TouchHelper:", "Error applying batch insert", e);
+//
+//                        }
 
                         break;
                     case STEP_DELIVEY :
@@ -293,32 +316,44 @@ implements ItemTouchHelperAdapter{
 
         switch(mProcesStep) {
             case STEP_CUSTOM_ORDER : {
+
                 Log.i("TouchHelper:", "Adapter onItemAcepted" + position);
+                mClickHandler.onItemAceptedCall(getItemId(position));
 
-
-                Log.i("TouchHelper:", "Adapter onItemAcepted " + position + " : " + mContext.getApplicationContext().toString());
-                long cursorId = getItemId(position);
-                Log.e("TouchHelper:", "position: "+position);
-                Log.e("TouchHelper:", "getItemCount(): "+getItemCount());
-
-
-                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(cursorId));
-                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, 1);
-                batchOperations.add(builder.build());
-                try {
-
-                    mContext.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-                    Log.e("TouchHelper:", "position: "+position);
-                    Log.e("TouchHelper:", "getItemCount(): "+getItemCount());
-                    mOnDataChangeHandler.onDataChange();
-
-//                notifyItemRemoved(position);
-//                    notifyItemRangeChanged(position, getItemCount());
-                } catch (RemoteException | OperationApplicationException e) {
-                    Log.e("TouchHelper:", "Error applying batch insert", e);
-
-                }
+//                if (MainActivity.mPickingOrderSelected==0){
+//                    mClickHandler.onDialogAlert(mContext.getString(R.string.selectPickingOrderToAssing));
+//
+//                }
+//                else {
+//                    Log.i("TouchHelper:", "Adapter onItemAcepted " + position + " : " + mContext.getApplicationContext().toString());
+//                    long cursorId = getItemId(position);
+//                    Log.e("TouchHelper:", "position: " + position);
+//                    Log.e("TouchHelper:", "getItemCount(): " + getItemCount());
+//
+//
+//                    ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+//                    ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(cursorId));
+//                    builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, 1);
+//                    SimpleDateFormat df = new SimpleDateFormat(mContext.getString(R.string.dateFormat));
+//                    String formattedDate = df.format(new Date());
+//                    builder.withValue(CustomOrdersColumns.DATE_OF_PICKING_ASIGNATION_CUSTOM_ORDER, formattedDate);
+//                    builder.withValue(CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER, MainActivity.getmPickingOrderSelected());
+//                    batchOperations.add(builder.build());
+//                    try {
+//
+//                        mContext.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//                        Log.e("TouchHelper:", "position: " + position);
+//                        Log.e("TouchHelper:", "getItemCount(): " + getItemCount());
+//                        mClickHandler.onDataChange();
+//
+//
+////                notifyItemRemoved(position);
+////                    notifyItemRangeChanged(position, getItemCount());
+//                    } catch (RemoteException | OperationApplicationException e) {
+//                        Log.e("TouchHelper:", "Error applying batch insert", e);
+//
+//                    }
+//                }
             }
                 break;
 

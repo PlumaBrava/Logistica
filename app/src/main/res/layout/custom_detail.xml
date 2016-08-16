@@ -185,9 +185,7 @@
                 android:layout_height="wrap_content"
                 app:layout_gravity="left"
                 android:paddingLeft="8dp"
-                android:hint="@string/custom_delivery_address_hint_text"
-
-                />
+                android:hint="@string/custom_delivery_address_hint_text"  />
 
 
         </LinearLayout>
@@ -225,7 +223,88 @@
 
         </LinearLayout>
 
+        <!--Custom Cuit-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/titleTextStyle"
+                app:layout_gravity="left"
+                app:layout_columnWeight="1"
+                android:paddingLeft="16dp"
+                android:paddingStart="16dp"
+                android:paddingRight="16dp"
+                android:paddingEnd="16dp"
+
+                android:textStyle="bold"
+                android:text="@string/custom_Cuit_text"/>
+            <EditText
+                android:id="@+id/custom_cuit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_gravity="left"
+                android:paddingLeft="8dp"
+                android:hint="@string/custom_Cuit_hint_text"
+
+                />
+
+        </LinearLayout>
+
+            <!--Custom IVA-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?android:attr/titleTextStyle"
+                    app:layout_gravity="left"
+                    app:layout_columnWeight="1"
+                    android:paddingLeft="16dp"
+                    android:paddingStart="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingEnd="16dp"
+
+                    android:textStyle="bold"
+                    android:text="@string/custom_IVA_text"/>
+                <EditText
+                    android:id="@+id/custom_iva"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_gravity="left"
+                    android:paddingLeft="8dp"
+                    android:hint="@string/custom_IVA_hint_text"
+
+                    />
+            </LinearLayout>
+
+            <!--Custom Special-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            <CheckBox
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="@string/custom_Special_text"
+                android:id="@+id/custom_special"
+                android:layout_weight="1"/>
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+
 
 </android.support.v7.widget.CardView>

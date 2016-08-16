@@ -77,7 +77,7 @@ public class NumberTextWatcher implements TextWatcher {
         if(s != null && !s.toString().isEmpty()){
 
             et.removeTextChangedListener(this);
-            String cleanString = s.toString().replaceAll("[$,.]", "");
+            String cleanString = s.toString().replaceAll("[€$,.]", "");
 
             double parsed = Double.parseDouble(cleanString);
             String formatted = NumberFormat.getCurrencyInstance().format((parsed/100));

@@ -12,16 +12,14 @@ import android.util.Log;
 import android.view.View;
 
 import com.nextnut.logistica.R;
-import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
-import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 
 /**
  * Created by sam_chordas on 8/14/15.
  */
-public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
+public class SimpleItemTouchHelperCallbackPickingCustomOrder extends ItemTouchHelper.Callback{
     private final ItemTouchHelperAdapter mAdapter;
 
-    public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter){
+    public SimpleItemTouchHelperCallbackPickingCustomOrder(ItemTouchHelperAdapter adapter){
         mAdapter = adapter;
     }
 
@@ -72,8 +70,8 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        final int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
-//        final int swipeFlags = ItemTouchHelper.END ;
+//        final int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        final int swipeFlags = ItemTouchHelper.START ;
         Log.i("TouchHelper:","getMovementFlag, dragFlags: "+dragFlags+"swipeFlags: "+swipeFlags);
         return makeMovementFlags(dragFlags, swipeFlags);
     }

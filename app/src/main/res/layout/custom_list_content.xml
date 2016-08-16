@@ -41,15 +41,15 @@ android:foreground="?selectableItemBackground">
     android:layout_height="wrap_content"
     android:divider="#FFCC00">
 
-    <ImageView
-        android:id="@+id/photocustom_listContent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:maxHeight="96dp"
-        android:maxWidth="96dp"
-        android:transitionName="@string/custom_icon_transition_imagen"
-        android:layout_gravity="center_vertical"/>
+    <!--<ImageView-->
+        <!--android:id="@+id/photocustom_listContent"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="@dimen/text_margin"-->
+        <!--android:maxHeight="96dp"-->
+        <!--android:maxWidth="96dp"-->
+        <!--android:transitionName="@string/custom_icon_transition_imagen"-->
+        <!--android:layout_gravity="center_vertical"/>-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -91,13 +91,7 @@ android:foreground="?selectableItemBackground">
             android:orientation="horizontal"
             android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/cityCustom_listContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="@dimen/text_margin"
-                android:layout_weight="1"></TextView>
+
 
         <TextView
             android:id="@+id/deliveryAddress_listContent"
@@ -109,7 +103,13 @@ android:foreground="?selectableItemBackground">
             />
         </LinearLayout>
 
-
+        <TextView
+            android:id="@+id/cityCustom_listContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/text_margin"
+            android:layout_weight="1"></TextView>
     </LinearLayout>
 
 </LinearLayout>

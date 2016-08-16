@@ -19,7 +19,8 @@ public class CustomOrdersColumns {
     @DataType(DataType.Type.INTEGER) @NotNull
     public static final String  REF_CUSTOM_CUSTOM_ORDER = "refCustomer";
 
-
+    @DataType(DataType.Type.INTEGER)
+    public static final String  REF_PICKING_ORDER_CUSTOM_ORDER = "refPickingOrder";
 
     @DataType(DataType.Type.TEXT)
     public static final String DATE_OF_PICKING_ASIGNATION_CUSTOM_ORDER = "dateOfPickingAsignationCustomOrder";
@@ -33,6 +34,7 @@ public class CustomOrdersColumns {
     @DataType(DataType.Type.INTEGER)
     public static final String STATUS_CUSTOM_ORDER = "statusCustomOrder";
 
-
+    @DataType(DataType.Type.REAL)
+    public static final String SALDO_A_PAGAR_PRICE_CUSTOM_ORDER = "saldoAPagarCustomOrder";
 
 }

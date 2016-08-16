@@ -195,11 +195,12 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         Log.i("ProductListActivity", "makeSceneTransitionAnimation");
 //                        Pair<View,String> p= new Pair<View, StrinTextViewPreciog>(vh.mphotoProducto, getString(R.string.detail_icon_transition_name));
-                        Pair<View, String> p1 = Pair.create((View) vh.mphotoCustomer, getString(R.string.custom_icon_transition_imagen));
+//                        Pair<View, String> p1 = Pair.create((View) vh.mphotoCustomer, getString(R.string.custom_icon_transition_imagen));
                         Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
                         Pair<View, String> p3 = Pair.create((View) vh.mSurename, getString(R.string.custom_icon_transition_surname));
                         ActivityOptionsCompat activityOptions =
-                                ActivityOptionsCompat.makeSceneTransitionAnimation(CustomListActivity.this, p1, p2, p3);
+//                                ActivityOptionsCompat.makeSceneTransitionAnimation(CustomListActivity.this, p1, p2, p3);
+                                ActivityOptionsCompat.makeSceneTransitionAnimation(CustomListActivity.this,  p2, p3);
                         startActivity(intent, activityOptions.toBundle());
 
                     } else {

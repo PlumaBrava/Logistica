@@ -62,6 +62,7 @@ implements ItemTouchHelperAdapter{
         public ImageView mphotoProducto;
         public TextView mTextViewNombre;
         public TextView mTextViewPrecio;
+        public TextView mTextViewPrecioEspecial;
         public TextView mTextViewDescition;
 
 
@@ -73,6 +74,7 @@ implements ItemTouchHelperAdapter{
             mphotoProducto = (ImageView) view.findViewById(R.id.photoProducto);
             mTextViewNombre = (TextView) view.findViewById(R.id.nombreProducto);
             mTextViewPrecio = (TextView) view.findViewById(R.id.precioProducto);
+            mTextViewPrecioEspecial = (TextView) view.findViewById(R.id.precioProductoSpecial);
             mTextViewDescition = (TextView) view.findViewById(R.id.descriptionProducto);
 
 
@@ -175,6 +177,7 @@ implements ItemTouchHelperAdapter{
                 NumberFormat format = NumberFormat.getCurrencyInstance();
 
                 viewHolder.mTextViewPrecio.setText(format.format(cursor.getDouble(cursor.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO))));
+                viewHolder.mTextViewPrecioEspecial.setText(format.format(cursor.getDouble(cursor.getColumnIndex(ProductsColumns.PRECIO_SPECIAL_PRODUCTO))));
                 viewHolder.mTextViewDescition.setText(cursor.getString(cursor.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
 
 

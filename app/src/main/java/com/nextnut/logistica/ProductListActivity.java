@@ -126,19 +126,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
     private ItemTouchHelper mItemTouchHelper;
 
-    Products[] products = {
-            new Products("Mercury", "imagen 1", 1.2),
-            new Products("Venus", "imagen 2", 2.5),
-            new Products("Earth", "imagen 3", 3.31),
-            new Products("Mars", "imagen 4", 4.44),
-            new Products("Ceres", "imagen 5", 5.55),
-            new Products("Jupiter", "imagen 6", 6.66),
-            new Products("Saturn", "imagen 7", 7.77),
-            new Products("Uranus", "imagen 8", 8.88),
-            new Products("Neptune", "imagen 9", 9.99),
-            new Products("Pluto", "imagen 10", 10.10),
-            new Products("Eris", "imagen 11", 11.11)
-    };
+
     private RecyclerView recyclerView;
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_save;
@@ -420,94 +408,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
     }
 
 
-    public void insertData() {
-        Log.d(LOG_TAG, "insert");
-        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(products.length);
-
-        for (Products p : products) {
-            ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
-                    LogisticaProvider.Products.CONTENT_URI);
-            builder.withValue(ProductsColumns.DESCRIPCION_PRODUCTO, p.getDetalle());
-            builder.withValue(ProductsColumns.IMAGEN_PRODUCTO, p.getImagen());
-            builder.withValue(ProductsColumns.PRECIO_PRODUCTO, p.getPrecio());
-            batchOperations.add(builder.build());
-        }
-
-        try {
-            this.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-        } catch (RemoteException | OperationApplicationException e) {
-            Log.e(LOG_TAG, "Error applying batch insert", e);
-        }
-
-    }
 
 
-//    public class SimpleItemRecyclerViewAdapter
-//            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-//
-//        private final List<DummyContent.DummyItem> mValues;
-//
-//        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
-//            mValues = items;
-//        }
-//
-//        @Override
-//        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//            View view = LayoutInflater.from(parent.getContext())
-//                    .inflate(R.layout.product_list_content, parent, false);
-//            return new ViewHolder(view);
-//        }
-//
-//        @Override
-//        public void onBindViewHolder(final ViewHolder holder, int position) {
-//            holder.mItem = mValues.get(position);
-//            holder.mIdView.setText(mValues.get(position).id);
-//            holder.mContentView.setText(mValues.get(position).content);
-//
-//            holder.mView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (mTwoPane) {
-//                        Bundle arguments = new Bundle();
-//                        arguments.putString(ProductDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-//                        ProductDetailFragment fragment = new ProductDetailFragment();
-//                        fragment.setArguments(arguments);
-//                        getSupportFragmentManager().beginTransaction()
-//                                .replace(R.id.product_detail_container, fragment)
-//                                .commit();
-//                    } else {
-//                        Context context = v.getContext();
-//                        Intent intent = new Intent(context, ProductDetailActivity.class);
-//                        intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-//
-//                        context.startActivity(intent);
-//                    }
-//                }
-//            });
-//        }
-//
-//        @Override
-//        public int getItemCount() {
-//            return mValues.size();
-//        }
-//
-//        public class ViewHolder extends RecyclerView.ViewHolder {
-//            public final View mView;
-//            public final TextView mIdView;
-//            public final TextView mContentView;
-//            public DummyContent.DummyItem mItem;
-//
-//            public ViewHolder(View view) {
-//                super(view);
-//                mView = view;
-//                mIdView = (TextView) view.findViewById(R.id.id);
-//                mContentView = (TextView) view.findViewById(R.id.content);
-//            }
-//
-//            @Override
-//            public String toString() {
-//                return super.toString() + " '" + mContentView.getText() + "'";
-//            }
-//        }
-//    }
+
 }

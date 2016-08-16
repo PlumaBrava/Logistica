@@ -23,28 +23,30 @@ public class DialogAlerta extends DialogFragment {
 
     public static DialogAlerta newInstance(String title) {
         DialogAlerta frag = new DialogAlerta();
+
         Bundle args = new Bundle();
         args.putString("title", title);
         frag.setArguments(args);
+        Log.i("onDialogAlert:", "fragment " +title);
         return frag;
     }
 
-    public void DFragmen(String title)
-    {
+//    public void DFragmen(String title)
+//    {
+//
+//    }
 
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-
-            View rootView = inflater.inflate(R.layout.dialogfragment, container, false);
-
-            getDialog().setTitle(getArguments().getString("title"));
-
-            // Do something else
-            return rootView;
-
-    }
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//                             Bundle savedInstanceState) {
+//
+//
+//            View rootView = inflater.inflate(R.layout.dialogfragment, container, false);
+//
+//            getDialog().setTitle(getArguments().getString("title"));
+//
+//            // Do something else
+//            return rootView;
+//
+//    }
 }

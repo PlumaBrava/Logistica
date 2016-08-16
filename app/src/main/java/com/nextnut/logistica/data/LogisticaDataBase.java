@@ -1,6 +1,12 @@
 package com.nextnut.logistica.data;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import net.simonvt.schematic.annotation.DataType;
 import net.simonvt.schematic.annotation.Database;
+import net.simonvt.schematic.annotation.OnUpgrade;
 import net.simonvt.schematic.annotation.Table;
 
 /**
@@ -8,7 +14,7 @@ import net.simonvt.schematic.annotation.Table;
  */
 @Database(version = LogisticaDataBase.VERSION)
 public class LogisticaDataBase {
-    public static final int VERSION = 1;
+    public static final int VERSION = 6;
 
     private LogisticaDataBase() {}
 
@@ -22,4 +28,37 @@ public class LogisticaDataBase {
 
     @Table(PickingOrdersDetailColumns.class)public static final String PICKING_ORDERS_DETAIL = "picking_orders_detail";
 
+
+    @OnUpgrade
+    public static void onUpgrade(Context context, SQLiteDatabase db, int oldVersion,
+                                 int newVersion) {
+        Log.i("UPDATE", "oldVersion:"+oldVersion);
+        if (oldVersion < 6) {
+//            Log.i("UPDATE", "oldVersion:"+oldVersion);
+//            db.execSQL("ALTER TABLE " + CUSTOM_ORDERS
+//                    + " ADD COLUMN " + CustomOrdersColumns.SALDO_A_PAGAR_PRICE_CUSTOM_ORDER + DataType.Type.REAL + " DEFAULT 0");
+
+
+            db.beginTransaction();
+            try {
+                db.execSQL("ALTER TABLE " + CUSTOM_ORDERS
+                        + " ADD COLUMN " + CustomOrdersColumns.SALDO_A_PAGAR_PRICE_CUSTOM_ORDER + " " + DataType.Type.REAL + " DEFAULT 0");
+                db.setTransactionSuccessful();
+            } catch (Exception e) {
+                Log.i("UPDATE", "oldVersion:"+e.toString());
+
+            } finally {
+                db.endTransaction();
+            }
+//            db.execSQL("DROP TABLE IF EXISTS shows"); Borra una tabla
+//            db.execSQL("CREATE TABLE "); Crea una tabla
+//            db.execSQL("ALTER TABLE IF EXISTS shows"); Modifica una tabla/
+//            db.execSQL("RENAME TABLE old_name TO new_name;"); Cambia el nombre/
+
+
+        }
+
+    }
 }
+
+

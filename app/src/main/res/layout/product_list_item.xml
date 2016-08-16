@@ -27,8 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
-        android:maxHeight="96dp"
-        android:maxWidth="96dp"
+        android:maxHeight="@dimen/product_cardPhotoheigth"
+        android:maxWidth="@dimen/product_cardPhotowidth"
         android:transitionName="@string/detail_icon_transition_name"
         android:layout_gravity="center_vertical"/>
 
@@ -62,6 +62,15 @@
         android:layout_gravity="center_vertical"
         android:textStyle="bold"
         />
+
+            <TextView
+                android:id="@+id/precioProductoSpecial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:layout_gravity="center_vertical"
+                android:textStyle="bold"
+                />
             <!--android:layout_weight="1"-->
         </LinearLayout>
 

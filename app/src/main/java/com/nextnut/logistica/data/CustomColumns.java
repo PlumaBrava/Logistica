@@ -28,7 +28,10 @@ public class CustomColumns {
     public static final String IMAGEN_CUSTOM = "ImagenCustome";
 
     @DataType(DataType.Type.TEXT)
-    public static final String REFERENCE_CUSTOM = "ContactReferenceCustom";
+    public static final String REFERENCE_CUSTOM = "ContactReferenceCustom"; // referencia a la tabla de contactos android
+
+    @DataType(DataType.Type.INTEGER)
+    public static final String SPECIAL_CUSTOM  = "SpecialCustom";
 
 //    @DataType(DataType.Type.TEXT)
 //    public static final String RAZON_SOCIAL_CUSTOM ="razonSocialCliente";
@@ -46,9 +49,9 @@ public class CustomColumns {
 //    @DataType(DataType.Type.TEXT)
 //    public static final String PROVINCIA_CUSTOM= "provinciaCliente";
 //
-//    @DataType(DataType.Type.TEXT)
-//    public static final String CUIT_CUSTOM= "cuitCliente";
-//
-//    @DataType(DataType.Type.INTEGER)
-//    public static final String IVA_CUSTOM= "ivaCliente";
+    @DataType(DataType.Type.TEXT)
+    public static final String CUIT_CUSTOM= "cuitCliente";
+
+    @DataType(DataType.Type.REAL)
+    public static final String IVA_CUSTOM= "ivaCliente";
 }

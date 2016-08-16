@@ -159,6 +159,7 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
                         Log.i(LOG_TAG,"nClickListener"+", valor id:"+getItemId(holder.getAdapterPosition()));
                         Intent intent = new Intent();
                         intent.putExtra("resultado",getItemId(holder.getAdapterPosition()));
+//                        intent.putExtra("resultado",2);
                         setResult(RESULT_OK, intent);
                         finish();
 

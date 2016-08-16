@@ -1,16 +1,26 @@
 package com.nextnut.logistica;
 
 import android.animation.ObjectAnimator;
+import android.content.ContentProviderOperation;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.OperationApplicationException;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +33,7 @@ import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 
+import com.nextnut.logistica.Util.DialogAlerta;
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.CustomOrdersDetailColumns;
@@ -33,6 +44,11 @@ import com.nextnut.logistica.rest.CustomsOrdersCursorAdapter;
 import com.nextnut.logistica.rest.OrderDetailCursorAdapter;
 
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * An activity representing a list of CustomOrders. This activity
@@ -50,6 +66,9 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
     private static final int CUSTOM_LOADER_TOTAL_PRODUCTOS = 1;
 
+    final private int  MY_PERMISSIONS_REQUEST_CALL_PHONE =123;
+    final private int  MY_PERMISSIONS_REQUEST_READ_CONTACT =124;
+
     private static final int CUSTOM_ORDER_LOADER = 0;
 
     private CustomsOrdersCursorAdapter mCursorAdapter;
@@ -58,11 +77,20 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
     private RecyclerView recyclerViewTotalProductos;
 
     private ItemTouchHelper mItemTouchHelper;
+
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_save;
     private FloatingActionButton fab_delete;
 
     private int mItem = 0;
+    private long mCustomOrderIdSelected;
+
+
+    public static final int ORDER_STATUS_INICIAL = 0;
+    public static final int ORDER_STATUS_PICKING = 1;
+    public static final int ORDER_STATUS_DELIVERED = 2;
+    public static final int ORDER_STATUS_DELETED = 3;
+
 //    /**
 //     * The dummy content this fragment is presenting.
 //     */
@@ -145,12 +173,18 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             @Override
             public void onClick(long id, OrderDetailCursorAdapter.ViewHolder v) {
                 Log.i(LOG_TAG, "Productos:" + id);
-                changeSize(recyclerViewTotalProductos);
+//                changeSize(recyclerViewTotalProductos);
+                recyclerViewTotalProductos.setVisibility(View.GONE);
             }
 
                     @Override
                     public void onFavorite(long id, OrderDetailCursorAdapter.ViewHolder vh) {
                         Log.i(LOG_TAG, " onFavorite:" + id);
+                    }
+
+                    @Override
+                    public void onProductDismiss(long id) {
+
                     }
                 }
         );
@@ -217,16 +251,144 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
 
             }
-        }
-        ,CustomsOrdersCursorAdapter.STEP_CUSTOM_ORDER, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapteronDataChangekHandler() {
+
+            @Override
+            public void onMakeACall(String ContactID) {
+                Log.i("ProductListActivity", "Make a Call "+ ContactID );
+                makeTheCall(ContactID);
+            }
+
+            @Override
+            public void onDialogAlert(String message) {
+                Log.i("onDialogAlert:", "onDialogAlert " +message);
+//                DialogAlerta dFragment = DialogAlerta.newInstance("test"+message);
+//
+//                dFragment.show(getFragmentManager(), "Dialog Fragment");
+
+
+                AlertDialog.Builder alert ;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    alert  = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
+                } else {
+                    alert  = new AlertDialog.Builder(getContext());
+                }
+
+//                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+
+                alert.setMessage(message);
+                alert.create().show();
+                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onItemDismissCall(long cursorID) {
+                mCustomOrderIdSelected =cursorID;
+
+                AlertDialog.Builder alert ;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    alert  = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
+                } else {
+                    alert  = new AlertDialog.Builder(getContext());
+                }
+
+//                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+
+                alert.setMessage("Do you want to delete?");
+                alert.setNegativeButton("CANCEL",new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Log.i("YesNoDialog:", "setNegativeButton" );
+                        onDataChange();
+
+                        dialog.cancel();
+                    }
+                });
+                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Log.i("YesNoDialog:", "setPositiveButton " );
+
+                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(2);
+
+                        ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrdersDetail.withRefCustomOrder(mCustomOrderIdSelected));
+                        ContentProviderOperation.Builder builder1 = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
+                        batchOperations.add(builder.build());
+                        batchOperations.add(builder1.build());
+
+                        try {
+
+                           getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+
+
+
+
+//                    notifyItemRemoved(position);
+                        } catch (RemoteException | OperationApplicationException e) {
+                            Log.e("TouchHelper:", "Error applying batch insert", e);
+
+                        }finally {
+                            onDataChange();
+                        }
+                    }
+                });
+                alert.create().show(); // btw show() creates and shows it..
+
+
+
+
+            }
+
+            @Override
+            public void onItemAceptedCall(long cursorID) {
+                mCustomOrderIdSelected=cursorID;
+
+                if (MainActivity.mPickingOrderSelected==0){
+
+                    onDialogAlert(getResources().getString(R.string.selectPickingOrderToAssing));
+                    onDataChange();
+                }
+                else {
+
+
+                    Log.e("TouchHelper:", "mCustomOrderIdSelecte " +mCustomOrderIdSelected);
+
+
+
+                    ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+                    ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
+                    builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_PICKING );
+                    SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
+                    String formattedDate = df.format(new Date());
+                    builder.withValue(CustomOrdersColumns.DATE_OF_PICKING_ASIGNATION_CUSTOM_ORDER, formattedDate);
+                    builder.withValue(CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER, MainActivity.getmPickingOrderSelected());
+                    batchOperations.add(builder.build());
+                    try {
+
+                        getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+                          onDataChange();
+
+
+//
+                    } catch (RemoteException | OperationApplicationException e) {
+                        Log.e("TouchHelper:", "Error applying batch insert", e);
+
+                    }
+                }
+            }
+
             @Override
             public void onDataChange() {
                 Log.i("ProductListActivity", "CustomsOrdersCursorAdapteronDataChangekHandler");
                 getLoaderManager().restartLoader(CUSTOM_LOADER_LIST, null, CustomOrderListFragment.this);
                 getLoaderManager().restartLoader(CUSTOM_LOADER_TOTAL_PRODUCTOS, null, CustomOrderListFragment.this);
-//                mDataChangeNotification.onStepModification(MainActivity.CUSTOM_ORDER_FRAGMENT);
             }
-        });
+        }
+        ,CustomsOrdersCursorAdapter.STEP_CUSTOM_ORDER);
 
 
         recyclerView.setAdapter(mCursorAdapter);
@@ -319,7 +481,9 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                         LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
                         LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
                         LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
-                        LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM
+                        LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+                        LogisticaDataBase.CUSTOMS + "." + CustomColumns.REFERENCE_CUSTOM,
+                        LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.STATUS_CUSTOM_ORDER
                 };
 //
 //        String from[] = {LogisticaProvider.CustomOrders.CONTENT_URI.toString() + " as CO" ,
@@ -357,7 +521,10 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 /* 6 */             LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL,
 /* 7 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
 /* 8 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
-/* 9 */             LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER};
+/* 9 */             LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
+/* 10 */            LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL
+
+                };
 
 
                 Log.i(LOG_TAG, "onCreateLoader");
@@ -393,7 +560,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
                     Log.i(LOG_TAG, "swapCursor");
                     mCursorAdapter.swapCursor(data);
-                    animateViewsIn();
+//                    animateViewsIn();
                 }
                 break;
 
@@ -485,5 +652,170 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         void onStepModification(int step);
 
     }
+    public void makeTheCall (String ContactID ){
 
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(getContext(),
+                android.Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.e(LOG_TAG, "phone-Number: "+"PERMISSION No GRANTED");
+
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                    android.Manifest.permission.CALL_PHONE)) {
+                Log.e(LOG_TAG, "phone-Number: "+"Notificar el pedido");
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{android.Manifest.permission.CALL_PHONE},
+                        MY_PERMISSIONS_REQUEST_CALL_PHONE);
+                Log.e(LOG_TAG, "phone-Number: "+"pace el pedido luego de verificar si debe");
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{android.Manifest.permission.CALL_PHONE},
+                        MY_PERMISSIONS_REQUEST_CALL_PHONE);
+                Log.e(LOG_TAG, "phone-Number: "+"pace el pedido");
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }
+
+        else {
+            Log.e(LOG_TAG, "phone-Number: "+"llama directo, esta autorizado");
+            makePhoneCall(ContactID);
+//                Intent intent = new Intent(Intent.ACTION_CALL,
+//                        Uri.parse("tel:"+number));
+//                startActivity(intent);
+            // Do something with the phone number...
+        }
+
+
+    }
+
+    public void makePhoneCall(String id ) {
+        Log.e(LOG_TAG, "phone-Number: "+"makePhoneCal : "+id);
+        Cursor cursor = null;
+        String phoneNumber = "";
+        int type = 0;
+        String phoneType = "";
+        List<String> allNumbers = new ArrayList<String>();
+        int phoneIdx = 0;
+        int displayNameKeyIdx = 0;
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(getContext(),
+                android.Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.e(LOG_TAG, "phone-Number: " + "READ_CONTACTS No GRANTED");
+
+
+//                            // Should we show an explanation?
+//                            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+//                                    android.Manifest.permission.READ_CONTACTS)) {
+//                                Log.e(LOG_TAG, "phone-Number: " + "Notificar el pedido READ_CONTACTS");
+//                                // Show an expanation to the user *asynchronously* -- don't block
+            // this thread waiting for the user's response! After the user
+            // sees the explanation, try again to request the permission.
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{android.Manifest.permission.READ_CONTACTS},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACT);
+            Log.e(LOG_TAG, "phone-Number: " + "Hace el pedido luego de verificar si debe READ_CONTACTS");
+        } else {
+
+            // No explanation needed, we can request the permission.
+
+
+            try {
+
+
+                cursor = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
+//                        cursor = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone._ID + "=?", new String[] { id }, null);
+                phoneIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                displayNameKeyIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
+                Log.e(LOG_TAG, "phone-Number: " + "curor count : " + cursor.getCount());
+                Log.e(LOG_TAG, "phone-Number: " + "curor toString : " + cursor.toString());
+                if (cursor.moveToFirst()) {
+                    while (cursor.isAfterLast() == false) {
+                        phoneNumber = cursor.getString(phoneIdx);
+                        type = cursor.getInt(displayNameKeyIdx);
+                        switch (type) {
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+                                phoneType="HOME";
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+                                phoneType="MOVILE";
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+                                phoneType="WORK";
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_FAX_WORK:
+                            phoneType="FAX WORK";
+                            break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_MAIN:
+                            phoneType="MAIN";
+                            break;
+                            default: phoneType="Otro";
+                        }
+                        Log.e(LOG_TAG, "phone-Number: " + "multiple : " + phoneType+" : "+phoneNumber);
+                        allNumbers.add(phoneType+" : "+phoneNumber);
+                        cursor.moveToNext();
+
+                    }
+                } else {
+                    //no results actions
+                }
+
+
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "phone-Number: " + "Exception" + e.toString());
+                //error actions
+            } finally {
+                Log.e(LOG_TAG, "phone-Number: " + "finally");
+                if (cursor != null) {
+                    cursor.close();
+                }
+
+                final CharSequence[] items = allNumbers.toArray(new String[allNumbers.size()]);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Choose a number");
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        String selectedNumber = items[item].toString();
+                        selectedNumber = selectedNumber.replace("-", "");
+                       String selectedNumber1[]= selectedNumber.split(":");
+                        Log.e(LOG_TAG, "phone-Number: " + "mULTIPLE llamando. selectedNumber1.length: " + selectedNumber1.length);
+                        Log.e(LOG_TAG, "phone-Number: " + "mULTIPLE llamando a: " + selectedNumber1[1]);
+                        Intent intent = new Intent(Intent.ACTION_CALL,
+                                Uri.parse("tel:" + selectedNumber1[1]));
+                        startActivity(intent);
+
+                    }
+                });
+                AlertDialog alert = builder.create();
+                if (allNumbers.size() > 1) {
+                    alert.show();
+                } else {
+                    String selectedNumber = phoneNumber.toString();
+                    selectedNumber = selectedNumber.replace("-", "");
+                    Log.e(LOG_TAG, "phone-Number: " + "sIMPLE llamando a: " + selectedNumber);
+                    Intent intent = new Intent(Intent.ACTION_CALL,
+                            Uri.parse("tel:" + selectedNumber));
+                    startActivity(intent);
+                }
+
+                if (phoneNumber.length() == 0) {
+                    //no numbers found actions
+                }
+            }
+        }
+
+
+    }
 }
+

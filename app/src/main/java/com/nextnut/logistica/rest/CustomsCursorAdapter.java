@@ -48,7 +48,7 @@ implements ItemTouchHelperAdapter{
 
         public TextView mName;
         public TextView mSurename;
-        public ImageView mphotoCustomer;
+//        public ImageView mphotoCustomer;
         public TextView mDeliveryAddress;
         public TextView mCity;
 
@@ -58,7 +58,7 @@ implements ItemTouchHelperAdapter{
             super(view);
             view.setOnClickListener(this);
 
-            mphotoCustomer = (ImageView) view.findViewById(R.id.photocustom_listContent);
+//            mphotoCustomer = (ImageView) view.findViewById(R.id.photocustom_listContent);
             mName = (TextView) view.findViewById(R.id.nameCustom_listContent);
             mSurename = (TextView) view.findViewById(R.id.surenameCustom_listContent);
             mDeliveryAddress = (TextView) view.findViewById(R.id.deliveryAddress_listContent);
@@ -111,13 +111,13 @@ implements ItemTouchHelperAdapter{
                 DatabaseUtils.dumpCursor(cursor);
                 viewHolder.mcursorId=cursor.getInt(cursor.getColumnIndex(CustomColumns.ID_CUSTOM));
                 viewHolder.mphotString=cursor.getString(cursor.getColumnIndex(CustomColumns.IMAGEN_CUSTOM));
-                Picasso.with(viewHolder.mphotoCustomer.getContext())
-
-                        .load(viewHolder.mphotString)
-                        .resize(96, 96)
-                        .placeholder(R.drawable.art_clear)
-                        .centerCrop()
-                        .into(viewHolder.mphotoCustomer);
+//                Picasso.with(viewHolder.mphotoCustomer.getContext())
+//
+//                        .load(viewHolder.mphotString)
+//                        .resize(96, 96)
+//                        .placeholder(R.drawable.art_clear)
+//                        .centerCrop()
+//                        .into(viewHolder.mphotoCustomer);
 
                 viewHolder.mName.setText(cursor.getString(cursor.getColumnIndex(CustomColumns.NAME_CUSTOM)));
                 viewHolder.mSurename.setText(cursor.getString(cursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));

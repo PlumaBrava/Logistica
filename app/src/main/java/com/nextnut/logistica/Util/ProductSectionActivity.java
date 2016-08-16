@@ -35,6 +35,10 @@ import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 public class ProductSectionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
    ProductCursorAdapter mAdapter;
     private static final int CURSOR_LOADER_ID = 0;
+    public static final String KEY_RefPRODUCTO = "refProducto";
+    public static final String KEY_PRODUCTO_NAME = "ProductoName";
+    public static final String KEY_PRODUCTO_PRICE = "ProductPrice";
+    public static final String KEY_PRODUCTO_PRICES_ESPECIAL = "ProductPriceEspecial";
     private static final String LOG_TAG = ProductSectionActivity.class.getSimpleName();
     private long mItem;
     @Override
@@ -62,10 +66,13 @@ public class ProductSectionActivity extends AppCompatActivity implements LoaderM
             public void onClick(long id, ProductCursorAdapter.ViewHolder vh) {
                 Log.i(LOG_TAG,"setupRecyclerView"+id);
                 Intent intent = new Intent();
-                intent.putExtra("refProducto", id);
-                intent.putExtra("ProductoName", vh.mTextViewNombre.getText());
-//                CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecio.getText().toString());
-                intent.putExtra("ProductPrice",vh.mTextViewPrecio.getText().toString());
+                intent.putExtra(KEY_RefPRODUCTO, id);
+                intent.putExtra(KEY_PRODUCTO_NAME, vh.mTextViewNombre.getText());
+
+                intent.putExtra(KEY_PRODUCTO_PRICE,vh.mTextViewPrecio.getText().toString());
+                intent.putExtra(KEY_PRODUCTO_PRICES_ESPECIAL,vh.mTextViewPrecioEspecial.getText().toString());
+                Log.i(LOG_TAG,"ProductPrice"+vh.mTextViewPrecio.getText().toString());
+
                 Log.i(LOG_TAG,"ProductPrice"+vh.mTextViewPrecio.getText().toString());
                 setResult(RESULT_OK, intent);
                 finish();

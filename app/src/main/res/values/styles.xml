@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -17,7 +18,8 @@
     </style>
 
     <!-- Base application theme. -->
-    <style name="AppTheme.Dialog" parent="Base.Theme.AppCompat.Light.Dialog.MinWidth">
+    <!--<style name="AppTheme.Dialog" parent="Base.Theme.AppCompat.Light.Dialog.MinWidth">-->
+    <style name="AppTheme.Dialog" parent="Base.Theme.AppCompat.Light.Dialog">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>

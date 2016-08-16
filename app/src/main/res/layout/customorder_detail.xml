@@ -24,6 +24,7 @@
         android:backgroundTintMode="src_in"
         android:showDividers="beginning|end">
 
+
         <LinearLayout
 
             android:layout_width="match_parent"
@@ -32,6 +33,52 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:layout_marginTop="8dp">
+
+
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/open"
+                android:text="@string/boton_conectPrinter"
+
+                android:background="@color/button_material_light"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp" />
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/send"
+                android:text="@string/boton_Print"
+
+                android:background="@color/button_material_light"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp" />
+
+
+
+
+
+
+        </LinearLayout>
+
+
+
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="8dp">
+
+
+
 
         <Button
             android:layout_width="wrap_content"
@@ -117,7 +164,7 @@
                 android:text="@string/custom_name_text"/>
             <!--android:singleLine="true"-->
             <!--style="?android:attr/titleTextStyle"-->
-            <EditText
+            <TextView
                 android:id="@+id/custom_name_text"
 
                 android:layout_width="wrap_content"
@@ -140,7 +187,7 @@
                 android:text="@string/custom_last_text" />
             <!--android:singleLine="true"-->
             <!--style="?android:attr/titleTextStyle"-->
-            <EditText
+            <TextView
                 android:id="@+id/product_Lastname"
                 app:layout_columnWeight="1"
                 android:layout_width="wrap_content"
@@ -210,7 +257,7 @@
                 android:textStyle="bold"
                 android:text="@string/custom_delivery_address_text"
                 android:padding="4dp" />
-            <EditText
+            <TextView
                 android:id="@+id/custom_delivery_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -239,7 +286,7 @@
                 android:textStyle="bold"
                 android:text="@string/custom_city_text"
                 android:padding="4dp" />
-            <EditText
+            <TextView
                 android:id="@+id/custom_city"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -263,6 +310,16 @@
 
         <TextView
             android:id="@+id/montoToal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_gravity="left"
+            android:paddingLeft="8dp"
+            android:hint="@string/custom_city_hint_text"
+
+            />
+
+        <TextView
+            android:id="@+id/montoToalDelivery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_gravity="left"
@@ -301,8 +358,8 @@
 
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
         app:layoutManager="LinearLayoutManager"
         />
     <!--tools:context="com.nextnut.logistica.ProductListActivity"-->

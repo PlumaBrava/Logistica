@@ -1,6 +1,6 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_horizontal_margin">8dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="appbar_padding_top">8dp</dimen>
@@ -14,10 +14,14 @@
         @dimen/abc_list_item_padding_horizontal_material
     </dimen>
     <dimen name="Poduct_cardViewElevation">2dp</dimen>
-    <dimen name="product_cardViewMarginLeft">4dp</dimen>
+    <dimen name="product_cardViewMarginLeft">2dp</dimen>
     <dimen name="product_cardViewtMarginTop">4dp</dimen>
-    <dimen name="product_cardViewMarginRight">4dp</dimen>
+    <dimen name="product_cardViewMarginRight">2dp</dimen>
     <dimen name="product_cardViewMarginBottom">4dp</dimen>
+
+    <dimen name="product_cardPhotoheigth">64dp</dimen>
+    <dimen name="product_cardPhotowidth">64dp</dimen>
+
 
 
     <dimen name="offset_y">300dp</dimen>
