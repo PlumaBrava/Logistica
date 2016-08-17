@@ -21,7 +21,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.nextnut.logistica.CustomOrderListFragment;
 import com.nextnut.logistica.MainActivity;
+import com.nextnut.logistica.PickingListFragment;
 import com.nextnut.logistica.R;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
@@ -80,7 +82,7 @@ implements ItemTouchHelperAdapter{
             mCreationDate = (TextView) view.findViewById(R.id.PicckinOder_creationdate);
             mSharePickingOrder =(ImageButton)view.findViewById(R.id.SharePickingorder);
 
-
+            mSharePickingOrder.setBackgroundColor(Color.TRANSPARENT);
 
         }
 
@@ -88,14 +90,14 @@ implements ItemTouchHelperAdapter{
         @Override
         public void onItemSelected() {
             Log.i("TouchHelper:", "Adapter onItemSelected(): ");
-            itemView.setBackgroundColor(Color.LTGRAY);
+//            itemView.setBackgroundColor(Color.LTGRAY);
         }
 
         @Override
         public void onItemClear() {
 
             Log.i("TouchHelper:", "Adapter onItemClear(): ");
-            itemView.setBackgroundColor(0x7f0100a5);
+//            itemView.setBackgroundColor(0x7f0100a5);
         }
 
 
@@ -133,19 +135,30 @@ implements ItemTouchHelperAdapter{
             public void onBindViewHolder (final ViewHolder viewHolder, Cursor cursor){
                 DatabaseUtils.dumpCursor(cursor);
 
+
+                if(cursor.getInt(cursor.getColumnIndex(PickingOrdersColumns.STATUS_PICKING_ORDERS))==
+                        PickingListFragment.PICKING_STATUS_CERRADA){
+                    Log.i("PickingCursor:", "PICKING_STATUS_CERRADA: ");
+                    ((View )(viewHolder.mPickingOrderNumber.getParent().getParent())).setBackgroundColor(Color.RED);
+
+                } else {
+                    Log.i("PickingCursor:", "PICKING_STATUS_NO CERRADA: ");
+                    ((View )(viewHolder.mPickingOrderNumber.getParent().getParent())).setBackgroundColor(Color.WHITE);
+                }
+
                 viewHolder.mPickingOrderId =cursor.getLong(cursor.getColumnIndex(PickingOrdersColumns.ID_PICKING_ORDERS));
                 viewHolder.mPickingOrderNumber.setText(Long.toString(cursor.getLong(cursor.getColumnIndex(PickingOrdersColumns.ID_PICKING_ORDERS))));
                 viewHolder.mpickingOrderComents.setText(cursor.getString(cursor.getColumnIndex(PickingOrdersColumns.COMMENTS_PICKING_ORDERS)));
                 viewHolder.mCreationDate.setText(cursor.getString(cursor.getColumnIndex(PickingOrdersColumns.CREATION_DATE_PICKING_ORDERS)));
                 Log.i("PickingCursor:", "getmPickingOrderSelected: "+MainActivity.getmPickingOrderSelected());
                 Log.i("PickingCursor:", "D_PICKING_ORDERS: "+cursor.getLong(cursor.getColumnIndex(PickingOrdersColumns.ID_PICKING_ORDERS)));
-                if(mpickongOrderSelected && MainActivity.getmPickingOrderSelected()==cursor.getLong(cursor.getColumnIndex(PickingOrdersColumns.ID_PICKING_ORDERS))){
-                    viewHolder.itemView.setBackgroundColor(Color.RED);
-
-                }else {
-//                    viewHolder.itemView.setBackgroundColor(Color.MAGENTA);
-//                    viewHolder.itemView.setVisibility(mpickongOrderSelected?View.GONE:View.VISIBLE);
-                }
+//                if(mpickongOrderSelected && MainActivity.getmPickingOrderSelected()==cursor.getLong(cursor.getColumnIndex(PickingOrdersColumns.ID_PICKING_ORDERS))){
+//                    viewHolder.itemView.setBackgroundColor(Color.RED);
+//
+//                }else {
+////                    viewHolder.itemView.setBackgroundColor(Color.MAGENTA);
+////                    viewHolder.itemView.setVisibility(mpickongOrderSelected?View.GONE:View.VISIBLE);
+//                }
 
                 viewHolder.mSharePickingOrder.setOnClickListener(new View.OnClickListener() {
                     @Override

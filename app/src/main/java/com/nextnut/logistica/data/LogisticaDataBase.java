@@ -34,10 +34,6 @@ public class LogisticaDataBase {
                                  int newVersion) {
         Log.i("UPDATE", "oldVersion:"+oldVersion);
         if (oldVersion < 6) {
-//            Log.i("UPDATE", "oldVersion:"+oldVersion);
-//            db.execSQL("ALTER TABLE " + CUSTOM_ORDERS
-//                    + " ADD COLUMN " + CustomOrdersColumns.SALDO_A_PAGAR_PRICE_CUSTOM_ORDER + DataType.Type.REAL + " DEFAULT 0");
-
 
             db.beginTransaction();
             try {
@@ -54,9 +50,33 @@ public class LogisticaDataBase {
 //            db.execSQL("CREATE TABLE "); Crea una tabla
 //            db.execSQL("ALTER TABLE IF EXISTS shows"); Modifica una tabla/
 //            db.execSQL("RENAME TABLE old_name TO new_name;"); Cambia el nombre/
+//            CREATE TABLE employees (
+//                    id            INTEGER       PRIMARY KEY,
+//                    first_name    VARCHAR(50)   not null,
+//                    last_name     VARCHAR(75)   not null,
+//                    fname         VARCHAR(50)   not null,
+//                    dateofbirth   DATE          not null
+//            );
+
+        }
+
+        if (oldVersion < 7) {
+
+            db.beginTransaction();
+            try {
+                db.execSQL("ALTER TABLE " + CUSTOM_ORDERS
+                        + " ADD COLUMN " + CustomOrdersColumns.SALDO_A_PAGAR_PRICE_CUSTOM_ORDER + " " + DataType.Type.REAL + " DEFAULT 0");
+                db.setTransactionSuccessful();
+            } catch (Exception e) {
+                Log.i("UPDATE", "oldVersion:"+e.toString());
+
+            } finally {
+                db.endTransaction();
+            }
 
 
         }
+
 
     }
 }

@@ -197,22 +197,7 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
             intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
             Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + customRef);
             Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
-//            intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, customRef);
-//                            fab_new.setVisibility(View.VISIBLE);
-//                            fab_save.setVisibility(View.GONE);
-//                            fab_delete.setVisibility(View.GONE);
-
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-////                Log.i("ProductListActivity", "makeSceneTransitionAnimation");
 //
-////                                Pair<View, String> p1 = Pair.create((View) vh.mphotoCustomer, getString(R.string.custom_icon_transition_imagen));
-////                Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
-////                                Pair<View, String> p3 = Pair.create((View) vh.mSurename, getString(R.string.custom_icon_transition_surname));
-//                ActivityOptionsCompat activityOptions =
-//                        ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p2);
-//                startActivity(intent, activityOptions.toBundle());
-//
-//            } else {
             Log.i("ProductListActivity", "makeSceneTransitionAnimation Normal");
             startActivity(intent);
 //            }

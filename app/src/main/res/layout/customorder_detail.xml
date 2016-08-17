@@ -238,7 +238,63 @@
                 />
 
         </LinearLayout>
+        <!--Cuit-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/titleTextStyle"
+                app:layout_gravity="left"
+                app:layout_columnWeight="1"
+
+                android:textStyle="bold"
+                android:text="@string/custom_Cuit_text"
+                android:padding="4dp" />
+            <TextView
+                android:id="@+id/CUIT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_gravity="left"
+                android:hint="@string/custom_Cuit_hint_text"
+
+                android:padding="4dp" />
+
+
+        </LinearLayout>
+
+        <!--iva-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/titleTextStyle"
+                app:layout_gravity="left"
+                app:layout_columnWeight="1"
+
+                android:textStyle="bold"
+                android:text="@string/custom_IVA_text"
+                android:padding="4dp" />
+            <TextView
+                android:id="@+id/IVA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_gravity="left"
+
+
+                android:padding="4dp" />
+
+
+        </LinearLayout>
 
         <!--Custom Delivey Address-->
         <LinearLayout
@@ -298,6 +354,8 @@
 
         </LinearLayout>
 
+
+
         <TextView
             android:id="@+id/cantidadTotal"
             android:layout_width="wrap_content"
@@ -314,7 +372,6 @@
             android:layout_height="wrap_content"
             app:layout_gravity="left"
             android:paddingLeft="8dp"
-            android:hint="@string/custom_city_hint_text"
 
             />
 
@@ -324,7 +381,7 @@
             android:layout_height="wrap_content"
             app:layout_gravity="left"
             android:paddingLeft="8dp"
-            android:hint="@string/custom_city_hint_text"
+
 
             />
 

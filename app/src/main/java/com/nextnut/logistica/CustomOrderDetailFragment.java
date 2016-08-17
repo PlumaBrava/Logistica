@@ -113,6 +113,9 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     private TextView mLastName;
     private TextView mDeliveyAddress;
     private TextView mCity;
+    private TextView mCuit;
+    private TextView mIva;
+    private Double mIvaCalculo;
     public TextView mCantidadTotal;
     public TextView mMontoTotal;
     public TextView mMontoTotalDelivey;
@@ -204,7 +207,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             case CUSTOM_ORDER_NEW:
                 getLoaderManager().initLoader(CUSTOM_LOADER_NEW, null, this);
                 getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
+//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
                 Log.e(LOG_TAG, "onActivityCreated-CUSTOM_LOADER_NEW");
                 break;
 
@@ -213,21 +216,21 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-default DETAIL_PRODUCT_LOADER");
                     getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
                 } else {
-                    getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
+//                    getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
                     Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-DETAIL_PRODUCT_LOADER");
                 }
                 break;
             case ACTION_CUSTOM_ORDER_DELIVERY:
                 getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
                 getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
+//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
                 Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
                 break;
 
             case CUSTOM_ORDER_SELECTION:
                 getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
                 getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
+//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
                 Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
             default:
                 break;
@@ -304,6 +307,9 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         mImageCustomer = (ImageView) rootView.findViewById(R.id.custom_imagen);
         mDeliveyAddress = (TextView) rootView.findViewById(R.id.custom_delivery_address);
         mCity = (TextView) rootView.findViewById(R.id.custom_city);
+        mCuit = (TextView) rootView.findViewById(R.id.CUIT);
+        mIva = (TextView) rootView.findViewById(R.id.IVA);
+
 
         mCantidadTotal=(TextView) rootView.findViewById(R.id.cantidadTotal);;
         mMontoTotal=(TextView) rootView.findViewById(R.id.montoToal);;
@@ -372,27 +378,10 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                         null,
                         null,null);
 
-//               if (c_favorite!=null && c_favorite.getCount()>0 ) {
-//                   c_favorite.moveToFirst();
-//                   do {
-//
-//
-//                       Log.i(LOG_TAG, "onf - ID: " + c_favorite.getLong(0));
-//                       Log.i(LOG_TAG, "onf - REF_CUSTOM: " + c_favorite.getLong(1));
-//                       Log.i(LOG_TAG, "onf - REF_PRODUCT: " + c_favorite.getString(2));
-//                       Log.i(LOG_TAG, "onf - PRODUCT_NAME: " + c_favorite.getString(3));
-//                       Log.i(LOG_TAG, "onf - QUANTITY: " + c_favorite.getString(4));
-//                       Log.i(LOG_TAG, "onf - PRICE_CUSTOM: " + c_favorite.getDouble(5));
-//                       Log.i(LOG_TAG, "onf - FAVORITE_CUSTOM: " + c_favorite.getLong(6));
-//
-//
-//                   } while (c_favorite.moveToNext());
-//               }
-
 
                  if (c_favorite.getCount()>=1){
                      Log.i(LOG_TAG, "ya existe onFavorite" + id+ "cantidad: "+c_favorite.getCount()+ "refCustomer: "+vh.mRefCustomer+ " refProducto: "+vh.mRefProduct);
-//                     YesNoDialog.newInstance ("Ya existe favorito","Lo cambia?");
+;
                      mIdDetailCustomOrder_for_favorite=vh.mDetalleOrderId;
                      mCheckBox_for_favorite=vh.mfavorito;
                      AlertDialog.Builder alert = new AlertDialog.Builder((Activity)getContext());
@@ -467,10 +456,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             @Override
             public void onProductDismiss(long id) {
                 Log.i(LOG_TAG, "onProductDismiss, ID:"+id);
-//                ContentValues upDateValues = new ContentValues();
-//                upDateValues.put(CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL, new BoolIntConverter().boolToInt(vh.mfavorito.isChecked()));
-//                getContext().getContentResolver().delete(LogisticaProvider.CustomOrdersDetail.withId(id), null, null);
-//                mAdapter.notifyDataSetChanged();
 
 
 
@@ -618,6 +603,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
       switch(id) {
 
             case CUSTOM_LOADER:
+
             return new CursorLoader(
 
                     getActivity(),
@@ -638,7 +624,9 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     /*5*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.DELIIVERY_ADDRES_CUSTOM,
     /*6*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.DELIVERY_CITY_CUSTOM,
     /*7*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.IMAGEN_CUSTOM,
-    /*8*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.SPECIAL_CUSTOM
+    /*8*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.SPECIAL_CUSTOM,
+    /*9*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.CUIT_CUSTOM,
+    /*10*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.IVA_CUSTOM
                 };
 
 
@@ -664,6 +652,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 /* 7 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.IMAGEN_CUSTOM,
 /* 8 */                      LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.ID_CUSTOM_ORDER,
 /* 9 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.SPECIAL_CUSTOM,
+/* 10 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.CUIT_CUSTOM,
+/* 11 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.IVA_CUSTOM,
               };
 
 
@@ -748,10 +738,14 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     mCity.setText(data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
                     mCurrentPhotoPath = data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM));
                     mIsSpecialCustom=data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM));
-
+                    Log.i(LOG_TAG, "CUSTOM_LOADER- mIsSpecialCustom: " + mIsSpecialCustom);
                     Picasso.with(getContext())
                             .load(mCurrentPhotoPath)
                             .into(mImageCustomer);
+                    mCuit.setText(data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)));
+                    mIva.setText(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM)));
+                    mIvaCalculo=data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
+
                 }
 
                 break;
@@ -767,12 +761,17 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     mCity.setText(data.getString(6));
                     mCurrentPhotoPath = data.getString(7);
                     mIsSpecialCustom=data.getInt(8);
+                    Log.i(LOG_TAG, "CUSTOM_ORDER_LOADER- mIsSpecialCustom: " + mIsSpecialCustom);
                     if (appBarLayout != null) {
 
 //                        appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + data.getString(0));
                         appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + mItem);
 
                     }
+                    mCuit.setText(data.getString(9));
+                    mIva.setText(data.getString(10));
+                    mIvaCalculo=data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
+                    getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
                 }
                 break;
 
@@ -788,6 +787,12 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     mCity.setText(data.getString(6));
                     mCurrentPhotoPath = data.getString(7);
                     mIsSpecialCustom=data.getInt(9);
+                    Log.i(LOG_TAG, "CUSTOM_LOADER_NEW- mIsSpecialCustom: " + mIsSpecialCustom);
+
+                    mCuit.setText(data.getString(10));
+                    mIva.setText(data.getString(11));
+                    mIvaCalculo=data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
+
                     if (appBarLayout != null) {
 
                         appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + data.getLong(8));
@@ -841,12 +846,12 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                         } catch (RemoteException | OperationApplicationException e) {
                             Log.e(LOG_TAG, "Error applying batch insert", e);
                         }finally {
-                            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-                            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
+//                            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
+
                             mAdapter.notifyDataSetChanged();
                         }
 
-
+                        getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
                     }
                 }
                 break;
@@ -869,15 +874,29 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                 if (data != null && data.moveToFirst()) {
                     NumberFormat format = NumberFormat.getCurrencyInstance();
                     mCantidadTotal.setText("cantidad: "+Integer.toString(data.getInt(1)));
-                    mMontoTotal.setText("Monto Total:"+ format.format(data.getDouble(0)));
-                    mMontoTotalDelivey.setText("Monto Total:"+ format.format(data.getDouble(2)));
+                    Log.i(LOG_TAG, "TOTALES_LOADER - IVAstring"+ mIva.getText().toString());
+
+                    Log.i(LOG_TAG, "TOTALES_LOADER - mIvaCalculo"+ mIvaCalculo);
+                    Log.i(LOG_TAG, "TOTALES_LOADER - mIsSpecialCustom"+ mIsSpecialCustom);
+                    if(mIsSpecialCustom>0){
+                        mIvaCalculo=0.0;
+                    }
+                    Log.i(LOG_TAG, "TOTALES_LOADER - mIvaCalculo"+ (1+mIvaCalculo/100));
+                    mMontoTotal.setText("Monto Total:"+ format.format(data.getDouble(0))+"-"+
+                            format.format(data.getDouble(0)*(1+mIvaCalculo/100)));
+                    Log.i(LOG_TAG, "TOTALES_LOADER - IVA"+ mIva.getText().toString() );
+                    Log.i(LOG_TAG, "TOTALES_LOADER - IVA%"+ (Integer.parseInt(mIva.getText().toString()))/100);
+
+
+                    mMontoTotalDelivey.setText("Monto Total Delivery:"+ format.format(data.getDouble(2))+"-"+
+                            format.format(data.getDouble(2)*(1+mIvaCalculo/100)));
                     do {
 
                         Log.i(LOG_TAG, "TOTALES_LOADER - cantidad"+ Integer.toString(data.getInt(1)) );
                         Log.i(LOG_TAG, "TOTALES_LOADER - monto total" +format.format(data.getDouble(0)) );
-                        saveTotalPrice(data.getDouble(0));
+                        saveTotalPrice(data.getDouble(0)*(1+mIvaCalculo/100));
                         if (mAction==CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY){
-                            saveTotalPrice(data.getDouble(2));
+                            saveTotalPrice(data.getDouble(2)*(1+mIvaCalculo/100));
                         }
 
                     }while (data.moveToNext());
@@ -1291,13 +1310,13 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             msg="^FO5,"+(h+i)+"^ADN,24,10^FD"+"Producto"+"^FS";
             mmOutputStream.write(msg.getBytes());
 
-            msg="^FO170,"+(h+i)+"^ADN,24,10^FD"+"Cantidad"+"^FS";
+            msg="^FO190,"+(h+i)+"^ADN,24,10^FD"+"Cantidad"+"^FS";
             mmOutputStream.write(msg.getBytes());
 
-            msg="^FO290,"+(h+i)+"^ADN,24,10^FD"+"Precio"+"^FS";
+            msg="^FO310,"+(h+i)+"^ADN,24,10^FD"+"Precio"+"^FS";
             mmOutputStream.write(msg.getBytes());
 
-            msg="^FO410,"+(h+i)+"^ADN,24,10^FD"+"Total"+"^FS";
+            msg="^FO430,"+(h+i)+"^ADN,24,10^FD"+"Total"+"^FS";
             mmOutputStream.write(msg.getBytes());
 
            h=h+i;
@@ -1333,13 +1352,13 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + name + "^FS";
                     mmOutputStream.write(msg.getBytes());
 
-                    msg = "^FO170," + (h + i) + "^ADN,24,10^FD" + cantidad + "^FS";
+                    msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + cantidad + "^FS";
                     mmOutputStream.write(msg.getBytes());
 
-                    msg = "^FO290," + (h + i) + "^ADN,24,10^FD" +format.format( precio) + "^FS";
+                    msg = "^FO310," + (h + i) + "^ADN,24,10^FD" +format.format( precio) + "^FS";
                     mmOutputStream.write(msg.getBytes());
 
-                    msg = "^FO410," + (h + i) + "^ADN,24,10^FD" +format.format( total) + "^FS";
+                    msg = "^FO430," + (h + i) + "^ADN,24,10^FD" +format.format( total) + "^FS";
                     mmOutputStream.write(msg.getBytes());
 
 
@@ -1353,6 +1372,14 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
 
             msg = "^FO290," + h + "^ADN,36,20^FD" + format.format(totalOrden) + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+
+            msg = "^FO310," + h + "^ADN,36,20^FD" +"iva: "+ format.format(totalOrden*mIvaCalculo/100) + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+
+            msg = "^FO430," + h + "^ADN,36,20^FD" + "= "+format.format(totalOrden*(1+mIvaCalculo/100)) + "^FS";
             mmOutputStream.write(msg.getBytes());
             // Print a barCode
 //            msg="^B8N,100,Y,N";

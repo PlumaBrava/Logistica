@@ -907,6 +907,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                             Log.e(LOG_TAG, "updatePickingOrder Error applying batch insert", e);
                         } finally {
                             mCursorAdapterTotalProductos.notifyDataSetChanged();
+                            getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, this);
                         }
                         }
 

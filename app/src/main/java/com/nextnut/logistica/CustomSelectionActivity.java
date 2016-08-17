@@ -86,13 +86,16 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.i(LOG_TAG,"onCreateLoader");
+
+
+        String orderBy =CustomColumns.DELIVERY_CITY_CUSTOM  +" ASC, "+ CustomColumns.NAME_CUSTOM  +" ASC, "+ CustomColumns.LASTNAME_CUSTOM +" ASC ";
         return new CursorLoader(
                 this,
                 LogisticaProvider.Customs.CONTENT_URI,
                 null,
                 null,
                 null,
-                null);
+                orderBy);
     }
 
     @Override
@@ -147,7 +150,11 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
 
                 mCursor.moveToPosition(position);
 
-                String text1 = mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM))+" "+mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM));
+
+                String text1 = mCursor.getString(mCursor.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM))+" | "+
+                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM))+ " "+
+                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
+
                 holder.custonName.setText(text1);
 
                 Log.i("LOG_TAG", "ID: " + Long.toString(getItemId(position)));

@@ -120,14 +120,14 @@ implements ItemTouchHelperAdapter{
         @Override
         public void onItemSelected() {
             Log.i("TouchHelper:", "Adapter onItemSelected(): ");
-            itemView.setBackgroundColor(Color.LTGRAY);
+//            itemView.setBackgroundColor(Color.LTGRAY);
         }
 
         @Override
         public void onItemClear() {
 
             Log.i("TouchHelper:", "Adapter onItemClear(): ");
-            itemView.setBackgroundColor(0);
+//            itemView.setBackgroundColor(0);
         }
 
         @Override

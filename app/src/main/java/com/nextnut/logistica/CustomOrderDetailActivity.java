@@ -30,56 +30,49 @@ public class CustomOrderDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
+
+
+//        FloatingActionButton fab_save = (FloatingActionButton) findViewById(R.id.fab_save);
+//        fab_save.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//
+//                CustomOrderDetailFragment customOrderDetailFragment=(CustomOrderDetailFragment)
+//                        getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+//                if (customOrderDetailFragment!=null){
+//                    customOrderDetailFragment.SaveCustomOrder();
+//                    Log.i(LOG_TAG,"no null fragment");
+//                }else {
+//                    Log.i(LOG_TAG,"null fragment");
+//                }
+//
+//            }
+//
+//        });
+//
+//        FloatingActionButton fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
+//        fab_delete.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "fab_delete:Replace with your own detail action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//
+//                CustomOrderDetailFragment customOrderDetailFragment=(CustomOrderDetailFragment)
+//                        getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+//                if (customOrderDetailFragment!=null){
+//                    customOrderDetailFragment.deleteCustomOrder();
+//                    Log.i(LOG_TAG,"no null fragment");
+//                }else {
+//                    Log.i(LOG_TAG,"null fragment");
+//                }
+//
+//
 //
 //
 //            }
 //        });
-
-        FloatingActionButton fab_save = (FloatingActionButton) findViewById(R.id.fab_save);
-        fab_save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-                CustomOrderDetailFragment customOrderDetailFragment=(CustomOrderDetailFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
-                if (customOrderDetailFragment!=null){
-                    customOrderDetailFragment.SaveCustomOrder();
-                    Log.i(LOG_TAG,"no null fragment");
-                }else {
-                    Log.i(LOG_TAG,"null fragment");
-                }
-
-            }
-
-        });
-
-        FloatingActionButton fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
-        fab_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "fab_delete:Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-                CustomOrderDetailFragment customOrderDetailFragment=(CustomOrderDetailFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
-                if (customOrderDetailFragment!=null){
-                    customOrderDetailFragment.deleteCustomOrder();
-                    Log.i(LOG_TAG,"no null fragment");
-                }else {
-                    Log.i(LOG_TAG,"null fragment");
-                }
-
-
-
-
-            }
-        });
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -110,13 +103,13 @@ public class CustomOrderDetailActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.customorder_detail_container, fragment)
                     .commit();
-            if(mAction==CustomDetailFragment.CUSTOM_NEW){
-                fab_delete.setVisibility(View.GONE);
-                fab_save.setVisibility(View.VISIBLE);
-            }else {
-                fab_delete.setVisibility(View.VISIBLE);
-                fab_save.setVisibility(View.VISIBLE);
-            }
+//            if(mAction==CustomDetailFragment.CUSTOM_NEW){
+//                fab_delete.setVisibility(View.GONE);
+//                fab_save.setVisibility(View.VISIBLE);
+//            }else {
+//                fab_delete.setVisibility(View.VISIBLE);
+//                fab_save.setVisibility(View.VISIBLE);
+//            }
 
         }
     }

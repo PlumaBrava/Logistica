@@ -244,7 +244,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                 Log.e(LOG_TAG, "phone-name: "+name);
                 Log.e(LOG_TAG, "phone- _id : "+ mIdContact );
 
-
+                button.setText(name);
                 // Here, thisActivity is the current activity
                 if (ContextCompat.checkSelfPermission(getContext(),
                         android.Manifest.permission.CALL_PHONE)

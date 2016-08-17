@@ -69,8 +69,9 @@
     <!--<string name="custom_city_hint_text">City</string>-->
     <string name="custom_Cuit_text">Cuit:</string>
     <string name="custom_Cuit_hint_text">00-00000000-0</string>
-    <string name="custom_IVA_text">iva:</string>
+    <string name="custom_IVA_text">Iva:</string>
     <string name="custom_IVA_hint_text">21</string>
+
     <string name="custom_icon_transition_name" translatable="false">TN_CustomName</string>
     <string name="custom_icon_transition_surname" translatable="false">TN_CustomSurname</string>
     <string name="custom_icon_transition_imagen" translatable="false">TN_CustomIcon</string>
