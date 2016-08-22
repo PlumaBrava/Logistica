@@ -242,12 +242,29 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         }
         if (id == R.id.customs) {
             Toast.makeText(MainActivity.this, "Customs", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this,CustomListActivity.class);
+            Intent intent = new Intent(this, CustomListActivity.class);
 
             ActivityOptionsCompat activityOptions =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(this);
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
             return true;
+        }  if (id == R.id.reportexCliente) {
+
+            Intent intent1 = new Intent(this, ReporteMensualxCliente.class);
+
+            ActivityOptionsCompat activityOptions1 =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+            ActivityCompat.startActivity(this, intent1, activityOptions1.toBundle());
+            return true;
+
+        } if (id == R.id.reportexMes) {
+
+                    Intent intent1 = new Intent(this,ReportexMes.class);
+
+                    ActivityOptionsCompat activityOptions1 =
+                            ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+                    ActivityCompat.startActivity(this, intent1, activityOptions1.toBundle());
+                    return true;
         }
 
         return super.onOptionsItemSelected(item);

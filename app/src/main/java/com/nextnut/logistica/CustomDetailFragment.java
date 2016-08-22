@@ -136,7 +136,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         View rootView = inflater.inflate(R.layout.custom_detail, container, false);
 
 
-        mCustomId = (TextView) rootView.findViewById(R.id.custom_Id);
+//        mCustomId = (TextView) rootView.findViewById(R.id.custom_Id);
         mCustomName = (EditText) rootView.findViewById(R.id.custom_name_text);
         mLastName = (EditText) rootView.findViewById(R.id.product_Lastname);
         button = (Button) rootView.findViewById(R.id.custom_imagen_button);

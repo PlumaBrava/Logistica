@@ -15,5 +15,14 @@
         android:icon="@drawable/ic_action_image_timer_auto"
         android:title="@string/customs"
         app:showAsAction="ifRoom"/>
+    <item android:id="@+id/reportexCliente"
+        android:orderInCategory="110"
+        android:title="@string/reportesXcliente"
+        app:showAsAction="never"/>
+    <item android:id="@+id/reportexMes"
+        android:orderInCategory="110"
+        android:title="@string/reportesXMes"
+        app:showAsAction="never"/>
+
 <!-- Revisar iconos -->
 </menu>

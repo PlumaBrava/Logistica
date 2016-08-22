@@ -174,7 +174,15 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             public void onClick(long id, OrderDetailCursorAdapter.ViewHolder v) {
                 Log.i(LOG_TAG, "Productos:" + id);
 //                changeSize(recyclerViewTotalProductos);
-                recyclerViewTotalProductos.setVisibility(View.GONE);
+//                recyclerViewTotalProductos.setVisibility(View.GONE);
+
+
+                Intent intent = new Intent(getContext(), ProductosEnOrdenes.class);
+
+                Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + id);
+
+                intent.putExtra(ProductosEnOrdenes.ARG_ITEM_ID, id);
+                startActivity(intent);
             }
 
                     @Override

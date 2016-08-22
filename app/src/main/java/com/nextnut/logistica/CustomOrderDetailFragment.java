@@ -180,7 +180,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+//        updateDateFormat();
+//        reportTotalesXProductoy();
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
@@ -846,7 +847,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                         } catch (RemoteException | OperationApplicationException e) {
                             Log.e(LOG_TAG, "Error applying batch insert", e);
                         }finally {
-//                            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
+                            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
 
                             mAdapter.notifyDataSetChanged();
                         }
@@ -885,7 +886,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     mMontoTotal.setText("Monto Total:"+ format.format(data.getDouble(0))+"-"+
                             format.format(data.getDouble(0)*(1+mIvaCalculo/100)));
                     Log.i(LOG_TAG, "TOTALES_LOADER - IVA"+ mIva.getText().toString() );
-                    Log.i(LOG_TAG, "TOTALES_LOADER - IVA%"+ (Integer.parseInt(mIva.getText().toString()))/100);
+//                    Log.i(LOG_TAG, "TOTALES_LOADER - IVA%"+ (Integer.parseInt(mIva.getText().toString()))/100);
 
 
                     mMontoTotalDelivey.setText("Monto Total Delivery:"+ format.format(data.getDouble(2))+"-"+
@@ -935,7 +936,115 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     }
 
+    public void updateDateFormat(){
+        try {
+            Cursor c = getActivity().getContentResolver().query(LogisticaProvider.CustomOrders.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
 
+//            LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO
+            if (c != null && c.getCount() > 0) {
+                Log.i(LOG_TAG, "Update - count: " + c.getCount());
+                c.moveToFirst();
+
+
+                do {
+
+                    ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+                    ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(c.getLong(0)));
+                    builder.withValue(CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER, "2016-08-15");
+                    batchOperations.add(builder.build());
+                    getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+                } while (c.moveToNext());
+
+
+
+
+
+            } else {
+                Log.i(LOG_TAG, "Informe - count: " + "null");
+            }
+
+        } catch (Exception e) {
+            Log.e(LOG_TAG, " Informe Error applying batch insert", e);
+        }
+    }
+
+
+
+    public void reportTotalesXProductoy(){
+
+        String select[] = {
+
+
+                "strftime('%Y-%m', "+ LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER+ " ) ",
+//     LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
+                LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+                LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+                            LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
+                           "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) as Qdeliver ",
+                           "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) as Qorder ",
+                            };
+
+        Log.i(LOG_TAG, "Informe -  select: " +select[0] );
+
+//       Total por Cliente
+//        LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+//                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
+//                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) ",
+//                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) ",
+//    };
+
+        String where =
+                LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER + " = " + mCustomRef + " and " +
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL + " = 1 ";
+        try {
+        Cursor c = getActivity().getContentResolver().query(LogisticaProvider.reporte.CONTENT_URI,
+                select,
+                null,
+                null,
+                null,
+                null);
+
+//            LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO
+        if (c != null && c.getCount() > 0) {
+            Log.i(LOG_TAG, "Informe - count: " + c.getCount());
+            c.moveToFirst();
+
+            String mes=c.getString(0)+"-";
+            Log.i(LOG_TAG, "Informe -ano mes"+mes);
+            String cliente=c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
+            Log.i(LOG_TAG, "Informe -   Cliente_NAME: " + cliente);
+            String producto=null;
+            do {
+               if(!mes.equals(c.getString(0)+"-")){
+                    mes=c.getString(0)+"-";
+                    Log.i(LOG_TAG, "Informe -ano mes"+mes);
+               }if(!cliente.equals(
+                           c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM))
+                    )) {
+                        cliente=c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
+
+                        Log.i(LOG_TAG, "Informe -   Cliente_NAME: " + cliente);
+                    }
+                producto=c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
+                Log.i(LOG_TAG, "Informe -     PRODUCT_NAME: " + producto+": "+c.getString(c.getColumnIndex("Qdeliver"))+c.getString(c.getColumnIndex("Qorder")));
+
+
+            } while (c.moveToNext());
+
+
+        } else {
+            Log.i(LOG_TAG, "Informe - count: " + "null");
+        }
+
+        } catch (Exception e) {
+            Log.e(LOG_TAG, " Informe Error applying batch insert", e);
+        }
+    }
 
     public void deleteCustomOrder() {
         Log.i(LOG_TAG, "delete");
@@ -1367,19 +1476,31 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             }
 
             h = h + i*3;
+
+            if (mIvaCalculo>0){
+            msg = "^FO5," + h  + "^ADN,36,20^FD" + "SubTotal: " + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+
+            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden) + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            h=h+i+i;
+
+            msg = "^FO5," + h  + "^ADN,36,20^FD" + "Iva: "+ "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden*mIvaCalculo/100) + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            h=h+i+i;
+
+            }
+
             msg = "^FO5," + h  + "^ADN,36,20^FD" + "Total: " + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-
-            msg = "^FO290," + h + "^ADN,36,20^FD" + format.format(totalOrden) + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-
-            msg = "^FO310," + h + "^ADN,36,20^FD" +"iva: "+ format.format(totalOrden*mIvaCalculo/100) + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-
-            msg = "^FO430," + h + "^ADN,36,20^FD" + "= "+format.format(totalOrden*(1+mIvaCalculo/100)) + "^FS";
+            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden*(1+mIvaCalculo/100)) + "^FS";
             mmOutputStream.write(msg.getBytes());
             // Print a barCode
 //            msg="^B8N,100,Y,N";

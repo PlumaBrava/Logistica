@@ -37,6 +37,8 @@ public class LogisticaProvider {
             String JOINPRODUCTDETAILORDER = "join_Product_Detail_order";
             String JOINCUSTOMORDERDETAILPRODUCTOCUSTOMER = "join_customorderDetail_Product_Customer";
             String JOINCUSTOMORDERDETAILPRODUCTOCUSTOMERPICKING = "join_customorderDetail_Product_Customer_picking";
+            String REPORTE = "reporte";
+            String REPORTExMES = "reportexMes";
 
         }
 
@@ -397,6 +399,94 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
 
 
         public static final Uri CONTENT_URI = buildUri(Path.JOINCUSTOMORDERDETAILPRODUCTOCUSTOMERPICKING );
+    }
+
+    @TableEndpoint(table =  LogisticaDataBase.CUSTOM_ORDERS_DETAIL )
+    public static class reporte {
+
+
+
+        @ContentUri(
+
+                path = Path.REPORTE ,
+
+                type = "vnd.android.cursor.item/reporte",
+
+
+                join = "  JOIN " + LogisticaDataBase.PRODUCTS + " ON " +
+                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO + " = " +
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." +  CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL
+
+                        +
+
+                        " JOIN " + LogisticaDataBase.CUSTOM_ORDERS  + " ON " +
+                        LogisticaDataBase.CUSTOM_ORDERS + "." +CustomOrdersColumns.ID_CUSTOM_ORDER+" = "+
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." +  CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL
+
+                        +  " JOIN " + LogisticaDataBase.CUSTOMS   + " ON " +
+                        LogisticaDataBase.CUSTOMS + "." +CustomColumns.ID_CUSTOM+" = "+
+                        LogisticaDataBase.CUSTOM_ORDERS + "." +  CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER
+
+
+
+                ,
+
+                groupBy = "1,2,3,4 "
+                       // LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM +" , "+
+//                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
+//      Totales por cliente y Producto1
+//                groupBy =
+//                LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM +" , "+
+//                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
+
+        )
+
+
+        public static final Uri CONTENT_URI = buildUri(Path.REPORTE );
+    }
+
+    @TableEndpoint(table =  LogisticaDataBase.CUSTOM_ORDERS_DETAIL )
+    public static class reportexMes {
+
+
+
+        @ContentUri(
+
+                path = Path.REPORTExMES ,
+
+                type = "vnd.android.cursor.item/reporte",
+
+
+                join = "  JOIN " + LogisticaDataBase.PRODUCTS + " ON " +
+                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO + " = " +
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." +  CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL
+
+                        +
+
+                        " JOIN " + LogisticaDataBase.CUSTOM_ORDERS  + " ON " +
+                        LogisticaDataBase.CUSTOM_ORDERS + "." +CustomOrdersColumns.ID_CUSTOM_ORDER+" = "+
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." +  CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL
+
+                        +  " JOIN " + LogisticaDataBase.CUSTOMS   + " ON " +
+                        LogisticaDataBase.CUSTOMS + "." +CustomColumns.ID_CUSTOM+" = "+
+                        LogisticaDataBase.CUSTOM_ORDERS + "." +  CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER
+
+
+
+                ,
+
+                groupBy = "1, 2 "
+                // LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM +" , "+
+//                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
+//      Totales por cliente y Producto1
+//                groupBy =
+//                LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM +" , "+
+//                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
+
+        )
+
+
+        public static final Uri CONTENT_URI = buildUri(Path.REPORTExMES );
     }
 
 }

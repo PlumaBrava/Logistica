@@ -281,7 +281,7 @@
                     android:layout_height="wrap_content"
                     app:layout_gravity="left"
                     android:paddingLeft="8dp"
-                    android:hint="@string/custom_IVA_hint_text"
+
 
                     />
             </LinearLayout>

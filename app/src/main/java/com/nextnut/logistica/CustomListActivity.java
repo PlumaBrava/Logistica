@@ -28,6 +28,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
+import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.dummy.DummyContent;
 import com.nextnut.logistica.rest.CustomsCursorAdapter;
@@ -272,7 +273,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
                 null,
                 null,
                 null,
-                null);
+                CustomColumns.LASTNAME_CUSTOM +" ASC , "+CustomColumns.NAME_CUSTOM+" ASC  ");
     }
 
     @Override

@@ -585,10 +585,13 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
         if (mAction == PRODUCT_SELECTION && mItem != 0) {
 
             Log.i(LOG_TAG, "entro");
-//            ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete();
-//            batchOperations.add(builder.build());
-            getActivity().getContentResolver().delete(
-                    LogisticaProvider.Products.withId(mItem), null, null);
+
+            // Comento borrar producto para que no se borre por error. Modificar el estado!
+
+
+
+//            getActivity().getContentResolver().delete(
+//                    LogisticaProvider.Products.withId(mItem), null, null);
             getActivity().onBackPressed();
         }
 
