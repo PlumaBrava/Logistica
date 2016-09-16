@@ -1,24 +1,26 @@
 package com.nextnut.logistica.rest;
 
-import android.animation.Animator;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewAnimationUtils;
+
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-//import com.nextnut.distribution.ProductsActivity;
-//import com.nextnut.distribution.R;
+
 import com.nextnut.logistica.ProductDetailActivity;
 import com.nextnut.logistica.R;
 import com.nextnut.logistica.data.ProductsColumns;
@@ -27,19 +29,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 
-//import com.sam_chordas.android.schematicplanets.R;
-//import com.sam_chordas.android.schematicplanets.data.ArchivedPlanetColumns;
-//import com.sam_chordas.android.schematicplanets.data.PlanetColumns;
-//import com.sam_chordas.android.schematicplanets.data.PlanetProvider;
 
-//import de.hdodenhof.circleimageview.CircleImageView;
-
-/**
- * Created by sam_chordas on 8/12/15.
- * Credit to skyfishjy gist:
- *    https://gist.github.com/skyfishjy/443b7448f59be978bc59
- * for the code structure
- */
 
 public class ProductCursorAdapter extends CursorRecyclerViewAdapter<ProductCursorAdapter.ViewHolder>
 implements ItemTouchHelperAdapter{
@@ -78,7 +68,7 @@ implements ItemTouchHelperAdapter{
             mTextViewDescition = (TextView) view.findViewById(R.id.descriptionProducto);
 
 
-//            mImageview = (CircleImageView) view.findViewById(R.id.planet_image);
+
         }
 
 
@@ -102,21 +92,7 @@ implements ItemTouchHelperAdapter{
             Log.i("onClick", "cursorID " + mcursorId);
             Log.i("onClick", "PhotoString " + mphotString);
             mClickHandler.onClick(mcursorId, this);
-//            if(listener != null)
-//                listener.onClick(view);
-//            boolean isRed = isRed = !true;
-//            final int radius = (int) Math.hypot(view.getWidth() / 2, view.getHeight() / 2);
-//            view.setBackgroundColor(Color.RED);
-//            if (isRed) {
-//                view.setBackgroundColor(Color.GRAY);
-//
-//            } else {
-//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-//                    Animator anim = ViewAnimationUtils.createCircularReveal(view, view.getWidth() / 2, view.getHeight() / 2, 0, radius);
-//                    view.setBackgroundColor(Color.GREEN);
-//                    anim.start();
-//                }
-//            }
+
         }
     }
 
@@ -132,44 +108,22 @@ implements ItemTouchHelperAdapter{
             }
 
 
-//    public void setOnClickListener(View.OnClickListener listener) {
-//        this.listener = listener;
-//    }
 
-
-//        Log.i("TouchHelper:","Adapter onItemDismiss ");
-////        long cursorId = getItemId(mVh.getChildPosition(view));
-//        Cursor c = getCursor();
-//        ContentValues cv = new ContentValues();
-//        cv.put(ProductsColumns._ID_PRODUCTO,c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
-//        cv.put(ProductsColumns.DESCRIPCION_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-//        cv.put(ProductsColumns.IMAGEN_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
-//        cv.put(ProductsColumns.PRECIO_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
-//
-//        Intent intent=new Intent(mContext,ProductDetailActivity.class);
-//        intent.putExtra("PRODUCT_MODIFICACION",true);
-//        intent.putExtra("_ID_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
-//        intent.putExtra("DESCRIPCION_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-//        intent.putExtra("IMAGEN_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
-//        intent.putExtra("PRECIO_PRODUCTO",c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
-//
-//        mContext.startActivity(intent);
-
-//        mContext.getContentResolver().delete(PlanetProvider.Planets.withId(cursorId),
-//                null, null);
-//        mContext.getContentResolver().insert(PlanetProvider.ArchivedPlanets.withId(cursorId),
-//                cv);
 
             @Override
             public void onBindViewHolder (ViewHolder viewHolder, Cursor cursor){
                 DatabaseUtils.dumpCursor(cursor);
                 viewHolder.mcursorId=cursor.getLong(cursor.getColumnIndex(ProductsColumns._ID_PRODUCTO));
                 viewHolder.mphotString=cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO));
+                if (cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO))==null){
+                    viewHolder.mphotoProducto.setBackgroundColor(Color.BLUE);
+                }
+                Drawable drawable = resize(R.drawable.ic_action_action_redeem);
                 Picasso.with(viewHolder.mphotoProducto.getContext())
 
                         .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
-                        .resize(96, 96)
-                        .placeholder(R.drawable.art_clear)
+                        .placeholder( drawable)
+                        .resize(mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotowidth), mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotoheigth))
                         .centerCrop()
                         .into(viewHolder.mphotoProducto);
 
@@ -183,19 +137,23 @@ implements ItemTouchHelperAdapter{
 
             }
 
-//        viewHolder.mImageview.setImageResource(cursor.getInt(cursor.getColumnIndex(
-//                                PlanetColumns.IMAGE_RESOURCE)));
+    private Drawable resize(int somedrawable) {
+        // Read your drawable from somewhere
 
+        Drawable dr =mContext.getResources(). getDrawable(somedrawable);
+        Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
 
-//    @Override
-//    public void onClick(View v) {
-////        int adapterPosition = getAdapterPosition();
-//        mClickHandler.onClick( this);
-////        mCursor.moveToPosition(adapterPosition);
-//    }
-//    public static interface ForecastAdapterOnClickHandler {
-//        void onClick( ProductCursorAdapter vh);
-//    }
+        Drawable d = new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(bitmap
+                ,mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotoheigth)
+                ,mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotowidth)
+                , true));
+// Set your new, scaled drawable "d"
+
+//        Bitmap b = ((BitmapDrawable)image).getBitmap();
+//        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
+//        return new BitmapDrawable(getResources(), bitmapResized);
+        return d;
+    }
 
 
     public static interface ProductCursorAdapterOnClickHandler {

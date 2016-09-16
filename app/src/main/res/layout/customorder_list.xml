@@ -28,11 +28,12 @@
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     android:elevation="2dp"
+
     app:layoutManager="LinearLayoutManager"
 
     />
-    <!--tools:context="com.nextnut.logistica.ProductListActivity"-->
-    <!--tools:listitem="@layout/product_list_content"-->
+    <!--android:background ="@color/colorAccent"-->
+
 <TextView
 android:id="@+id/recyclerview_totalproduct_empty"
 android:layout_width="match_parent"

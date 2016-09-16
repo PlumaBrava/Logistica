@@ -52,6 +52,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.nextnut.logistica.Util.MakeCall.makeTheCall;
+import static com.nextnut.logistica.Util.SharePickingOrder.sharePickingOrder;
+import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
+
 /**
  * An activity representing a list of CustomOrders. This activity
  * has different presentations for handset and tablet-size devices. On
@@ -258,10 +262,11 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
 
                         } catch (RemoteException | OperationApplicationException e) {
-                            Log.e("TouchHelper:", "Error applying batch insert", e);
+                            Log.i("TouchHelper:", "Error applying batch insert", e);
 
                         } finally {
                             onDataChange();
+                            upDateWitget (getContext());
                         }
 
                     }
@@ -303,11 +308,10 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
                     @Override
                     public void sharePickingorder(PickingOrdersCursorAdapter.ViewHolder vh) {
-
+                        Log.i(LOG_TAG, "sharePickingorder"+ vh.mPickingOrderNumber.getText().toString());
+                        sharePickingOrder(getContext(),  vh.mPickingOrderNumber.getText().toString(),mTilePickingComent.getText().toString());
                     }
-                },
-
-                PickingOrdersCursorAdapter.STEP_PICKING
+                }
             );
 
 
@@ -451,7 +455,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
             @Override
             public void onMakeACall(String ContactID) {
-
+                makeTheCall(getActivity(),ContactID);
             }
 
             @Override
@@ -524,7 +528,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                 mCursorAdapterTotalProductos.notifyDataSetChanged();
             }
         }
-                ,CustomsOrdersCursorAdapter.STEP_CUSTOM_ORDER
+
         );
 
         recyclerViewCustomOrderInDeliveyOrder.setAdapter(mCustomsOrdersCursorAdapter);

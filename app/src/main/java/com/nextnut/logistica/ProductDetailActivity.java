@@ -1,7 +1,6 @@
 package com.nextnut.logistica;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,7 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
-import java.util.List;
+
 
 /**
  * An activity representing a single Product detail screen. This
@@ -27,31 +26,6 @@ public class ProductDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Bundle bundle =  getIntent().getExtras();
-        for (String key : bundle.keySet()) {
-            Object value = bundle.get(key);
-            Log.i(LOG_TAG ,"resyktado "+ String.format("%s - %s - (%s)", key,
-                    value.toString(), value.getClass().getName()));
-        }
-
-//        Uri data = getIntent().getData();
-//        String scheme = data.getScheme(); // "http"
-//        String host = data.getHost(); // "twitter.com"
-//        List<String> params = data.getPathSegments();
-//        String first = params.get(0); // "status"
-////        String second = params.get(1); // "1234"
-//
-//        Log.i(LOG_TAG ,"resyktado scheme-"+ scheme);
-//        Log.i(LOG_TAG ,"resyktado host-"+ host);
-//        Log.i(LOG_TAG ,"resyktado first-"+ first);
-//        Log.i(LOG_TAG ,"resyktado toString-"+ data.toString());
-//        Log.i(LOG_TAG ,"resyktado a-"+ data.getQueryParameters("a"));
-//        Log.i(LOG_TAG ,"resyktado numbre-"+ data.getQueryParameters("numbre"));
-//        Log.i(LOG_TAG ,"resyktado getEncodedUserInfo-"+  data.getEncodedUserInfo());
-
-
-
 
 
         setContentView(R.layout.activity_product_detail);
@@ -75,22 +49,22 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
-        fab_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Delete", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
-                if(productDetailFragment!=null){
-                    productDetailFragment.deleteProduct();
-                    Log.i(LOG_TAG,"no null fragment");
-                }else {
-                    Log.i(LOG_TAG,"null fragment");
-                }
-            }
-        });
+//        FloatingActionButton fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
+//        fab_delete.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Delete", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
+//                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
+//                if(productDetailFragment!=null){
+//                    productDetailFragment.deleteProduct();
+//                    Log.i(LOG_TAG,"no null fragment");
+//                }else {
+//                    Log.i(LOG_TAG,"null fragment");
+//                }
+//            }
+//        });
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -122,10 +96,10 @@ public class ProductDetailActivity extends AppCompatActivity {
             ProductDetailFragment fragment = new ProductDetailFragment();
             fragment.setArguments(arguments);
             if(mAction==ProductDetailFragment.PRODUCT_NEW){
-                fab_delete.setVisibility(View.GONE);
+//                fab_delete.setVisibility(View.GONE);
                 fab_save.setVisibility(View.VISIBLE);
             }else {
-                fab_delete.setVisibility(View.VISIBLE);
+//                fab_delete.setVisibility(View.VISIBLE);
                 fab_save.setVisibility(View.VISIBLE);
             }
 
@@ -155,15 +129,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void doPositiveClick() {
-        // Do stuff here.
-        Log.i("FragmentAlertDialog", "ProductoDetaiActivity-Positive click!");
-    }
-
-    public void doNegativeClick() {
-        // Do stuff here.
-        Log.i("FragmentAlertDialog", "ProductoDetaiActivity-Negative click!");
-    }
 
 
 

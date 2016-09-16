@@ -45,19 +45,18 @@ implements ItemTouchHelperAdapter{
     int mProcesStep;
     private boolean mpickongOrderSelected=false;
 
-    public static final int STEP_CUSTOM_ORDER = 0;
-    public static final int STEP_PICKING = 1;
-    public static  final int STEP_DELIVEY = 2;
+//    public static final int STEP_CUSTOM_ORDER = 0;
+//    public static final int STEP_PICKING = 1;
+//    public static  final int STEP_DELIVEY = 2;
 
 //    private View.OnClickListener listener;
-    public PickingOrdersCursorAdapter(Context context, Cursor cursor, View empltyView, PinckingOrdersCursorAdapterOnClickHandler dh, int procesStep
+    public PickingOrdersCursorAdapter(Context context, Cursor cursor, View empltyView, PinckingOrdersCursorAdapterOnClickHandler dh
 
     ){
         super(context, cursor,empltyView);
         mContext = context;
         mClickHandler = dh;
-//        mOnDataChangeHandler=dchangeH;
-        mProcesStep= procesStep;
+
 
     }
 
@@ -143,7 +142,9 @@ implements ItemTouchHelperAdapter{
 
                 } else {
                     Log.i("PickingCursor:", "PICKING_STATUS_NO CERRADA: ");
-                    ((View )(viewHolder.mPickingOrderNumber.getParent().getParent())).setBackgroundColor(Color.WHITE);
+                    ((View )(viewHolder.mPickingOrderNumber.getParent().getParent())).setBackgroundColor(
+                            mContext.getResources().getColor(R.color.PickingCard_background));
+
                 }
 
                 viewHolder.mPickingOrderId =cursor.getLong(cursor.getColumnIndex(PickingOrdersColumns.ID_PICKING_ORDERS));
@@ -163,6 +164,7 @@ implements ItemTouchHelperAdapter{
                 viewHolder.mSharePickingOrder.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        Log.i("adapter", "sharePickingorder"+ viewHolder.mPickingOrderNumber.getText().toString());
                         mClickHandler.sharePickingorder(viewHolder);
                     }
                 });
@@ -205,98 +207,6 @@ implements ItemTouchHelperAdapter{
 
                 mClickHandler.onItemDismissCall(getItemId(position));
                 Log.i("TouchHelper:", "Adapter onItemDismiss picking CUSTOM ORDER " + position);
-                switch (mProcesStep) {
-                    case STEP_CUSTOM_ORDER: {
-//
-//                        Log.i("TouchHelper:", "Adapter onItemDismiss CUSTOM ORDER " + position);
-//
-//
-//                      cursorId = getItemId(position);
-//                        AlertDialog.Builder alert = new AlertDialog.Builder((Activity)mContext);
-//
-//                        alert.setMessage("Do you want to delete?");
-//                        alert.setNegativeButton("CANCEL",new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int whichButton) {
-//                                Log.i("YesNoDialog:", "setNegativeButton" );
-//                                mClickHandler.onDataChange();
-//                                dialog.cancel();
-//                            }
-//                        });
-//                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int whichButton) {
-//                                Log.i("YesNoDialog:", "setPositiveButton " );
-//
-//                                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(2);
-//
-//                                ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrdersDetail.withRefCustomOrder(cursorId));
-//                                ContentProviderOperation.Builder builder1 = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrders.withId(cursorId));
-//                                batchOperations.add(builder.build());
-//                                batchOperations.add(builder1.build());
-//
-//                                try {
-//
-//                                    mContext.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-//                                    notifyDataSetChanged();
-//                                    mClickHandler.onDataChange();
-//
-////                    notifyItemRemoved(position);
-//                                } catch (RemoteException | OperationApplicationException e) {
-//                                    Log.e("TouchHelper:", "Error applying batch insert", e);
-//
-//                                }
-//                            }
-//                        });
-//                        alert.create().show(); // btw show() creates and shows it..
-
-                    }
-                        break;
-                    case STEP_PICKING :
-//                        Log.i("TouchHelper:", "Adapter onItemDismiss PICKIG --" + position);
-//                        cursorId = getItemId(position);
-//                        AlertDialog.Builder alert = new AlertDialog.Builder((Activity)mContext);
-//
-//                        alert.setMessage(mContext.getResources().getString(R.string.detete_picking_order));
-//                        alert.setNegativeButton(mContext.getResources().getString(R.string.detete_picking_order_cancel),new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int whichButton) {
-//                                Log.i("YesNoDialog:", "setNegativeButton" );
-//                                mClickHandler.onDataChange();
-//                                dialog.cancel();
-//                            }
-//                        });
-//                        alert.setPositiveButton(mContext.getResources().getString(R.string.detete_picking_order_ok), new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int whichButton) {
-//                                Log.i("YesNoDialog:", "setPositiveButton ");
-//                                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-//                                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(cursorId));
-//                                builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, 1);
-//                                batchOperations.add(builder.build());
-//
-//
-//                                try {
-//
-//                                    mContext.getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-//                                    mClickHandler.onDataChange();
-//
-//
-//                                } catch (RemoteException | OperationApplicationException e) {
-//                                    Log.e("TouchHelper:", "Error applying batch insert", e);
-//
-//                                }
-//                            }});
-//                        alert.create().show(); // btw show() creates and shows it..
-
-
-                        break;
-                    case STEP_DELIVEY :
-                        break;
-                    default:
-                        break;
-                }
-
 
             }
 

@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nextnut.logistica.Util.ProductSectionActivity;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
 
@@ -54,12 +55,12 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
      */
     private ViewPager mViewPager;
 
-    public int mCurrentFragmet;
+
     public static final int CUSTOM_ORDER_FRAGMENT=0;
     public static final int PICKING_FRAGMENT=1;
     public static final int DELIVERY_FRAGMENT=2;
 
-    private static final int REQUEST_CUSTOMER = 1234;
+//    private static final int REQUEST_CUSTOMER = 1234;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     public static long mPickingOrderSelected=0;
@@ -68,9 +69,7 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         return mPickingOrderSelected;
     }
 
-    public void setmPickingOrderSelected(long orderSelected){
-       mPickingOrderSelected=orderSelected;
-    }
+
 
 
     @Override
@@ -88,16 +87,6 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        // Eliminar si no se usa la interfase.
-
-        CustomOrderListFragment.DataChangeNotification a= new CustomOrderListFragment.DataChangeNotification() {
-            @Override
-            public void onStepModification(int step) {
-
-            }
-        }
-
-                ;
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
@@ -113,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
                     case CUSTOM_ORDER_FRAGMENT: {
                         Log.i(LOG_TAG,"mCurrentFragmet CUSTOM_ORDER_FRAGMENT "+mViewPager.getCurrentItem());
                         Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
-                        startActivityForResult(intent, REQUEST_CUSTOMER);
+                        startActivityForResult(intent,CustomOrderDetailFragment. REQUEST_CUSTOMER);
 
 //                        Intent intent = new Intent(MainActivity.this, CustomOrderDetailActivity.class);
 //                        intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
@@ -149,8 +138,13 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
     @Override
     public void onActivityResult(int requestCode,
                                  int resultCode, Intent data) {
-        Log.i(LOG_TAG, "LLego resyktado ok" );
-        if (requestCode == REQUEST_CUSTOMER && resultCode == RESULT_OK) {
+        Log.i(LOG_TAG, "LLego resultado ok" );
+        Log.i(LOG_TAG, "LLego requestCode: "+requestCode );
+        Log.i(LOG_TAG, "LLego resultCode: "+resultCode );
+
+        ////////////////// CUSTOMER for a new Order /////////
+
+        if (requestCode == CustomOrderDetailFragment. REQUEST_CUSTOMER && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
 
             if (bundle == null){ Log.i(LOG_TAG, "LLego resyktado ok" + "bundleNULL");}
@@ -193,16 +187,76 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
             }
 
             }
+
+            CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+
+
+
+
             Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
             intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
             Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + customRef);
             Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
-//
-            Log.i("ProductListActivity", "makeSceneTransitionAnimation Normal");
+
             startActivity(intent);
-//            }
+
 
         }
+
+
+
+        ////////////////// UPDATE CUSTOMER /////////
+        if (requestCode == CustomOrderDetailFragment. UPDATE_CUSTOMER && resultCode == RESULT_OK) {
+            Bundle bundle = data.getExtras();
+
+            if (bundle != null) {
+
+                long customRef = bundle.getLong("resultado");
+
+                Log.i(LOG_TAG, "LLego resyktado ok long " + customRef);
+
+                if (customRef != 0) {
+
+                    CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+
+
+                    if (fragmentCustomOrder != null) {
+                        Log.i(LOG_TAG, "Picking Frament Not Null");
+                        fragmentCustomOrder.upDateCustomer(customRef);
+
+
+                    } else {
+                        Log.i(LOG_TAG, "Picking Frament  Null");
+                    }
+                }
+                }
+            }
+        ////////////////// Select a new Product /////////
+
+
+            if (requestCode == CustomOrderDetailFragment.REQUEST_PRODUCT && resultCode == RESULT_OK) {
+                String res = data.getExtras().getString("resultado");
+                Log.i(LOG_TAG, "REQUEST_PRODUCT " + data.getExtras().getString("ProductoName"));
+
+                Log.i(LOG_TAG, "REQUEST_PRODUCT ProductPrice" + data.getExtras().getString("ProductPrice"));
+
+                CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+
+
+                if (fragmentCustomOrder != null) {
+                    Log.i(LOG_TAG, "Picking Frament Not Null");
+                    fragmentCustomOrder.saveCustomOrderProduct(data.getExtras().getLong(ProductSectionActivity.KEY_RefPRODUCTO),
+                            data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_NAME),
+                            data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICES_ESPECIAL),
+                            data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICE)
+                    );
+
+                } else {
+                    Log.i(LOG_TAG, "Picking Frament  Null");
+                }
+
+
+            }
 
 
         }
@@ -276,40 +330,7 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         Log.i("Main:", "mPickingOrderSelected " +mPickingOrderSelected);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -344,9 +365,8 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
                     return b;
 
                 default:
-                // getItem is called to instantiate the fragment for the given page.
-                // Return a PlaceholderFragment (defined as a static inner class below).
-                return PlaceholderFragment.newInstance(position + 1);
+
+                return null;
             }
         }
 

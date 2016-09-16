@@ -9,6 +9,7 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
@@ -56,7 +57,9 @@ import java.util.Date;
  * in two-pane mode (on tablets) or a {@link ProductDetailActivity}
  * on handsets.
  */
-public class ProductDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, YesNoDialog.EditNameDialogListener {
+public class ProductDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+//        , YesNoDialog.EditNameDialogListener
+{
 
 
     /**
@@ -73,13 +76,13 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     public static final int PRODUCT_SELECTION = 3;
     private static final int DETAIL_PRODUCT_LOADER = 0;
     private static final int DEFAULT_DETAIL_PRODUCT_LOADER = 1;
-    private static final int NAME_PRODUCT_LOADER = 2;
+
 
 
     private static final String LOG_TAG = ProductDetailFragment.class.getSimpleName();
 
     private long mItem = 0;
-    private TextView mProductId;
+
     private EditText mProductName;
     private EditText mProductPrice;
     private EditText mProductPriceSpecial;
@@ -136,7 +139,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.product_detail, container, false);
 
-        mProductId = (TextView) rootView.findViewById(R.id.product_Id_text);
+
         mProductName = (EditText) rootView.findViewById(R.id.product_name_text);
         Log.i(LOG_TAG, "OnEditorActionListener existeProductName test10");
         mProductName.addTextChangedListener(new TextWatcher() {
@@ -236,15 +239,18 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
 
         if (mCurrentPhotoPath == null) {
             Log.i("prdDetFrament", "mCurrentPhotoPath=null");
-            mImageProducto.setImageResource(R.drawable.art_clear);
+            mImageProducto.setBackgroundColor(Color.BLUE);
+            mImageProducto.setImageResource(R.drawable.ic_action_action_redeem);
+
         } else {
+            mImageProducto.setBackgroundColor(Color.TRANSPARENT);
             Log.i("prdDetFrament", "mCurrentPhotoPath!=null");
         }
         if (mAction == PRODUCT_NEW) {
             if (appBarLayout != null) {
                 appBarLayout.setTitle(getResources().getString(R.string.pruductDetailBar_NEW_PRODUCT));
             }
-            mProductId.setText(getResources().getString(R.string.pruductDetailBar_NEW_PRODUCT));
+
         }
 
 
@@ -274,7 +280,6 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                 break;
         }
 
-//        getLoaderManager().initLoader(NAME_PRODUCT_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
 
     }
@@ -324,10 +329,11 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                 Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
                 Picasso.with(getContext())
                         .load(mCurrentPhotoPath)
-                        .placeholder(R.drawable.art_clear)
+                        .placeholder(R.drawable.ic_action_action_redeem)
+                        .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                         .into(mImageProducto);
 
-//                mProductId.setText(mCurrentPhotoPath);
+
 
 
             } else if (requestCode == REQUEST_IMAGE_GET) {
@@ -366,29 +372,14 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
 
                         mCurrentPhotoPath = "file:" + file.getAbsolutePath();
                         Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
+                        mImageProducto.setBackgroundColor(Color.TRANSPARENT);
                         Picasso.with(getContext())
                                 .load(mCurrentPhotoPath)
-                                .placeholder(R.drawable.art_clear)
+                                .placeholder(R.drawable.ic_action_action_redeem)
+                                .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                                 .into(mImageProducto);
 
 
-
-
-
-                        ////////////////////////////////////
-//                        mCurrentPhotoPath = String.valueOf(data.getData());
-//
-//                        getBitmapFromUri(data.getData());
-//                        getRealPathFromURI(getContext(),data.getData());
-//                        Log.i("prdDetFrament", "mCurrentPhotoPath  getRelPath:" + getRealPathFromURI(getContext(),data.getData()));
-//
-//                        Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
-//
-//                        Picasso.with(getContext())
-//                                .load(data.getData())
-//                                .into(mImageProducto);
-//
-//
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -414,8 +405,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
             public void onClick(DialogInterface dialog, int item) {
 
                 Log.e(LOG_TAG, "dialog:" + dialog + " item: " + item);
-//                boolean result=getContext().
-//                        Utility.checkPermission(this);
+
                 if (items[item].equals("Take Photo")) {
 
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -428,14 +418,6 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                         startActivityForResult(intent, REQUEST_IMAGE_GET);
                     }
 
-//                    Intent intent = new Intent();
-//                    intent.setType("image/*");
-//                    intent.setAction(Intent.ACTION_GET_CONTENT);//
-//                    startActivityForResult(Intent.createChooser(intent, "Select File"),SELECT_FILE);
-
-
-//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
@@ -474,31 +456,6 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                         null,
                         null);
 
-            case NAME_PRODUCT_LOADER:
-                Log.e(LOG_TAG, "onCreateLoader-NAME_PRODUCT_LOADER");
-
-                // Now create and return a CursorLoader that will take care of
-                // creating a Cursor for the data being displayed.
-
-                // Now create and return a CursorLoader that will take care of
-                // creating a Cursor for the data being displayed.
-                String select = "((" + ProductsColumns.NOMBRE_PRODUCTO + " NOTNULL) AND ("
-                        + ProductsColumns.NOMBRE_PRODUCTO + " ='mate'))";
-//                AND ("
-//                        + Contacts.DISPLAY_NAME + " != '' ))";
-
-                String proyection[] = {ProductsColumns.NOMBRE_PRODUCTO, "sum(" + ProductsColumns.PRECIO_PRODUCTO
-                        + " * " + ProductsColumns.PRECIO_PRODUCTO
-                        + ")"};
-                return new CursorLoader(
-                        getActivity(),
-                        LogisticaProvider.Products.CONTENT_URI,//uri
-                        proyection,// PROYECTION
-                        select,//sELECTION (WHERE)
-                        null,// ARGUMENTS, STRING
-                        null); // ORDEN
-
-
             default:
                 Log.e(LOG_TAG, "onCreateLoader-Default");
                 return null;
@@ -522,15 +479,9 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                     }
                     break;
 
-                case NAME_PRODUCT_LOADER:
-                    if (data != null && data.moveToFirst()) {
-                        Log.e(LOG_TAG, "NAME_PRODUCT_LOADERdata != null && data.moveToFirst() cantidad de mate" + data.getCount());
-                        Log.e(LOG_TAG, "NAME_PRODUCT_LOADERdata != null && data.moveToFirst() Producto" + data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
 
-                        Log.e(LOG_TAG, "NAME_PRODUCT_LOADERdata != null && data.moveToFirst() suma" + Double.toString(data.getDouble(1)));
-                    }
             }
-            mProductId.setText(Integer.toString(data.getInt(data.getColumnIndex(ProductsColumns._ID_PRODUCTO))));
+
             mProductName.setText(data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
             NumberFormat format = NumberFormat.getCurrencyInstance();
 
@@ -540,8 +491,15 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
             mProductDescription.setText(data.getString(data.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
 
             mCurrentPhotoPath = data.getString(data.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO));
+            if (mCurrentPhotoPath==null){
+                mImageProducto.setBackgroundColor(Color.BLUE);
+            } else {
+                mImageProducto.setBackgroundColor(Color.TRANSPARENT);
+            }
             Picasso.with(getContext())
                     .load(mCurrentPhotoPath)
+                    .placeholder(R.drawable.ic_action_action_redeem)
+                    .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                     .into(mImageProducto);
 
             if (appBarLayout != null) {
@@ -557,24 +515,15 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.e(LOG_TAG, "onLoaderReset");
-
+        // There are nothing to reset.
     }
 
-    public void doPositiveClick() {
-        // Do stuff here.
-        Log.i("FragmentAlertDialog", "Positive click!");
-    }
 
-    public void doNegativeClick() {
-        // Do stuff here.
-        Log.i("FragmentAlertDialog", "Negative click!");
-    }
-
-    @Override
-    public void onFinishEditDialog(String inputText) {
-        Log.i("FragmentAlertDialog", "onFinishEditDialog: " + inputText);
-
-    }
+//    @Override
+//    public void onFinishEditDialog(String inputText) {
+//        Log.i("FragmentAlertDialog", "onFinishEditDialog: " + inputText);
+//
+//    }
 
     public void deleteProduct() {
 

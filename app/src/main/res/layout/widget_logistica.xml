@@ -27,21 +27,21 @@
             android:textSize="24sp"
             android:textStyle="bold|italic" />
         <!--android:layout_centerVertical="true"-->
-        <FrameLayout
+        <!--<FrameLayout-->
             android:id="@+id/widget"
             android:layout_width="match_parent"
             android:layout_height="@dimen/abc_action_bar_default_height_material"
             >
-            <!--android:background="@color/primary"-->
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/app_name"
-                android:layout_gravity="center"
+            <!--&lt;!&ndash;android:background="@color/primary"&ndash;&gt;-->
+            <!--<ImageView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:contentDescription="@string/app_name"-->
+                <!--android:layout_gravity="center"-->
 
-                />
+                <!--/>-->
             <!--android:src="@drawable/manchester_united"-->
-        </FrameLayout>
+        <!--</FrameLayout>-->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -39,14 +39,8 @@ import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 import java.util.ArrayList;
 
 
-/**
- * An activity representing a list of Products. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link ProductDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- */
+
+
 public class ProductListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = ProductListActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 0;
@@ -81,20 +75,6 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
     public void onStop() {
         super.onStop();
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        Action viewAction = Action.newAction(
-//                Action.TYPE_VIEW, // TODO: choose an action type.
-//                "ProductList Page", // TODO: Define a title for the content shown.
-//                // TODO: If you have web page content that matches this app activity's content,
-//                // make sure this auto-generated web page URL is correct.
-//                // Otherwise, set the URL to null.
-//                Uri.parse("http://host/path"),
-//                // TODO: Make sure this auto-generated app URL is correct.
-//                Uri.parse("android-app://com.nextnut.logistica/http/host/path")
-//        );
-//        AppIndex.AppIndexApi.end(client, viewAction);
-//        client.disconnect();
     }
 
     /**
@@ -102,12 +82,12 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
      * implement. This mechanism allows activities to be notified of item
      * selections.
      */
-    public interface Callback {
-        /**
-         * DetailFragmentCallback for when an item has been selected.
-         */
-        public void onItemClicked(int id, ProductCursorAdapter.ViewHolder vh);
-    }
+//    public interface Callback {
+//        /**
+//         * DetailFragmentCallback for when an item has been selected.
+//         */
+//        public void onItemClicked(int id, ProductCursorAdapter.ViewHolder vh);
+//    }
 
     private ProductCursorAdapter mCursorAdapter;
 
@@ -150,8 +130,8 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
                 intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_NEW);
                 Log.i(LOG_TAG,"PRODUCT_MODIFICACION"+ false);
                 fab_new.setVisibility(View.VISIBLE);
-                fab_save.setVisibility(View.GONE);
-                fab_delete.setVisibility(View.GONE);
+//                fab_save.setVisibility(View.GONE);
+//                fab_delete.setVisibility(View.GONE);
                 startActivity(intent);
             }
         });
@@ -169,7 +149,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
                     productDetailFragment.verificationAndsave();
                     fab_new.setVisibility(View.VISIBLE);
                     fab_save.setVisibility(View.GONE);
-                    fab_delete.setVisibility(View.GONE);
+//                    fab_delete.setVisibility(View.GONE);
                     Log.i(LOG_TAG,"no null fragment");
                 }else {
                     Log.i(LOG_TAG,"null fragment");
@@ -178,26 +158,26 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
         });
 
-        fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
-        fab_delete.setVisibility(View.GONE);
-        fab_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Delete Product", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
-                if(productDetailFragment!=null){
-                    productDetailFragment.deleteProduct();
-                    fab_new.setVisibility(View.VISIBLE);
-                    fab_save.setVisibility(View.GONE);
-                    fab_delete.setVisibility(View.GONE);
-                    Log.i(LOG_TAG,"no null fragment");
-                }else {
-                    Log.i(LOG_TAG,"null fragment");
-                }
-            }
-        });
+//        fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
+//        fab_delete.setVisibility(View.GONE);
+//        fab_delete.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Delete Product", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
+//                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
+//                if(productDetailFragment!=null){
+//                    productDetailFragment.deleteProduct();
+//                    fab_new.setVisibility(View.VISIBLE);
+//                    fab_save.setVisibility(View.GONE);
+//                    fab_delete.setVisibility(View.GONE);
+//                    Log.i(LOG_TAG,"no null fragment");
+//                }else {
+//                    Log.i(LOG_TAG,"null fragment");
+//                }
+//            }
+//        });
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -236,18 +216,14 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
                     fab_new.setVisibility(View.GONE);
                     fab_save.setVisibility(View.VISIBLE);
-                    fab_delete.setVisibility(View.VISIBLE);
+//                    fab_delete.setVisibility(View.VISIBLE);
 
                 } else {
                     Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
                     intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
                     intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, id);
                     fab_new.setVisibility(View.VISIBLE);
-                    fab_save.setVisibility(View.GONE);
-                    fab_delete.setVisibility(View.GONE);
-//                intent.putExtra("DESCRIPCION_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-//                intent.putExtra("IMAGEN_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
-//                intent.putExtra("PRECIO_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         Log.i("ProductListActivity", "makeSceneTransitionAnimation");
 //                        Pair<View,String> p= new Pair<View, String>(vh.mphotoProducto, getString(R.string.detail_icon_transition_name));
@@ -268,9 +244,6 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
         recyclerView.setAdapter(mCursorAdapter);
 
 
-
-//        recyclerView.addItemDecoration(
-//                new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST));
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
@@ -297,11 +270,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 //            animateViewsIn();
         }
 
-//        **************************
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
 
@@ -349,25 +318,10 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
         return super.onOptionsItemSelected(item);
     }
 
-//    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-////        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
-//        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-//    }
-//
-//    RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.productos_list);
-//    recyclerView.setLayoutManager(
-//            new LinearLayoutManager(recyclerView.getContext())
-//            );
+
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        Cursor c = this.getContentResolver().query(LogisticaProvider.Products.CONTENT_URI,
-                null, null, null, null);
-
-        if (c == null || c.getCount() == 0) {
-            Log.i(LOG_TAG, "cursor count: null");
-//            insertData();
-        }
 
         getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 

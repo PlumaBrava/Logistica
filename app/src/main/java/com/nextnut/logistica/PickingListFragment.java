@@ -53,6 +53,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.nextnut.logistica.Util.MakeCall.makeTheCall;
+import static com.nextnut.logistica.Util.SharePickingOrder.sharePickingOrder;
+import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
+
 /**
  * An activity representing a list of CustomOrders. This activity
  * has different presentations for handset and tablet-size devices. On
@@ -353,6 +357,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
 
                                     } finally {
                                         onDataChange();
+                                        upDateWitget (getContext());
                                     }
 
                                 }
@@ -385,86 +390,9 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
 
                     @Override
                     public void sharePickingorder(PickingOrdersCursorAdapter.ViewHolder vh) {
-                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-
-
-
-
-                        shareIntent.setType("text/plain");
-
-                        String mensaje ="";
-
-//                        String select[] = {
-///* 0 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns._ID_PRODUCTO,
-///* 1 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
-///* 2 */             LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER,
-///* 3 */             LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
-///* 4 */             LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL,
-///* 5 */             "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " )",
-///* 6 */             LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL,
-///* 7 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
-///* 8 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
-///* 9 */             LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
-///* 10 */           "sum( " + LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.ID_PICKING_ORDERS_DETAIL+ " )",
-///* 11 */            "sum( "+ LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.QUANTITY_PICKING_ORDERS_DETAIL+ " )",
-///* 12 */            "count( "+ LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.ID_PICKING_ORDERS_DETAIL+ " )",
-///* 13 */            "max( "+ LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.ID_PICKING_ORDERS_DETAIL+ " )"};
-//
-//                        String where = LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " + CustomOrderDetailFragment.STATUS_ORDER_PICKING
-//                                + " and " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + vh.mPickingOrderNumber.getText().toString();
-
-
-                        String select[] = {
-/* 0 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns._ID_PRODUCTO,
-/* 1 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
-/* 2 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
-/* 3 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
-/* 4 */            "sum ( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL +" )",
-/* 5 */            LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.ID_PICKING_ORDERS_DETAIL,
-/* 6 */           "max ( "+ LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.QUANTITY_PICKING_ORDERS_DETAIL +" )",
-/* 7 */           "sum ( "+  LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL +" )",
-/* 8 */            "max ( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL+" )"};
-
-
-                        String where =
-
-                                LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + vh.mPickingOrderNumber.getText().toString() ;
-
-
-                        mensaje =" Orden de Picking : "+vh.mPickingOrderNumber.getText().toString()+"\n"+"\n";
-
-                        Cursor c=  getContext().getContentResolver().query(LogisticaProvider.join_customorderDetail_Product_Customer_picking.CONTENT_URI, select,where,null,null);
-                        Log.i(LOG_TAG, "c.count: "+ c.getCount() );
-                        if (c != null && c.moveToFirst()) {
-
-                            do {
-
-//                                Log.i(LOG_TAG, "c.count ref Product " + data.getDouble(PickingOrderProductsAdapter.COLUMN_ID_PRODUCTO));
-//                                Log.i(LOG_TAG, "c.count name:" + data.getString(PickingOrderProductsAdapter.COLUMN_NOMBRE_PRODUCTO));
-//
-//
-//                                Log.i(LOG_TAG, "c.count ref det : " + data.getDouble(PickingOrderProductsAdapter.COLUMN_OORDERS_COUNT));
-//                                Log.i(LOG_TAG, "c.count quantity : " + data.getDouble(PickingOrderProductsAdapter.COLUMN_QTOTAL_ORDENES));
-//                                Log.i(LOG_TAG, "c.count quantity delivey: " + data.getDouble(PickingOrderProductsAdapter.COLUMN_QTOTAL_DELIVERY));
-//
-//                                Log.i(LOG_TAG, "c.count PICKING_DETAIL_id " + data.getDouble(PickingOrderProductsAdapter.COLUMN_ID_PICKING));
-//                                Log.i(LOG_TAG, "c.count quantity picking: " + data.getDouble(PickingOrderProductsAdapter.COLUMN_QTOTAL_PICKING));
-
-                                mensaje = mensaje +c.getString(PickingOrderProductsAdapter.COLUMN_NOMBRE_PRODUCTO)+": "+c.getDouble(PickingOrderProductsAdapter.COLUMN_QTOTAL_PICKING)+"\n";
-
-                            } while (c.moveToNext());
-                        }
-                        mensaje=mensaje+ "\n"+mTilePickingComent.getText().toString()+"\n";
-
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, mensaje);
-
-                        startActivity(shareIntent);
+                        sharePickingOrder(getContext(),  vh.mPickingOrderNumber.getText().toString(),mTilePickingComent.getText().toString());
                     }
-                },
-
-                PickingOrdersCursorAdapter.STEP_PICKING
+                }
             );
 
 
@@ -566,7 +494,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
 
             @Override
             public void onMakeACall(String ContactID) {
-
+                makeTheCall(getActivity(),ContactID);
             }
 
             @Override
@@ -633,9 +561,10 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                 mCursorAdapterTotalProductos.notifyDataSetChanged();
                 mCursorAdapterPickingOrder.notifyDataSetChanged();
                 mCursorAdapterTotalProductos.notifyDataSetChanged();
+                upDateWitget (getContext());
             }
         }
-                ,CustomsOrdersCursorAdapter.STEP_CUSTOM_ORDER
+
         );
 
         recyclerViewCustomOrderInPickingOrder.setAdapter(mCustomsOrdersCursorAdapter);

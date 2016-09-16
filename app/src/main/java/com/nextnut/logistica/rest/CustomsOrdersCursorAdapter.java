@@ -40,20 +40,19 @@ implements ItemTouchHelperAdapter{
     final private CustomsOrdersCursorAdapterOnClickHandler mClickHandler;
 
 
-    int mProcesStep;
 
     public static final int STEP_CUSTOM_ORDER = 0;
-    public static final int STEP_PICKING = 1;
-    public static  final int STEP_DELIVEY = 2;
+//    public static final int STEP_PICKING = 1;
+//    public static  final int STEP_DELIVEY = 2;
 
 //    private View.OnClickListener listener;
-    public CustomsOrdersCursorAdapter(Context context, Cursor cursor, View empltyView, CustomsOrdersCursorAdapterOnClickHandler dh,int procesStep
+    public CustomsOrdersCursorAdapter(Context context, Cursor cursor, View empltyView, CustomsOrdersCursorAdapterOnClickHandler dh
 
     ){
         super(context, cursor,empltyView);
         mContext = context;
         mClickHandler = dh;
-        mProcesStep= procesStep;
+
 
     }
 

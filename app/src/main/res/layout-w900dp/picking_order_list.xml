@@ -80,7 +80,7 @@ android:text="@string/empty_product_list" />
 
    </LinearLayout>
    <!--</LinearLayout>-->
-
+   <include layout="@layout/picking_orders_title" />
    <android.support.v4.widget.NestedScrollView
        android:id="@+id/customorder_detail_container"
        android:layout_width="0dp"

@@ -39,6 +39,7 @@ public class LogisticaProvider {
             String JOINCUSTOMORDERDETAILPRODUCTOCUSTOMERPICKING = "join_customorderDetail_Product_Customer_picking";
             String REPORTE = "reporte";
             String REPORTExMES = "reportexMes";
+            String WIDGET = "witgets";
 
         }
 
@@ -488,5 +489,64 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
 
         public static final Uri CONTENT_URI = buildUri(Path.REPORTExMES );
     }
+    @TableEndpoint(table =  LogisticaDataBase.PRODUCTS )
+    public static class join_witget {
+    @ContentUri(
+
+            path = Path.WIDGET ,
+
+            type = "vnd.android.cursor.item/join_widget",
+
+
+            join = "  JOIN " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + " ON " + LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO + " = " +
+                    LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." +  CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL
+
+                    +
+
+                    " JOIN " + LogisticaDataBase.CUSTOM_ORDERS  + " ON " +
+                    LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." +  CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL +" = "
+                    + LogisticaDataBase.CUSTOM_ORDERS + "." +CustomOrdersColumns.ID_CUSTOM_ORDER
+
+                    +  " left JOIN " + LogisticaDataBase.PICKING_ORDERS_DETAIL
+
+                    + " ON " + " ( "
+                    +
+
+                    LogisticaDataBase.PICKING_ORDERS_DETAIL + "." +  PickingOrdersDetailColumns.REF_PICKING_ORDER_PICKING_ORDERS_DETAIL +" = "
+                    + LogisticaDataBase.CUSTOM_ORDERS + "." +CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER
+
+                    +" AND "
+
+                    + LogisticaDataBase.PICKING_ORDERS_DETAIL  + "." +PickingOrdersDetailColumns.REF_PRODUCT_PICKING_ORDERS_DETAIL+" = "
+                    +  LogisticaDataBase.PRODUCTS+ "." + ProductsColumns._ID_PRODUCTO
+                    + " ) "
+
+//
+//
+                    +  " left JOIN " + LogisticaDataBase.PICKING_ORDERS
+
+                    + " ON " + " ( "
+                    +
+
+                    LogisticaDataBase.PICKING_ORDERS+ "." +  PickingOrdersColumns.ID_PICKING_ORDERS+" = "
+                    + LogisticaDataBase.CUSTOM_ORDERS + "." +CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER
+
+
+
+                    + " ) "
+
+            ,
+
+            groupBy = "1,2"
+//                    LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
+//                        + " , "+
+//
+//                        LogisticaDataBase.PICKING_ORDERS_DETAIL + "." +  PickingOrdersDetailColumns.REF_PICKING_ORDER_PICKING_ORDERS_DETAIL
+
+    )
+
+
+    public static final Uri CONTENT_URI = buildUri(Path.WIDGET );
+}
 
 }

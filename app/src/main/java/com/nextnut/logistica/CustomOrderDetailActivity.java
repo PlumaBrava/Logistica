@@ -1,7 +1,10 @@
 package com.nextnut.logistica;
 
+import android.content.ContentProviderOperation;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
@@ -11,6 +14,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+
+import com.nextnut.logistica.Util.ProductSectionActivity;
+import com.nextnut.logistica.data.CustomOrdersColumns;
+import com.nextnut.logistica.data.LogisticaProvider;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * An activity representing a single CustomOrder detail screen. This
@@ -129,5 +140,120 @@ public class CustomOrderDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode,
+                                 int resultCode, Intent data) {
+        Log.i(LOG_TAG, "LLego resultado ok" );
+        Log.i(LOG_TAG, "LLego requestCode: "+requestCode );
+        Log.i(LOG_TAG, "LLego resultCode: "+resultCode );
+//        if (requestCode == MainActivity. REQUEST_CUSTOMER && resultCode == RESULT_OK) {
+//            Bundle bundle = data.getExtras();
+//
+//            if (bundle == null){ Log.i(LOG_TAG, "LLego resyktado ok" + "bundleNULL");}
+//            else {Log.i(LOG_TAG, "LLego resyktado ok" + "bundle ok: " + bundle.toString());
+//
+//                for (String key : bundle.keySet()) {
+//                    Object value = bundle.get(key);
+//                    Log.i("resyktado", String.format("%s %s (%s)", key,
+//                            value.toString(), value.getClass().getName()));
+//                }
+//
+//
+//            }
+//
+//            String res = bundle .getString("resultado");
+//            Log.i(LOG_TAG, "LLego resyktado ok " + res);
+//            Log.i(LOG_TAG, "LLego resyktado ok int " + bundle .getInt("resultado"));
+//            long customRef = bundle.getLong("resultado");
+//
+//            Log.i(LOG_TAG, "LLego resyktado ok long " + customRef);
+//
+//            if (customRef != 0) {
+////            if ( mItem != 0) {
+//                Log.i(LOG_TAG, "save New");
+//                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+//                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrders.CONTENT_URI);
+//                builder.withValue(CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER, customRef);
+//                SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
+//                String formattedDate = df.format(new Date());
+//                Log.i(LOG_TAG, "formattedDate:" + formattedDate);
+//                builder.withValue(CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER, formattedDate);
+//                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, CustomOrderDetailFragment.STATUS_ORDER_INICIAL);
+//
+//                batchOperations.add(builder.build());
+//                try {
+//
+//                    getApplicationContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//                } catch (RemoteException | OperationApplicationException e) {
+//                    Log.e(LOG_TAG, "Error applying batch insert", e);
+//                }
+//
+//            }
+//            Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
+//            intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//            Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + customRef);
+//            Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+////
+//            Log.i("ProductListActivity", "makeSceneTransitionAnimation Normal");
+//            startActivity(intent);
+////            }
+//
+//        }
+
+        ////////////////// UPDATE CUSTOMER /////////
+        if (requestCode == CustomOrderDetailFragment. UPDATE_CUSTOMER && resultCode == RESULT_OK) {
+            Bundle bundle = data.getExtras();
+
+            if (bundle != null) {
+
+                long customRef = bundle.getLong("resultado");
+
+                Log.i(LOG_TAG, "LLego resyktado ok long " + customRef);
+
+                if (customRef != 0) {
+
+                    CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+
+
+                    if (fragmentCustomOrder != null) {
+                        Log.i(LOG_TAG, "Picking Frament Not Null");
+                        fragmentCustomOrder.upDateCustomer(customRef);
+
+
+                    } else {
+                        Log.i(LOG_TAG, "Picking Frament  Null");
+                    }
+                }
+            }
+        }
+
+        if (requestCode == CustomOrderDetailFragment. REQUEST_PRODUCT && resultCode == RESULT_OK) {
+            String res = data.getExtras().getString("resultado");
+            Log.i(LOG_TAG, "REQUEST_PRODUCT "+ data.getExtras().getString("ProductoName") );
+
+            Log.i(LOG_TAG, "REQUEST_PRODUCT ProductPrice"+  data.getExtras().getString("ProductPrice") );
+
+            CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+//                    findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
+
+            if (fragmentCustomOrder != null) {
+                Log.i(LOG_TAG,"Picking Frament Not Null");
+                fragmentCustomOrder.saveCustomOrderProduct(data.getExtras().getLong(ProductSectionActivity.KEY_RefPRODUCTO),
+                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_NAME),
+                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICES_ESPECIAL),
+                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICE)
+
+                );
+
+            }else {
+                Log.i(LOG_TAG, "Picking Frament  Null");
+            }
+
+
+        }
+
+
     }
 }

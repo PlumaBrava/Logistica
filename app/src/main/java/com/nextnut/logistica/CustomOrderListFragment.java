@@ -2,21 +2,21 @@ package com.nextnut.logistica;
 
 import android.animation.ObjectAnimator;
 import android.content.ContentProviderOperation;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.OperationApplicationException;
-import android.content.pm.PackageManager;
+
 import android.database.Cursor;
-import android.net.Uri;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.provider.ContactsContract;
-import android.support.v4.app.ActivityCompat;
+
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
+
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
@@ -33,7 +33,7 @@ import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 
-import com.nextnut.logistica.Util.DialogAlerta;
+
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.CustomOrdersDetailColumns;
@@ -48,7 +48,10 @@ import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
+
+import static com.nextnut.logistica.Util.MakeCall.makeTheCall;
+import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
 
 /**
  * An activity representing a list of CustomOrders. This activity
@@ -66,23 +69,18 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
     private static final int CUSTOM_LOADER_TOTAL_PRODUCTOS = 1;
 
-    final private int  MY_PERMISSIONS_REQUEST_CALL_PHONE =123;
-    final private int  MY_PERMISSIONS_REQUEST_READ_CONTACT =124;
 
-    private static final int CUSTOM_ORDER_LOADER = 0;
 
-    private CustomsOrdersCursorAdapter mCursorAdapter;
+    private CustomsOrdersCursorAdapter mOrdersAdapter;
     private OrderDetailCursorAdapter mCursorAdapterTotalProductos;
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerViewOrders;
     private RecyclerView recyclerViewTotalProductos;
 
     private ItemTouchHelper mItemTouchHelper;
 
-    private FloatingActionButton fab_new;
-    private FloatingActionButton fab_save;
-    private FloatingActionButton fab_delete;
 
-    private int mItem = 0;
+
+    private long mItem = 0;
     private long mCustomOrderIdSelected;
 
 
@@ -91,15 +89,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
     public static final int ORDER_STATUS_DELIVERED = 2;
     public static final int ORDER_STATUS_DELETED = 3;
 
-//    /**
-//     * The dummy content this fragment is presenting.
-//     */
-//    private DummyContent.DummyItem mItem;
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
     private boolean mTwoPane;
 
     private static final String LOG_TAG = CustomOrderListFragment.class.getSimpleName();
@@ -109,31 +99,15 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
     private boolean symmetric = true;
     private boolean small = true;
 
-    private DataChangeNotification mDataChangeNotification;
-
-    public CustomOrderListFragment() {
-
-    }
-    public CustomOrderListFragment(DataChangeNotification dataChangeNotification) {
-        this.mDataChangeNotification= dataChangeNotification;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
 
-//        if (getArguments().containsKey(ARG_ITEM_ID)) {
-//            // Load the dummy content specified by the fragment
-//            // arguments. In a real-world scenario, use a Loader
-//            // to load content from a content provider.
-//            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
-//
-//            Activity activity = this.getActivity();
-//            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-//            if (appBarLayout != null) {
-//                appBarLayout.setTitle(mItem.content);
-//            }
-//        }
+            mItem = savedInstanceState.getLong("mItem");
+            Log.i(LOG_TAG, "ononCreate ARG_ITEM_ID2 :" + mItem);
+        }
+
     }
 
 
@@ -142,25 +116,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.activity_customorder_list, container, false);
 
-//        setContentView(R.layout.activity_customorder_list);
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        toolbar.setTitle(getTitle());
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-//        // Show the Up button in the action bar.
-//        ActionBar actionBar = getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//        }
 
         View emptyViewTotalProducts = rootView.findViewById(R.id.recyclerview_totalproduct_empty);
         recyclerViewTotalProductos = (RecyclerView) rootView.findViewById(R.id.total_products_customOrder);
@@ -168,6 +124,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         recyclerViewTotalProductos.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mCursorAdapterTotalProductos = new OrderDetailCursorAdapter(getContext(), null,
+//                null,
                 emptyViewTotalProducts,
                 new OrderDetailCursorAdapter.ProductCursorAdapterOnClickHandler() {
             @Override
@@ -202,21 +159,21 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
 
         View emptyView = rootView.findViewById(R.id.recyclerview_custom_empty);
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.customorder_list);
+        recyclerViewOrders = (RecyclerView) rootView.findViewById(R.id.customorder_list);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        recyclerViewOrders.setLayoutManager(new LinearLayoutManager(recyclerViewOrders.getContext()));
 
 
-        mCursorAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyView, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
+        mOrdersAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyView, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
             @Override
             public void onClick(long id, CustomsOrdersCursorAdapter.ViewHolder vh) {
                 Log.i(LOG_TAG, "onclicka:" + id);
-//
+                mItem=id;
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
                     arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
-                    Log.i(LOG_TAG, "ARG_ITEM_ID2 :" + id);
+                    Log.i(LOG_TAG, "click ARG_ITEM_ID2 :" + id);
                     arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
 
                     CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
@@ -226,9 +183,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                             .replace(R.id.customorder_detail_container, fragment)
                             .commit();
 
-//                            fab_new.setVisibility(View.GONE);
-//                            fab_save.setVisibility(View.VISIBLE);
-//                            fab_delete.setVisibility(View.VISIBLE);
+
 
                 } else {
                     Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
@@ -236,9 +191,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                     Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + id);
                     Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomDetailFragment.CUSTOM_SELECTION);
                     intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
-//                            fab_new.setVisibility(View.VISIBLE);
-//                            fab_save.setVisibility(View.GONE);
-//                            fab_delete.setVisibility(View.GONE);
+
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         Log.i("ProductListActivity", "makeSceneTransitionAnimation");
@@ -263,15 +216,12 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             @Override
             public void onMakeACall(String ContactID) {
                 Log.i("ProductListActivity", "Make a Call "+ ContactID );
-                makeTheCall(ContactID);
+                makeTheCall(getActivity(),ContactID);
             }
 
             @Override
             public void onDialogAlert(String message) {
                 Log.i("onDialogAlert:", "onDialogAlert " +message);
-//                DialogAlerta dFragment = DialogAlerta.newInstance("test"+message);
-//
-//                dFragment.show(getFragmentManager(), "Dialog Fragment");
 
 
                 AlertDialog.Builder alert ;
@@ -304,10 +254,8 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                     alert  = new AlertDialog.Builder(getContext());
                 }
 
-//                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-
-                alert.setMessage("Do you want to delete?");
-                alert.setNegativeButton("CANCEL",new DialogInterface.OnClickListener() {
+                alert.setMessage(getString(R.string.doYouWantDelete));
+                alert.setNegativeButton(getString(R.string.CANCEL),new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
                         Log.i("YesNoDialog:", "setNegativeButton" );
@@ -316,7 +264,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                         dialog.cancel();
                     }
                 });
-                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
                         Log.i("YesNoDialog:", "setPositiveButton " );
@@ -331,10 +279,6 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                         try {
 
                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-
-
-
-
 //                    notifyItemRemoved(position);
                         } catch (RemoteException | OperationApplicationException e) {
                             Log.e("TouchHelper:", "Error applying batch insert", e);
@@ -394,17 +338,21 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                 Log.i("ProductListActivity", "CustomsOrdersCursorAdapteronDataChangekHandler");
                 getLoaderManager().restartLoader(CUSTOM_LOADER_LIST, null, CustomOrderListFragment.this);
                 getLoaderManager().restartLoader(CUSTOM_LOADER_TOTAL_PRODUCTOS, null, CustomOrderListFragment.this);
+                upDateWitget (getContext());
+//                Intent dataUpdateIntent = new Intent("android.appwidget.action.APPWIDGET_UPDATE");
+//                getContext().sendBroadcast(dataUpdateIntent);
+
             }
         }
-        ,CustomsOrdersCursorAdapter.STEP_CUSTOM_ORDER);
+       );
 
 
-        recyclerView.setAdapter(mCursorAdapter);
+        recyclerViewOrders.setAdapter(mOrdersAdapter);
 
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mOrdersAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+        mItemTouchHelper.attachToRecyclerView(recyclerViewOrders);
 
 
         if (rootView.findViewById(R.id.customorder_detail_container) != null) {
@@ -413,8 +361,37 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             // If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
-        }
+
+                CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
+
+                    Bundle arguments = new Bundle();
+
+                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
+                    Log.i(LOG_TAG, "new ARG_ITEM_ID2 :" + mItem);
+                if (mItem != 0) {
+                    arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
+                }else {
+                    // go to the last order
+                    arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+                 }
+                    fragment.setArguments(arguments);
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.customorder_detail_container, fragment)
+                        .commit();
+
+            }
+
+
+
         return rootView;
+    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.i(LOG_TAG, "onSaveInstanceState ARG_ITEM_ID2 :" + mItem);
+        outState.putLong("mItem", mItem);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -428,21 +405,26 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         Log.i(LOG_TAG, "setUserVisibleHint" + isVisibleToUser);
-        if(isVisibleToUser && mCursorAdapter!=null){
+        if(isVisibleToUser && mOrdersAdapter !=null){
             getLoaderManager().restartLoader(CUSTOM_LOADER_LIST, null, this);
             getLoaderManager().restartLoader(CUSTOM_LOADER_TOTAL_PRODUCTOS, null, CustomOrderListFragment.this);
 
         }
         super.setUserVisibleHint(isVisibleToUser);
+//        CustomOrderDetailFragment fragmentCOD = (CustomOrderDetailFragment) getActivity(). getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+//        fragmentCOD.setUserVisibleHint(isVisibleToUser);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(LOG_TAG, "onActivityCreated");
-        getLoaderManager().initLoader(CUSTOM_LOADER_LIST, null, this);
-        getLoaderManager().initLoader(CUSTOM_LOADER_TOTAL_PRODUCTOS, null, this);
+
 
         super.onActivityCreated(savedInstanceState);
+
+
+        getLoaderManager().initLoader(CUSTOM_LOADER_LIST, null, this);
+        getLoaderManager().initLoader(CUSTOM_LOADER_TOTAL_PRODUCTOS, null, this);
     }
 
 
@@ -463,8 +445,8 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         return super.onOptionsItemSelected(item);
     }
 //
-//    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-//        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+//    private void setupRecyclerView(@NonNull RecyclerView recyclerViewOrders) {
+//        recyclerViewOrders.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
 //    }
 
     @Override
@@ -475,16 +457,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             case CUSTOM_LOADER_LIST:
                 Log.i(LOG_TAG, "CUSTOM_LOADER_LIST CreateLoader");
 
-//        // Now create and return a CursorLoader that will take care of
-//        // creating a Cursor for the data being displayed.
-//
-//        // Now create and return a CursorLoader that will take care of
-//        // creating a Cursor for the data being displayed.
-//        String select = "((" + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER + " NOTNULL) AND ("
-//                + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER + " ='2'))";
-////                AND ("
-////                        + Contacts.DISPLAY_NAME + " != '' ))";
-//
+
                 String proyection[] = {LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER,
                         LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
                         LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
@@ -493,18 +466,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                         LogisticaDataBase.CUSTOMS + "." + CustomColumns.REFERENCE_CUSTOM,
                         LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.STATUS_CUSTOM_ORDER
                 };
-//
-//        String from[] = {LogisticaProvider.CustomOrders.CONTENT_URI.toString() + " as CO" ,
-//                LogisticaProvider.Customs.CONTENT_URI.toString() + " as CUSTOM"
-//
-//        };
-//        return new CursorLoader(
-//                getActivity(),
-//                LogisticaProvider.CustomOrders.CONTENT_URI2,//uri
-//                proyection,// PROYECTION (select)
-//                select,//sELECTION (WHERE)
-//                null,// ARGUMENTS, STRING
-//                null); // ORDEN
+
 
 
                 return new CursorLoader(
@@ -560,16 +522,14 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             case CUSTOM_LOADER_LIST:
                 Log.i(LOG_TAG, "onLoadFinished");
                 if (data != null && data.moveToFirst()) {
-//                    Log.i(LOG_TAG, "ID:" + data.getInt(0));
-//                    Log.i(LOG_TAG, "date:" + data.getString(1));
-//                    Log.i(LOG_TAG, "price:" + data.getLong(2));
-//                    Log.i(LOG_TAG, "Name:" + data.getString(3));
-//                    Log.i(LOG_TAG, "LastName:" + data.getString(4));
-
                     Log.i(LOG_TAG, "swapCursor");
-                    mCursorAdapter.swapCursor(data);
+                    mOrdersAdapter.swapCursor(data);
 //                    animateViewsIn();
                 }
+
+
+
+
                 break;
 
 
@@ -578,22 +538,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                 if (data != null && data.moveToFirst()) {
                     mCursorAdapterTotalProductos.swapCursor(data);
                     Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - data.getCount: " + data.getCount());
-
-//                    do {
-//
-//
-////                Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - producto: "+ data.getString(0) );
-//                        Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - nombre: " + data.getString(6));
-////                Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - imagen:"+ data.getString(2) );
-////                Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - descrition"+ data.getString(3) );
-//                        Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - cantidad" + data.getString(5));
-////                Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - precio"+ data.getString(5) );
-////                Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - favorito"+ data.getString(6) );
-////                Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - ID_CUSTOM_ORDER"+ data.getString(7) );
-////                Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - Status"+ data.getString(8) );
-////                Log.i(LOG_TAG, "CUSTOM_LOADER_TOTAL_PRODUCTOS - FechaCreacion"+ data.getString(9) );
-//                    } while (data.moveToNext());
-                }
+                    }
 
                 break;
         }
@@ -602,7 +547,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         Log.i(LOG_TAG, "swapCursor");
-        mCursorAdapter.swapCursor(null);
+        mOrdersAdapter.swapCursor(null);
     }
 
 
@@ -631,7 +576,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
     private void animateViewsIn() {
 //        ViewGroup root = (ViewGroup) findViewById(R.id.root);
-        int count = recyclerView.getChildCount();
+        int count = recyclerViewOrders.getChildCount();
         float offset = getResources().getDimensionPixelSize(R.dimen.offset_y);
         Interpolator interpolator =
                 AnimationUtils.loadInterpolator(getContext(), android.R.interpolator.linear_out_slow_in);
@@ -639,7 +584,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         // loop over the children setting an increasing translation y but the same animation
         // duration + interpolation
         for (int i = 0; i < count; i++) {
-            View view = recyclerView.getChildAt(i);
+            View view = recyclerViewOrders.getChildAt(i);
             view.setVisibility(View.VISIBLE);
             view.setTranslationX(-offset);
             view.setAlpha(0.85f);
@@ -655,175 +600,6 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         }
     }
 
-    public interface DataChangeNotification {
 
-        void onStepModification(int step);
-
-    }
-    public void makeTheCall (String ContactID ){
-
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(getContext(),
-                android.Manifest.permission.CALL_PHONE)
-                != PackageManager.PERMISSION_GRANTED) {
-            Log.e(LOG_TAG, "phone-Number: "+"PERMISSION No GRANTED");
-
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                    android.Manifest.permission.CALL_PHONE)) {
-                Log.e(LOG_TAG, "phone-Number: "+"Notificar el pedido");
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{android.Manifest.permission.CALL_PHONE},
-                        MY_PERMISSIONS_REQUEST_CALL_PHONE);
-                Log.e(LOG_TAG, "phone-Number: "+"pace el pedido luego de verificar si debe");
-            } else {
-
-                // No explanation needed, we can request the permission.
-
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{android.Manifest.permission.CALL_PHONE},
-                        MY_PERMISSIONS_REQUEST_CALL_PHONE);
-                Log.e(LOG_TAG, "phone-Number: "+"pace el pedido");
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        }
-
-        else {
-            Log.e(LOG_TAG, "phone-Number: "+"llama directo, esta autorizado");
-            makePhoneCall(ContactID);
-//                Intent intent = new Intent(Intent.ACTION_CALL,
-//                        Uri.parse("tel:"+number));
-//                startActivity(intent);
-            // Do something with the phone number...
-        }
-
-
-    }
-
-    public void makePhoneCall(String id ) {
-        Log.e(LOG_TAG, "phone-Number: "+"makePhoneCal : "+id);
-        Cursor cursor = null;
-        String phoneNumber = "";
-        int type = 0;
-        String phoneType = "";
-        List<String> allNumbers = new ArrayList<String>();
-        int phoneIdx = 0;
-        int displayNameKeyIdx = 0;
-
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(getContext(),
-                android.Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED) {
-            Log.e(LOG_TAG, "phone-Number: " + "READ_CONTACTS No GRANTED");
-
-
-//                            // Should we show an explanation?
-//                            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-//                                    android.Manifest.permission.READ_CONTACTS)) {
-//                                Log.e(LOG_TAG, "phone-Number: " + "Notificar el pedido READ_CONTACTS");
-//                                // Show an expanation to the user *asynchronously* -- don't block
-            // this thread waiting for the user's response! After the user
-            // sees the explanation, try again to request the permission.
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{android.Manifest.permission.READ_CONTACTS},
-                    MY_PERMISSIONS_REQUEST_READ_CONTACT);
-            Log.e(LOG_TAG, "phone-Number: " + "Hace el pedido luego de verificar si debe READ_CONTACTS");
-        } else {
-
-            // No explanation needed, we can request the permission.
-
-
-            try {
-
-
-                cursor = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
-//                        cursor = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone._ID + "=?", new String[] { id }, null);
-                phoneIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                displayNameKeyIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
-                Log.e(LOG_TAG, "phone-Number: " + "curor count : " + cursor.getCount());
-                Log.e(LOG_TAG, "phone-Number: " + "curor toString : " + cursor.toString());
-                if (cursor.moveToFirst()) {
-                    while (cursor.isAfterLast() == false) {
-                        phoneNumber = cursor.getString(phoneIdx);
-                        type = cursor.getInt(displayNameKeyIdx);
-                        switch (type) {
-                            case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
-                                phoneType="HOME";
-                                break;
-                            case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
-                                phoneType="MOVILE";
-                                break;
-                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
-                                phoneType="WORK";
-                                break;
-                            case ContactsContract.CommonDataKinds.Phone.TYPE_FAX_WORK:
-                            phoneType="FAX WORK";
-                            break;
-                            case ContactsContract.CommonDataKinds.Phone.TYPE_MAIN:
-                            phoneType="MAIN";
-                            break;
-                            default: phoneType="Otro";
-                        }
-                        Log.e(LOG_TAG, "phone-Number: " + "multiple : " + phoneType+" : "+phoneNumber);
-                        allNumbers.add(phoneType+" : "+phoneNumber);
-                        cursor.moveToNext();
-
-                    }
-                } else {
-                    //no results actions
-                }
-
-
-            } catch (Exception e) {
-                Log.e(LOG_TAG, "phone-Number: " + "Exception" + e.toString());
-                //error actions
-            } finally {
-                Log.e(LOG_TAG, "phone-Number: " + "finally");
-                if (cursor != null) {
-                    cursor.close();
-                }
-
-                final CharSequence[] items = allNumbers.toArray(new String[allNumbers.size()]);
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Choose a number");
-                builder.setItems(items, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        String selectedNumber = items[item].toString();
-                        selectedNumber = selectedNumber.replace("-", "");
-                       String selectedNumber1[]= selectedNumber.split(":");
-                        Log.e(LOG_TAG, "phone-Number: " + "mULTIPLE llamando. selectedNumber1.length: " + selectedNumber1.length);
-                        Log.e(LOG_TAG, "phone-Number: " + "mULTIPLE llamando a: " + selectedNumber1[1]);
-                        Intent intent = new Intent(Intent.ACTION_CALL,
-                                Uri.parse("tel:" + selectedNumber1[1]));
-                        startActivity(intent);
-
-                    }
-                });
-                AlertDialog alert = builder.create();
-                if (allNumbers.size() > 1) {
-                    alert.show();
-                } else {
-                    String selectedNumber = phoneNumber.toString();
-                    selectedNumber = selectedNumber.replace("-", "");
-                    Log.e(LOG_TAG, "phone-Number: " + "sIMPLE llamando a: " + selectedNumber);
-                    Intent intent = new Intent(Intent.ACTION_CALL,
-                            Uri.parse("tel:" + selectedNumber));
-                    startActivity(intent);
-                }
-
-                if (phoneNumber.length() == 0) {
-                    //no numbers found actions
-                }
-            }
-        }
-
-
-    }
 }
 

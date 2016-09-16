@@ -13,7 +13,7 @@
     <dimen name="product_detail_view_padding_vertical">
         @dimen/abc_list_item_padding_horizontal_material
     </dimen>
-    <dimen name="Poduct_cardViewElevation">2dp</dimen>
+    <dimen name="Poduct_cardViewElevation">4dp</dimen>
     <dimen name="product_cardViewMarginLeft">2dp</dimen>
     <dimen name="product_cardViewtMarginTop">4dp</dimen>
     <dimen name="product_cardViewMarginRight">2dp</dimen>
@@ -31,7 +31,7 @@
     <!--<dimen name="custom_detail_view_padding_vertical">-->
     <!--@dimen/abc_list_item_padding_horizontal_material-->
     <!--</dimen>-->
-    <dimen name="custom_cardViewElevation">2dp</dimen>
+    <dimen name="custom_cardViewElevation">4dp</dimen>
     <dimen name="custom_cardViewMarginLeft">4dp</dimen>
     <dimen name="custom_cardViewtMarginTop">4dp</dimen>
     <dimen name="custom_cardViewMarginRight">4dp</dimen>
@@ -43,6 +43,16 @@
     <!--Dimens of Custom Selection Activity-->
     <dimen name="content_custom_selection_margin">16dp</dimen>
     <dimen name="content_custom_selection_text_size">24sp</dimen>
+
+    <!--Dimens of Product Picture-->
+    <dimen name="product_picture_h">96dp</dimen>
+    <dimen name="product_picture_w">96dp</dimen>
+
+    <!--
+Refer to App Widget Documentation for margin information
+http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
+    -->
+    <dimen name="widget_margin">8dp</dimen>
 
 
 </resources>

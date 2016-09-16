@@ -1,6 +1,5 @@
 package com.nextnut.logistica;
 
-import android.*;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
@@ -13,7 +12,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.RemoteException;
-import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
@@ -24,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -36,21 +35,16 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.nextnut.logistica.Util.CurrencyToDouble;
 import com.nextnut.logistica.Util.CustomTextWatcher;
-import com.nextnut.logistica.Util.NumberTextWatcher;
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
-import com.nextnut.logistica.data.ProductsColumns;
-import com.nextnut.logistica.dummy.DummyContent;
 import com.squareup.picasso.Picasso;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import android.Manifest.permission_group.*;
+
+import static com.nextnut.logistica.Util.MakeCall.getUserName;
 
 /**
  * A fragment representing a single Custom detail screen.
@@ -118,11 +112,16 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
             mItem = (long)getArguments().getLong(ARG_ITEM_ID);
             Log.i(LOG_TAG, "ARG_ITEM_IDfrag: " + mItem);
-            Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+            AppCompatActivity activity = (AppCompatActivity) this.getContext();
+             appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle("ID :" + mItem);
+                Log.i(LOG_TAG, "appBarLayout:!= null " + mItem);
+                if (mItem==0){
+                    appBarLayout.setTitle(getResources().getString(R.string.custom_new)+ mItem);
+                }else
+                    appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" "+ mItem);
             }
+            Log.i(LOG_TAG, "appBarLayout= null " + mItem);
         }
         if (getArguments().containsKey(CUSTOM_ACTION)) {
             mAction = getArguments().getInt(CUSTOM_ACTION);
@@ -136,7 +135,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         View rootView = inflater.inflate(R.layout.custom_detail, container, false);
 
 
-//        mCustomId = (TextView) rootView.findViewById(R.id.custom_Id);
+
         mCustomName = (EditText) rootView.findViewById(R.id.custom_name_text);
         mLastName = (EditText) rootView.findViewById(R.id.product_Lastname);
         button = (Button) rootView.findViewById(R.id.custom_imagen_button);
@@ -200,7 +199,12 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         mCuit = (EditText) rootView.findViewById(R.id.custom_cuit);
         mIva = (EditText) rootView.findViewById(R.id.custom_iva);
         mSpecial = (CheckBox) rootView.findViewById(R.id.custom_special);
-
+//        if (appBarLayout != null) {
+//            if (mItem==0){
+//                appBarLayout.setTitle(getResources().getString(R.string.custom_new)+ mItem);
+//            }else
+//                appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" "+ mItem);
+//        }
         return rootView;
     }
 
@@ -239,49 +243,50 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                 mIdContact = cursor.getString(column3);
                 if (mCustomId!=null){
                     button.setBackgroundColor(Color.GREEN);
+
                 }
                 Log.e(LOG_TAG, "phone-Number: "+number);
                 Log.e(LOG_TAG, "phone-name: "+name);
                 Log.e(LOG_TAG, "phone- _id : "+ mIdContact );
 
                 button.setText(name);
-                // Here, thisActivity is the current activity
-                if (ContextCompat.checkSelfPermission(getContext(),
-                        android.Manifest.permission.CALL_PHONE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    Log.e(LOG_TAG, "phone-Number: "+"PERMISSION No GRANTED");
-
-
-                    // Should we show an explanation?
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                            android.Manifest.permission.CALL_PHONE)) {
-                        Log.e(LOG_TAG, "phone-Number: "+"Notificar el pedido");
-                        // Show an expanation to the user *asynchronously* -- don't block
-                        // this thread waiting for the user's response! After the user
-                        // sees the explanation, try again to request the permission.
-                        ActivityCompat.requestPermissions(getActivity(),
-                                new String[]{android.Manifest.permission.CALL_PHONE},
-                                MY_PERMISSIONS_REQUEST_CALL_PHONE);
-                        Log.e(LOG_TAG, "phone-Number: "+"pace el pedido luego de verificar si debe");
-                    } else {
-
-                        // No explanation needed, we can request the permission.
-
-                        ActivityCompat.requestPermissions(getActivity(),
-                                new String[]{android.Manifest.permission.CALL_PHONE},
-                                MY_PERMISSIONS_REQUEST_CALL_PHONE);
-                        Log.e(LOG_TAG, "phone-Number: "+"pace el pedido");
-                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                        // app-defined int constant. The callback method gets the
-                        // result of the request.
-                    }
-                }
-
-                else {
-                    Log.e(LOG_TAG, "phone-Number: "+"llama directo, esta autorizado");
-//                    makePhoneCall(mIdContact);
-
-                }
+//                // Here, thisActivity is the current activity
+//                if (ContextCompat.checkSelfPermission(getContext(),
+//                        android.Manifest.permission.CALL_PHONE)
+//                        != PackageManager.PERMISSION_GRANTED) {
+//                    Log.e(LOG_TAG, "phone-Number: "+"PERMISSION No GRANTED");
+//
+//
+//                    // Should we show an explanation?
+//                    if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+//                            android.Manifest.permission.CALL_PHONE)) {
+//                        Log.e(LOG_TAG, "phone-Number: "+"Notificar el pedido");
+//                        // Show an expanation to the user *asynchronously* -- don't block
+//                        // this thread waiting for the user's response! After the user
+//                        // sees the explanation, try again to request the permission.
+//                        ActivityCompat.requestPermissions(getActivity(),
+//                                new String[]{android.Manifest.permission.CALL_PHONE},
+//                                MY_PERMISSIONS_REQUEST_CALL_PHONE);
+//                        Log.e(LOG_TAG, "phone-Number: "+"pace el pedido luego de verificar si debe");
+//                    } else {
+//
+//                        // No explanation needed, we can request the permission.
+//
+//                        ActivityCompat.requestPermissions(getActivity(),
+//                                new String[]{android.Manifest.permission.CALL_PHONE},
+//                                MY_PERMISSIONS_REQUEST_CALL_PHONE);
+//                        Log.e(LOG_TAG, "phone-Number: "+"pace el pedido");
+//                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+//                        // app-defined int constant. The callback method gets the
+//                        // result of the request.
+//                    }
+//                }
+//
+//                else {
+//                    Log.e(LOG_TAG, "phone-Number: "+"llama directo, esta autorizado");
+////                    makePhoneCall(mIdContact);
+//
+//                }
 
 
             }
@@ -304,10 +309,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                     if (mCustomId!=null){
                         button.setBackgroundColor(Color.GREEN);
                     }
-//                    makePhoneCall(mIdContact );
-//                Intent intent = new Intent(Intent.ACTION_CALL,
-//                        Uri.parse("tel:"+number));
-//                startActivity(intent);
+
 
                 } else {
                     Log.e(LOG_TAG, "phone-Number: "+"PERMISSION_rehazado");
@@ -324,100 +326,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
 
 
-    public void makePhoneCall(String id ) {
-        Log.e(LOG_TAG, "phone-Number: "+"makePhoneCal : "+id);
-                    Cursor cursor = null;
-                    String phoneNumber = "";
-                    List<String> allNumbers = new ArrayList<String>();
-                    int phoneIdx = 0;
-
-        // Here, thisActivity is the current activity
-                        if (ContextCompat.checkSelfPermission(getContext(),
-                                Manifest.permission.READ_CONTACTS)
-                                != PackageManager.PERMISSION_GRANTED) {
-                            Log.e(LOG_TAG, "phone-Number: " + "READ_CONTACTS No GRANTED");
-
-
-//                            // Should we show an explanation?
-//                            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-//                                    android.Manifest.permission.READ_CONTACTS)) {
-//                                Log.e(LOG_TAG, "phone-Number: " + "Notificar el pedido READ_CONTACTS");
-//                                // Show an expanation to the user *asynchronously* -- don't block
-                                // this thread waiting for the user's response! After the user
-                                // sees the explanation, try again to request the permission.
-                                ActivityCompat.requestPermissions(getActivity(),
-                                        new String[]{android.Manifest.permission.READ_CONTACTS},
-                                        MY_PERMISSIONS_REQUEST_READ_CONTACT);
-                                Log.e(LOG_TAG, "phone-Number: " + "Hace el pedido luego de verificar si debe READ_CONTACTS");
-                            } else {
-
-                                // No explanation needed, we can request the permission.
-
-
-                                try {
-
-
-                                    cursor = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
-//                        cursor = getActivity().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone._ID + "=?", new String[] { id }, null);
-                                    phoneIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                                    Log.e(LOG_TAG, "phone-Number: " + "curor count : " + cursor.getCount());
-                                    Log.e(LOG_TAG, "phone-Number: " + "curor toString : " + cursor.toString());
-                                    if (cursor.moveToFirst()) {
-                                        while (cursor.isAfterLast() == false) {
-                                            phoneNumber = cursor.getString(phoneIdx);
-                                            Log.e(LOG_TAG, "phone-Number: " + "phoneNumber : " + phoneNumber);
-                                            allNumbers.add(phoneNumber);
-                                            cursor.moveToNext();
-
-                                        }
-                                    } else {
-                                        //no results actions
-                                    }
-
-
-                                } catch (Exception e) {
-                                    Log.e(LOG_TAG, "phone-Number: " + "Exception" + e.toString());
-                                    //error actions
-                                } finally {
-                                    Log.e(LOG_TAG, "phone-Number: " + "finally");
-                                    if (cursor != null) {
-                                        cursor.close();
-                                    }
-
-                                    final CharSequence[] items = allNumbers.toArray(new String[allNumbers.size()]);
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                    builder.setTitle("Choose a number");
-                                    builder.setItems(items, new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int item) {
-                                            String selectedNumber = items[item].toString();
-                                            selectedNumber = selectedNumber.replace("-", "");
-                                            Log.e(LOG_TAG, "phone-Number: " + "mULTIPLE llamando a: " + selectedNumber);
-                                            Intent intent = new Intent(Intent.ACTION_CALL,
-                                                    Uri.parse("tel:" + selectedNumber));
-                                            startActivity(intent);
-
-                                        }
-                                    });
-                                    AlertDialog alert = builder.create();
-                                    if (allNumbers.size() > 1) {
-                                        alert.show();
-                                    } else {
-                                        String selectedNumber = phoneNumber.toString();
-                                        selectedNumber = selectedNumber.replace("-", "");
-                                        Log.e(LOG_TAG, "phone-Number: " + "sIMPLE llamando a: " + selectedNumber);
-                                        Intent intent = new Intent(Intent.ACTION_CALL,
-                                                Uri.parse("tel:" + selectedNumber));
-                                        startActivity(intent);
-                                    }
-
-                                    if (phoneNumber.length() == 0) {
-                                        //no numbers found actions
-                                    }
-                                }
-                            }
-
-
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -443,6 +351,17 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 //        getLoaderManager().initLoader(NAME_PRODUCT_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (appBarLayout != null) {
+            if (mItem==0){
+                appBarLayout.setTitle(getResources().getString(R.string.custom_new)+ mItem);
+            }else
+                appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" "+ mItem);
+        }
     }
 
     public void verificationAndsave() {
@@ -493,6 +412,8 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
             }
             getActivity().onBackPressed();
         }
+    // The data is not valid
+
     }
 
     public void deleteCustomer() {
@@ -514,7 +435,66 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     }
 
     public Boolean verification(){
-        return true;
+        Log.i(LOG_TAG, "verification");
+        Boolean isvalid =true;
+        if( mCustomName.getText().toString().equals(null))
+        {
+            isvalid =false;
+            mCustomName.setBackgroundColor(Color.RED);
+            Log.i(LOG_TAG, "verification null mCustomName");
+
+        } else {
+            mCustomName.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+
+        Log.i(LOG_TAG, "verification null mLastName.getText().toString()" +mLastName.getText().toString());
+        if( mLastName.getText().toString().equals(""))
+        {
+            isvalid =false;
+            mLastName.setBackgroundColor(Color.RED);
+            Log.i(LOG_TAG, "verification null mLastName");
+        } else {
+            mLastName.setBackgroundColor(Color.TRANSPARENT);
+        }
+        if( mDeliveyAddress.getText().toString().equals(""))
+        {
+            isvalid =false;
+            mDeliveyAddress.setBackgroundColor(Color.RED);
+            Log.i(LOG_TAG, "verification null mDeliveyAddress");
+        } else {
+            mDeliveyAddress.setBackgroundColor(Color.TRANSPARENT);
+        }
+        if( mCity.getText().toString().equals(""))
+        {
+            isvalid =false;
+            mCity.setBackgroundColor(Color.RED);
+            Log.i(LOG_TAG, "verification null mCity");
+        } else {
+            mCity.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+
+        if( mCuit.getText().toString().equals(""))
+        {
+            isvalid =false;
+            mCuit.setBackgroundColor(Color.RED);
+            Log.i(LOG_TAG, "verification null mCuit");
+        } else {
+            mCuit.setBackgroundColor(Color.TRANSPARENT);
+        }
+       if( mIva.getText().toString().equals(""))
+       {
+           isvalid =false;
+           mIva.setBackgroundColor(Color.RED);
+           Log.i(LOG_TAG, "verification null Iva");
+       } else {
+           mIva.setBackgroundColor(Color.TRANSPARENT);
+       }
+
+//        mSpecial doesn´t need to be verified;
+
+        return isvalid;
     }
 
     @Override
@@ -585,6 +565,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
             if (mIdContact != null){
             button.setBackgroundColor(Color.GREEN);
+                button.setText(getUserName(getContext() ,mIdContact));
                 Log.e(LOG_TAG, "button green");
             } else
             {  Log.e(LOG_TAG, "button null");}
@@ -597,13 +578,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
             
 
 
-            if (appBarLayout != null) {
-                {
-                    appBarLayout.setTitle(data.getString(data.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+
-                            data.getString(data.getColumnIndex(CustomColumns.LASTNAME_CUSTOM))
-                    );
-                }
-            }
+
         }
     }
 

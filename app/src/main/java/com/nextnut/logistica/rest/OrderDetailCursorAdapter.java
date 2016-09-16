@@ -170,21 +170,7 @@ implements ItemTouchHelperAdapter{
             Log.i("onClick", "cursorID " + mDetalleOrderId);
             Log.i("onClick", "PhotoString " + mphotString);
             mClickHandler.onClick(mDetalleOrderId, this);
-//            if(listener != null)
-//                listener.onClick(view);
-//            boolean isRed = isRed = !true;
-//            final int radius = (int) Math.hypot(view.getWidth() / 2, view.getHeight() / 2);
-//            view.setBackgroundColor(Color.RED);
-//            if (isRed) {
-//                view.setBackgroundColor(Color.GRAY);
-//
-//            } else {
-//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-//                    Animator anim = ViewAnimationUtils.createCircularReveal(view, view.getWidth() / 2, view.getHeight() / 2, 0, radius);
-//                    view.setBackgroundColor(Color.GREEN);
-//                    anim.start();
-//                }
-//            }
+
         }
     }
 
@@ -236,7 +222,7 @@ implements ItemTouchHelperAdapter{
                 Picasso.with(viewHolder.mphotoProducto.getContext())
 
                         .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
-                        .resize(96, 96)
+                        .resize(mContext.getResources().getDimensionPixelSize(R.dimen.product_picture_w), mContext.getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                         .placeholder(R.drawable.ic_action_action_redeem)
                         .centerCrop()
                         .into(viewHolder.mphotoProducto);

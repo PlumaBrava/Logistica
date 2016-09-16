@@ -7,6 +7,10 @@
     <!--Verification Colors-->
     <color name="ValidationOK">#f25bf96b</color>
     <color name="ValidationERROR">#ff4043</color>
-    <color name="Card_background">#f25ab5b3</color>
+    <color name="ProductCard_background">#f2c6f6f5</color>
+    <color name="CustomOrderCard_background">#6396cba4</color>
+    <color name="PickingCard_background">#f2eead44</color>
+    <!--<color name="PickingCard_background">#f25bf96b</color>-->
+    <color name="TotalProductCard_background">#f2f4c5f2</color>
 
 </resources>
