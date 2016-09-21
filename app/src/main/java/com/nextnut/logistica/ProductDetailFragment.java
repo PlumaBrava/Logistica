@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
@@ -34,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nextnut.logistica.Util.CurrencyToDouble;
+import com.nextnut.logistica.Util.Imagenes;
 import com.nextnut.logistica.Util.NumberTextWatcher;
 import com.nextnut.logistica.Util.DialogAlerta;
 import com.nextnut.logistica.data.LogisticaProvider;
@@ -50,6 +52,11 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static com.nextnut.logistica.Util.Imagenes.resize;
+import static com.nextnut.logistica.Util.Imagenes.saveImageSelectedReturnPath;
+import static com.nextnut.logistica.Util.Imagenes.savePhotoReturnPath;
+import static com.nextnut.logistica.Util.Imagenes.selectImage;
 
 /**
  * A fragment representing a single Product detail screen.
@@ -96,8 +103,8 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     private int mAction;
 
 
-    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1888;
-    private static final int REQUEST_IMAGE_GET = 1889;
+//    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1888;
+//    private static final int REQUEST_IMAGE_GET = 1889;
 
     CollapsingToolbarLayout appBarLayout;
 
@@ -230,22 +237,22 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                selectImage();
+                selectImage(ProductDetailFragment.this);
 
 
             }
 
         });
 
-        if (mCurrentPhotoPath == null) {
-            Log.i("prdDetFrament", "mCurrentPhotoPath=null");
-            mImageProducto.setBackgroundColor(Color.BLUE);
-            mImageProducto.setImageResource(R.drawable.ic_action_action_redeem);
-
-        } else {
-            mImageProducto.setBackgroundColor(Color.TRANSPARENT);
-            Log.i("prdDetFrament", "mCurrentPhotoPath!=null");
-        }
+//        if (mCurrentPhotoPath == null) {
+//            Log.i("prdDetFrament", "mCurrentPhotoPath=null");
+//            mImageProducto.setBackgroundColor(Color.BLUE);
+//            mImageProducto.setImageResource(R.drawable.ic_action_action_redeem);
+//
+//        } else {
+//            mImageProducto.setBackgroundColor(Color.TRANSPARENT);
+//            Log.i("prdDetFrament", "mCurrentPhotoPath!=null");
+//        }
         if (mAction == PRODUCT_NEW) {
             if (appBarLayout != null) {
                 appBarLayout.setTitle(getResources().getString(R.string.pruductDetailBar_NEW_PRODUCT));
@@ -291,100 +298,117 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i("FragmentAlertDialog", "onActivityResul -requestCode:" + requestCode + "-resultCode:" + resultCode);
-
+        Drawable drawable = resize(getContext(), R.drawable.ic_action_action_redeem);
         if (resultCode == Activity.RESULT_OK) {
 
-            if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (requestCode == Imagenes.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
 
 
-                Bitmap bmp = (Bitmap) data.getExtras().get("data");
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                Bitmap bmp = (Bitmap) data.getExtras().get("data");
+//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//
+//                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//                byte[] byteArray = stream.toByteArray();
+//
+//                // convert byte array to Bitmap
+//
+//                Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
+//                        byteArray.length);
+//
+//
+//                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//                String filename = "Product_" + timeStamp;
+//
+//                File file = new File(getContext().getFilesDir(), filename);
+//
+//                FileOutputStream outputStream;
+//
+//                try {
+//                    outputStream = getContext().openFileOutput(filename, Context.MODE_PRIVATE);
+////                    outputStream.write(string.getBytes());
+//                    outputStream.write(byteArray);
+//                    outputStream.close();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
 
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
+//                mCurrentPhotoPath = "file:" + file.getAbsolutePath();
+                mCurrentPhotoPath = "file:" + savePhotoReturnPath(getContext(),(Bitmap) data.getExtras().get("data"));
 
-                // convert byte array to Bitmap
-
-                Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
-                        byteArray.length);
-
-
-                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                String filename = "Product_" + timeStamp;
-
-                File file = new File(getContext().getFilesDir(), filename);
-
-                FileOutputStream outputStream;
-
-                try {
-                    outputStream = getContext().openFileOutput(filename, Context.MODE_PRIVATE);
-//                    outputStream.write(string.getBytes());
-                    outputStream.write(byteArray);
-                    outputStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                mCurrentPhotoPath = "file:" + file.getAbsolutePath();
                 Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
                 Picasso.with(getContext())
                         .load(mCurrentPhotoPath)
-                        .placeholder(R.drawable.ic_action_action_redeem)
+                        .placeholder(drawable)
                         .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                         .into(mImageProducto);
 
 
 
 
-            } else if (requestCode == REQUEST_IMAGE_GET) {
-                Bitmap bm = null;
-                if (data != null) {
-                    try {
-                        bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), data.getData());
+            } else if (requestCode == Imagenes.REQUEST_IMAGE_GET) {
 
 
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-                        bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                        byte[] byteArray = stream.toByteArray();
-
-                        // convert byte array to Bitmap
-
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
-                                byteArray.length);
+                mCurrentPhotoPath = "file:" + saveImageSelectedReturnPath(getContext(),data);
 
 
-                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                        String filename = "Product_" + timeStamp;
-
-                        File file = new File(getContext().getFilesDir(), filename);
-
-                        FileOutputStream outputStream;
-
-                        try {
-                            outputStream = getContext().openFileOutput(filename, Context.MODE_PRIVATE);
-//                    outputStream.write(string.getBytes());
-                            outputStream.write(byteArray);
-                            outputStream.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        mCurrentPhotoPath = "file:" + file.getAbsolutePath();
-                        Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
-                        mImageProducto.setBackgroundColor(Color.TRANSPARENT);
-                        Picasso.with(getContext())
-                                .load(mCurrentPhotoPath)
-                                .placeholder(R.drawable.ic_action_action_redeem)
-                                .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-                                .into(mImageProducto);
+                Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
+                mImageProducto.setBackgroundColor(Color.TRANSPARENT);
+                Picasso.with(getContext())
+                        .load(mCurrentPhotoPath)
+                        .placeholder(drawable)
+                        .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+                        .into(mImageProducto);
 
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
 
-                }
+//                Bitmap bm = null;
+//                if (data != null) {
+//                    try {
+//                        bm = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), data.getData());
+//
+//
+//                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//
+//                        bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//                        byte[] byteArray = stream.toByteArray();
+//
+//                        // convert byte array to Bitmap
+//
+//                        Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
+//                                byteArray.length);
+//
+//
+//                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//                        String filename = "Product_" + timeStamp;
+//
+//                        File file = new File(getContext().getFilesDir(), filename);
+//
+//                        FileOutputStream outputStream;
+
+//                        try {
+//                            outputStream = getContext().openFileOutput(filename, Context.MODE_PRIVATE);
+////                    outputStream.write(string.getBytes());
+//                            outputStream.write(byteArray);
+//                            outputStream.close();
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//
+//                        mCurrentPhotoPath = "file:" + file.getAbsolutePath();
+//                        Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
+//                        mImageProducto.setBackgroundColor(Color.TRANSPARENT);
+//                        Picasso.with(getContext())
+//                                .load(mCurrentPhotoPath)
+//                                .placeholder(R.drawable.ic_action_action_redeem)
+//                                .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+//                                .into(mImageProducto);
+//
+//
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+
+//                }
 
             }
 
@@ -395,37 +419,37 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
 
 
 
-    private void selectImage() {
-        final CharSequence[] items = {"Take Photo", "Choose from Library",
-                "Cancel"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-
-                Log.e(LOG_TAG, "dialog:" + dialog + " item: " + item);
-
-                if (items[item].equals("Take Photo")) {
-
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-                } else if (items[item].equals("Choose from Library")) {
-
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("image/*");
-                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                        startActivityForResult(intent, REQUEST_IMAGE_GET);
-                    }
-
-
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
+//    private void selectImage() {
+//        final CharSequence[] items = {"Take Photo", "Choose from Library",
+//                "Cancel"};
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//        builder.setTitle("Add Photo!");
+//        builder.setItems(items, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int item) {
+//
+//                Log.e(LOG_TAG, "dialog:" + dialog + " item: " + item);
+//
+//                if (items[item].equals("Take Photo")) {
+//
+//                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                    startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+//                } else if (items[item].equals("Choose from Library")) {
+//
+//                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                    intent.setType("image/*");
+//                    if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+//                        startActivityForResult(intent, REQUEST_IMAGE_GET);
+//                    }
+//
+//
+//                } else if (items[item].equals("Cancel")) {
+//                    dialog.dismiss();
+//                }
+//            }
+//        });
+//        builder.show();
+//    }
 
 
     @Override

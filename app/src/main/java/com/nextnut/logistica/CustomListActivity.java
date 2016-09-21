@@ -15,7 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
@@ -70,8 +70,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
         fab_new.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "New Customer", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
 
                 Intent intent = new Intent(getApplicationContext(), CustomDetailActivity.class);
                 intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, 0);
@@ -90,8 +89,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Save product", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
                 CustomDetailFragment customDetailFragment=(CustomDetailFragment)
                         getSupportFragmentManager().findFragmentById(R.id.custom_detail_container);
                 if(customDetailFragment!=null){
@@ -112,8 +110,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
         fab_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Delete Product", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
                 CustomDetailFragment customDetailFragment=(CustomDetailFragment)
                         getSupportFragmentManager().findFragmentById(R.id.custom_detail_container);
                 if(customDetailFragment!=null){

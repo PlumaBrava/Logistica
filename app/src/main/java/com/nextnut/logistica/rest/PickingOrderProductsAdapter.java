@@ -7,6 +7,7 @@ import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.RemoteException;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,6 +32,8 @@ import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+
+import static com.nextnut.logistica.Util.Imagenes.resize;
 
 //import com.nextnut.distribution.ProductsActivity;
 //import com.nextnut.distribution.R;
@@ -170,11 +173,12 @@ implements ItemTouchHelperAdapter{
 
                 viewHolder.mDetalleOrderId=cursor.getLong(COLUMN_ID_PRODUCTO);
                 viewHolder.mphotString=cursor.getString(COLUMN_IMAGEN_PRODUCTO);
+                Drawable drawable = resize(mContext, R.drawable.ic_action_action_redeem);
                 Picasso.with(viewHolder.mphotoProducto.getContext())
 
                         .load(cursor.getString(COLUMN_IMAGEN_PRODUCTO))
-                        .resize(96, 96)
-                        .placeholder(R.drawable.ic_action_action_redeem)
+                        .resize(viewHolder.mphotoProducto.getMaxWidth(),viewHolder. mphotoProducto.getMaxHeight())
+                        .placeholder(drawable)
                         .centerCrop()
                         .into(viewHolder.mphotoProducto);
 

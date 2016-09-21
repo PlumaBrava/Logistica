@@ -4,11 +4,13 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:fitsSystemWindows">false</item> // permite el scrooll llegue hasta status bar- si es flase pasa por debajo(esto esta bueno para las fotos
         <item name="android:statusBarColor">@android:color/transparent</item>
 
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowEnterTransitionOverlap">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
+
 
         <item name="android:windowSoftInputMode">stateHidden</item>
 
@@ -20,4 +22,10 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <!-- Base application - used to the activities that en w900 are showed as . -->
+    <style name="AppTheme.Dialog_NoActionBar" parent="AppTheme.NoActionBar">
+
+    </style>
+
 </resources>

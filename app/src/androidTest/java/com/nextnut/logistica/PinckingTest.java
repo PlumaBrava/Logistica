@@ -31,6 +31,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.core.AllOf.allOf;
+import static org.junit.matchers.JUnitMatchers.containsString;
 
 //import android.support.test.uiautomator.UiDevice;
 
@@ -63,10 +64,21 @@ public class PinckingTest {
         onView(withId(R.id.fab)).perform(click());
         // Select the first Picking
 //        onView(withId(R.id.pickingOrder_list)).perform(RecyclerViewActions.scrollToPosition(0));
-        onView(withText("1")).perform( click());
+//        onView(withText("1")).perform( click());
+
+
+        onView(allOf(withId(R.id.pickingNumberOrderCard),withText("4"))).perform(click());
+
+//        onView(withId(R.id.pickingOrder_list))
+//                .perform(RecyclerViewActions.actionOnItem(
+//                        hasDescendant(withText("4")), click()));
 
         // Select the orders
-        onView(withText("Custom Orders")).perform(click());
+//        onView(withId(R.id.pickingNumberOrderCard))
+//                .check(matches(withText(containsString("4"))));
+//                .perform(click());
+        onView(withText("CUSTOM ORDERS")).perform(click());
+
         pauseTestFor(1000);
         onView(withId(R.id.customorder_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, mYswipeRight()));
         pauseTestFor(1000);

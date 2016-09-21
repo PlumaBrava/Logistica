@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +31,8 @@ import com.squareup.picasso.Picasso;
 import com.nextnut.logistica.Util.CurrencyToDouble;
 
 import java.text.NumberFormat;
+
+import static com.nextnut.logistica.Util.Imagenes.resize;
 
 //import com.nextnut.distribution.ProductsActivity;
 //import com.nextnut.distribution.R;
@@ -214,16 +219,23 @@ implements ItemTouchHelperAdapter{
                 viewHolder.mphotString=cursor.getString(7);
 
 
-                if (cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO))==null){
-                    viewHolder.mphotoProducto.setBackgroundColor(Color.BLUE);
-                }
+//                Drawable d=mContext.getResources(). getDrawable(R.drawable.ic_action_action_redeem);;
+//                d.setColorFilter(new PorterDuffColorFilter(Color.BLUE, PorterDuff.Mode.SCREEN));
+//                if (cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO))==null){
+//
+////                    viewHolder.mphotoProducto.setBackgroundColor(Color.BLUE);
+//
+//                    d.setColorFilter(new PorterDuffColorFilter(Color.BLUE, PorterDuff.Mode.SCREEN));
+//                }
 
-
+                Log.i("OrderDetailAdapter", "Size:  " +viewHolder.mphotoProducto.getWidth()+"-"+viewHolder.mphotoProducto.getHeight());
+                Drawable drawable = resize(mContext, R.drawable.ic_action_action_redeem);
                 Picasso.with(viewHolder.mphotoProducto.getContext())
 
                         .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
-                        .resize(mContext.getResources().getDimensionPixelSize(R.dimen.product_picture_w), mContext.getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-                        .placeholder(R.drawable.ic_action_action_redeem)
+                        .resize(viewHolder.mphotoProducto.getMaxWidth(),viewHolder. mphotoProducto.getMaxHeight())
+//                        .placeholder(R.drawable.ic_action_action_redeem)
+                        .placeholder(drawable)
                         .centerCrop()
                         .into(viewHolder.mphotoProducto);
 

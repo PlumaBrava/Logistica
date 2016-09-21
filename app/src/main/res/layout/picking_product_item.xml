@@ -33,9 +33,9 @@
             android:id="@+id/photoProducto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:maxHeight="124dp"
-            android:maxWidth="124dp"
+            android:contentDescription="@string/photo"
+            android:maxHeight="@dimen/product_cardPhotoheigth"
+            android:maxWidth="@dimen/product_cardPhotowidth"
             android:background="@color/colorAccent"
             android:transitionName="@string/detail_icon_transition_name"
             android:layout_gravity="center"/>
@@ -59,6 +59,7 @@
         android:layout_marginLeft="@dimen/text_margin"
         android:layout_gravity="left"
         android:textStyle="bold"
+        android:contentDescription="@string/productTitleListItem"
        />
             <TextView
                 android:id="@+id/precioProducto"
@@ -69,6 +70,7 @@
                 android:layout_gravity="start"
                 android:textStyle="bold"
                 android:layout_weight="1"
+                android:contentDescription="@string/priceListItem"
                 />
             <!--android:layout_margin="@dimen/text_margin"-->
                 </LinearLayout>
@@ -80,38 +82,38 @@
 
 
                 <TextView
-                    android:text="ordenes"
+                    android:text="@string/Orders"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
                     android:gravity="center"
                     android:layout_weight="1"
-
+                    android:contentDescription="@string/Orders"
 
                     />
                 <!--android:layout_weight="1"-->
                 <!--android:layout_margin="@dimen/text_margin"-->
 
                 <TextView
-                    android:text ="Picking"
+                    android:text ="@string/Picking"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:gravity="center"
                     android:layout_weight="1"
-
+                    android:contentDescription="@string/Picking"
 
 
                     />
 
                 <TextView
-                    android:text="delivery"
+                    android:text="@string/Delivery"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:gravity="center"
                     android:layout_weight="1"
-
+                    android:contentDescription="@string/Delivery"
 
 
                     />
@@ -138,7 +140,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:layout_weight="1"
-
+            android:contentDescription="@string/quantityOrders"
 
             />
                 <!--android:layout_weight="1"-->
@@ -151,7 +153,7 @@
             android:textStyle="bold"
             android:gravity="center"
             android:layout_weight="1"
-
+            android:contentDescription="@string/quantityPicking"
 
 
             />
@@ -163,7 +165,7 @@
                     android:textStyle="bold"
                     android:gravity="center"
                     android:layout_weight="1"
-
+                    android:contentDescription="@string/quantityDelivered"
 
 
                     />

@@ -48,7 +48,7 @@
             android:name=".ProductDetailActivity"
             android:label="@string/title_product_detail"
             android:parentActivityName=".ProductListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.Dialog_NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -91,28 +91,28 @@
             android:name=".CustomDetailActivity"
             android:label="@string/title_custom_detail"
             android:parentActivityName=".CustomListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.Dialog_NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.CustomListActivity" />
         </activity>
-        <activity
-            android:name=".CustomOrderListFragment"
-            android:label="@string/title_customorder_list"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
-        </activity>
+        <!--<activity-->
+            <!--android:name=".CustomOrderListFragment"-->
+            <!--android:label="@string/title_customorder_list"-->
+            <!--android:parentActivityName=".MainActivity"-->
+            <!--android:theme="@style/AppTheme.NoActionBar">-->
+            <!--<meta-data-->
+                <!--android:name="android.support.PARENT_ACTIVITY"-->
+                <!--android:value="com.nextnut.logistica.MainActivity" />-->
+        <!--</activity>-->
         <activity
             android:name=".CustomOrderDetailActivity"
             android:label="@string/title_customorder_detail"
-            android:parentActivityName=".CustomOrderListFragment"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.Dialog_NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".CustomOrderListFragment" />
+                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".LoginActivity"

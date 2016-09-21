@@ -29,6 +29,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 
+import static com.nextnut.logistica.Util.Imagenes.resize;
 
 
 public class ProductCursorAdapter extends CursorRecyclerViewAdapter<ProductCursorAdapter.ViewHolder>
@@ -115,10 +116,10 @@ implements ItemTouchHelperAdapter{
                 DatabaseUtils.dumpCursor(cursor);
                 viewHolder.mcursorId=cursor.getLong(cursor.getColumnIndex(ProductsColumns._ID_PRODUCTO));
                 viewHolder.mphotString=cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO));
-                if (cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO))==null){
-                    viewHolder.mphotoProducto.setBackgroundColor(Color.BLUE);
-                }
-                Drawable drawable = resize(R.drawable.ic_action_action_redeem);
+
+                Log.i("ProductCursorAdapter", "Size:  " +viewHolder.mphotoProducto.getWidth()+"-"+viewHolder.mphotoProducto.getHeight());
+
+                Drawable drawable = resize(mContext, R.drawable.ic_action_action_redeem);
                 Picasso.with(viewHolder.mphotoProducto.getContext())
 
                         .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
@@ -137,23 +138,23 @@ implements ItemTouchHelperAdapter{
 
             }
 
-    private Drawable resize(int somedrawable) {
-        // Read your drawable from somewhere
-
-        Drawable dr =mContext.getResources(). getDrawable(somedrawable);
-        Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
-
-        Drawable d = new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(bitmap
-                ,mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotoheigth)
-                ,mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotowidth)
-                , true));
-// Set your new, scaled drawable "d"
-
-//        Bitmap b = ((BitmapDrawable)image).getBitmap();
-//        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
-//        return new BitmapDrawable(getResources(), bitmapResized);
-        return d;
-    }
+//    private Drawable resize(int somedrawable) {
+//        // Read your drawable from somewhere
+//
+//        Drawable dr =mContext.getResources(). getDrawable(somedrawable);
+//        Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+//
+//        Drawable d = new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(bitmap
+//                ,mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotoheigth)
+//                ,mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotowidth)
+//                , true));
+//// Set your new, scaled drawable "d"
+//
+////        Bitmap b = ((BitmapDrawable)image).getBitmap();
+////        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
+////        return new BitmapDrawable(getResources(), bitmapResized);
+//        return d;
+//    }
 
 
     public static interface ProductCursorAdapterOnClickHandler {

@@ -19,8 +19,8 @@
     <dimen name="product_cardViewMarginRight">2dp</dimen>
     <dimen name="product_cardViewMarginBottom">4dp</dimen>
 
-    <dimen name="product_cardPhotoheigth">64dp</dimen>
-    <dimen name="product_cardPhotowidth">64dp</dimen>
+    <dimen name="product_cardPhotoheigth">96dp</dimen>
+    <dimen name="product_cardPhotowidth">96dp</dimen>
 
 
     <dimen name="offset_y">300dp</dimen>

@@ -70,8 +70,9 @@ public class ApplicationTest {
             MainActivity.class,true,true);
 @Test
 public void createCustom0() throws InterruptedException {
+        pauseTestFor(4000);
     onView(withId(R.id.customs)).perform(click());
-//    pauseTestFor(4000);
+
     onView(withId(R.id.fab_new)).perform(click());
 //    pauseTestFor(4000);
 

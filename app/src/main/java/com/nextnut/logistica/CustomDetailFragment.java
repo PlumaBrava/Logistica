@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
@@ -37,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nextnut.logistica.Util.CustomTextWatcher;
+import com.nextnut.logistica.Util.Imagenes;
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.squareup.picasso.Picasso;
@@ -44,6 +47,10 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.nextnut.logistica.Util.Imagenes.resize;
+import static com.nextnut.logistica.Util.Imagenes.saveImageSelectedReturnPath;
+import static com.nextnut.logistica.Util.Imagenes.savePhotoReturnPath;
+import static com.nextnut.logistica.Util.Imagenes.selectImage;
 import static com.nextnut.logistica.Util.MakeCall.getUserName;
 
 /**
@@ -87,8 +94,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     private int mAction;
 
 
-    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1888;
-    private static final int REQUEST_IMAGE_GET = 1889;
+
 
     CollapsingToolbarLayout appBarLayout;
 
@@ -155,6 +161,13 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
             }
         });
         mImageCustomer = (ImageView) rootView.findViewById(R.id.custom_imagen);
+        mImageCustomer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i(LOG_TAG, "mImageCustomer on Click: ");
+                selectImage(CustomDetailFragment.this);
+            }
+        });
         mDeliveyAddress = (EditText) rootView.findViewById(R.id.custom_delivery_address);
         mCity = (EditText) rootView.findViewById(R.id.custom_city);
 
@@ -213,10 +226,12 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     String mIdContact;
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request it is that we're responding to
-        if (requestCode == PICK_CONTACT_REQUEST) {
+
             // Make sure the request was successful
             if (resultCode == Activity.RESULT_OK) {
+
+                // Check which request it is that we're responding to
+                if (requestCode == PICK_CONTACT_REQUEST) {
                 // Get the URI that points to the selected contact
                 Uri contactUri = data.getData();
                 // We only need the NUMBER column, because there will be only one row in the result
@@ -250,47 +265,41 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                 Log.e(LOG_TAG, "phone- _id : "+ mIdContact );
 
                 button.setText(name);
-//                // Here, thisActivity is the current activity
-//                if (ContextCompat.checkSelfPermission(getContext(),
-//                        android.Manifest.permission.CALL_PHONE)
-//                        != PackageManager.PERMISSION_GRANTED) {
-//                    Log.e(LOG_TAG, "phone-Number: "+"PERMISSION No GRANTED");
-//
-//
-//                    // Should we show an explanation?
-//                    if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-//                            android.Manifest.permission.CALL_PHONE)) {
-//                        Log.e(LOG_TAG, "phone-Number: "+"Notificar el pedido");
-//                        // Show an expanation to the user *asynchronously* -- don't block
-//                        // this thread waiting for the user's response! After the user
-//                        // sees the explanation, try again to request the permission.
-//                        ActivityCompat.requestPermissions(getActivity(),
-//                                new String[]{android.Manifest.permission.CALL_PHONE},
-//                                MY_PERMISSIONS_REQUEST_CALL_PHONE);
-//                        Log.e(LOG_TAG, "phone-Number: "+"pace el pedido luego de verificar si debe");
-//                    } else {
-//
-//                        // No explanation needed, we can request the permission.
-//
-//                        ActivityCompat.requestPermissions(getActivity(),
-//                                new String[]{android.Manifest.permission.CALL_PHONE},
-//                                MY_PERMISSIONS_REQUEST_CALL_PHONE);
-//                        Log.e(LOG_TAG, "phone-Number: "+"pace el pedido");
-//                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-//                        // app-defined int constant. The callback method gets the
-//                        // result of the request.
-//                    }
-//                }
-//
-//                else {
-//                    Log.e(LOG_TAG, "phone-Number: "+"llama directo, esta autorizado");
-////                    makePhoneCall(mIdContact);
-//
-//                }
+            }
+                if (requestCode == Imagenes.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+                    mCurrentPhotoPath = "file:" + savePhotoReturnPath(getContext(),(Bitmap) data.getExtras().get("data"));
 
+                    Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
+                    Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
+                    Picasso.with(getContext())
+                            .load(mCurrentPhotoPath)
+                            .placeholder(drawable)
+                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+                            .into(mImageCustomer);
+
+
+
+
+                } else if (requestCode == Imagenes.REQUEST_IMAGE_GET) {
+
+
+                    mCurrentPhotoPath = "file:" + saveImageSelectedReturnPath(getContext(), data);
+
+
+                    Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
+                    mImageCustomer.setBackgroundColor(Color.TRANSPARENT);
+                    Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
+                    Picasso.with(getContext())
+                            .load(mCurrentPhotoPath)
+                            .placeholder(drawable)
+                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+                            .into(mImageCustomer);
+
+
+                }
 
             }
-        }
     }
    final private int  MY_PERMISSIONS_REQUEST_CALL_PHONE =123;
    final private int  MY_PERMISSIONS_REQUEST_READ_CONTACT =124;
@@ -319,9 +328,9 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                 return;
             }
 
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
+
+
+                }
     }
 
 
@@ -331,6 +340,17 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     public void onActivityCreated(Bundle savedInstanceState) {
 
         switch (mAction) {
+            case CUSTOM_NEW:{
+                Log.e(LOG_TAG, "onActivityCreated-CUSTOM_NEW");
+                Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
+                Picasso.with(getContext())
+                        .load(mCurrentPhotoPath)
+                        .placeholder(drawable)
+                        .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+                        .into(mImageCustomer);
+                break;
+            }
+
             case CUSTOM_DOUBLE_SCREEN:
                 if (mItem == 0) {
                     Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-default DETAIL_PRODUCT_LOADER");
@@ -547,6 +567,8 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                 case DEFAULT_DETAIL_CUSTOM_LOADER:
                     if (data != null && data.moveToFirst()) {
                         Log.e(LOG_TAG, "DEFAULT_DETAIL_PRODUCT_LOADERdata != null && data.moveToFirst() cantidad" + data.getCount());
+
+
                     }
                     break;
 
@@ -557,6 +579,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
             mDeliveyAddress.setText(data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)));
             mCity.setText(data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
             mCurrentPhotoPath=data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM));
+
             mIdContact=data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM));
             mCuit.setText(data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)));
             mIva.setText(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM)));
@@ -570,12 +593,13 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
             } else
             {  Log.e(LOG_TAG, "button null");}
 
-
+            Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
             Picasso.with(getContext())
                     .load(mCurrentPhotoPath)
+                    .placeholder(drawable)
+                    .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                     .into(mImageCustomer);
 
-            
 
 
 

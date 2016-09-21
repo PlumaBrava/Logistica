@@ -7,7 +7,7 @@ import android.os.Build;
 import android.os.RemoteException;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     public static long mPickingOrderSelected=0;
-
+    public FloatingActionButton mFab;
     public static long    getmPickingOrderSelected(){
         return mPickingOrderSelected;
     }
@@ -86,16 +86,50 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            public void onPageScrollStateChanged(int state) {
+                Log.i(LOG_TAG,"addOnPageChangeListener-onPageScrollStateChanged"+state);
+            }
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                Log.i(LOG_TAG,"addOnPageChangeListener-onPageScrolled"+position+"-"+positionOffset+"-"+positionOffsetPixels);
+            }
 
+            public void onPageSelected(int position) {
+                Log.i(LOG_TAG, "addOnPageChangeListener-xxxonPageSelecte" + position);
+                switch (position) {
+                    case CUSTOM_ORDER_FRAGMENT: {
+                        mFab.setVisibility(View.VISIBLE);
+                        Log.i(LOG_TAG, "xxxorder" + position);
+                        break;
+                    }
+                    case PICKING_FRAGMENT: {
+                        if(mPickingOrderSelected>0){
+                            mFab.setVisibility(View.GONE);
+                            Log.i(LOG_TAG, "xxxpickinga" + position);
+                        }else{
+                            mFab.setVisibility(View.VISIBLE);
+                            Log.i(LOG_TAG, "xxxpickingb" + position);
+                        }
+                        break;
+                    }
+                    case DELIVERY_FRAGMENT: {
+                            mFab.setVisibility(View.GONE);
+                        Log.i(LOG_TAG, "xxxfragmentr" + position);
+                        break;
+                    }
+                    default:
+                }
+            }
+        });
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
                 Log.i(LOG_TAG,"mCurrentFragmet"+mViewPager.getCurrentItem());
 
                 switch (mViewPager.getCurrentItem()) {
@@ -275,15 +309,15 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Toast.makeText(MainActivity.this, "Action Sttings", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this,LoginActivity.class);
-            ActivityOptionsCompat activityOptions =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
-            return true;
-        }
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            Toast.makeText(MainActivity.this, "Action Sttings", Toast.LENGTH_SHORT).show();
+//            Intent intent = new Intent(this,LoginActivity.class);
+//            ActivityOptionsCompat activityOptions =
+//                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+//            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
+//            return true;
+//        }
 
         if (id == R.id.productos) {
             Toast.makeText(MainActivity.this, "Productos", Toast.LENGTH_SHORT).show();
@@ -324,9 +358,18 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         return super.onOptionsItemSelected(item);
     }
 
+    // Set the picking order in the main activity
+    // to assign custom orders and manage the fab visibility in the picking segment
     @Override
     public void onPickingOrderSelected(long pickingOrderID) {
         mPickingOrderSelected = pickingOrderID;
+        if(mPickingOrderSelected>0){
+            mFab.setVisibility(View.GONE);
+            Log.i(LOG_TAG, "xxxpickinga" + pickingOrderID);
+        }else{
+            mFab.setVisibility(View.VISIBLE);
+            Log.i(LOG_TAG, "xxxpickingb" + pickingOrderID);
+        }
         Log.i("Main:", "mPickingOrderSelected " +mPickingOrderSelected);
     }
 

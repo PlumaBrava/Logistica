@@ -134,6 +134,7 @@
                 android:maxWidth="96dp"
                 app:layout_gravity="center"
                 android:transitionName="@string/custom_icon_transition_imagen"
+                android:contentDescription="@string/custom_photo"
                 />
 
         </LinearLayout>

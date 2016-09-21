@@ -25,6 +25,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- Base application - used to the activities that en w900 are showed as . -->
+    <style name="AppTheme.Dialog_NoActionBar" parent="AppTheme.NoActionBar"/>
+
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
