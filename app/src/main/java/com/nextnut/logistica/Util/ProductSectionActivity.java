@@ -1,4 +1,4 @@
-package com.nextnut.logistica.Util;
+package com.nextnut.logistica.util;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -6,7 +6,6 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -23,14 +22,12 @@ import android.widget.TextView;
 
 import com.nextnut.logistica.R;
 import com.nextnut.logistica.data.CustomColumns;
-import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.CustomOrdersDetailColumns;
 import com.nextnut.logistica.data.LogisticaDataBase;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.rest.CursorRecyclerViewAdapter;
 import com.nextnut.logistica.rest.ProductCursorAdapter;
-import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 
 public class ProductSectionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
    ProductCursorAdapter mAdapter;

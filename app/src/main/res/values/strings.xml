@@ -20,7 +20,7 @@
 
     <!--Products List Activity List-->
     <!--<string name="empty_product_list">No Products to Show</string>-->
-    <string name="empty_product_list"></string>
+    <string name="empty_product_list">No Products to display</string>
 
     <!--Products Detail Activity-->
 
@@ -82,7 +82,9 @@
     <string name="custom_DetailBar_NEW_PRODUCT" translatable="false">New Product</string>
 
     <!--Products List Activity List-->
-    <string name="empty_custom_list">No Customrs to Show</string>
+    <string name="empty_custom_list">No Customers to Show</string>
+    <string name="empty_picking_list">No Picking Order to Show</string>
+    <string name="empty_delivery_list">No Delivery Order to Show</string>
     <string name="title_customorder_list">CustomOrders</string>
     <string name="title_customorder_detail">CustomOrder Detail</string>
 
@@ -125,7 +127,7 @@
 
     <!--Custom ORDER CARD (customorder_list_contet.xml-->
     <string name="custom_card_order_number">ORDER: </string>
-    <string name="custom_card_empty_custom_list">No Order to Display </string>
+    <string name="custom_card_empty_custom_list">No Customers to Display </string>
 
     <!--Picking ORDER CARD (customorder_list_contet.xml-->
     <string name="pickng_card_order_number">PICKING ORDER</string>
@@ -297,6 +299,7 @@
     <string name="appwidget_picking">Picking: </string>
     <string name="appwidget_product"> - Producto: </string>
     <string name="add_widget">Add widget</string>
+
 
 
 </resources>

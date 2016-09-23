@@ -55,20 +55,6 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
     public void onStart() {
         super.onStart();
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        client.connect();
-//        RecyclerView.SmoothScroller.Action viewAction = RecyclerView.SmoothScroller.Action.newAction(
-//                RecyclerView.SmoothScroller.Action.TYPE_VIEW, // TODO: choose an action type.
-//                "ProductList Page", // TODO: Define a title for the content shown.
-//                // TODO: If you have web page content that matches this app activity's content,
-//                // make sure this auto-generated web page URL is correct.
-//                // Otherwise, set the URL to null.
-//                Uri.parse("http://host/path"),
-//                // TODO: Make sure this auto-generated app URL is correct.
-//                Uri.parse("android-app://com.nextnut.logistica/http/host/path")
-//        );
-//        AppIndex.AppIndexApi.start(client, viewAction);
     }
 
     @Override
@@ -77,17 +63,6 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
     }
 
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of item
-     * selections.
-     */
-//    public interface Callback {
-//        /**
-//         * DetailFragmentCallback for when an item has been selected.
-//         */
-//        public void onItemClicked(int id, ProductCursorAdapter.ViewHolder vh);
-//    }
 
     private ProductCursorAdapter mCursorAdapter;
 
@@ -245,12 +220,12 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
 
 
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+//        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
+//        mItemTouchHelper = new ItemTouchHelper(callback);
+//        mItemTouchHelper.attachToRecyclerView(recyclerView);
 
 
-        if (findViewById(R.id.product_detail_container) != null) {
+        if (findViewById(R.id.product_detail_container) != null ) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the

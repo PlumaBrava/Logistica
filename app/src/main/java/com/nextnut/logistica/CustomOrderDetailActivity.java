@@ -1,27 +1,16 @@
 package com.nextnut.logistica;
 
-import android.content.ContentProviderOperation;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.support.design.widget.FloatingActionButton;
 
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
-import com.nextnut.logistica.Util.ProductSectionActivity;
-import com.nextnut.logistica.data.CustomOrdersColumns;
-import com.nextnut.logistica.data.LogisticaProvider;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import com.nextnut.logistica.util.ProductSectionActivity;
 
 /**
  * An activity representing a single CustomOrder detail screen. This

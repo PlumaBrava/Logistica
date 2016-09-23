@@ -196,12 +196,12 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
 
         recyclerView.setAdapter(mCursorAdapter);
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+//        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
+//        mItemTouchHelper = new ItemTouchHelper(callback);
+//        mItemTouchHelper.attachToRecyclerView(recyclerView);
 
 
-        if (findViewById(R.id.custom_detail_container) != null) {
+        if (findViewById(R.id.custom_detail_container) != null ) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the

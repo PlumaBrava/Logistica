@@ -155,7 +155,14 @@ implements ItemTouchHelperAdapter{
                         CustomOrderListFragment.ORDER_STATUS_DELIVERED){
                     ((View )(viewHolder.mOrderNumber.getParent().getParent())).setBackgroundColor(Color.RED);
                     viewHolder.mOrderNumber.setTextColor(Color.GREEN);
+                }else {
+                    Log.i("CustomOrderCursor:", "STATUS_NO delivered: ");
+                    ((View )(viewHolder.mOrderNumber.getParent().getParent())).setBackgroundColor(
+                            mContext.getResources().getColor(R.color.CustomOrderCard_background));
+
                 }
+
+
                 viewHolder.mcursorId=cursor.getLong(0);
                 viewHolder.mOrderNumber.setText(Long.toString(cursor.getLong(0)));
                 viewHolder.mName.setText(cursor.getString(3));

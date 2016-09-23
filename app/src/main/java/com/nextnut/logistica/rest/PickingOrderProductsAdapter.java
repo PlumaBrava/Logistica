@@ -1,39 +1,24 @@
 package com.nextnut.logistica.rest;
 
-import android.app.Dialog;
-import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.RemoteException;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.nextnut.logistica.R;
-import com.nextnut.logistica.Util.BoolIntConverter;
-import com.nextnut.logistica.Util.CurrencyToDouble;
-import com.nextnut.logistica.data.CustomOrdersDetailColumns;
-import com.nextnut.logistica.data.LogisticaProvider;
-import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 import com.squareup.picasso.Picasso;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
-
-import static com.nextnut.logistica.Util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.resize;
 
 //import com.nextnut.distribution.ProductsActivity;
 //import com.nextnut.distribution.R;
@@ -80,7 +65,7 @@ implements ItemTouchHelperAdapter{
         Log.i("OrderDetailCursorAda:", "Constructor");
 
         Log.i("OrderDetailCursorAda:", "((View)empltyView.getParent()).getId()" + ((View)empltyView.getParent()).getId());
-        Log.i("OrderDetailCursorAda:", "R.layout.activity_customorder_list" + R.layout.activity_customorder_list);
+
     }
 
 

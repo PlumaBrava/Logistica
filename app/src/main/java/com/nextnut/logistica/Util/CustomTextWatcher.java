@@ -1,4 +1,4 @@
-package com.nextnut.logistica.Util;
+package com.nextnut.logistica.util;
 
 import android.content.Context;
 import android.text.Editable;

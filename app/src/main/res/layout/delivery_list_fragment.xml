@@ -8,27 +8,6 @@
     android:id="@+id/picking_list_fragment_Layout1"
     tools:context=".MainActivity">
 
-<!--<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:fitsSystemWindows="true"-->
-    <!--tools:context=".MainActivity">-->
-
-    <!--<android.support.design.widget.AppBarLayout-->
-        <!--android:id="@+id/app_bar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:theme="@style/AppTheme.AppBarOverlay">-->
-
-        <!--<android.support.v7.widget.Toolbar-->
-            <!--android:id="@+id/toolbar"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="?attr/actionBarSize"-->
-            <!--app:popupTheme="@style/AppTheme.PopupOverlay" />-->
-
-    <!--</android.support.design.widget.AppBarLayout>-->
 
     <FrameLayout
         android:id="@+id/delivery_list_fragment_Layout"
@@ -37,20 +16,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <include layout="@layout/delivery_order_list" />
-        <TextView
-            android:id="@+id/recyclerview_custom_empty"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_anchor="@+id/custom_list"
-            app:layout_anchorGravity="fill"
-            android:gravity="center_horizontal"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:text="@string/empty_custom_list" />
+
     </FrameLayout>
 
     <!--<android.support.design.widget.FloatingActionButton-->

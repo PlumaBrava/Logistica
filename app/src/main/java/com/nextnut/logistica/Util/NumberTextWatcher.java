@@ -1,16 +1,13 @@
-package com.nextnut.logistica.Util;
+package com.nextnut.logistica.util;
 
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.ParseException;
 
 /**
  * Created by perez.juan.jose on 31/05/2016.

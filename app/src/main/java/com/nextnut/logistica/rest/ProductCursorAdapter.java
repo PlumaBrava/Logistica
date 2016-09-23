@@ -6,10 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -29,7 +27,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 
-import static com.nextnut.logistica.Util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.resize;
 
 
 public class ProductCursorAdapter extends CursorRecyclerViewAdapter<ProductCursorAdapter.ViewHolder>

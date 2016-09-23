@@ -13,4 +13,8 @@
     <!--<color name="PickingCard_background">#f25bf96b</color>-->
     <color name="TotalProductCard_background">#f2f4c5f2</color>
 
+    // Colors in adapeter Swipe
+    <color name="SwipeRight">#388E3C</color>
+    <color name="SwipeLeft">#D32F2F</color>
+
 </resources>

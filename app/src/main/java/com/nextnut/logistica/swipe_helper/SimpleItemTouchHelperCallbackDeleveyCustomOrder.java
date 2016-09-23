@@ -43,14 +43,16 @@ public class SimpleItemTouchHelperCallbackDeleveyCustomOrder extends ItemTouchHe
             float width = height / 3;
 
             if (dX > 0) {
-                p.setColor(Color.parseColor("#388E3C"));
+                p.setColor(recyclerView.getResources().getColor(R.color.SwipeRight));
                 RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom());
                 c.drawRect(background, p);
-                icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.art_clear);
-                RectF icon_dest = new RectF((float) itemView.getLeft() + width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 2 * width, (float) itemView.getBottom() - width);
+                icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_candado);
+//                RectF icon_dest = new RectF((float) itemView.getLeft() + width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 2 * width, (float) itemView.getBottom() - width);
+                RectF icon_dest = new RectF((float) itemView.getLeft() + 1* width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 5 * width, (float) itemView.getBottom() - width);
+
                 c.drawBitmap(icon, null, icon_dest, p);
             } else {
-                p.setColor(Color.parseColor("#D32F2F"));
+                p.setColor(recyclerView.getResources().getColor(R.color.SwipeLeft));
                 RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
                 c.drawRect(background, p);
                 icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.art_clouds);

@@ -13,6 +13,8 @@ import android.view.View;
 
 import com.nextnut.logistica.R;
 
+import static com.nextnut.logistica.R.drawable.ic_action_action_redeem;
+
 /**
  * Created by sam_chordas on 8/14/15.
  */
@@ -53,8 +55,10 @@ public class SimpleItemTouchHelperCallbackPickingCustomOrder extends ItemTouchHe
                 p.setColor(Color.parseColor("#D32F2F"));
                 RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
                 c.drawRect(background, p);
-                icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.art_clouds);
-                RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
+                icon = BitmapFactory.decodeResource(recyclerView.getResources(),ic_action_action_redeem);
+//                RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
+                RectF icon_dest = new RectF((float) itemView.getRight() - 5* width, (float) itemView.getTop() + width, (float) itemView.getRight() - 1*width, (float) itemView.getBottom() - width);
+
                 c.drawBitmap(icon, null, icon_dest, p);
             }
         }

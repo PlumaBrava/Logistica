@@ -1,10 +1,8 @@
 package com.nextnut.logistica;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
@@ -17,13 +15,10 @@ import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -38,20 +33,20 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nextnut.logistica.Util.CustomTextWatcher;
-import com.nextnut.logistica.Util.Imagenes;
+import com.nextnut.logistica.util.CustomTextWatcher;
+import com.nextnut.logistica.util.Imagenes;
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
+import com.nextnut.logistica.util.MakeCall;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import static com.nextnut.logistica.Util.Imagenes.resize;
-import static com.nextnut.logistica.Util.Imagenes.saveImageSelectedReturnPath;
-import static com.nextnut.logistica.Util.Imagenes.savePhotoReturnPath;
-import static com.nextnut.logistica.Util.Imagenes.selectImage;
-import static com.nextnut.logistica.Util.MakeCall.getUserName;
+import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
+import static com.nextnut.logistica.util.Imagenes.savePhotoReturnPath;
+import static com.nextnut.logistica.util.Imagenes.selectImage;
+import static com.nextnut.logistica.util.MakeCall.getUserName;
 
 /**
  * A fragment representing a single Custom detail screen.
@@ -301,14 +296,13 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
             }
     }
-   final private int  MY_PERMISSIONS_REQUEST_CALL_PHONE =123;
-   final private int  MY_PERMISSIONS_REQUEST_READ_CONTACT =124;
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_CALL_PHONE: {
+            case MakeCall.MY_PERMISSIONS_REQUEST_CALL_PHONE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

@@ -1,9 +1,8 @@
-package com.nextnut.logistica.Util;
+package com.nextnut.logistica.util;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.CustomOrdersDetailColumns;

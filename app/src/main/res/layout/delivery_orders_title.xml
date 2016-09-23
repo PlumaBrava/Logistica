@@ -15,7 +15,9 @@
     android:clickable="true"
     android:focusable="true"
     android:id="@+id/deliveryOrderNumbertitleID"
-    android:foreground="?selectableItemBackground">
+    android:foreground="?selectableItemBackground"
+    app:cardBackgroundColor="@color/PickingCard_background"
+    >
 
 
 
@@ -60,9 +62,10 @@
                 android:layout_gravity="top|end"
                 android:gravity="top|end"
                 android:layout_weight="1"
+                android:layout_marginTop="@dimen/fab_margin"
                 android:src="@android:drawable/ic_menu_save" />
 
-            <!--android:layout_margin="@dimen/fab_margin"-->
+
 
         </LinearLayout>
 

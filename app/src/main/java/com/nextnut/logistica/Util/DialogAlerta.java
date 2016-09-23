@@ -1,15 +1,10 @@
-package com.nextnut.logistica.Util;
+package com.nextnut.logistica.util;
 
 
 import android.os.Bundle;
 
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.nextnut.logistica.R;
 
 /**
  * Created by perez.juan.jose on 12/06/2016.

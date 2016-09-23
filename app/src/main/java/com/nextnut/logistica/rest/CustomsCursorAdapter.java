@@ -24,7 +24,7 @@ import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 import com.squareup.picasso.Picasso;
 
-import static com.nextnut.logistica.Util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.resize;
 
 
 public class CustomsCursorAdapter extends CursorRecyclerViewAdapter<CustomsCursorAdapter.ViewHolder>

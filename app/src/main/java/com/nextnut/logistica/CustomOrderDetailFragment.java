@@ -36,9 +36,9 @@ import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.nextnut.logistica.Util.BoolIntConverter;
-import com.nextnut.logistica.Util.CurrencyToDouble;
-import com.nextnut.logistica.Util.ProductSectionActivity;
+import com.nextnut.logistica.util.BoolIntConverter;
+import com.nextnut.logistica.util.CurrencyToDouble;
+import com.nextnut.logistica.util.ProductSectionActivity;
 
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.CustomOrdersColumns;
@@ -48,7 +48,6 @@ import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.rest.OrderDetailCursorAdapter;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -159,6 +158,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     CollapsingToolbarLayout appBarLayout;
 
+    private View mRootView;
     RecyclerView mRecyclerView;
     OrderDetailCursorAdapter mAdapter;
     private ItemTouchHelper mItemTouchHelper;
@@ -283,10 +283,10 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(LOG_TAG, "onCreateView");
-        View rootView = inflater.inflate(R.layout.customorder_detail, container, false);
+        mRootView = inflater.inflate(R.layout.customorder_detail, container, false);
 
-        openButton = (Button) rootView.findViewById(R.id.open);
-        sendButton = (Button) rootView.findViewById(R.id.send);
+        openButton = (Button) mRootView.findViewById(R.id.open);
+        sendButton = (Button) mRootView.findViewById(R.id.send);
         // open bluetooth connection
         openButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -310,27 +310,27 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             }
         });
 
-        mOrderNumber = (TextView) rootView.findViewById(R.id.orderNumber);
-        mBotonSeleccionCliente = (Button) rootView.findViewById(R.id.botonSelecionCliente);
+        mOrderNumber = (TextView) mRootView.findViewById(R.id.orderNumber);
+        mBotonSeleccionCliente = (Button) mRootView.findViewById(R.id.botonSelecionCliente);
         mBotonSeleccionCliente.setVisibility(View.VISIBLE);
 
-        mBotonSeleccionProduto = (Button) rootView.findViewById(R.id.botonSelecionProdcuto);
+        mBotonSeleccionProduto = (Button) mRootView.findViewById(R.id.botonSelecionProdcuto);
         mBotonSeleccionProduto.setVisibility(View.VISIBLE);
 
-//        mCustomId = (TextView) rootView.findViewById(R.id.custom_Id);
-        mCustomName = (TextView) rootView.findViewById(R.id.custom_name_text);
-        mLastName = (TextView) rootView.findViewById(R.id.product_Lastname);
-//        button = (Button) rootView.findViewById(R.id.custom_imagen_button);
-        mImageCustomer = (ImageView) rootView.findViewById(R.id.custom_imagen);
-        mDeliveyAddress = (TextView) rootView.findViewById(R.id.custom_delivery_address);
-        mCity = (TextView) rootView.findViewById(R.id.custom_city);
-        mCuit = (TextView) rootView.findViewById(R.id.CUIT);
-        mIva = (TextView) rootView.findViewById(R.id.IVA);
+//        mCustomId = (TextView) mRootView.findViewById(R.id.custom_Id);
+        mCustomName = (TextView) mRootView.findViewById(R.id.custom_name_text);
+        mLastName = (TextView) mRootView.findViewById(R.id.product_Lastname);
+//        button = (Button) mRootView.findViewById(R.id.custom_imagen_button);
+        mImageCustomer = (ImageView) mRootView.findViewById(R.id.custom_imagen);
+        mDeliveyAddress = (TextView) mRootView.findViewById(R.id.custom_delivery_address);
+        mCity = (TextView) mRootView.findViewById(R.id.custom_city);
+        mCuit = (TextView) mRootView.findViewById(R.id.CUIT);
+        mIva = (TextView) mRootView.findViewById(R.id.IVA);
 
-        mIsSpecialCustom = (CheckBox) rootView.findViewById(R.id.custom_special);
-        mCantidadTotal=(TextView) rootView.findViewById(R.id.cantidadTotal);;
-        mMontoTotal=(TextView) rootView.findViewById(R.id.montoToal);;
-        mMontoTotalDelivey=(TextView) rootView.findViewById(R.id.montoToalDelivery);;
+        mIsSpecialCustom = (CheckBox) mRootView.findViewById(R.id.custom_special);
+        mCantidadTotal=(TextView) mRootView.findViewById(R.id.cantidadTotal);;
+        mMontoTotal=(TextView) mRootView.findViewById(R.id.montoToal);;
+        mMontoTotalDelivey=(TextView) mRootView.findViewById(R.id.montoToalDelivery);;
 
 
         mBotonSeleccionCliente.setOnClickListener(new View.OnClickListener() {
@@ -371,8 +371,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
         });
 
-        View emptyView = rootView.findViewById(R.id.recyclerview_product_empty);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.product_list_customOrder);
+        View emptyView = mRootView.findViewById(R.id.recyclerview_product_empty);
+        mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.product_list_customOrder);
 
         mAdapter = new OrderDetailCursorAdapter(getContext(), null, emptyView, new OrderDetailCursorAdapter.ProductCursorAdapterOnClickHandler() {
             @Override
@@ -513,11 +513,11 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         setupRecyclerView((RecyclerView) mRecyclerView);
 
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter,SimpleItemTouchHelperCallback.ORDER_INICIAL);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
-        return rootView;
+        return mRootView;
     }
 
     public void showDialogNumberPicker(final OrderDetailCursorAdapter.ViewHolder vh){
@@ -588,32 +588,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         recyclerView.setAdapter(mAdapter);
     }
 
-//    public static final int RESULT_OK           = -1;
-//    @Override
-//    public void onActivityResult(int requestCode,
-//                                 int resultCode, Intent data) {
-//        Log.i(LOG_TAG, "LLego resyktado ok" );
-//        if (requestCode == REQUEST_CUSTOMER && resultCode == RESULT_OK) {
-//            String res = data.getExtras().getString("resultado");
-//            Log.i(LOG_TAG, "LLego resyktado ok"+ res );
-//            mCustomRef=data.getExtras().getLong("resultado");
-//            getLoaderManager().restartLoader(CUSTOM_LOADER, null, this);
-//        }
-//        if (requestCode == REQUEST_PRODUCT && resultCode == RESULT_OK) {
-//            String res = data.getExtras().getString("resultado");
-//            Log.i(LOG_TAG, "REQUEST_PRODUCT "+ data.getExtras().getString("ProductoName") );
-//
-//            Log.i(LOG_TAG, "REQUEST_PRODUCT ProductPrice"+  data.getExtras().getString("ProductPrice") );
-//            saveCustomOrderProduct(data.getExtras().getLong(ProductSectionActivity.KEY_RefPRODUCTO),
-//                    data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_NAME),
-//                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICES_ESPECIAL),
-//                    data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICE)
-//
-//            );
-//
-//        }
-//
-//    }
+
 
 
 
@@ -681,7 +656,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                       getActivity(),
                       LogisticaProvider.ShowJoin.CONTENT_URI,
                       proyection1,
-                      null,
+                      LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.STATUS_CUSTOM_ORDER +"="+CustomOrderDetailFragment.STATUS_ORDER_INICIAL,
                       null,
                       null);
 
@@ -853,6 +828,9 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
                         getLoaderManager().initLoader(TOTALES_LOADER, null, this);
                     }
+                } else
+                {
+                    mRootView.setVisibility(View.GONE);
                 }
                 break;
 

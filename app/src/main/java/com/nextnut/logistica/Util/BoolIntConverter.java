@@ -1,4 +1,4 @@
-package com.nextnut.logistica.Util;
+package com.nextnut.logistica.util;
 
 /**
  * Created by perez.juan.jose on 20/07/2016.

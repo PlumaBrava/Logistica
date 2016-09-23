@@ -1,4 +1,4 @@
-package com.nextnut.logistica.Util;
+package com.nextnut.logistica.util;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,7 +11,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -25,8 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static java.security.AccessController.getContext;
 
 /**
  * Created by perez.juan.jose on 20/09/2016.

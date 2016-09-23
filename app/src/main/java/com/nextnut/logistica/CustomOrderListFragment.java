@@ -23,7 +23,6 @@ import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,7 +49,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-import static com.nextnut.logistica.Util.MakeCall.makeTheCall;
+import static com.nextnut.logistica.util.MakeCall.makeTheCall;
 import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
 
 /**
@@ -114,7 +113,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View rootView = inflater.inflate(R.layout.activity_customorder_list, container, false);
+        View rootView = inflater.inflate(R.layout.customorder_list_fragment, container, false);
 
 
 
@@ -130,8 +129,6 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             @Override
             public void onClick(long id, OrderDetailCursorAdapter.ViewHolder v) {
                 Log.i(LOG_TAG, "Productos:" + id);
-//                changeSize(recyclerViewTotalProductos);
-//                recyclerViewTotalProductos.setVisibility(View.GONE);
 
 
                 Intent intent = new Intent(getContext(), ProductosEnOrdenes.class);
@@ -350,38 +347,20 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         recyclerViewOrders.setAdapter(mOrdersAdapter);
 
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mOrdersAdapter);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mOrdersAdapter,SimpleItemTouchHelperCallback.ORDER_INICIAL);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerViewOrders);
 
 
-        if (rootView.findViewById(R.id.customorder_detail_container) != null) {
+        if (rootView.findViewById(R.id.customorder_detail_container) != null ) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
+            loadDustomDetailFragment();
 
-                CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
-
-                    Bundle arguments = new Bundle();
-
-                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
-                    Log.i(LOG_TAG, "new ARG_ITEM_ID2 :" + mItem);
-                if (mItem != 0) {
-                    arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-                }else {
-                    // go to the last order
-                    arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
-                 }
-                    fragment.setArguments(arguments);
-
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .addToBackStack(null)
-                        .replace(R.id.customorder_detail_container, fragment)
-                        .commit();
-
-            }
+        }
 
 
 
@@ -525,6 +504,9 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                     Log.i(LOG_TAG, "swapCursor");
                     mOrdersAdapter.swapCursor(data);
 //                    animateViewsIn();
+                    if(mTwoPane) {
+
+                    }
                 }
 
 
@@ -550,6 +532,30 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         mOrdersAdapter.swapCursor(null);
     }
 
+
+    public void loadDustomDetailFragment(){
+        CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
+
+        Bundle arguments = new Bundle();
+
+        arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
+        Log.i(LOG_TAG, "new ARG_ITEM_ID2 :" + mItem);
+        if (mItem != 0) {
+            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
+        } else {
+            // go to the last order
+            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+        }
+        Log.i(LOG_TAG, "new ARG_ITEM_ID2 mOrdersAdapter.getItemCount():" + mOrdersAdapter.getItemCount());
+
+        fragment.setArguments(arguments);
+
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .addToBackStack(null)
+                .replace(R.id.customorder_detail_container, fragment)
+                .commit();        // go to the last order
+        arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+    }
 
     public void changeSize(View view) {
         Interpolator interpolator = AnimationUtils.loadInterpolator(getContext(), android.R

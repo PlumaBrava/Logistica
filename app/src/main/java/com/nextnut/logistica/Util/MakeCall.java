@@ -1,4 +1,4 @@
-package com.nextnut.logistica.Util;
+package com.nextnut.logistica.util;
 
 import android.Manifest;
 import android.app.Activity;

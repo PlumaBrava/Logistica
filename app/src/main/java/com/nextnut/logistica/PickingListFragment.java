@@ -33,8 +33,6 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.nextnut.logistica.Util.CurrencyToDouble;
-import com.nextnut.logistica.Util.DialogAlerta;
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.CustomOrdersDetailColumns;
@@ -53,8 +51,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.nextnut.logistica.Util.MakeCall.makeTheCall;
-import static com.nextnut.logistica.Util.SharePickingOrder.sharePickingOrder;
+import static com.nextnut.logistica.util.MakeCall.makeTheCall;
+import static com.nextnut.logistica.util.SharePickingOrder.sharePickingOrder;
 import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
 
 /**
@@ -155,18 +153,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
         Log.i(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
-//        if (getArguments().containsKey(ARG_ITEM_ID)) {
-//            // Load the dummy content specified by the fragment
-//            // arguments. In a real-world scenario, use a Loader
-//            // to load content from a content provider.
-//            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
-//
-//            Activity activity = this.getActivity();
-//            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-//            if (appBarLayout != null) {
-//                appBarLayout.setTitle(mItem.content);
-//            }
-//        }
+
     }
     @Override
     public void onResume() {
@@ -380,8 +367,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 Log.i("YesNoDialog:", "setPositiveButton picking ");
 
-//                                        DialogAlerta dFragment = DialogAlerta.newInstance(message);
-//                        dFragment.show(getFragmentManager(), "Dialog Fragment");
+
                             }
                         });
                         alert.create().show();
@@ -401,7 +387,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
 
         recyclerViewPickingOrder.setAdapter(mCursorAdapterPickingOrder);
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapterPickingOrder);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapterPickingOrder, SimpleItemTouchHelperCallback.PICKING);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerViewPickingOrder);
 
@@ -426,14 +412,9 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                                     }
         );
 
-//        mCursorAdapterTotalProductos.resetFavoriteVisible();
+
         recyclerViewTotalProductos.setAdapter(mCursorAdapterTotalProductos);
         recyclerViewTotalProductos.setVisibility(View.GONE);
-
-//////////////
-
-
-
 
         recyclerViewCustomOrderInPickingOrder = (RecyclerView) rootView.findViewById(R.id.customOrderInpickingOrder_list);
 
@@ -443,7 +424,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
             @Override
             public void onClick(long id, CustomsOrdersCursorAdapter.ViewHolder vh) {
                 Log.i(LOG_TAG, "onclicka:" + id);
-//
+
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
@@ -458,9 +439,6 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                             .replace(R.id.customorder_detail_container, fragment)
                             .commit();
 
-//                            fab_new.setVisibility(View.GONE);
-//                            fab_save.setVisibility(View.VISIBLE);
-//                            fab_delete.setVisibility(View.VISIBLE);
 
                 } else {
                     Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
@@ -468,9 +446,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                     Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + id);
                     Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomDetailFragment.CUSTOM_SELECTION);
                     intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
-//                            fab_new.setVisibility(View.VISIBLE);
-//                            fab_save.setVisibility(View.GONE);
-//                            fab_delete.setVisibility(View.GONE);
+
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         Log.i("ProductListActivity", "makeSceneTransitionAnimation");
@@ -505,6 +481,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
             @Override
             public void onItemDismissCall(long cursorID) {
                 mCustomOrderIdSelected=cursorID;
+
                 Log.i("TouchHelper:", "Adapter onItemDismiss PICKIG --" );
 
                 ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
@@ -531,26 +508,27 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
             @Override
             public void onItemAceptedCall(long cursorID) {
                 mCustomOrderIdSelected=cursorID;
-                Log.i("TouchHelper:", "Adapter onItemDismiss PICKIG --" );
-
-                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
-                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, CustomOrderListFragment.ORDER_STATUS_DELETED);
-                builder.withValue(CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER, null);
-                batchOperations.add(builder.build());
-
-
-                try {
-                    getContext(). getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-
-
-
-                } catch (RemoteException | OperationApplicationException e) {
-                    Log.e("TouchHelper:", "Error applying batch insert", e);
-
-                }finally {
-                    onDataChange();
-                }
+                // It has been blocked the order cant  swipe to the rigth
+//                Log.i("TouchHelper:", "Adapter onItemAceptedCalls PICKIG --" );
+//
+//                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+//                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
+//                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, CustomOrderListFragment.ORDER_STATUS_DELETED);
+//                builder.withValue(CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER, null);
+//                batchOperations.add(builder.build());
+//
+//
+//                try {
+//                    getContext(). getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//
+//
+//
+//                } catch (RemoteException | OperationApplicationException e) {
+//                    Log.e("TouchHelper:", "Error applying batch insert", e);
+//
+//                }finally {
+//                    onDataChange();
+//                }
             }
 
             @Override
@@ -591,10 +569,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
         String select = "((" + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER+ " NOTNULL) AND ("
                 + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " =?))";
 
-//
-//        String projection []= {ProductsColumns.NOMBRE_PRODUCTO, "sum("+ ProductsColumns.PRECIO_PRODUCTO
-//                + " * " + ProductsColumns.PRECIO_PRODUCTO
-//                +")"};
+
         String projection[] = {CustomOrdersColumns.ID_CUSTOM_ORDER};
         String arg[] = {String.valueOf(mIDPickingOrderSelected)};
 
@@ -662,10 +637,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
         }
         return super.onOptionsItemSelected(item);
     }
-//
-//    private void setupRecyclerView(@NonNull RecyclerView recyclerViewPickingOrder) {
-//        recyclerViewPickingOrder.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
-//    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -706,21 +678,6 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                         null);
 
             case PICKING_LOADER_TOTAL_PRODUCTOS:
-//
-//                String select[] = {
-///* 0 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns._ID_PRODUCTO,
-///* 1 */             LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER,
-///* 2 */             LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER,
-///* 3 */             LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
-///* 4 */             LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL,
-///* 5 */             "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " )",
-///* 6 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
-///* 7 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
-///* 8 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
-///* 9 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
-///* 10 */           "sum( " + LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.ID_PICKING_ORDERS_DETAIL+ " )",
-///* 11 */            "sum( "+ LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.QUANTITY_PICKING_ORDERS_DETAIL+ " )",
-///* 12 */            "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+ " )"};
 
 
                 String select[] = {
@@ -738,18 +695,9 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
 
 
                 String where =
-//                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " + CustomOrderDetailFragment.STATUS_ORDER_PICKING
-//                        + " and " +
-                                LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + MainActivity.getmPickingOrderSelected()
-//                                    +" and ( " +
-//                                LogisticaDataBase.PICKING_ORDERS_DETAIL + "." + PickingOrdersDetailColumns.REF_PICKING_ORDER_PICKING_ORDERS_DETAIL + " = " + MainActivity.getmPickingOrderSelected() +
-//                               " or " +  LogisticaDataBase.PICKING_ORDERS_DETAIL + "." + PickingOrdersDetailColumns.REF_PICKING_ORDER_PICKING_ORDERS_DETAIL + " is null )"
+                               LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + MainActivity.getmPickingOrderSelected()
                         ;
 
-//                String groupBy[]={LogisticaDataBase.PRODUCTS + "." + ProductsColumns._ID_PRODUCTO,
-//                        LogisticaDataBase.CUSTOM_ORDERS + "." +CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER
-//
-//                };
 
                 Log.i(LOG_TAG, "onCreateLoader");
                 return new CursorLoader(
@@ -772,7 +720,8 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
         switch (loader.getId()) {
 
             case CUSTOM_ORDER_LOADER:
-            if (data != null && data.moveToFirst()) {
+//            if (data != null && data.moveToFirst())
+            {
 //            Log.i(LOG_TAG,"ID:"+ data.getInt(0));
 //            Log.i(LOG_TAG,"date:"+ data.getString(1));
 //            Log.i(LOG_TAG,"price:"+ data.getLong(2));
@@ -786,7 +735,8 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                 break;
             case PICKING_ORDER_LOADER:
                 Log.i(LOG_TAG, "PICKING_ORDER_LOADER count: "+data.getCount());
-                if (data != null && data.moveToFirst()) {
+//                if (data != null && data.moveToFirst())
+                {
                 mCursorAdapterPickingOrder.swapCursor(data);}
                 break;
 
@@ -866,7 +816,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
         String formattedDate = df.format(new Date());
         builder.withValue(PickingOrdersColumns.CREATION_DATE_PICKING_ORDERS, formattedDate);
         Log.i(LOG_TAG, "formattedDate:" + formattedDate);
-//        builder.withValue(PickingOrdersColumns.COMMENTS_PICKING_ORDERS, "New Order");
+
         builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, CustomOrderDetailFragment.STATUS_ORDER_INICIAL);
 
         batchOperations.add(builder.build());
@@ -926,7 +876,6 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                 public void onClick(View v) {
 
                     vh.mTextcantidadPicking.setText(String.valueOf(np.getValue()));
-//                    CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecio.getText().toString());
                     saveCantidadPicking(vh, String.valueOf(np.getValue()));
 
                     d.dismiss();

@@ -1,7 +1,4 @@
-package com.nextnut.logistica.Util;
-
-import java.security.PublicKey;
-import java.text.NumberFormat;
+package com.nextnut.logistica.util;
 
 /**
  * Created by perez.juan.jose on 09/06/2016.

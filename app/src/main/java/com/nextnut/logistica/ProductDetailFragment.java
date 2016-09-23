@@ -3,25 +3,19 @@ package com.nextnut.logistica;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
-import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -32,31 +26,22 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.nextnut.logistica.Util.CurrencyToDouble;
-import com.nextnut.logistica.Util.Imagenes;
-import com.nextnut.logistica.Util.NumberTextWatcher;
-import com.nextnut.logistica.Util.DialogAlerta;
+import com.nextnut.logistica.util.CurrencyToDouble;
+import com.nextnut.logistica.util.Imagenes;
+import com.nextnut.logistica.util.NumberTextWatcher;
+import com.nextnut.logistica.util.DialogAlerta;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
-import com.nextnut.logistica.Util.YesNoDialog;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
-import static com.nextnut.logistica.Util.Imagenes.resize;
-import static com.nextnut.logistica.Util.Imagenes.saveImageSelectedReturnPath;
-import static com.nextnut.logistica.Util.Imagenes.savePhotoReturnPath;
-import static com.nextnut.logistica.Util.Imagenes.selectImage;
+import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
+import static com.nextnut.logistica.util.Imagenes.savePhotoReturnPath;
+import static com.nextnut.logistica.util.Imagenes.selectImage;
 
 /**
  * A fragment representing a single Product detail screen.

@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -15,14 +17,23 @@ import com.nextnut.logistica.R;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 
+import static android.R.drawable.ic_delete;
+import static com.nextnut.logistica.R.drawable.ic_action_action_redeem;
+import static com.nextnut.logistica.R.drawable.ic_action_image_timer_auto;
+
 /**
  * Created by sam_chordas on 8/14/15.
  */
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     private final ItemTouchHelperAdapter mAdapter;
+    public static final int   ORDER_INICIAL=1;
+    public static final int   PICKING=2;
+    public static final int   DELIVERY=3;
 
-    public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter){
+    private int mStep;
+    public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter,int step){
         mAdapter = adapter;
+        mStep=step;
     }
 
 
@@ -37,26 +48,58 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     @Override
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
 
-        Bitmap icon;
+        Bitmap icon=null;
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
 
             View itemView = viewHolder.itemView;
             float height = (float) itemView.getBottom() - (float) itemView.getTop();
-            float width = height / 3;
+            float width = height / 6;
 
             if (dX > 0) {
-                p.setColor(Color.parseColor("#388E3C"));
+                p.setColor(recyclerView.getResources().getColor(R.color.SwipeRight));
+
                 RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom());
                 c.drawRect(background, p);
-                icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.art_clear);
-                RectF icon_dest = new RectF((float) itemView.getLeft() + width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 2 * width, (float) itemView.getBottom() - width);
+
+                switch (mStep) {
+
+                    case ORDER_INICIAL:
+                    icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
+                    break;
+                    case PICKING:
+                    icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_lory);
+                    break;
+                    case DELIVERY:
+                        icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_candado);
+                        break;
+                }
+
+//                    RectF icon_dest = new RectF((float) itemView.getLeft() + width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 2 * width, (float) itemView.getBottom() - width);
+                    RectF icon_dest = new RectF((float) itemView.getLeft() + 1* width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 5 * width, (float) itemView.getBottom() - width);
                 c.drawBitmap(icon, null, icon_dest, p);
             } else {
-                p.setColor(Color.parseColor("#D32F2F"));
+                p.setColor(recyclerView.getResources().getColor(R.color.SwipeLeft));
                 RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
                 c.drawRect(background, p);
-                icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.art_clouds);
-                RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
+
+                switch (mStep) {
+
+                    case ORDER_INICIAL:
+                        icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_delete);
+                        break;
+                    case PICKING:
+                        icon = BitmapFactory.decodeResource(recyclerView.getResources(),ic_action_action_redeem);
+                        break;
+                    case DELIVERY:
+                        icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
+                        break;
+                }
+
+
+
+
+                RectF icon_dest = new RectF((float) itemView.getRight() - 5* width, (float) itemView.getTop() + width, (float) itemView.getRight() - 1*width, (float) itemView.getBottom() - width);
+
                 c.drawBitmap(icon, null, icon_dest, p);
             }
         }
@@ -90,10 +133,10 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
         Log.i("TouchHelper:","onSwiped: "+i);
 
        switch (i){
-           case 32:
+           case ItemTouchHelper.END:
                mAdapter.onItemAcepted(viewHolder.getAdapterPosition());
                break;
-           case 16:
+           case ItemTouchHelper.START :
 
                mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
 
@@ -106,7 +149,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
 
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-        Log.i("TouchHelper:","onSelectedChanged: "+actionState +"Position: ");
+        Log.i("TouchHelper:","onSelectedChanged:ACTION_STATE_IDLE (0)="+actionState );
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
             ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
             itemViewHolder.onItemSelected();
