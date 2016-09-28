@@ -1,32 +1,32 @@
 package com.nextnut.logistica;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
-import com.nextnut.logistica.rest.CustomAdapter;
+import com.squareup.picasso.Picasso;
+
+import static com.nextnut.logistica.util.Imagenes.resize;
 
 public class CustomSelectionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     Adapter mAdapter;
@@ -150,13 +150,26 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
                 mCursor.moveToPosition(position);
 
 
-                String text1 = mCursor.getString(mCursor.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM))+" | "+
-                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM))+ " "+
-                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
+//                String text1 = mCursor.getString(mCursor.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM))+" | "+
+//                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM))+ " "+
+//                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
+                holder.customCity.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
+                holder.custonName.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM))+ " "+
+                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));
 
-                holder.custonName.setText(text1);
+                Drawable drawable = resize(CustomSelectionActivity.this, R.drawable.ic_action_action_redeem);
+                Picasso.with(CustomSelectionActivity.this)
+
+                        .load(mCursor.getString(mCursor.getColumnIndex(CustomColumns.IMAGEN_CUSTOM)))
+                        .resize(holder.photoCliente.getMaxWidth(),holder.photoCliente.getMaxHeight())
+//                        .placeholder(R.drawable.ic_action_action_redeem)
+                        .placeholder(drawable)
+                        .centerCrop()
+                        .into(holder.photoCliente);
+
 
                 Log.i("LOG_TAG", "ID: " + Long.toString(getItemId(position)));
+
 
            holder.custonName.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -189,6 +202,8 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
 
+            public final ImageView photoCliente;
+            public final TextView customCity;
             public final TextView custonName;
 
 
@@ -197,6 +212,8 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
                 super(view);
                 Log.i(LOG_TAG,"ViewHolder(");
                 mView = view;
+                photoCliente = (ImageView) view.findViewById(R.id.photoCliente);
+                customCity = (TextView) view.findViewById(R.id.customCity);
                 custonName = (TextView) view.findViewById(R.id.customNameSpinner);
 
             }

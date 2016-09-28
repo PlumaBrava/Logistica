@@ -12,11 +12,11 @@ import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -31,14 +31,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-
-import com.nextnut.logistica.util.BoolIntConverter;
-import com.nextnut.logistica.util.CurrencyToDouble;
-import com.nextnut.logistica.util.ProductSectionActivity;
 
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.CustomOrdersColumns;
@@ -48,6 +43,9 @@ import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.rest.OrderDetailCursorAdapter;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
+import com.nextnut.logistica.util.BoolIntConverter;
+import com.nextnut.logistica.util.CurrencyToDouble;
+import com.nextnut.logistica.util.ProductSectionActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,6 +119,9 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     private TextView mCuit;
     private TextView mIva;
     private Double mIvaCalculo;
+
+
+
     public TextView mCantidadTotal;
     public TextView mMontoTotal;
     public TextView mMontoTotalDelivey;
@@ -204,6 +205,9 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     }
 
+
+
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(LOG_TAG, "onActivityCreated");
@@ -235,6 +239,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                 getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
 //                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
                 Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
+                openButton.setVisibility(View.VISIBLE);
+                sendButton.setVisibility(View.VISIBLE);
                 break;
 
 
@@ -245,6 +251,47 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 //        getLoaderManager().initLoader(NAME_PRODUCT_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
 
+    }
+
+    @Override
+    public void onResume() {
+        Log.i(LOG_TAG, " onResume");
+        switch (mAction) {
+            case CUSTOM_ORDER_NEW: // Go to the last order
+                getLoaderManager().restartLoader(CUSTOM_LOADER_NEW, null, this);
+//                getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
+//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
+                Log.e(LOG_TAG, "onActivityCreated-CUSTOM_LOADER_NEW");
+                break;
+
+            case CUSTOM_ORDER_SELECTION: // Go to the mItem order.
+                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
+                getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
+//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
+                Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
+                break;
+//            case CUSTOM_ORDER_DOUBLE_SCREEN:
+//                if (mItem == 0) {
+//                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-default DETAIL_PRODUCT_LOADER");
+//                    getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
+//                } else {
+////                    getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
+//                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-DETAIL_PRODUCT_LOADER");
+//                }
+//                break;
+            case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
+                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
+                getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
+//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
+                Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
+                break;
+
+
+            default:
+                break;
+        }
+
+        super.onResume();
     }
 
     @Override
@@ -287,6 +334,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
         openButton = (Button) mRootView.findViewById(R.id.open);
         sendButton = (Button) mRootView.findViewById(R.id.send);
+        openButton.setVisibility(View.GONE);
+        sendButton.setVisibility(View.GONE);
         // open bluetooth connection
         openButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -551,6 +600,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                         NumberFormat format = NumberFormat.getCurrencyInstance();
                         vh.mTextToalDelivery.setText(format.format(total));
                         saveCantidad(vh.mDetalleOrderId, Integer.valueOf(np.getValue()));
+
                         d.dismiss();
 
                     }else {
@@ -560,6 +610,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                         NumberFormat format = NumberFormat.getCurrencyInstance();
                         vh.mTextToal.setText(format.format(total));
                         saveCantidad(vh.mDetalleOrderId, Integer.valueOf(np.getValue()));
+
                         d.dismiss();
                     }
                 }
@@ -866,28 +917,31 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                 if (data != null && data.moveToFirst()) {
 
                     mCursorTotales=data;
-//                    do {
-//
-//                        Log.i(LOG_TAG, "PRODUCTS_LOADER - nombre"+ data.getString(6) );
-//                        Log.i(LOG_TAG, "PRODUCTS_LOADER - precio"+ data.getString(4) );
-//                        Log.i(LOG_TAG, "PRODUCTS_LOADER - descrition"+ data.getString(8) );
-//                    }while (data.moveToNext());
+                    do {
+
+                        Log.i(LOG_TAG, "PRODUCTS_LOADER - nombre"+ data.getString(6) );
+                        Log.i(LOG_TAG, "PRODUCTS_LOADER - precio"+ data.getString(4) );
+                        Log.i(LOG_TAG, "PRODUCTS_LOADER - cantidad Orden"+ data.getString(5) );
+                        Log.i(LOG_TAG, "PRODUCTS_LOADER - cantidad Delivery"+ data.getString(10) );
+                        Log.i(LOG_TAG, "PRODUCTS_LOADER - descrition"+ data.getString(8) );
+                    }while (data.moveToNext());
                 }
                 mAdapter.swapCursor(data);
+
                 break;
 
             case TOTALES_LOADER:
                 if (data != null && data.moveToFirst()) {
                     NumberFormat format = NumberFormat.getCurrencyInstance();
                     mCantidadTotal.setText("cantidad: "+Integer.toString(data.getInt(1)));
-                    Log.i(LOG_TAG, "TOTALES_LOADER - IVAstring"+ mIva.getText().toString());
-
-                    Log.i(LOG_TAG, "TOTALES_LOADER - mIvaCalculo"+ mIvaCalculo);
-                    Log.i(LOG_TAG, "TOTALES_LOADER - mIsSpecialCustom"+ mIsSpecialCustom.isChecked());
+//                    Log.i(LOG_TAG, "TOTALES_LOADER - IVAstring"+ mIva.getText().toString());
+//
+//                    Log.i(LOG_TAG, "TOTALES_LOADER - mIvaCalculo"+ mIvaCalculo);
+//                    Log.i(LOG_TAG, "TOTALES_LOADER - mIsSpecialCustom"+ mIsSpecialCustom.isChecked());
                     if(mIsSpecialCustom.isChecked()){
                         mIvaCalculo=0.0;
                     }
-                    Log.i(LOG_TAG, "TOTALES_LOADER - mIvaCalculo"+ (1+mIvaCalculo/100));
+//                    Log.i(LOG_TAG, "TOTALES_LOADER - mIvaCalculo"+ (1+mIvaCalculo/100));
                     mMontoTotal.setText("Monto Total:"+ format.format(data.getDouble(0))+"-"+
                             format.format(data.getDouble(0)*(1+mIvaCalculo/100)));
                     Log.i(LOG_TAG, "TOTALES_LOADER - IVA"+ mIva.getText().toString() );
@@ -898,8 +952,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                             format.format(data.getDouble(2)*(1+mIvaCalculo/100)));
                     do {
 
-                        Log.i(LOG_TAG, "TOTALES_LOADER - cantidad"+ Integer.toString(data.getInt(1)) );
-                        Log.i(LOG_TAG, "TOTALES_LOADER - monto total" +format.format(data.getDouble(0)) );
+//                        Log.i(LOG_TAG, "TOTALES_LOADER - cantidad"+ Integer.toString(data.getInt(1)) );
+//                        Log.i(LOG_TAG, "TOTALES_LOADER - monto total" +format.format(data.getDouble(0)) );
                         saveTotalPrice(data.getDouble(0)*(1+mIvaCalculo/100));
                         if (mAction==CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY){
                             saveTotalPrice(data.getDouble(2)*(1+mIvaCalculo/100));
@@ -1102,6 +1156,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
             getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
             getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
+            mAdapter.notifyDataSetChanged();
+
         } catch (RemoteException | OperationApplicationException e) {
             Log.e(LOG_TAG, "Error applying batch insert", e);
         }
@@ -1125,7 +1181,12 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         } try {
 
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-            getLoaderManager().initLoader(TOTALES_LOADER, null, this);
+
+
+            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
+            // XXX
+            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
+//            mAdapter.notifyDataSetChanged();
         } catch (RemoteException | OperationApplicationException e) {
             Log.e(LOG_TAG, "Error applying batch insert", e);
         }
