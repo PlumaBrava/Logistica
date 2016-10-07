@@ -1,15 +1,9 @@
 package com.nextnut.logistica.rest;
 
-import android.app.Activity;
-import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Color;
-import android.os.RemoteException;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,18 +14,15 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.nextnut.logistica.CustomOrderListFragment;
 import com.nextnut.logistica.MainActivity;
 import com.nextnut.logistica.PickingListFragment;
 import com.nextnut.logistica.R;
-import com.nextnut.logistica.data.CustomOrdersColumns;
-import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.PickingOrdersColumns;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 
-import java.util.ArrayList;
+//import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+//import com.nextnut.logistica.CustomOrderListFragment;
 
 
 public class PickingOrdersCursorAdapter extends CursorRecyclerViewAdapter<PickingOrdersCursorAdapter.ViewHolder>

@@ -3,31 +3,32 @@ package com.nextnut.logistica;
 import android.content.ContentProviderOperation;
 import android.content.Intent;
 import android.content.OperationApplicationException;
+import android.os.Bundle;
 import android.os.RemoteException;
-import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.Toast;
 
-import com.nextnut.logistica.util.ProductSectionActivity;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
+import com.nextnut.logistica.util.ProductSectionActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,17 +51,21 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private AdView mAddView ;
 
-
+    private InterstitialAd mInterstitial;
     public static final int CUSTOM_ORDER_FRAGMENT=0;
     public static final int PICKING_FRAGMENT=1;
     public static final int DELIVERY_FRAGMENT=2;
+    public static final String USER_DISPLAY_NAME="userDisplayName";
+    public static final String USER_ID="userId";
 
 //    private static final int REQUEST_CUSTOMER = 1234;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     public static long mPickingOrderSelected=0;
     public FloatingActionButton mFab;
+
     public static long    getmPickingOrderSelected(){
         return mPickingOrderSelected;
     }
@@ -121,16 +126,23 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         tabLayout.setupWithViewPager(mViewPager);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab);
+
+
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-                Log.i(LOG_TAG,"mCurrentFragmet"+mViewPager.getCurrentItem());
+                Log.i(LOG_TAG,"mFAb ViewPagerCurrentItem"+mViewPager.getCurrentItem());
+                if(getResources().getBoolean(R.bool.is_app_free)) {
+                    Log.i(LOG_TAG, "mFAb-is_app_free:true" );
+                    showInsterstitial();
+                } else {
+                    Log.i(LOG_TAG, "mFAb-is_app_free:false" );
 
-                switch (mViewPager.getCurrentItem()) {
+                    switch (mViewPager.getCurrentItem()) {
                     case CUSTOM_ORDER_FRAGMENT: {
-                        Log.i(LOG_TAG,"mCurrentFragmet CUSTOM_ORDER_FRAGMENT "+mViewPager.getCurrentItem());
+                        Log.i(LOG_TAG,"mFab CUSTOM_ORDER_FRAGMENT "+mViewPager.getCurrentItem());
                         Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
                         startActivityForResult(intent,CustomOrderDetailFragment. REQUEST_CUSTOMER);
 
@@ -148,11 +160,11 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
                         PickingListFragment fragmentpicking = (PickingListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
 
                         if (fragmentpicking != null) {
-                            Log.i(LOG_TAG,"Picking Frament Not Null");
+                            Log.i(LOG_TAG,"mFab Picking Frament Not Null");
                             fragmentpicking.saveNewPickingOrder();
                             break;
                         }else {
-                            Log.i(LOG_TAG, "Picking Frament  Null");
+                            Log.i(LOG_TAG, "mFab Picking Frament  Null");
                         }
                     }
                     case DELIVERY_FRAGMENT: {
@@ -160,8 +172,28 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
                     }
                     default:
                 }
-            }
+            }}
         });
+
+
+        if (findViewById(R.id.adView) != null && this.getResources().getBoolean(R.bool.is_app_free) ) {
+
+            Log.i(LOG_TAG, "Banner advertissing");
+            // Banner advertising
+            mAddView = (AdView) findViewById(R.id.adView);
+            AdRequest adRequest = new AdRequest.Builder()
+                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                    .addTestDevice("A086DD273532AA15DD4D5A83D2A6880E")
+                    .addTestDevice("4A2790CC2F2F210B9805A86F1289FEAF")
+                    .build();
+//        mAddView.setAdListener(new ToastAdListener(this));
+            mAddView.loadAd(adRequest);
+
+//             interstitial advertising
+            mInterstitial = newInterstitialAd();
+            loadInterstitial();
+
+        }
 
     }
 
@@ -437,4 +469,145 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
 
 
     }
+
+    public void loadInterstitial(){
+
+
+        // Disable the next level button and load the ad.
+//        mFab.setEnabled(false);
+        AdRequest adRequest = new AdRequest.Builder()
+                .setRequestAgent("android_studio:ad_template")
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("A086DD273532AA15DD4D5A83D2A6880E")
+                .addTestDevice("4A2790CC2F2F210B9805A86F1289FEAF")
+                .build();
+        mInterstitial.loadAd(adRequest);
+    }
+
+    private InterstitialAd newInterstitialAd() {
+        Log.i(LOG_TAG, "onAdLoaded-InterstitialAd" );
+        InterstitialAd interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
+        interstitialAd.setAdListener(new AdListener() {
+
+
+            @Override
+            public void onAdLeftApplication() {
+//                Toast.makeText(getApplicationContext(),"LeftApplication",Toast.LENGTH_SHORT).show();
+
+            }
+            @Override
+            public void onAdOpened() {
+//                Toast.makeText(getApplicationContext(),"on AdOpened",Toast.LENGTH_SHORT).show();
+
+            }
+
+
+
+            @Override
+            public void onAdLoaded() {
+//                Toast.makeText(getApplicationContext(),"on onAdLoaded",Toast.LENGTH_SHORT).show();
+//                if(spinner.getVisibility()!=View.VISIBLE){ btnSat.setEnabled(true);}
+                mFab.setVisibility(View.VISIBLE);
+                Log.i(LOG_TAG, "newInterstitialAd-onAdLoaded" );
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                // When Failed, prepear a new add and call tellJoke.
+                String mErrorReason="";
+                switch (errorCode){
+
+                    case AdRequest.ERROR_CODE_INTERNAL_ERROR:
+                        mErrorReason ="Internal Error";
+                        break;
+
+                    case AdRequest.ERROR_CODE_INVALID_REQUEST:
+                        mErrorReason ="Invalid Request";
+                        break;
+
+                    case AdRequest.ERROR_CODE_NETWORK_ERROR:
+                        mErrorReason ="Network Error";
+                        break;
+
+                    case AdRequest.ERROR_CODE_NO_FILL:
+                        mErrorReason ="No Fill";
+                        break;
+                }
+                Toast.makeText(getApplicationContext(),
+                        String.format("on onAdFailedToLoad (%S)", mErrorReason ),
+                        Toast.LENGTH_SHORT).show();
+                super.onAdFailedToLoad(errorCode);
+
+
+                mInterstitial = newInterstitialAd();
+                loadInterstitial();
+//                mFab.setEnabled(true);
+            }
+
+
+
+            @Override
+            public void onAdClosed() {
+//                Toast.makeText(getApplicationContext(),"on Ad Closed",Toast.LENGTH_SHORT).show();
+                // When Closed the add is clossed, prepear a new add and call tellJoke.
+
+                mInterstitial = newInterstitialAd();
+                loadInterstitial();
+                fabActions ();
+            }
+        });
+        return interstitialAd;
+    }
+    public void showInsterstitial(){
+        if(mInterstitial != null && mInterstitial.isLoaded()){
+//            Toast.makeText(this, "loaded-SHOW", Toast.LENGTH_SHORT).show();
+
+            mInterstitial.show();
+
+        } else {
+//            Toast.makeText(this, "Ad did not load", Toast.LENGTH_SHORT).show();
+
+        }
+
+
+    }
+
+    public void fabActions (){
+        Log.i(LOG_TAG,"FabAction");
+
+        switch (mViewPager.getCurrentItem()) {
+            case CUSTOM_ORDER_FRAGMENT: {
+                Log.i(LOG_TAG,"mCurrentFragmet CUSTOM_ORDER_FRAGMENT "+mViewPager.getCurrentItem());
+                Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
+                startActivityForResult(intent,CustomOrderDetailFragment. REQUEST_CUSTOMER);
+
+//                        Intent intent = new Intent(MainActivity.this, CustomOrderDetailActivity.class);
+//                        intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//                        ActivityOptionsCompat activityOptions =
+//                                ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
+//                        ActivityCompat.startActivity(MainActivity.this, intent, activityOptions.toBundle());
+
+                break;
+            }
+            case PICKING_FRAGMENT: {
+
+
+                PickingListFragment fragmentpicking = (PickingListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
+
+                if (fragmentpicking != null) {
+                    Log.i(LOG_TAG,"Picking Frament Not Null");
+                    fragmentpicking.saveNewPickingOrder();
+                    break;
+                }else {
+                    Log.i(LOG_TAG, "Picking Frament  Null");
+                }
+            }
+            case DELIVERY_FRAGMENT: {
+                break;
+            }
+            default:
+        }
+    }
+
 }

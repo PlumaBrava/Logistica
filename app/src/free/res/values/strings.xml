@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="is_app_free">true</bool>
+    <string name="app_name">Logistica Free</string>
+    <string name="banner_ad_unit_id">ca-app-pub-1583094035439130/2883257645</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-1583094035439130/4359990840</string>
+
+    //Logistica Free
+    <string name="server_client_id">378485183737-l6gnvdaogiit9if0dfj7g0k69cpkqlqt.apps.googleusercontent.com</string>
+
+</resources>

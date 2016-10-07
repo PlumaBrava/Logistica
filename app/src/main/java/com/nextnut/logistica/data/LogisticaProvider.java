@@ -2,7 +2,7 @@ package com.nextnut.logistica.data;
 
 import android.net.Uri;
 
-import com.nextnut.logistica.CustomOrderDetailActivity;
+import com.nextnut.logistica.BuildConfig;
 
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
@@ -20,7 +20,10 @@ import java.util.Map;
 public class LogisticaProvider {
 
         public static final String AUTHORITY =
-                "com.nextnut.logistica.data.LogisticaProvider";
+                BuildConfig.APPLICATION_ID +
+
+                ".data.LogisticaProvider";
+//                "com.nextnut.logistica.debug.data.LogisticaProvider";
         static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
         interface Path{

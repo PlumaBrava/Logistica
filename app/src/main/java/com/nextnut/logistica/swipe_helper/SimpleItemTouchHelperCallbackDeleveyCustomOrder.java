@@ -3,7 +3,6 @@ package com.nextnut.logistica.swipe_helper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.v7.widget.RecyclerView;
@@ -55,7 +54,7 @@ public class SimpleItemTouchHelperCallbackDeleveyCustomOrder extends ItemTouchHe
                 p.setColor(recyclerView.getResources().getColor(R.color.SwipeLeft));
                 RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
                 c.drawRect(background, p);
-                icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.art_clouds);
+                icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
                 RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
                 c.drawBitmap(icon, null, icon_dest, p);
             }

@@ -1,4 +1,4 @@
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.android.application'
 
 android {
@@ -7,7 +7,9 @@ android {
             keyAlias 'LogisticaKey'
             keyPassword 'Maria001'
 //            storeFile file('C:/Users/perez.juan.jose/Documents/GitHub/Logistica/LogisticaKey.jks')
-            storeFile file('$rootdir/LogisticaKey.jks')
+//            storeFile file('$rootdir/LogisticaKey.jks')  directorio free or paid
+//            storeFile file(project(":app").getProjectDir().getPath()+'/LogisticaKey.jks') app directory
+            storeFile file(getRootDir().getPath()+'/LogisticaKey.jks')
             storePassword 'Maria001'
         }
     }
@@ -24,13 +26,35 @@ android {
     }
     buildTypes {
         release {
+            debuggable false // relesase version are not debuggables.
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.LogisticaKey
         }
     }
+    productFlavors {
+        free {
+            applicationId = "com.nextnut.logistica.free"
+            versionName "1.0-free"
+            minSdkVersion 16
+            signingConfig signingConfigs.LogisticaKey
+            targetSdkVersion 24
+        }
+        paid {
+            applicationId = "com.nextnut.logistica.paid"
+            versionName "1.0-paid"
+            minSdkVersion 16
+            signingConfig signingConfigs.LogisticaKey
+            targetSdkVersion 24
+        }
+    }
+
+
     dexOptions {
         javaMaxHeapSize "4g"
+
+    }
+    productFlavors {
     }
 }
 
@@ -76,5 +100,8 @@ dependencies {
     compile 'net.simonvt.schematic:schematic:0.6.7'
     compile 'net.simonvt.schematic:schematic-compiler:0.6.7'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    // Auth
     compile 'com.google.android.gms:play-services-auth:9.6.1'
+    // Adds
+    compile 'com.google.android.gms:play-services-ads:9.6.1'
 }

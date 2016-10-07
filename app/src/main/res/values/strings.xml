@@ -15,7 +15,7 @@
     <!--Section Process Titles-->
     <string name="title_custom_orders">Custom Orders</string>
     <string name="title_picking">Picking</string>
-    <string name="title_delivery">Delivey</string>
+    <string name="title_delivery">Delivery</string>
 
 
     <!--Products List Activity List-->
@@ -299,6 +299,11 @@
     <string name="appwidget_picking">Picking: </string>
     <string name="appwidget_product"> - Producto: </string>
     <string name="add_widget">Add widget</string>
+
+
+
+    //Logistica Paid
+    <string name="server_client_id">378485183737-0rknnj5dulrkqnb8khbjbks0a3k2iecf.apps.googleusercontent.com</string>
 
 
 

@@ -171,7 +171,7 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
                 Log.i("LOG_TAG", "ID: " + Long.toString(getItemId(position)));
 
 
-           holder.custonName.setOnClickListener(new View.OnClickListener() {
+           holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 

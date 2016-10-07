@@ -6,37 +6,33 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
 
-import android.view.MenuItem;
-
-
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.nextnut.logistica.data.LogisticaProvider;
-
 import com.nextnut.logistica.rest.ProductCursorAdapter;
-import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
-
 
 import java.util.ArrayList;
+
+//import com.google.android.gms.common.api.GoogleApiClient;
 
 
 
@@ -49,7 +45,7 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
-    private GoogleApiClient client;
+
 
     @Override
     public void onStart() {

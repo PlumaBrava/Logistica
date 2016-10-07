@@ -23,3 +23,20 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+
+task tests(type: Test) {
+
+    include '**/*VerifyPickingTest*'
+//    dependsOn ':app:connectedPaidAndroidTest:'
+//    dependsOn ':jokejavalibrary:test'
+}
+
+task biggerTests() {
+    group = 'verification'
+    description = 'Run all tests'
+
+
+    dependsOn tests
+    }
+
