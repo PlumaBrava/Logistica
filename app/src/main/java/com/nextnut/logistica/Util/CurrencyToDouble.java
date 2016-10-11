@@ -10,10 +10,10 @@ public class CurrencyToDouble {
     }
 
     public Double convert(){
-        if(s != null && !s.toString().isEmpty()){
+        if(s != null && !s.isEmpty()){
 
 
-            String cleanString = s.toString().replaceAll("[$,.]", "");
+            String cleanString = s.replaceAll("[$,.]", "");
 
             double parsed = Double.parseDouble(cleanString);
             return parsed/100;

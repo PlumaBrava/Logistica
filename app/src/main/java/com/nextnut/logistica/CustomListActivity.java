@@ -5,28 +5,26 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.View;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.rest.CustomsCursorAdapter;
-import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 
 /**
  * An activity representing a list of Customs. This activity
@@ -39,7 +37,6 @@ import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 public class CustomListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private CustomsCursorAdapter mCursorAdapter;
-    private RecyclerView recyclerView;
 
     private ItemTouchHelper mItemTouchHelper;
     private FloatingActionButton fab_new;
@@ -75,7 +72,6 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
                 Intent intent = new Intent(getApplicationContext(), CustomDetailActivity.class);
                 intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, 0);
                 intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_NEW);
-                Log.i(LOG_TAG, "PRODUCT_MODIFICACION" + false);
                 fab_new.setVisibility(View.VISIBLE);
                 fab_save.setVisibility(View.GONE);
                 fab_delete.setVisibility(View.GONE);
@@ -97,9 +93,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
                     fab_new.setVisibility(View.VISIBLE);
                     fab_save.setVisibility(View.GONE);
                     fab_delete.setVisibility(View.GONE);
-                    Log.i(LOG_TAG,"no null fragment");
                 }else {
-                    Log.i(LOG_TAG,"null fragment");
                 }
             }
 
@@ -118,9 +112,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
                     fab_new.setVisibility(View.VISIBLE);
                     fab_save.setVisibility(View.GONE);
                     fab_delete.setVisibility(View.GONE);
-                    Log.i(LOG_TAG,"no null fragment");
                 }else {
-                    Log.i(LOG_TAG,"null fragment");
                 }
             }
         });
@@ -132,19 +124,17 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
         }
 
         View emptyView = findViewById(R.id.recyclerview_custom_empty);
-        recyclerView = (RecyclerView) findViewById(R.id.custom_list);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.custom_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
         mCursorAdapter = new CustomsCursorAdapter(this, null, emptyView, new CustomsCursorAdapter.CustomsCursorAdapterOnClickHandler() {
             @Override
             public void onClick(long id, CustomsCursorAdapter.ViewHolder vh) {
-                Log.i(LOG_TAG, "onclicka:" + id);
                 mItem = id; // when rotate the screen the selecction of the second Screen is conserved.
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
                     arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
-                    Log.i(LOG_TAG, "ARG_ITEM_ID2 :" + id);
                     arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
 
                     CustomDetailFragment fragment = new CustomDetailFragment();
@@ -167,8 +157,6 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
                     Intent intent = new Intent(getApplicationContext(), CustomDetailActivity.class);
                     intent.putExtras(arguments);
 
-                    Log.i(LOG_TAG, "ARG_ITEM_ID1-: " + mItem );
-                    Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomDetailFragment.CUSTOM_SELECTION);
 
                     fab_new.setVisibility(View.VISIBLE);
                     fab_save.setVisibility(View.GONE);
@@ -181,12 +169,10 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
                         Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
                         Pair<View, String> p3 = Pair.create((View) vh.mSurename, getString(R.string.custom_icon_transition_surname));
                         ActivityOptionsCompat activityOptions =
-//                                ActivityOptionsCompat.makeSceneTransitionAnimation(CustomListActivity.this, p1, p2, p3);
                                 ActivityOptionsCompat.makeSceneTransitionAnimation(CustomListActivity.this,  p2, p3);
                         startActivity(intent, activityOptions.toBundle());
 
                     } else {
-                        Log.i("ProductListActivity", "makeSceneTransitionAnimation Normal");
                         startActivity(intent);
                     }
                 }
@@ -195,10 +181,6 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
 
 
         recyclerView.setAdapter(mCursorAdapter);
-
-//        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
-//        mItemTouchHelper = new ItemTouchHelper(callback);
-//        mItemTouchHelper.attachToRecyclerView(recyclerView);
 
 
         if (findViewById(R.id.custom_detail_container) != null ) {
@@ -211,7 +193,6 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
             Bundle arguments = new Bundle();
             arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);// Fragmet load de last ID.
             arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_DOUBLE_SCREEN);
-            Log.i(LOG_TAG, "Custom_MODIFICACION" + false);
             CustomDetailFragment fragment = new CustomDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
@@ -222,9 +203,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-
         getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
-
         super.onPostCreate(savedInstanceState);
     }
 

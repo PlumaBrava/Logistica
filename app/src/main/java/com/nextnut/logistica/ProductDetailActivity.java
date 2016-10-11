@@ -22,7 +22,7 @@ import android.view.MenuItem;
  */
 public class ProductDetailActivity extends AppCompatActivity {
     private static final String LOG_TAG = ProductDetailActivity.class.getSimpleName();
-    private int mAction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,12 +90,12 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             Bundle arguments = new Bundle();
             arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(ProductDetailFragment.ARG_ITEM_ID,0));
-            mAction= getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION,ProductDetailFragment.PRODUCT_SELECTION);
-            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION,mAction);
+            int mAction = getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
+            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, mAction);
             Log.i(LOG_TAG, "CUSTOM_ACTION" + mAction);
             ProductDetailFragment fragment = new ProductDetailFragment();
             fragment.setArguments(arguments);
-            if(mAction==ProductDetailFragment.PRODUCT_NEW){
+            if(mAction ==ProductDetailFragment.PRODUCT_NEW){
 //                fab_delete.setVisibility(View.GONE);
                 fab_save.setVisibility(View.VISIBLE);
             }else {

@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/text_margin"
         android:layout_marginLeft="@dimen/text_margin"
-        android:layout_gravity="left"
+        android:layout_gravity="start"
         android:textStyle="bold"
         android:contentDescription="@string/productTitleListItem"
        />
@@ -85,7 +85,7 @@
                     android:text="@string/Orders"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
+                    android:layout_gravity="start"
                     android:gravity="center"
                     android:layout_weight="1"
                     android:contentDescription="@string/Orders"

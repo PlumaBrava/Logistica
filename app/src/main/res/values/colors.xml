@@ -16,5 +16,6 @@
     // Colors in adapeter Swipe
     <color name="SwipeRight">#388E3C</color>
     <color name="SwipeLeft">#D32F2F</color>
+    <color name="WidgetBackground">#09C</color>
 
 </resources>

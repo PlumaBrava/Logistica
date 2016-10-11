@@ -1,15 +1,10 @@
 package com.nextnut.logistica.rest;
 
-import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Color;
-import android.os.RemoteException;
-
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,17 +14,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.nextnut.logistica.CustomOrderListFragment;
-import com.nextnut.logistica.MainActivity;
 import com.nextnut.logistica.R;
 import com.nextnut.logistica.data.CustomOrdersColumns;
-import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 
 
 public class CustomsOrdersCursorAdapter extends CursorRecyclerViewAdapter<CustomsOrdersCursorAdapter.ViewHolder>
@@ -45,7 +35,6 @@ implements ItemTouchHelperAdapter{
 //    public static final int STEP_PICKING = 1;
 //    public static  final int STEP_DELIVEY = 2;
 
-//    private View.OnClickListener listener;
     public CustomsOrdersCursorAdapter(Context context, Cursor cursor, View empltyView, CustomsOrdersCursorAdapterOnClickHandler dh
 
     ){
@@ -89,24 +78,15 @@ implements ItemTouchHelperAdapter{
                     mClickHandler.onMakeACall(mCustomerRefContacto);
                 }
             });
-
-
-
-
         }
 
 
         @Override
         public void onItemSelected() {
-            Log.i("TouchHelper:", "Adapter onItemSelected(): ");
-//            itemView.setBackgroundColor(Color.LTGRAY);
         }
 
         @Override
         public void onItemClear() {
-
-            Log.i("TouchHelper:", "Adapter onItemClear(): ");
-//            itemView.setBackgroundColor(0x7f0100a5);
         }
 
 
@@ -114,10 +94,6 @@ implements ItemTouchHelperAdapter{
 
         @Override
         public void onClick(View view) {
-
-            Log.i("onClick", "onClick " + getPosition() + " " + getAdapterPosition());
-            Log.i("onClick", "cursorID " + mcursorId);
-            Log.i("onClick", "PhotoString " + mphotString);
             mClickHandler.onClick(mcursorId, this);
 
         }
@@ -132,7 +108,6 @@ implements ItemTouchHelperAdapter{
                 View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.customorder_list_content, parent, false);
 
-//                itemView.setOnClickListener(mContext);
                 ViewHolder vh = new ViewHolder(itemView);
 
                 return vh;
@@ -156,7 +131,6 @@ implements ItemTouchHelperAdapter{
                     ((View )(viewHolder.mOrderNumber.getParent().getParent())).setBackgroundColor(Color.RED);
                     viewHolder.mOrderNumber.setTextColor(Color.GREEN);
                 }else {
-                    Log.i("CustomOrderCursor:", "STATUS_NO delivered: ");
                     ((View )(viewHolder.mOrderNumber.getParent().getParent())).setBackgroundColor(
                             mContext.getResources().getColor(R.color.CustomOrderCard_background));
 
@@ -173,28 +147,11 @@ implements ItemTouchHelperAdapter{
                 viewHolder.mCustomerRefContacto=cursor.getString(5);
                 viewHolder.mBottonPhoto.setVisibility(viewHolder.mCustomerRefContacto!=null?View.VISIBLE:View.GONE);
 
-//                viewHolder.mPickingOrderId=cursor.getInt(cursor.getColumnIndex(CustomColumns.ID_CUSTOM));
-//                viewHolder.mOrderNumber.setText(Integer.toString(cursor.getInt(cursor.getColumnIndex(CustomOrdersColumns.ID_CUSTOM_ORDER))));
-//                viewHolder.mName.setText("name");
-//                viewHolder.mLastname.setText("LastName");
-//                viewHolder.mTotalPrice.setText(Long.toString(cursor.getLong(cursor.getColumnIndex(CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER))));
-//                viewHolder.mDate.setText(cursor.getString(cursor.getColumnIndex(CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER)));
 
             }
 
-//        viewHolder.mImageview.setImageResource(cursor.getInt(cursor.getColumnIndex(
-//                                PlanetColumns.IMAGE_RESOURCE)));
 
 
-//    @Override
-//    public void onClick(View v) {
-////        int adapterPosition = getAdapterPosition();
-//        mClickHandler.onClick( this);
-////        mCursor.moveToPosition(adapterPosition);
-//    }
-//    public static interface ForecastAdapterOnClickHandler {
-//        void onClick( ProductCursorAdapter vh);
-//    }
 
     /**
      * Here is the key method to apply the animation
@@ -206,16 +163,14 @@ implements ItemTouchHelperAdapter{
     private void setAnimation(View viewToAnimate)
     {
         // If the bound view wasn't previously displayed on screen, it's animated
-//        if (position > lastPosition)
         {
             Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
             viewToAnimate.startAnimation(animation);
-//            lastPosition = position;
         }
     }
 
 
-    public static interface CustomsOrdersCursorAdapterOnClickHandler {
+    public interface CustomsOrdersCursorAdapterOnClickHandler {
         void onClick(long id, ViewHolder vh);
         void onMakeACall(String ContactID);
         void onDialogAlert(String message);
@@ -224,9 +179,6 @@ implements ItemTouchHelperAdapter{
         void onDataChange();
     }
 
-//    public static interface CustomsOrdersCursorAdapteronDataChangekHandler {
-//
-//    }
 
 
 
@@ -237,7 +189,6 @@ implements ItemTouchHelperAdapter{
 
 
 
-                        Log.i("TouchHelper:", "Adapter onItemDismiss CUSTOM ORDER " + position);
                         mClickHandler.onItemDismissCall(getItemId(position));
 
 
@@ -247,10 +198,6 @@ implements ItemTouchHelperAdapter{
 
     @Override
     public void onItemAcepted(int position) {
-
-
-
-                Log.i("TouchHelper:", "Adapter onItemAcepted" + position);
                 mClickHandler.onItemAceptedCall(getItemId(position));
 
 

@@ -80,10 +80,7 @@
             <!--android:layout_margin="@dimen/text_margin"-->
 
 
-
-
-
-            <EditText
+        <EditText
             android:id="@+id/TitlepickingOrderComents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -93,7 +90,7 @@
             android:hint="@string/picking_card_Text_Coment"
             android:background="@drawable/edittext_bg"
             android:layout_margin="@dimen/text_margin"
-            android:layout_weight="1"></EditText>
+            android:layout_weight="1" />
 
 
 

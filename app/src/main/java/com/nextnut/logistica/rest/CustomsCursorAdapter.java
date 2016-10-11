@@ -8,7 +8,6 @@ import android.database.DatabaseUtils;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import com.nextnut.logistica.ProductDetailActivity;
 import com.nextnut.logistica.R;
 import com.nextnut.logistica.data.CustomColumns;
-
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
@@ -72,23 +70,16 @@ implements ItemTouchHelperAdapter{
 
         @Override
         public void onItemSelected() {
-            Log.i("TouchHelper:", "Adapter onItemSelected(): ");
             itemView.setBackgroundColor(Color.LTGRAY);
         }
 
         @Override
         public void onItemClear() {
-
-            Log.i("TouchHelper:", "Adapter onItemClear(): ");
             itemView.setBackgroundColor(0);
         }
 
         @Override
         public void onClick(View view) {
-
-            Log.i("onClick", "onClick " + getPosition() + " " + getAdapterPosition());
-            Log.i("onClick", "cursorID " + mcursorId);
-            Log.i("onClick", "PhotoString " + mphotString);
             mClickHandler.onClick(mcursorId, this);
 
         }
@@ -98,8 +89,6 @@ implements ItemTouchHelperAdapter{
             public ViewHolder onCreateViewHolder (ViewGroup parent,int viewType){
                 View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.custom_list_content, parent, false);
-
-//                itemView.setOnClickListener(mContext);
                 ViewHolder vh = new ViewHolder(itemView);
                 mVh = vh;
                 return vh;
@@ -129,28 +118,14 @@ implements ItemTouchHelperAdapter{
 
             }
 
-//        viewHolder.mImageview.setImageResource(cursor.getInt(cursor.getColumnIndex(
-//                                PlanetColumns.IMAGE_RESOURCE)));
 
 
-//    @Override
-//    public void onClick(View v) {
-////        int adapterPosition = getAdapterPosition();
-//        mClickHandler.onClick( this);
-////        mCursor.moveToPosition(adapterPosition);
-//    }
-//    public static interface ForecastAdapterOnClickHandler {
-//        void onClick( ProductCursorAdapter vh);
-//    }
-
-
-    public static interface CustomsCursorAdapterOnClickHandler {
+    public interface CustomsCursorAdapterOnClickHandler {
         void onClick(long id, ViewHolder vh);
     }
 
             @Override
             public void onItemDismiss ( int position){
-                Log.i("TouchHelper:", "Adapter onItemDismiss ");
                 long cursorId = getItemId(position);
                 Cursor c = getCursor();
                 ContentValues cv = new ContentValues();
@@ -168,12 +143,7 @@ implements ItemTouchHelperAdapter{
 
                 mContext.startActivity(intent);
 
-//        mContext.getContentResolver().delete(PlanetProvider.Planets.withId(cursorId),
-//                null, null);
-//        mContext.getContentResolver().insert(PlanetProvider.ArchivedPlanets.withId(cursorId),
-//                cv);
                 notifyDataSetChanged();
-//        notifyItemRemoved(position);
             }
 
     @Override

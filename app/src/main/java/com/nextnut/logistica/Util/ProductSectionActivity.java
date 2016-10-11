@@ -6,7 +6,6 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -14,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,20 +49,15 @@ public class ProductSectionActivity extends AppCompatActivity implements LoaderM
 
         View emptyView = findViewById(R.id.recyclerview_product_empty);
         View recyclerView = findViewById(R.id.content_product_selection);
-//        mAdapter = new Adapter(null,emptyView);
         mAdapter= new ProductCursorAdapter(this,null,emptyView, new ProductCursorAdapter.ProductCursorAdapterOnClickHandler() {
             @Override
             public void onClick(long id, ProductCursorAdapter.ViewHolder vh) {
-                Log.i(LOG_TAG,"setupRecyclerView"+id);
                 Intent intent = new Intent();
                 intent.putExtra(KEY_RefPRODUCTO, id);
                 intent.putExtra(KEY_PRODUCTO_NAME, vh.mTextViewNombre.getText());
 
                 intent.putExtra(KEY_PRODUCTO_PRICE,vh.mTextViewPrecio.getText().toString());
                 intent.putExtra(KEY_PRODUCTO_PRICES_ESPECIAL,vh.mTextViewPrecioEspecial.getText().toString());
-                Log.i(LOG_TAG,"ProductPrice"+vh.mTextViewPrecio.getText().toString());
-
-                Log.i(LOG_TAG,"ProductPrice"+vh.mTextViewPrecio.getText().toString());
                 setResult(RESULT_OK, intent);
                 finish();
 
@@ -104,7 +97,6 @@ public class ProductSectionActivity extends AppCompatActivity implements LoaderM
                         " FROM "+LogisticaDataBase.CUSTOM_ORDERS_DETAIL+ " WHERE ( "+
                 LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL +" = "+mItem+" ))";
 
-        Log.i(LOG_TAG,"onCreateLoader");
         return new CursorLoader(
                 this,
                 LogisticaProvider.Products.CONTENT_URI,
@@ -117,21 +109,16 @@ public class ProductSectionActivity extends AppCompatActivity implements LoaderM
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data!=null) {
-            Log.i(LOG_TAG,"onLoadFinished");
             mAdapter.swapCursor(data);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.i(LOG_TAG,"onLoaderReset");
         mAdapter.swapCursor(null);
 
 
     }
-//
-//    public class Adapter extends CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHolder>
-//            extends RecyclerView.Adapter<VH>{
 
     public class Adapter extends CursorRecyclerViewAdapter<ProductSectionActivity.Adapter.ViewHolder>{
 
@@ -163,51 +150,10 @@ public class ProductSectionActivity extends AppCompatActivity implements LoaderM
         }
 
 
-//        @Override
-//        public void onBindViewHolder(ViewHolder viewHolder, int position) {
-//            mPosition=position;
-//            if(!mDataIsValid){
-//                throw new IllegalStateException("This should only be called when Cursor is valid");
-//            }
-//            if(!mCursor.moveToPosition(position)){
-//                throw new IllegalStateException("Could not move cursor to position " + position);
-//            }
-//
-//            if (mCursor == null) {
-//                Log.i(LOG_TAG, "cursor Nulo");
-//            } else{
-//
-//                mCursor.moveToPosition(position);
-//
-//
-//
-//                String text1 = mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM))+" "+mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM));
-//                viewHolder.custonName.setText(text1);
-//
-//                Log.i("LOG_TAG", "ID: " + Long.toString(getItemId(position)));
-//
-//                viewHolder.custonName.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//
-//                        Log.i(LOG_TAG,"nClickListener"+", valor id:"+getItemId(mPosition));
-//                        Intent intent = new Intent();
-//                        intent.putExtra("resultado",getItemId(mPosition);
-//                        setResult(RESULT_OK, intent);
-//                        finish();
-//
-//
-//
-//                    }
-//                });
-//
-//            }
-//        }
 
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.i(LOG_TAG,"onCreateViewHolder");
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.product_list_item, parent, false);
             return new ViewHolder(view);
@@ -233,7 +179,6 @@ public class ProductSectionActivity extends AppCompatActivity implements LoaderM
             public ViewHolder(View view) {
 
                 super(view);
-                Log.i(LOG_TAG,"ViewHolder(");
                 mView = view;
                 custonName = (TextView) view.findViewById(R.id.customNameSpinner);
 

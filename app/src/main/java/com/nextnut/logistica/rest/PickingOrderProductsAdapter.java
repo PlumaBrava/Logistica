@@ -211,7 +211,7 @@ implements ItemTouchHelperAdapter{
 
 
 
-    public static interface ProductCursorAdapterOnClickHandler {
+    public interface ProductCursorAdapterOnClickHandler {
         void onClick(long id, ViewHolder vh);
 
     }

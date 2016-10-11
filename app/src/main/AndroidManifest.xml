@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+
     package="com.nextnut.logistica"
     >
 
@@ -40,11 +40,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.LoginActivity" />
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".ProductListActivity"
@@ -81,16 +76,6 @@
         android:name=".data.generated.LogisticaProvider"
             android:authorities="${applicationId}.data.LogisticaProvider"
             android:exported="false" />
-        <!--android:authorities="com.nextnut.logistica.debug.data.LogisticaProvider"-->
-
-
-        <!--
- ATTENTION: This was auto-generated to add Google Play services to your project for
-     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
-        -->
-        <!--<meta-data-->
-            <!--android:name="com.google.android.gms.version"-->
-            <!--android:value="@integer/google_play_services_version" />-->
 
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
@@ -116,15 +101,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.CustomListActivity" />
         </activity>
-        <!--<activity-->
-            <!--android:name=".CustomOrderListFragment"-->
-            <!--android:label="@string/title_customorder_list"-->
-            <!--android:parentActivityName=".MainActivity"-->
-            <!--android:theme="@style/AppTheme.NoActionBar">-->
-            <!--<meta-data-->
-                <!--android:name="android.support.PARENT_ACTIVITY"-->
-                <!--android:value="com.nextnut.logistica.MainActivity" />-->
-        <!--</activity>-->
+
         <activity
             android:name=".CustomOrderDetailActivity"
             android:label="@string/title_customorder_detail"
@@ -144,9 +121,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!--<meta-data-->
-                <!--android:name="android.support.PARENT_ACTIVITY"-->
-                <!--android:value="com.nextnut.logistica.MainActivity" />-->
+
         </activity>
         <activity
             android:name=".CustomSelectionActivity"

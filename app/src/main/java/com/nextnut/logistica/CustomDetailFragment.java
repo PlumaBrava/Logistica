@@ -11,10 +11,10 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -22,7 +22,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,10 +32,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nextnut.logistica.util.CustomTextWatcher;
-import com.nextnut.logistica.util.Imagenes;
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
+import com.nextnut.logistica.util.CustomTextWatcher;
+import com.nextnut.logistica.util.Imagenes;
 import com.nextnut.logistica.util.MakeCall;
 import com.squareup.picasso.Picasso;
 
@@ -111,22 +110,18 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
 
-            mItem = (long)getArguments().getLong(ARG_ITEM_ID);
-            Log.i(LOG_TAG, "ARG_ITEM_IDfrag: " + mItem);
+            mItem = getArguments().getLong(ARG_ITEM_ID);
             AppCompatActivity activity = (AppCompatActivity) this.getContext();
              appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                Log.i(LOG_TAG, "appBarLayout:!= null " + mItem);
                 if (mItem==0){
                     appBarLayout.setTitle(getResources().getString(R.string.custom_new)+ mItem);
                 }else
                     appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" "+ mItem);
             }
-            Log.i(LOG_TAG, "appBarLayout= null " + mItem);
         }
         if (getArguments().containsKey(CUSTOM_ACTION)) {
             mAction = getArguments().getInt(CUSTOM_ACTION);
-            Log.i(LOG_TAG, "CUSTOM_ACTION" + mAction);
         }
     }
 
@@ -134,9 +129,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.custom_detail, container, false);
-
-
-
         mCustomName = (EditText) rootView.findViewById(R.id.custom_name_text);
         mLastName = (EditText) rootView.findViewById(R.id.product_Lastname);
         button = (Button) rootView.findViewById(R.id.custom_imagen_button);
@@ -144,12 +136,9 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
             @Override
             public void onClick(View view) {
                 try {
-
-
                     Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri.parse("content://contacts"));
                     pickContactIntent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE); // Show user only contacts w/ phone numbers
                     startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -159,7 +148,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         mImageCustomer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i(LOG_TAG, "mImageCustomer on Click: ");
                 selectImage(CustomDetailFragment.this);
             }
         });
@@ -168,7 +156,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
         mCustomName.addTextChangedListener(new TextWatcher() {
                                                public void afterTextChanged(Editable s) {
-                                                   Log.i(LOG_TAG, "OnEditorActionListener afterTextChanged s: " + s.toString());
                                                }
 
                                                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -179,7 +166,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                                                    StringBuilder b = new StringBuilder();
                                                    for (int i = 0; i < s.length(); i++) {
                                                        if (s.charAt(i) == '\n') {
-                                                           Log.i(LOG_TAG, "OnEditorActionListener onTextChanged,-existeProductName Enter detected");
                                                            modifyText = true;
                                                        } else {
                                                            b.append(s.charAt(i));
@@ -207,12 +193,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         mCuit = (EditText) rootView.findViewById(R.id.custom_cuit);
         mIva = (EditText) rootView.findViewById(R.id.custom_iva);
         mSpecial = (CheckBox) rootView.findViewById(R.id.custom_special);
-//        if (appBarLayout != null) {
-//            if (mItem==0){
-//                appBarLayout.setTitle(getResources().getString(R.string.custom_new)+ mItem);
-//            }else
-//                appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" "+ mItem);
-//        }
         return rootView;
     }
 
@@ -255,16 +235,12 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                     button.setBackgroundColor(Color.GREEN);
 
                 }
-                Log.e(LOG_TAG, "phone-Number: "+number);
-                Log.e(LOG_TAG, "phone-name: "+name);
-                Log.e(LOG_TAG, "phone- _id : "+ mIdContact );
 
                 button.setText(name);
             }
                 if (requestCode == Imagenes.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-                    mCurrentPhotoPath = "file:" + savePhotoReturnPath(getContext(),(Bitmap) data.getExtras().get("data"));
+                    mCurrentPhotoPath = getString(R.string.file) + savePhotoReturnPath(getContext(),(Bitmap) data.getExtras().get(getString(R.string.data)));
 
-                    Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
                     Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
                     Picasso.with(getContext())
                             .load(mCurrentPhotoPath)
@@ -272,16 +248,8 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                             .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                             .into(mImageCustomer);
 
-
-
-
                 } else if (requestCode == Imagenes.REQUEST_IMAGE_GET) {
-
-
-                    mCurrentPhotoPath = "file:" + saveImageSelectedReturnPath(getContext(), data);
-
-
-                    Log.i("prdDetFrament", "mCurrentPhotoPath:" + mCurrentPhotoPath);
+                    mCurrentPhotoPath = getString(R.string.file) + saveImageSelectedReturnPath(getContext(), data);
                     mImageCustomer.setBackgroundColor(Color.TRANSPARENT);
                     Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
                     Picasso.with(getContext())
@@ -290,8 +258,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                             .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                             .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                             .into(mImageCustomer);
-
-
                 }
 
             }
@@ -306,7 +272,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.e(LOG_TAG, "phone-Number: "+"PERMISSION_autorizado");
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     if (mCustomId!=null){
@@ -315,7 +280,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
 
                 } else {
-                    Log.e(LOG_TAG, "phone-Number: "+"PERMISSION_rehazado");
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
@@ -335,7 +299,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
         switch (mAction) {
             case CUSTOM_NEW:{
-                Log.e(LOG_TAG, "onActivityCreated-CUSTOM_NEW");
                 Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
                 Picasso.with(getContext())
                         .load(mCurrentPhotoPath)
@@ -347,22 +310,18 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
             case CUSTOM_DOUBLE_SCREEN:
                 if (mItem == 0) {
-                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-default DETAIL_PRODUCT_LOADER");
                     getLoaderManager().initLoader(DEFAULT_DETAIL_CUSTOM_LOADER, null, this);
                 } else {
                     getLoaderManager().initLoader(DETAIL_CUSTOM_LOADER, null, this);
-                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-DETAIL_PRODUCT_LOADER");
                 }
                 break;
             case CUSTOM_SELECTION:
                 getLoaderManager().initLoader(DETAIL_CUSTOM_LOADER, null, this);
-                Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
                 break;
             default:
                 break;
         }
 
-//        getLoaderManager().initLoader(NAME_PRODUCT_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
 
     }
@@ -380,11 +339,9 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
     public void verificationAndsave() {
 
-        Log.i(LOG_TAG, "save");
         if (verification()) {
             ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
             if (mAction == CUSTOM_NEW && mItem == 0) {
-                Log.i(LOG_TAG, "save New");
 
                 ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.Customs.CONTENT_URI);
                 builder.withValue(CustomColumns.NAME_CUSTOM, mCustomName.getText().toString());
@@ -399,10 +356,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
                 batchOperations.add(builder.build());
             } else
-//            if      (mAction==PRODUCT_SAVE )
             {
-
-                Log.i(LOG_TAG, "save Modification");
                 ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.Customs.withId(mItem));
                 builder.withValue(CustomColumns.NAME_CUSTOM, mCustomName.getText().toString());
                 builder.withValue(CustomColumns.LASTNAME_CUSTOM, mLastName.getText().toString());
@@ -418,11 +372,8 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
             }
 
             try {
-//
-//
                 getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
             } catch (RemoteException | OperationApplicationException e) {
-                Log.e(LOG_TAG, "Error applying batch insert", e);
             }
             getActivity().onBackPressed();
         }
@@ -432,15 +383,8 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
     public void deleteCustomer() {
 
-        Log.i(LOG_TAG, "deleteCustomer");
-        Log.i(LOG_TAG, "mAction" + mAction);
-        Log.i(LOG_TAG, " mItem" + mItem);
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
         if (mAction == CUSTOM_SELECTION && mItem != 0) {
-
-            Log.i(LOG_TAG, "entro");
-//            ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete();
-//            batchOperations.add(builder.build());
             getActivity().getContentResolver().delete(
                     LogisticaProvider.Customs.withId(mItem), null, null);
             getActivity().onBackPressed();
@@ -449,25 +393,20 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     }
 
     public Boolean verification(){
-        Log.i(LOG_TAG, "verification");
         Boolean isvalid =true;
         if( mCustomName.getText().toString().equals(null))
         {
             isvalid =false;
             mCustomName.setBackgroundColor(Color.RED);
-            Log.i(LOG_TAG, "verification null mCustomName");
-
         } else {
             mCustomName.setBackgroundColor(Color.TRANSPARENT);
         }
 
 
-        Log.i(LOG_TAG, "verification null mLastName.getText().toString()" +mLastName.getText().toString());
         if( mLastName.getText().toString().equals(""))
         {
             isvalid =false;
             mLastName.setBackgroundColor(Color.RED);
-            Log.i(LOG_TAG, "verification null mLastName");
         } else {
             mLastName.setBackgroundColor(Color.TRANSPARENT);
         }
@@ -475,7 +414,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         {
             isvalid =false;
             mDeliveyAddress.setBackgroundColor(Color.RED);
-            Log.i(LOG_TAG, "verification null mDeliveyAddress");
         } else {
             mDeliveyAddress.setBackgroundColor(Color.TRANSPARENT);
         }
@@ -483,7 +421,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         {
             isvalid =false;
             mCity.setBackgroundColor(Color.RED);
-            Log.i(LOG_TAG, "verification null mCity");
         } else {
             mCity.setBackgroundColor(Color.TRANSPARENT);
         }
@@ -493,7 +430,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         {
             isvalid =false;
             mCuit.setBackgroundColor(Color.RED);
-            Log.i(LOG_TAG, "verification null mCuit");
         } else {
             mCuit.setBackgroundColor(Color.TRANSPARENT);
         }
@@ -501,7 +437,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
        {
            isvalid =false;
            mIva.setBackgroundColor(Color.RED);
-           Log.i(LOG_TAG, "verification null Iva");
        } else {
            mIva.setBackgroundColor(Color.TRANSPARENT);
        }
@@ -513,10 +448,8 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.e(LOG_TAG, "onCreateLoader" + id);
         switch (id) {
             case DETAIL_CUSTOM_LOADER:
-                Log.e(LOG_TAG, "onCreateLoader-DETAIL_PRODUCT_LOADER");
 
                 // Now create and return a CursorLoader that will take care of
                 // creating a Cursor for the data being displayed.
@@ -530,7 +463,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
 
             case DEFAULT_DETAIL_CUSTOM_LOADER:
-                Log.e(LOG_TAG, "onCreateLoader-DETAIL_PRODUCT_LOADER");
                 return new CursorLoader(
                         getActivity(),
                         LogisticaProvider.Customs.CONTENT_URI,
@@ -538,31 +470,21 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                         null,
                         null,
                         null);
-
-
-
-
             default:
-                Log.e(LOG_TAG, "onCreateLoader-Default");
                 return null;
         }
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.e(LOG_TAG, "onLoadFinished");
         if (data != null && data.moveToFirst()) {
             switch (loader.getId()) {
                 case DETAIL_CUSTOM_LOADER:
                     if (data != null && data.moveToFirst()) {
-                        Log.e(LOG_TAG, "DETAIL_PRODUCT_LOADER data != null && data.moveToFirst() cantidad" + data.getCount());
                     }
                     break;
                 case DEFAULT_DETAIL_CUSTOM_LOADER:
                     if (data != null && data.moveToFirst()) {
-                        Log.e(LOG_TAG, "DEFAULT_DETAIL_PRODUCT_LOADERdata != null && data.moveToFirst() cantidad" + data.getCount());
-
-
                     }
                     break;
 
@@ -573,19 +495,16 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
             mDeliveyAddress.setText(data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)));
             mCity.setText(data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
             mCurrentPhotoPath=data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM));
-
             mIdContact=data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM));
             mCuit.setText(data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)));
             mIva.setText(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM)));
-            mSpecial.setChecked(data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM))>0 ?true:false);
+            mSpecial.setChecked(data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0);
 
 
             if (mIdContact != null){
             button.setBackgroundColor(Color.GREEN);
                 button.setText(getUserName(getContext() ,mIdContact));
-                Log.e(LOG_TAG, "button green");
-            } else
-            {  Log.e(LOG_TAG, "button null");}
+            }
 
             Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
             Picasso.with(getContext())
@@ -602,6 +521,6 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.e(LOG_TAG, "onLoaderReset");
+
     }
 }

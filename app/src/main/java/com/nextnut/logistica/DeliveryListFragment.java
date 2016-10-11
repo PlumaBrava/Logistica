@@ -21,7 +21,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,8 +30,6 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.nextnut.logistica.util.CurrencyToDouble;
-import com.nextnut.logistica.util.DialogAlerta;
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.CustomOrdersDetailColumns;
@@ -46,6 +43,8 @@ import com.nextnut.logistica.rest.PickingOrderProductsAdapter;
 import com.nextnut.logistica.rest.PickingOrdersCursorAdapter;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallbackDeleveyCustomOrder;
+import com.nextnut.logistica.util.CurrencyToDouble;
+import com.nextnut.logistica.util.DialogAlerta;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,12 +82,9 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
     private EditText mTilePickingComent;
     private TextView mCreationDate;
 
-    private ItemTouchHelper mItemTouchHelper;
-    private ItemTouchHelper mItemTouchHelperCustomOrder;
-//    private PickingOrdersHandler  mPickingOrdersHandler;
+    //    private PickingOrdersHandler  mPickingOrdersHandler;
 
     private FloatingActionButton fab_new;
-    private FloatingActionButton fab_save;
     private FloatingActionButton fab_delete;
     private static final int CUSTOM_ORDER_LOADER = 0;
     private static final int PICKING_ORDER_LOADER = 1;
@@ -121,31 +117,25 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onHiddenChanged(boolean hidden) {
-        Log.i(LOG_TAG, "onHiddenChanged");
         super.onHiddenChanged(hidden);
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        Log.i(LOG_TAG, "setUserVisibleHint" + isVisibleToUser);
-        if(isVisibleToUser){
-//            getLoaderManager().restartLoader(PICKING_ORDER_LOADER, null, this);
-//            getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, this);
-//            getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
+        if (isVisibleToUser) {
         }
         super.setUserVisibleHint(isVisibleToUser);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
 
     }
+
     @Override
     public void onResume() {
-        Log.i(LOG_TAG, "onResume()");
         getLoaderManager().restartLoader(PICKING_ORDER_LOADER, null, this);
         getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, this);
         getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
@@ -153,8 +143,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
-        Log.i(LOG_TAG, "onCreateView");
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.delivery_list_fragment, container, false);
 
@@ -163,13 +152,13 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
 
-        recyclerView =(RecyclerView) rootView.findViewById(R.id.pickingOrder_list);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.pickingOrder_list);
         mDeliveryOrderTile = (CardView) rootView.findViewById(R.id.deliveryOrderNumbertitleID);
         mDeliveryOrderTile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                mIDPickingOrderSelected=0;
+                mIDPickingOrderSelected = 0;
                 mDeliveryOrderTile.setVisibility(View.GONE);
                 recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
                 recyclerViewTotalProductos.setVisibility(View.GONE);
@@ -177,12 +166,11 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
             }
         });
         mDeliveryOrderTile.setVisibility(View.GONE);
-        mTilePickingOrderNumber= (TextView) mDeliveryOrderTile.findViewById(R.id.titlepickingNumberOrderCard);
-        mTilePickingComent=(EditText) mDeliveryOrderTile.findViewById(R.id.TitlepickingOrderComents);
-        mCreationDate=(TextView) mDeliveryOrderTile.findViewById(R.id.titlePicckinOder_creationdate);
+        mTilePickingOrderNumber = (TextView) mDeliveryOrderTile.findViewById(R.id.titlepickingNumberOrderCard);
+        mTilePickingComent = (EditText) mDeliveryOrderTile.findViewById(R.id.TitlepickingOrderComents);
+        mCreationDate = (TextView) mDeliveryOrderTile.findViewById(R.id.titlePicckinOder_creationdate);
 
         recyclerView.setLayoutManager(layoutManager);
-
 
 
         mPickinOrdersAdapter = new PickingOrdersCursorAdapter(
@@ -190,33 +178,25 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                 null,
                 emptyView,
                 new PickingOrdersCursorAdapter.PinckingOrdersCursorAdapterOnClickHandler() {
-                @Override
+                    @Override
                     public void onClick(long id, PickingOrdersCursorAdapter.ViewHolder vh) {
-                         Log.i(LOG_TAG, "onclicka:" + id);
-
-
                         mTilePickingComent.setText(vh.mpickingOrderComents.getText());
                         mTilePickingOrderNumber.setText(vh.mPickingOrderNumber.getText());
                         mTilePickingComent.setVisibility(View.VISIBLE);
                         mCreationDate.setText(vh.mCreationDate.getText());
-
-                        mIDPickingOrderSelected=id;
-
-
+                        mIDPickingOrderSelected = id;
                         mPickinOrdersAdapter.notifyDataSetChanged();
-                        getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null,DeliveryListFragment.this);
-                        getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null,DeliveryListFragment.this);
+                        getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, DeliveryListFragment.this);
+                        getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, DeliveryListFragment.this);
                         mCursorAdapterTotalProductos.notifyDataSetChanged();
                         recyclerView.setVisibility(View.GONE);
                         recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.VISIBLE);
                         recyclerViewTotalProductos.setVisibility(View.VISIBLE);
                         mDeliveryOrderTile.setVisibility(View.VISIBLE);
-
                     }
 
                     @Override
                     public void onDataChange() {
-                        Log.i("ProductListActivity", "CustomsOrdersCursorAdapteronDataChangekHandler");
                         getLoaderManager().restartLoader(PICKING_ORDER_LOADER, null, DeliveryListFragment.this);
                         getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, DeliveryListFragment.this);
                         getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, DeliveryListFragment.this);
@@ -227,9 +207,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
                     @Override
                     public void onItemDismissCall(long cursorID) {
-                        mIDPickingOrderSelected=cursorID;
-                        Log.i("YesNoDialog:", "onItemDismissCall");
-
+                        mIDPickingOrderSelected = cursorID;
                         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
                         ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
                         builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PickingListFragment.PICKING_STATUS_INICIAL);
@@ -243,11 +221,10 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
 
                         } catch (RemoteException | OperationApplicationException e) {
-                            Log.i("TouchHelper:", "Error applying batch insert", e);
 
                         } finally {
                             onDataChange();
-                            upDateWitget (getContext());
+                            upDateWitget(getContext());
                         }
 
                     }
@@ -255,9 +232,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                     @Override
                     public void onItemAceptedCall(long cursorID) {
 
-                        mIDPickingOrderSelected=cursorID;
-                        Log.i("YesNoDialog:", "onItemDismissCall");
-
+                        mIDPickingOrderSelected = cursorID;
                         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
                         ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
                         builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PickingListFragment.PICKING_STATUS_CERRADA);
@@ -271,12 +246,10 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
 
                         } catch (RemoteException | OperationApplicationException e) {
-                            Log.e("TouchHelper:", "Error applying batch insert", e);
 
                         } finally {
                             onDataChange();
                         }
-
 
 
                     }
@@ -289,29 +262,25 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
                     @Override
                     public void sharePickingorder(PickingOrdersCursorAdapter.ViewHolder vh) {
-                        Log.i(LOG_TAG, "sharePickingorder"+ vh.mPickingOrderNumber.getText().toString());
-                        sharePickingOrder(getContext(),  vh.mPickingOrderNumber.getText().toString(),mTilePickingComent.getText().toString());
+                        sharePickingOrder(getContext(), vh.mPickingOrderNumber.getText().toString(), mTilePickingComent.getText().toString());
                     }
                 }
-            );
-
-
-
+        );
 
 
         recyclerView.setAdapter(mPickinOrdersAdapter);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mPickinOrdersAdapter, SimpleItemTouchHelperCallback.DELIVERY);
-        mItemTouchHelper = new ItemTouchHelper(callback);
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
 
 
-        fab_save = (FloatingActionButton) mDeliveryOrderTile.findViewById(R.id.fab_save_picking);
+        FloatingActionButton fab_save = (FloatingActionButton) mDeliveryOrderTile.findViewById(R.id.fab_save_picking);
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                mIDPickingOrderSelected=0;
+                mIDPickingOrderSelected = 0;
                 mDeliveryOrderTile.setVisibility(View.GONE);
                 recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
                 recyclerViewTotalProductos.setVisibility(View.GONE);
@@ -326,34 +295,19 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         recyclerViewTotalProductos.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-
-
-
-
-
-        mCursorAdapterTotalProductos= new PickingOrderProductsAdapter(getContext(), null,
+        mCursorAdapterTotalProductos = new PickingOrderProductsAdapter(getContext(), null,
                 emptyViewTotalProducts,
                 new PickingOrderProductsAdapter.ProductCursorAdapterOnClickHandler() {
                     @Override
                     public void onClick(long id, PickingOrderProductsAdapter.ViewHolder vh) {
 
-                        Log.i(LOG_TAG, "setupRecyclerView" + id);
-
-
                     }
-
-
-
                 }
         );
 
 
-
         recyclerViewTotalProductos.setAdapter(mCursorAdapterTotalProductos);
         recyclerViewTotalProductos.setVisibility(View.GONE);
-
-
-
 
 
         recyclerViewCustomOrderInDeliveyOrder = (RecyclerView) rootView.findViewById(R.id.customOrderInpickingOrder_list);
@@ -363,44 +317,31 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         mCustomsOrdersCursorAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyView, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
             @Override
             public void onClick(long id, CustomsOrdersCursorAdapter.ViewHolder vh) {
-                Log.i(LOG_TAG, "onclicka:" + id);
 
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
                     arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
-                    Log.i(LOG_TAG, "ARG_ITEM_ID2 :" + id);
                     arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-
                     CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
                     fragment.setArguments(arguments);
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .addToBackStack(null)
                             .replace(R.id.customorder_detail_container, fragment)
                             .commit();
-
-
-
                 } else {
                     Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
                     intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY);
-                    Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + id);
-                    Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomDetailFragment.CUSTOM_SELECTION);
                     intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
 
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Log.i("ProductListActivity", "makeSceneTransitionAnimation");
-
-//                                Pair<View, String> p1 = Pair.create((View) vh.mphotoCustomer, getString(R.string.custom_icon_transition_imagen));
                         Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
-//                                Pair<View, String> p3 = Pair.create((View) vh.mSurename, getString(R.string.custom_icon_transition_surname));
                         ActivityOptionsCompat activityOptions =
                                 ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p2);
                         startActivity(intent, activityOptions.toBundle());
 
                     } else {
-                        Log.i("ProductListActivity", "makeSceneTransitionAnimation Normal");
                         startActivity(intent);
                     }
 
@@ -411,7 +352,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
             @Override
             public void onMakeACall(String ContactID) {
-                makeTheCall(getActivity(),ContactID);
+                makeTheCall(getActivity(), ContactID);
             }
 
             @Override
@@ -423,32 +364,23 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
             public void onItemDismissCall(long cursorID) {
 
 
-                mCustomOrderIdSelected=cursorID;
+                mCustomOrderIdSelected = cursorID;
 
 
             }
 
             @Override
             public void onItemAceptedCall(long cursorID) {
-                mCustomOrderIdSelected=cursorID;
-                Log.i("TouchHelper:", "Adapter onItemDismiss PICKIG --" );
-
+                mCustomOrderIdSelected = cursorID;
                 ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
                 ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
                 builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, CustomOrderListFragment.ORDER_STATUS_DELIVERED);
-
                 batchOperations.add(builder.build());
-
-
                 try {
-                    getContext(). getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-
-
-
+                    getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
                 } catch (RemoteException | OperationApplicationException e) {
-                    Log.e("TouchHelper:", "Error applying batch insert", e);
 
-                }finally {
+                } finally {
                     onDataChange();
                 }
 
@@ -471,7 +403,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         recyclerViewCustomOrderInDeliveyOrder.setAdapter(mCustomsOrdersCursorAdapter);
 
         ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallbackDeleveyCustomOrder(mCustomsOrdersCursorAdapter);
-        mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
+        ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
         mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderInDeliveyOrder);
         recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
 
@@ -485,11 +417,8 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         return rootView;
     }
 
-    public boolean exitenCUasignedtoPickingOrder(){
-        Log.i("YesNoDialog:", "exitenCUasignedtoPickingOrder mIDPickingOrderSelected "+mIDPickingOrderSelected);
-
-
-        String select = "((" + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER+ " NOTNULL) AND ("
+    public boolean exitenCUasignedtoPickingOrder() {
+        String select = "((" + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " NOTNULL) AND ("
                 + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " =?))";
 
 
@@ -502,17 +431,8 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                 select,
                 arg,
                 null);
-        if (c == null || c.getCount() == 0) {
-            Log.i("YesNoDialog:", "exitenCUasignedtoPickingOrder true ");
-            return false;
-        }
-
-            else {
-            Log.i("YesNoDialog:", "exitenCUasignedtoPickingOrder falso ");
-            return true;
-        }
+        return !(c == null || c.getCount() == 0);
     }
-
 
 
     @Override
@@ -522,17 +442,15 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(LOG_TAG, "onActivityCreated");
         getLoaderManager().initLoader(PICKING_ORDER_LOADER, null, this);
         getLoaderManager().initLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, this);
         getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
 
-    super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        Log.i(LOG_TAG, "onViewStateRestored");
         super.onViewStateRestored(savedInstanceState);
     }
 
@@ -562,31 +480,30 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.i(LOG_TAG, "onCreateLoader");
 
-        switch(id){
+        switch (id) {
 
-            case CUSTOM_ORDER_LOADER :
+            case CUSTOM_ORDER_LOADER:
 
-        String proyection[] = {LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.ID_CUSTOM_ORDER ,
-                LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER ,
-                LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
-                LogisticaDataBase.CUSTOMS+"."+ CustomColumns.NAME_CUSTOM,
-                LogisticaDataBase.CUSTOMS+"."+ CustomColumns.LASTNAME_CUSTOM,
-                LogisticaDataBase.CUSTOMS + "." + CustomColumns.REFERENCE_CUSTOM,
-                LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.STATUS_CUSTOM_ORDER
-        };
+                String proyection[] = {LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER,
+                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
+                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
+                        LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+                        LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+                        LogisticaDataBase.CUSTOMS + "." + CustomColumns.REFERENCE_CUSTOM,
+                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER
+                };
 
 
-        return new CursorLoader(
-                getActivity(),
-                LogisticaProvider.ShowJoin.CONTENT_URI,
-                proyection,
-                " ( "+ LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.STATUS_CUSTOM_ORDER +" = "+CustomOrderListFragment.ORDER_STATUS_PICKING
-               + " or " + LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.STATUS_CUSTOM_ORDER +" = "+CustomOrderListFragment.ORDER_STATUS_DELIVERED+ " ) "
-                        + " and " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + mIDPickingOrderSelected,
-                null,
-                null);
+                return new CursorLoader(
+                        getActivity(),
+                        LogisticaProvider.ShowJoin.CONTENT_URI,
+                        proyection,
+                        " ( " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " + CustomOrderListFragment.ORDER_STATUS_PICKING
+                                + " or " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " + CustomOrderListFragment.ORDER_STATUS_DELIVERED + " ) "
+                                + " and " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + mIDPickingOrderSelected,
+                        null,
+                        null);
 
             case PICKING_ORDER_LOADER:
 
@@ -595,9 +512,9 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                         getActivity(),
                         LogisticaProvider.PickingOrders.CONTENT_URI,
                         null,
-                        LogisticaDataBase.PICKING_ORDERS+"."+ PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " +PickingListFragment.PICKING_STATUS_DELIVERY +
-                        " OR " +
-                        LogisticaDataBase.PICKING_ORDERS+"."+ PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " +PickingListFragment.PICKING_STATUS_CERRADA ,
+                        LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PickingListFragment.PICKING_STATUS_DELIVERY +
+                                " OR " +
+                                LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PickingListFragment.PICKING_STATUS_CERRADA,
                         null,
                         null);
 
@@ -609,19 +526,18 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 /* 1 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
 /* 2 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
 /* 3 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
-/* 4 */            "sum ( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL +" )",
-/* 5 */            LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.ID_PICKING_ORDERS_DETAIL,
-/* 6 */           "max ( "+ LogisticaDataBase.PICKING_ORDERS_DETAIL+"."+ PickingOrdersDetailColumns.QUANTITY_PICKING_ORDERS_DETAIL +" )",
-/* 7 */           "sum ( "+  LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL +" )",
-/* 8 */            "max ( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL+" )"};
+/* 4 */            "sum ( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " )",
+/* 5 */            LogisticaDataBase.PICKING_ORDERS_DETAIL + "." + PickingOrdersDetailColumns.ID_PICKING_ORDERS_DETAIL,
+/* 6 */           "max ( " + LogisticaDataBase.PICKING_ORDERS_DETAIL + "." + PickingOrdersDetailColumns.QUANTITY_PICKING_ORDERS_DETAIL + " )",
+/* 7 */           "sum ( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL + " )",
+/* 8 */            "max ( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL + " )"};
 
 
                 String where =
 
-                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + mIDPickingOrderSelected   ;
+                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + mIDPickingOrderSelected;
 
 
-                Log.i(LOG_TAG, "onCreateLoader");
                 return new CursorLoader(
                         getActivity(),
                         LogisticaProvider.join_customorderDetail_Product_Customer_picking.CONTENT_URI,
@@ -639,40 +555,31 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i(LOG_TAG, "onLoadFinished");
         switch (loader.getId()) {
 
             case CUSTOM_ORDER_LOADER:
-                Log.i(LOG_TAG, "CUSTOM_ORDER_LOADER count: "+data.getCount());
-            if (data != null && data.moveToFirst()) {
-            Log.i(LOG_TAG,"ID:"+ data.getInt(0));
-            Log.i(LOG_TAG,"date:"+ data.getString(1));
-            Log.i(LOG_TAG,"price:"+ data.getLong(2));
-            Log.i(LOG_TAG,"Name:"+ data.getString(3));
-            Log.i(LOG_TAG,"LastName:"+ data.getString(4));
+                if (data != null && data.moveToFirst()) {
+                    mCustomsOrdersCursorAdapter.swapCursor(data);
 
-                mCustomsOrdersCursorAdapter.swapCursor(data);
-
-            }
+                }
                 break;
             case PICKING_ORDER_LOADER:
-                Log.i(LOG_TAG, "PICKING_ORDER_LOADER count: "+data.getCount());
                 if (data != null && data.moveToFirst()) {
-                mPickinOrdersAdapter.swapCursor(data);}
+                    mPickinOrdersAdapter.swapCursor(data);
+                }
                 break;
 
 
             case PICKING_LOADER_TOTAL_PRODUCTOS:
-            Log.i(LOG_TAG, "PICKING_ORDER_LOADER count: "+data.getCount());
-            if (data != null && data.moveToFirst()) {
-                mCursorAdapterTotalProductos.swapCursor(data);}
-            break;
-    }
+                if (data != null && data.moveToFirst()) {
+                    mCursorAdapterTotalProductos.swapCursor(data);
+                }
+                break;
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.i(LOG_TAG, "swapCursor");
         mPickinOrdersAdapter.swapCursor(null);
         mCursorAdapterTotalProductos.swapCursor(null);
         mCustomsOrdersCursorAdapter.swapCursor(null);
@@ -681,57 +588,49 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
 
     public void saveNewPickingOrder() {
-        Log.i(LOG_TAG, "save New");
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
         ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.PickingOrders.CONTENT_URI);
         SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
         String formattedDate = df.format(new Date());
         builder.withValue(PickingOrdersColumns.CREATION_DATE_PICKING_ORDERS, formattedDate);
-        Log.i(LOG_TAG, "formattedDate:" + formattedDate);
-        builder.withValue(PickingOrdersColumns.COMMENTS_PICKING_ORDERS, "New Order");
+        builder.withValue(PickingOrdersColumns.COMMENTS_PICKING_ORDERS, getString(R.string.NewOrder));
         builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, CustomOrderDetailFragment.STATUS_ORDER_INICIAL);
-
         batchOperations.add(builder.build());
         try {
 
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
         } catch (RemoteException | OperationApplicationException e) {
-            Log.e(LOG_TAG, "Error applying batch insert", e);
         }
     }
 
-    public void showDialogNumberPicker(final PickingOrderProductsAdapter.ViewHolder vh){
+    public void showDialogNumberPicker(final PickingOrderProductsAdapter.ViewHolder vh) {
 
         {
 
             final Dialog d = new Dialog(getContext());
-            d.setTitle("NumberPicker");
+            d.setTitle(getString(R.string.NumberPicker));
             d.setContentView(R.layout.dialog_number_picker);
             Button b1 = (Button) d.findViewById(R.id.button1);
             Button b2 = (Button) d.findViewById(R.id.button2);
             final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
-            np.setMaxValue(5000);
-            np.setMinValue(1);
+            np.setMaxValue(getResources().getInteger(R.integer.MaxPickerNumber));
+            np.setMinValue(getResources().getInteger(R.integer.MinPickerNumber));
             np.setWrapSelectorWheel(true);
             np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                 @Override
                 public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                    Log.i("value is",""+newVal);
                 }
             });
-            b1.setOnClickListener(new View.OnClickListener()
-            {
+            b1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     vh.mTextcantidadPicking.setText(String.valueOf(np.getValue()));
                     CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecio.getText().toString());
-//                    saveCantidadPicking(vh, String.valueOf(np.getValue()));
                     d.dismiss();
                 }
             });
-            b2.setOnClickListener(new  View.OnClickListener()
-            {
+            b2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     d.dismiss();

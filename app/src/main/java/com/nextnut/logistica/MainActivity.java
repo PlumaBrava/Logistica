@@ -38,39 +38,24 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity implements PickingListFragment.PickingOrdersHandler {
 
     /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private AdView mAddView ;
 
     private InterstitialAd mInterstitial;
-    public static final int CUSTOM_ORDER_FRAGMENT=0;
-    public static final int PICKING_FRAGMENT=1;
-    public static final int DELIVERY_FRAGMENT=2;
-    public static final String USER_DISPLAY_NAME="userDisplayName";
-    public static final String USER_ID="userId";
-
-//    private static final int REQUEST_CUSTOMER = 1234;
+    public static final int CUSTOM_ORDER_FRAGMENT = 0;
+    public static final int PICKING_FRAGMENT = 1;
+    public static final int DELIVERY_FRAGMENT = 2;
+    public static final String USER_DISPLAY_NAME = "userDisplayName";
+    public static final String USER_ID = "userId";
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    public static long mPickingOrderSelected=0;
+    public static long mPickingOrderSelected = 0;
     public FloatingActionButton mFab;
 
-    public static long    getmPickingOrderSelected(){
+    public static long getmPickingOrderSelected() {
         return mPickingOrderSelected;
     }
-
-
 
 
     @Override
@@ -82,40 +67,42 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        /*
+      The {@link android.support.v4.view.PagerAdapter} that will provide
+      fragments for each of the sections. We use a
+      {@link FragmentPagerAdapter} derivative, which will keep every
+      loaded fragment in memory. If this becomes too memory intensive, it
+      may be best to switch to a
+      {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             public void onPageScrollStateChanged(int state) {
-                Log.i(LOG_TAG,"addOnPageChangeListener-onPageScrollStateChanged"+state);
             }
+
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Log.i(LOG_TAG,"addOnPageChangeListener-onPageScrolled"+position+"-"+positionOffset+"-"+positionOffsetPixels);
             }
 
             public void onPageSelected(int position) {
-                Log.i(LOG_TAG, "addOnPageChangeListener-xxxonPageSelecte" + position);
                 switch (position) {
                     case CUSTOM_ORDER_FRAGMENT: {
                         mFab.setVisibility(View.VISIBLE);
-                        Log.i(LOG_TAG, "xxxorder" + position);
                         break;
                     }
                     case PICKING_FRAGMENT: {
-                        if(mPickingOrderSelected>0){
+                        if (mPickingOrderSelected > 0) {
                             mFab.setVisibility(View.GONE);
-                            Log.i(LOG_TAG, "xxxpickinga" + position);
-                        }else{
+                        } else {
                             mFab.setVisibility(View.VISIBLE);
-                            Log.i(LOG_TAG, "xxxpickingb" + position);
                         }
                         break;
                     }
                     case DELIVERY_FRAGMENT: {
-                            mFab.setVisibility(View.GONE);
-                        Log.i(LOG_TAG, "xxxfragmentr" + position);
+                        mFab.setVisibility(View.GONE);
                         break;
                     }
                     default:
@@ -131,62 +118,43 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-                Log.i(LOG_TAG,"mFAb ViewPagerCurrentItem"+mViewPager.getCurrentItem());
-                if(getResources().getBoolean(R.bool.is_app_free)) {
-                    Log.i(LOG_TAG, "mFAb-is_app_free:true" );
+                if (getResources().getBoolean(R.bool.is_app_free)) {
                     showInsterstitial();
                 } else {
-                    Log.i(LOG_TAG, "mFAb-is_app_free:false" );
-
                     switch (mViewPager.getCurrentItem()) {
-                    case CUSTOM_ORDER_FRAGMENT: {
-                        Log.i(LOG_TAG,"mFab CUSTOM_ORDER_FRAGMENT "+mViewPager.getCurrentItem());
-                        Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
-                        startActivityForResult(intent,CustomOrderDetailFragment. REQUEST_CUSTOMER);
-
-//                        Intent intent = new Intent(MainActivity.this, CustomOrderDetailActivity.class);
-//                        intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
-//                        ActivityOptionsCompat activityOptions =
-//                                ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
-//                        ActivityCompat.startActivity(MainActivity.this, intent, activityOptions.toBundle());
-
-                        break;
-                    }
-                    case PICKING_FRAGMENT: {
-
-
-                        PickingListFragment fragmentpicking = (PickingListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
-
-                        if (fragmentpicking != null) {
-                            Log.i(LOG_TAG,"mFab Picking Frament Not Null");
-                            fragmentpicking.saveNewPickingOrder();
+                        case CUSTOM_ORDER_FRAGMENT: {
+                            Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
+                            startActivityForResult(intent, CustomOrderDetailFragment.REQUEST_CUSTOMER);
                             break;
-                        }else {
-                            Log.i(LOG_TAG, "mFab Picking Frament  Null");
                         }
+                        case PICKING_FRAGMENT: {
+
+
+                            PickingListFragment fragmentpicking = (PickingListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
+
+                            if (fragmentpicking != null) {
+                                fragmentpicking.saveNewPickingOrder();
+                                break;
+                            }
+                        }
+                        case DELIVERY_FRAGMENT: {
+                            break;
+                        }
+                        default:
                     }
-                    case DELIVERY_FRAGMENT: {
-                        break;
-                    }
-                    default:
                 }
-            }}
+            }
         });
 
 
-        if (findViewById(R.id.adView) != null && this.getResources().getBoolean(R.bool.is_app_free) ) {
-
-            Log.i(LOG_TAG, "Banner advertissing");
+        if (findViewById(R.id.adView) != null && this.getResources().getBoolean(R.bool.is_app_free)) {
             // Banner advertising
-            mAddView = (AdView) findViewById(R.id.adView);
+            AdView mAddView = (AdView) findViewById(R.id.adView);
             AdRequest adRequest = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                    .addTestDevice("A086DD273532AA15DD4D5A83D2A6880E")
-                    .addTestDevice("4A2790CC2F2F210B9805A86F1289FEAF")
+                    .addTestDevice(getString(R.string.device1))
+                    .addTestDevice(getString(R.string.device2))
                     .build();
-//        mAddView.setAdListener(new ToastAdListener(this));
             mAddView.loadAd(adRequest);
 
 //             interstitial advertising
@@ -200,65 +168,37 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
     @Override
     public void onActivityResult(int requestCode,
                                  int resultCode, Intent data) {
-        Log.i(LOG_TAG, "LLego resultado ok" );
-        Log.i(LOG_TAG, "LLego requestCode: "+requestCode );
-        Log.i(LOG_TAG, "LLego resultCode: "+resultCode );
+
 
         ////////////////// CUSTOMER for a new Order /////////
 
-        if (requestCode == CustomOrderDetailFragment. REQUEST_CUSTOMER && resultCode == RESULT_OK) {
+        if (requestCode == CustomOrderDetailFragment.REQUEST_CUSTOMER && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
 
-            if (bundle == null){ Log.i(LOG_TAG, "LLego resyktado ok" + "bundleNULL");}
-            else {Log.i(LOG_TAG, "LLego resyktado ok" + "bundle ok: " + bundle.toString());
-
-                for (String key : bundle.keySet()) {
-                    Object value = bundle.get(key);
-                    Log.i("resyktado", String.format("%s %s (%s)", key,
-                            value.toString(), value.getClass().getName()));
-                }
-
-
-            }
-
-            String res = bundle .getString("resultado");
-            Log.i(LOG_TAG, "LLego resyktado ok " + res);
-            Log.i(LOG_TAG, "LLego resyktado ok int " + bundle .getInt("resultado"));
-            long customRef = bundle.getLong("resultado");
-
-            Log.i(LOG_TAG, "LLego resyktado ok long " + customRef);
+            long customRef = bundle.getLong(CustomSelectionActivity.RESULTADO);
 
             if (customRef != 0) {
-//            if ( mItem != 0) {
-                Log.i(LOG_TAG, "save New");
                 ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
                 ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrders.CONTENT_URI);
                 builder.withValue(CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER, customRef);
                 SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
                 String formattedDate = df.format(new Date());
-                Log.i(LOG_TAG, "formattedDate:" + formattedDate);
                 builder.withValue(CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER, formattedDate);
                 builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, CustomOrderDetailFragment.STATUS_ORDER_INICIAL);
 
                 batchOperations.add(builder.build());
-            try {
+                try {
 
-                getApplicationContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-            } catch (RemoteException | OperationApplicationException e) {
-                Log.e(LOG_TAG, "Error applying batch insert", e);
-            }
+                    getApplicationContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+                } catch (RemoteException | OperationApplicationException e) {
+                    Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
+                }
 
             }
 
             CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
-
-
-
-
             Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
             intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
-            Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + customRef);
-            Log.i(LOG_TAG, "CUSTOM_ACTION" + CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
 
             startActivity(intent);
 
@@ -266,16 +206,13 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         }
 
 
-
         ////////////////// UPDATE CUSTOMER /////////
-        if (requestCode == CustomOrderDetailFragment. UPDATE_CUSTOMER && resultCode == RESULT_OK) {
+        if (requestCode == CustomOrderDetailFragment.UPDATE_CUSTOMER && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
 
             if (bundle != null) {
 
-                long customRef = bundle.getLong("resultado");
-
-                Log.i(LOG_TAG, "LLego resyktado ok long " + customRef);
+                long customRef = bundle.getLong(CustomSelectionActivity.RESULTADO);
 
                 if (customRef != 0) {
 
@@ -283,45 +220,35 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
 
 
                     if (fragmentCustomOrder != null) {
-                        Log.i(LOG_TAG, "Picking Frament Not Null");
                         fragmentCustomOrder.upDateCustomer(customRef);
 
 
-                    } else {
-                        Log.i(LOG_TAG, "Picking Frament  Null");
                     }
                 }
-                }
             }
+        }
         ////////////////// Select a new Product /////////
 
 
-            if (requestCode == CustomOrderDetailFragment.REQUEST_PRODUCT && resultCode == RESULT_OK) {
-                String res = data.getExtras().getString("resultado");
-                Log.i(LOG_TAG, "REQUEST_PRODUCT " + data.getExtras().getString("ProductoName"));
+        if (requestCode == CustomOrderDetailFragment.REQUEST_PRODUCT && resultCode == RESULT_OK) {
 
-                Log.i(LOG_TAG, "REQUEST_PRODUCT ProductPrice" + data.getExtras().getString("ProductPrice"));
-
-                CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+            CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
 
 
-                if (fragmentCustomOrder != null) {
-                    Log.i(LOG_TAG, "Picking Frament Not Null");
-                    fragmentCustomOrder.saveCustomOrderProduct(data.getExtras().getLong(ProductSectionActivity.KEY_RefPRODUCTO),
-                            data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_NAME),
-                            data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICES_ESPECIAL),
-                            data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICE)
-                    );
-
-                } else {
-                    Log.i(LOG_TAG, "Picking Frament  Null");
-                }
-
+            if (fragmentCustomOrder != null) {
+                fragmentCustomOrder.saveCustomOrderProduct(data.getExtras().getLong(ProductSectionActivity.KEY_RefPRODUCTO),
+                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_NAME),
+                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICES_ESPECIAL),
+                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICE)
+                );
 
             }
 
 
         }
+
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -337,19 +264,10 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            Toast.makeText(MainActivity.this, "Action Sttings", Toast.LENGTH_SHORT).show();
-//            Intent intent = new Intent(this,LoginActivity.class);
-//            ActivityOptionsCompat activityOptions =
-//                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-//            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
-//            return true;
-//        }
 
         if (id == R.id.productos) {
-            Toast.makeText(MainActivity.this, "Productos", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this,ProductListActivity.class);
+            Toast.makeText(MainActivity.this, getString(R.string.productToast), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, ProductListActivity.class);
             ActivityOptionsCompat activityOptions =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(this);
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
@@ -357,14 +275,15 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
             return true;
         }
         if (id == R.id.customs) {
-            Toast.makeText(MainActivity.this, "Customs", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, getString(R.string.productToast), Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, CustomListActivity.class);
 
             ActivityOptionsCompat activityOptions =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(this);
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
             return true;
-        }  if (id == R.id.reportexCliente) {
+        }
+        if (id == R.id.reportexCliente) {
 
             Intent intent1 = new Intent(this, ReporteMensualxCliente.class);
 
@@ -373,14 +292,15 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
             ActivityCompat.startActivity(this, intent1, activityOptions1.toBundle());
             return true;
 
-        } if (id == R.id.reportexMes) {
+        }
+        if (id == R.id.reportexMes) {
 
-                    Intent intent1 = new Intent(this,ReportexMes.class);
+            Intent intent1 = new Intent(this, ReportexMes.class);
 
-                    ActivityOptionsCompat activityOptions1 =
-                            ActivityOptionsCompat.makeSceneTransitionAnimation(this);
-                    ActivityCompat.startActivity(this, intent1, activityOptions1.toBundle());
-                    return true;
+            ActivityOptionsCompat activityOptions1 =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+            ActivityCompat.startActivity(this, intent1, activityOptions1.toBundle());
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -391,59 +311,48 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
     @Override
     public void onPickingOrderSelected(long pickingOrderID) {
         mPickingOrderSelected = pickingOrderID;
-        if(mPickingOrderSelected>0){
+        if (mPickingOrderSelected > 0) {
             mFab.setVisibility(View.GONE);
-            Log.i(LOG_TAG, "xxxpickinga" + pickingOrderID);
-        }else{
+        } else {
             mFab.setVisibility(View.VISIBLE);
-            Log.i(LOG_TAG, "xxxpickingb" + pickingOrderID);
         }
-        Log.i("Main:", "mPickingOrderSelected " +mPickingOrderSelected);
     }
-
 
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter  {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
 
-
         @Override
         public Fragment getItem(int position) {
-            Log.i("Main:", "getItem" + position);
             switch (position) {
 
                 case CUSTOM_ORDER_FRAGMENT:
-                   return new CustomOrderListFragment();
+                    return new CustomOrderListFragment();
 
                 case PICKING_FRAGMENT:
-                    PickingListFragment a= new PickingListFragment();
-
-                    Log.i("Main:", "Fragmet ID " +a.getId());
+                    PickingListFragment a = new PickingListFragment();
                     return a;
 
                 case DELIVERY_FRAGMENT:
-                    DeliveryListFragment b= new DeliveryListFragment();
-
-                    Log.i("Main:", "Fragmet ID " +b.getId());
+                    DeliveryListFragment b = new DeliveryListFragment();
                     return b;
 
                 default:
 
-                return null;
+                    return null;
             }
         }
 
         @Override
         public void startUpdate(ViewGroup container) {
-            Log.i("Main:", "startUpdate" );
             super.startUpdate(container);
         }
 
@@ -455,7 +364,6 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
 
         @Override
         public CharSequence getPageTitle(int position) {
-            Log.i("Main:", "getPageTitle: "+position );
             switch (position) {
                 case 0:
                     return getResources().getString(R.string.title_custom_orders);
@@ -470,22 +378,20 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
 
     }
 
-    public void loadInterstitial(){
+    public void loadInterstitial() {
 
 
         // Disable the next level button and load the ad.
-//        mFab.setEnabled(false);
         AdRequest adRequest = new AdRequest.Builder()
                 .setRequestAgent("android_studio:ad_template")
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .addTestDevice("A086DD273532AA15DD4D5A83D2A6880E")
-                .addTestDevice("4A2790CC2F2F210B9805A86F1289FEAF")
+                .addTestDevice(getString(R.string.device1))
+                .addTestDevice(getString(R.string.device2))
                 .build();
         mInterstitial.loadAd(adRequest);
     }
 
     private InterstitialAd newInterstitialAd() {
-        Log.i(LOG_TAG, "onAdLoaded-InterstitialAd" );
         InterstitialAd interstitialAd = new InterstitialAd(this);
         interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
         interstitialAd.setAdListener(new AdListener() {
@@ -493,101 +399,79 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
 
             @Override
             public void onAdLeftApplication() {
-//                Toast.makeText(getApplicationContext(),"LeftApplication",Toast.LENGTH_SHORT).show();
 
             }
+
             @Override
             public void onAdOpened() {
-//                Toast.makeText(getApplicationContext(),"on AdOpened",Toast.LENGTH_SHORT).show();
 
             }
-
 
 
             @Override
             public void onAdLoaded() {
-//                Toast.makeText(getApplicationContext(),"on onAdLoaded",Toast.LENGTH_SHORT).show();
-//                if(spinner.getVisibility()!=View.VISIBLE){ btnSat.setEnabled(true);}
                 mFab.setVisibility(View.VISIBLE);
-                Log.i(LOG_TAG, "newInterstitialAd-onAdLoaded" );
             }
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
                 // When Failed, prepear a new add and call tellJoke.
-                String mErrorReason="";
-                switch (errorCode){
+                String mErrorReason = "";
+                switch (errorCode) {
 
                     case AdRequest.ERROR_CODE_INTERNAL_ERROR:
-                        mErrorReason ="Internal Error";
+                        mErrorReason = getString(R.string.AddInternalError);
                         break;
 
                     case AdRequest.ERROR_CODE_INVALID_REQUEST:
-                        mErrorReason ="Invalid Request";
+                        mErrorReason = getString(R.string.AddInvalidReques);
                         break;
 
                     case AdRequest.ERROR_CODE_NETWORK_ERROR:
-                        mErrorReason ="Network Error";
+                        mErrorReason = getString(R.string.AddNetworkError);
                         break;
 
                     case AdRequest.ERROR_CODE_NO_FILL:
-                        mErrorReason ="No Fill";
+                        mErrorReason = getString(R.string.AddNoFill);
                         break;
                 }
                 Toast.makeText(getApplicationContext(),
-                        String.format("on onAdFailedToLoad (%S)", mErrorReason ),
+                        String.format(getString(R.string.AddonFailedToLoad), mErrorReason),
                         Toast.LENGTH_SHORT).show();
                 super.onAdFailedToLoad(errorCode);
 
 
                 mInterstitial = newInterstitialAd();
                 loadInterstitial();
-//                mFab.setEnabled(true);
             }
-
 
 
             @Override
             public void onAdClosed() {
-//                Toast.makeText(getApplicationContext(),"on Ad Closed",Toast.LENGTH_SHORT).show();
-                // When Closed the add is clossed, prepear a new add and call tellJoke.
-
                 mInterstitial = newInterstitialAd();
                 loadInterstitial();
-                fabActions ();
+                fabActions();
             }
         });
         return interstitialAd;
     }
-    public void showInsterstitial(){
-        if(mInterstitial != null && mInterstitial.isLoaded()){
-//            Toast.makeText(this, "loaded-SHOW", Toast.LENGTH_SHORT).show();
+
+    public void showInsterstitial() {
+        if (mInterstitial != null && mInterstitial.isLoaded()) {
 
             mInterstitial.show();
-
-        } else {
-//            Toast.makeText(this, "Ad did not load", Toast.LENGTH_SHORT).show();
 
         }
 
 
     }
 
-    public void fabActions (){
-        Log.i(LOG_TAG,"FabAction");
+    public void fabActions() {
 
         switch (mViewPager.getCurrentItem()) {
             case CUSTOM_ORDER_FRAGMENT: {
-                Log.i(LOG_TAG,"mCurrentFragmet CUSTOM_ORDER_FRAGMENT "+mViewPager.getCurrentItem());
                 Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
-                startActivityForResult(intent,CustomOrderDetailFragment. REQUEST_CUSTOMER);
-
-//                        Intent intent = new Intent(MainActivity.this, CustomOrderDetailActivity.class);
-//                        intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
-//                        ActivityOptionsCompat activityOptions =
-//                                ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
-//                        ActivityCompat.startActivity(MainActivity.this, intent, activityOptions.toBundle());
-
+                startActivityForResult(intent, CustomOrderDetailFragment.REQUEST_CUSTOMER);
                 break;
             }
             case PICKING_FRAGMENT: {
@@ -596,12 +480,10 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
                 PickingListFragment fragmentpicking = (PickingListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
 
                 if (fragmentpicking != null) {
-                    Log.i(LOG_TAG,"Picking Frament Not Null");
                     fragmentpicking.saveNewPickingOrder();
                     break;
-                }else {
-                    Log.i(LOG_TAG, "Picking Frament  Null");
                 }
+
             }
             case DELIVERY_FRAGMENT: {
                 break;
@@ -609,5 +491,4 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
             default:
         }
     }
-
 }

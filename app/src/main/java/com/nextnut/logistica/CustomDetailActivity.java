@@ -1,41 +1,14 @@
 package com.nextnut.logistica;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-
 import android.support.design.widget.FloatingActionButton;
-
-import android.support.v7.widget.Toolbar;
-
-import android.util.Log;
-
-import android.view.View;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.Manifest.permission.READ_CONTACTS;
+import android.view.View;
 
 /**
  * An activity representing a single Custom detail screen. This
@@ -45,7 +18,7 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class CustomDetailActivity extends AppCompatActivity {
     private static final String LOG_TAG = CustomDetailActivity.class.getSimpleName();
-    private int mAction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,9 +37,6 @@ public class CustomDetailActivity extends AppCompatActivity {
                         getSupportFragmentManager().findFragmentById(R.id.custom_detail_container);
                 if (customDetailFragment!=null){
                     customDetailFragment.verificationAndsave();
-                    Log.i(LOG_TAG,"no null fragment");
-                }else {
-                    Log.i(LOG_TAG,"null fragment");
                 }
 
 
@@ -84,9 +54,6 @@ public class CustomDetailActivity extends AppCompatActivity {
                         getSupportFragmentManager().findFragmentById(R.id.custom_detail_container);
                 if (customDetailFragment!=null){
                     customDetailFragment.deleteCustomer();
-                    Log.i(LOG_TAG,"no null fragment");
-                }else {
-                    Log.i(LOG_TAG,"null fragment");
                 }
 
             }
@@ -112,12 +79,12 @@ public class CustomDetailActivity extends AppCompatActivity {
             // using a fragment transaction.
             Bundle arguments = new Bundle();
             arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(CustomDetailFragment.ARG_ITEM_ID,0));
-            mAction= getIntent().getIntExtra(CustomDetailFragment.CUSTOM_ACTION,CustomDetailFragment.CUSTOM_SELECTION);
-            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION,mAction);
+            int mAction = getIntent().getIntExtra(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
+            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, mAction);
 
 
 
-            if(mAction==CustomDetailFragment.CUSTOM_NEW){
+            if(mAction ==CustomDetailFragment.CUSTOM_NEW){
                 fab_delete.setVisibility(View.GONE);
                 fab_save.setVisibility(View.VISIBLE);
             }else {

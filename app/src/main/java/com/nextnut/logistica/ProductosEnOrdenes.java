@@ -9,10 +9,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.nextnut.logistica.data.CustomColumns;
@@ -20,7 +17,6 @@ import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.CustomOrdersDetailColumns;
 import com.nextnut.logistica.data.LogisticaDataBase;
 import com.nextnut.logistica.data.LogisticaProvider;
-import com.nextnut.logistica.data.ProductsColumns;
 
 public class ProductosEnOrdenes extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 

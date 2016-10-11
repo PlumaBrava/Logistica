@@ -11,8 +11,7 @@ public class BoolIntConverter {
     }
 
     public boolean intToBool(int b) {
-        if (b==0) {return false;}
-        else  return true;
+        return b != 0;
     }
 }
 

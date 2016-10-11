@@ -7,22 +7,19 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.graphics.Color;
-
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import com.nextnut.logistica.ProductDetailActivity;
 import com.nextnut.logistica.R;
 import com.nextnut.logistica.data.ProductsColumns;
-import com.nextnut.logistica.swipe_helper.*;
+import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
+import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
@@ -59,37 +56,26 @@ implements ItemTouchHelperAdapter{
         public ViewHolder(View view) {
             super(view);
             view.setOnClickListener(this);
-
             mphotoProducto = (ImageView) view.findViewById(R.id.photoProducto);
             mTextViewNombre = (TextView) view.findViewById(R.id.nombreProducto);
             mTextViewPrecio = (TextView) view.findViewById(R.id.precioProducto);
             mTextViewPrecioEspecial = (TextView) view.findViewById(R.id.precioProductoSpecial);
             mTextViewDescition = (TextView) view.findViewById(R.id.descriptionProducto);
-
-
-
         }
 
 
         @Override
         public void onItemSelected() {
-            Log.i("TouchHelper:", "Adapter onItemSelected(): ");
             itemView.setBackgroundColor(Color.LTGRAY);
         }
 
         @Override
         public void onItemClear() {
-
-            Log.i("TouchHelper:", "Adapter onItemClear(): ");
             itemView.setBackgroundColor(0);
         }
 
         @Override
         public void onClick(View view) {
-
-            Log.i("onClick", "onClick " + getPosition() + " " + getAdapterPosition());
-            Log.i("onClick", "cursorID " + mcursorId);
-            Log.i("onClick", "PhotoString " + mphotString);
             mClickHandler.onClick(mcursorId, this);
 
         }
@@ -100,7 +86,6 @@ implements ItemTouchHelperAdapter{
                 View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.product_list_item, parent, false);
 
-//                itemView.setOnClickListener(mContext);
                 ViewHolder vh = new ViewHolder(itemView);
                 mVh = vh;
                 return vh;
@@ -114,12 +99,8 @@ implements ItemTouchHelperAdapter{
                 DatabaseUtils.dumpCursor(cursor);
                 viewHolder.mcursorId=cursor.getLong(cursor.getColumnIndex(ProductsColumns._ID_PRODUCTO));
                 viewHolder.mphotString=cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO));
-
-                Log.i("ProductCursorAdapter", "Size:  " +viewHolder.mphotoProducto.getWidth()+"-"+viewHolder.mphotoProducto.getHeight());
-
                 Drawable drawable = resize(mContext, R.drawable.ic_action_action_redeem);
                 Picasso.with(viewHolder.mphotoProducto.getContext())
-
                         .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
                         .placeholder( drawable)
                         .resize(mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotowidth), mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotoheigth))
@@ -136,32 +117,14 @@ implements ItemTouchHelperAdapter{
 
             }
 
-//    private Drawable resize(int somedrawable) {
-//        // Read your drawable from somewhere
-//
-//        Drawable dr =mContext.getResources(). getDrawable(somedrawable);
-//        Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
-//
-//        Drawable d = new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(bitmap
-//                ,mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotoheigth)
-//                ,mContext.getResources().getDimensionPixelSize(R.dimen.product_cardPhotowidth)
-//                , true));
-//// Set your new, scaled drawable "d"
-//
-////        Bitmap b = ((BitmapDrawable)image).getBitmap();
-////        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 50, 50, false);
-////        return new BitmapDrawable(getResources(), bitmapResized);
-//        return d;
-//    }
 
 
-    public static interface ProductCursorAdapterOnClickHandler {
+    public interface ProductCursorAdapterOnClickHandler {
         void onClick(long id, ViewHolder vh);
     }
 
             @Override
             public void onItemDismiss ( int position){
-                Log.i("TouchHelper:", "Adapter onItemDismiss ");
                 long cursorId = getItemId(position);
                 Cursor c = getCursor();
                 ContentValues cv = new ContentValues();
@@ -179,12 +142,7 @@ implements ItemTouchHelperAdapter{
 
                 mContext.startActivity(intent);
 
-//        mContext.getContentResolver().delete(PlanetProvider.Planets.withId(cursorId),
-//                null, null);
-//        mContext.getContentResolver().insert(PlanetProvider.ArchivedPlanets.withId(cursorId),
-//                cv);
                 notifyDataSetChanged();
-//        notifyItemRemoved(position);
             }
 
     @Override

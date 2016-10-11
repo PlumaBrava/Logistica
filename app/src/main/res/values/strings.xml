@@ -3,8 +3,31 @@
 
     <string name="section_format">Hello World from section: %1$d</string>
 
+    <!--Main Activity-->
+    <string name="device1">A086DD273532AA15DD4D5A83D2A6880E</string>
+    <string name="device2">4A2790CC2F2F210B9805A86F1289FEAF</string>
+
+  <!--Toast in Main activity for Menu Actions-->
+    <string name="productToast">Products</string>
+    <string name="CustomToast">Customs</string>
+    <string name="AddInternalError">Internal Error</string>
+    <string name="AddInvalidReques">Invalid Reques</string>
+    <string name="AddNetworkError">Network Error</string>
+    <string name="AddNoFill">No Fillr</string>
+    <string name="AddonFailedToLoad">on onAdFailedToLoad (%S)</string>
+
+    <!--Make a Call-->
+    <string name="MakeCall_Choose">Choose a number</string>
+    <string name="NomberTypeOtro">Otro</string>
+    <string name="NomberTypeMain">MAIN</string>
+    <string name="NomberTypeFaxWork">FAX WORK</string>
+    <string name="NomberTypeWork">WORK</string>
+    <string name="NomberTypeMovile">MOVILE</string>
+    <string name="NomberTypeHome">HOME</string>
+    <string name="MakeCall_Tel">tel:</string>
+
+
     <!--Menu Options-->
-    <!--<string name="action_settings">Settings</string>-->
     <string name="products">Products</string>
     <string name="customs">Customs</string>
     <string name="reportesXcliente">Reporte x Cliente</string>
@@ -21,6 +44,8 @@
     <!--Products List Activity List-->
     <!--<string name="empty_product_list">No Products to Show</string>-->
     <string name="empty_product_list">No Products to display</string>
+    <string name="empty_pickingOrder_list">No Picking Orders to display</string>
+    <string name="empty_custom_Order_list">No Custom Orders  sss to display</string>
 
     <!--Products Detail Activity-->
 
@@ -41,7 +66,7 @@
 
     <!--Verifications Message In Product-->
     <string name="theproducNametExist" translatable="true">The product already Exist</string>
-    <string name="theproducNametcantbenull" translatable="true">The product cant not be null</string>
+    <string name="theproducNametcantbenull" translatable="true">The product can not be null</string>
     <string name="theproductNameToLong" translatable="true">The product name is too long</string>
 
     <string name="theproductdesccantbenull" translatable="true">Description can not be null</string>
@@ -101,10 +126,11 @@
     <string name="favoriteAlreadyExisist">Favorite already Exists </string>
     <string name="doYouWantToChange">Do you want to change it? </string>
     <string name="quantityPicker">Select Quantity</string>
-
-
-
-
+    <string name="TotalCantidad">cantidad: </string>
+    <string name="MontoTotal">Monto Total:</string>
+    <string name="MontoTotalDelivey">Monto Total Delivery:</string>
+    <string name="InformeErrorApplyingBatchInsert">Informe Error applying batch insert</string>
+    <string name="InformeError">Error: </string>
     <string name="customOrder_Id_text">Custom Order Number:</string>
     <string name="customOrder_new">New Custom Order</string>
     <string name="customOrder_text">Name:</string>
@@ -113,6 +139,21 @@
     <string name="customOrder_last_hint_text">Lastename</string>
     <string name="BotonSeleccionCliente">Customer</string>
     <string name="title_activity_login">Sign in</string>
+
+    <string name="file">file:</string>
+    <string name="Product_">Product_</string>
+    <string name="yyyyMMdd_HHmmss">yyyyMMdd_HHmmss</string>
+    <string name="data">data</string>
+
+
+    <!--Share Picking Order-->
+    <string name="PickingOrderNumber"> Picking Order: </string>
+
+
+    <!--dialog number picker-->
+    <string name="dialogNumebrPickerCancel">Cancel</string>
+    <string name="dialogNumebrPickerSet">Set</string>
+    <string name="NumberPicker">Number Picker</string>
 
     <!-- Date Format -->
     <string name="dateFormat">yyyy-MM-dd</string>
@@ -125,9 +166,14 @@
     <string name="boton_conectPrinter">Conectar Impresora</string>
     <string name="boton_Print">Imprimir</string>
 
+    <!--delivery list fragment-->
+    <string name="NewOrder">New Order</string>
+
     <!--Custom ORDER CARD (customorder_list_contet.xml-->
     <string name="custom_card_order_number">ORDER: </string>
     <string name="custom_card_empty_custom_list">No Customers to Display </string>
+
+
 
     <!--Picking ORDER CARD (customorder_list_contet.xml-->
     <string name="pickng_card_order_number">PICKING ORDER</string>
@@ -151,6 +197,8 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+
 
 
     <!-- Picking Orders -->
@@ -178,7 +226,7 @@
 
     <!-- product_list_item -->
     <string name="productListItem">Product</string>
-    <string name="priceListItem">Price</string>
+        <string name="priceListItem">Price</string>
     <string name="SpecialpriceListItem">Special Price</string>
     <string name="photoListItem">Product Picture</string>
     <string name="productTitleListItem">Product header</string>
@@ -206,6 +254,14 @@
     <string name="title_activity_productos_en_ordenes">Productos en Ordenes</string>
     <string name="title_activity_reporte_mensualx_cliente">ReporteMensualxCliete</string>
     <string name="title_activity_reporte_x_Mes">Reporte por Mes </string>
+
+    <!--Reporte Mensual x Cliente-->
+    <string name="title_activity_reporte_mensualx_cliente_Title">Report</string>
+    <string name="title_activity_reporte_mensualx_cliente_SubTitle">by Customer</string>
+
+    <!--Reporte Mensual x Month-->
+    <string name="title_activity_reporte_mensualx_month_Title">Report</string>
+    <string name="title_activity_reporte_mensualx_month_SubTitle">by Month</string>
 
     // Widget
     <string name="appwidget_text">LOGISTICA - Products in Delivery</string>

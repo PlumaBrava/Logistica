@@ -13,10 +13,8 @@ import android.graphics.drawable.Drawable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 
 import com.nextnut.logistica.R;
-
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -65,9 +63,6 @@ public class Imagenes {
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-
-                Log.e("selectImage", "dialog:" + dialog + " item: " + item);
-
                 if (items[item].equals(fragment.getResources().getString(R.string.TakePhoto))) {
 
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -103,8 +98,8 @@ public class Imagenes {
                 byteArray.length);
 
 
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String filename = "Product_" + timeStamp;
+        String timeStamp = new SimpleDateFormat(context.getResources().getString(R.string.yyyyMMdd_HHmmss)).format(new Date());
+        String filename = context.getResources().getString(R.string.Product_) + timeStamp;
 
         File file = new File(context.getFilesDir(), filename);
 
@@ -112,7 +107,6 @@ public class Imagenes {
 
         try {
             outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-//                    outputStream.write(string.getBytes());
             outputStream.write(byteArray);
             outputStream.close();
         } catch (Exception e) {
@@ -135,14 +129,9 @@ public class Imagenes {
                 bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
 
-                // convert byte array to Bitmap
-
-//                Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0,
-//                        byteArray.length);
 
 
-                String filename = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//                String filename = "Product_" + timeStamp;
+                String filename = new SimpleDateFormat(context.getResources().getString(R.string.yyyyMMdd_HHmmss)).format(new Date());
 
                 File file = new File(context.getFilesDir(), filename);
 
@@ -150,7 +139,6 @@ public class Imagenes {
 
                 try {
                     outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
-//                    outputStream.write(string.getBytes());
                     outputStream.write(byteArray);
                     outputStream.close();
                 } catch (Exception e) {

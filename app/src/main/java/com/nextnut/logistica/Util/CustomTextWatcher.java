@@ -3,7 +3,6 @@ package com.nextnut.logistica.util;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -43,7 +42,6 @@ public class CustomTextWatcher implements TextWatcher {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == '\n') {
-                Log.i(LOG_TAG, "OnEditorActionListener onTextChanged,-existeProductName Enter detected");
                 modifyText = true;
             } else {
                 b.append(s.charAt(i));
@@ -53,8 +51,6 @@ public class CustomTextWatcher implements TextWatcher {
                 InputMethodManager inputManager = (InputMethodManager) et.getContext().getSystemService(
                         Context.INPUT_METHOD_SERVICE);
                 View view =  et.getRootView();
-//
-//                        getActivity().getCurrentFocus();
 
                 if (view != null) {
                     inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);

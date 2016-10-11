@@ -5,13 +5,13 @@ android {
     signingConfigs {
         LogisticaKey {
             keyAlias 'LogisticaKey'
-            keyPassword 'xxxx'
+            keyPassword 'Maria001'
 
 //            storeFile file('C:/Users/perez.juan.jose/Documents/GitHub/Logistica/LogisticaKey.jks')
 //            storeFile file('$rootdir/LogisticaKey.jks')  directorio free or paid
 //            storeFile file(project(":app").getProjectDir().getPath()+'/LogisticaKey.jks') app directory
             storeFile file(getRootDir().getPath()+'/LogisticaKey.jks')
-            storePassword 'xxxx'
+            storePassword 'Maria001'
         }
     }
     compileSdkVersion 24

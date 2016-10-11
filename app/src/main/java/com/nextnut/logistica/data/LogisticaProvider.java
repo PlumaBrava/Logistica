@@ -21,9 +21,7 @@ public class LogisticaProvider {
 
         public static final String AUTHORITY =
                 BuildConfig.APPLICATION_ID +
-
                 ".data.LogisticaProvider";
-//                "com.nextnut.logistica.debug.data.LogisticaProvider";
         static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
         interface Path{
@@ -53,7 +51,6 @@ public class LogisticaProvider {
             }
             return builder.build();
         }
-
 
 
 
@@ -222,12 +219,6 @@ public class LogisticaProvider {
         public static final String JOIN_NAME = "namecustomOrder";
         public static final String JOIN_LASTNAME = "lastnamecustomOrder";
 
-//        public static final String SEASON_NAME = "season_name";
-//        public static final String EPISODE_NUMBER = "episode_number";
-//        public static final String EPISODE_TITLE = "episode_title";
-
-        //projection for ContentResolver.query
-//        public static String[] SHOW_JOIN_PROJECTION = new String[]{SHOW_NAME, SEASON_NAME, EPISODE_NUMBER, EPISODE_NUMBER};
         public static String[] SHOW_JOIN_PROJECTION = new String[]{JOIN_CUSTOMORDER, JOIN_DATE, JOIN_PRICE_TOTAL , JOIN_NAME,JOIN_LASTNAME};
 
         @MapColumns
@@ -250,7 +241,6 @@ public class LogisticaProvider {
                 type = "vnd.android.cursor.item/join_custom_order",
 
                 join = "JOIN " + LogisticaDataBase.CUSTOMS+ " ON " + LogisticaDataBase.CUSTOM_ORDERS+ "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER + " = " + LogisticaDataBase.CUSTOMS + "." +  CustomColumns.ID_CUSTOM)
-//                defaultSort = LogisticaDataBase.CUSTOM_ORDERS+ "." + CustomOrdersColumns.ID_CUSTOM_ORDER  + " DESC")//OJO CON Desc lo escribi...
 
 
 public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
@@ -258,32 +248,6 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
 
     @TableEndpoint(table = LogisticaDataBase.CUSTOM_ORDERS_DETAIL)
     public static class joinCustomOrder_Product {
-//        //define "virtual" columns
-//        public static final String JOIN_CUSTOMORDER = "number_customOrder";
-//        public static final String JOIN_DATE = "date_customOrder";
-//        public static final String JOIN_PRICE_TOTAL = "pricetotalcustomOrder";
-//        public static final String JOIN_NAME = "namecustomOrder";
-//        public static final String JOIN_LASTNAME = "lastnamecustomOrder";
-//
-////        public static final String SEASON_NAME = "season_name";
-////        public static final String EPISODE_NUMBER = "episode_number";
-////        public static final String EPISODE_TITLE = "episode_title";
-//
-//        //projection for ContentResolver.query
-////        public static String[] SHOW_JOIN_PROJECTION = new String[]{SHOW_NAME, SEASON_NAME, EPISODE_NUMBER, EPISODE_NUMBER};
-//        public static String[] SHOW_JOIN_PROJECTION = new String[]{JOIN_CUSTOMORDER, JOIN_DATE, JOIN_PRICE_TOTAL , JOIN_NAME,JOIN_LASTNAME};
-//
-//        @MapColumns
-//        public static Map<String, String> mapColumns() {
-//            Map<String, String> map = new HashMap<>(1);
-//            map.put(JOIN_NAME, LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM);
-//            map.put(JOIN_LASTNAME, LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM);
-//            map.put(JOIN_CUSTOMORDER, LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER);
-//            map.put(JOIN_DATE, LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER);
-//            map.put(JOIN_PRICE_TOTAL, LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER);
-//
-//            return map;
-//        }
 
 
         @ContentUri(
@@ -291,11 +255,8 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
                 path = Path.JOINPRODUCTCUSTOMORDER ,
 
                 type = "vnd.android.cursor.item/joinProuct_CustomOrder",
-
-//                join = "LEFT   OUTER JOIN " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL )
                 join = "JOIN " + LogisticaDataBase.PRODUCTS+ " ON " + LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO+ " = " +
                         LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." +  CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL)
-//                defaultSort = LogisticaDataBase.CUSTOM_ORDERS+ "." + CustomOrdersColumns.ID_CUSTOM_ORDER  + " DESC")//OJO CON Desc lo escribi...
 
 
         public static final Uri CONTENT_URI = buildUri(Path.JOINPRODUCTCUSTOMORDER );
@@ -395,9 +356,6 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
                    ,
 
                 groupBy = LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
-//                        + " , "+
-//
-//                        LogisticaDataBase.PICKING_ORDERS_DETAIL + "." +  PickingOrdersDetailColumns.REF_PICKING_ORDER_PICKING_ORDERS_DETAIL
 
         )
 
@@ -436,12 +394,6 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
                 ,
 
                 groupBy = "1,2,3,4 "
-                       // LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM +" , "+
-//                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
-//      Totales por cliente y Producto1
-//                groupBy =
-//                LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM +" , "+
-//                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
 
         )
 
@@ -480,12 +432,6 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
                 ,
 
                 groupBy = "1, 2 "
-                // LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM +" , "+
-//                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
-//      Totales por cliente y Producto1
-//                groupBy =
-//                LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM +" , "+
-//                        LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
 
         )
 
@@ -524,8 +470,6 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
                     +  LogisticaDataBase.PRODUCTS+ "." + ProductsColumns._ID_PRODUCTO
                     + " ) "
 
-//
-//
                     +  " left JOIN " + LogisticaDataBase.PICKING_ORDERS
 
                     + " ON " + " ( "
@@ -541,10 +485,6 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
             ,
 
             groupBy = "1,2"
-//                    LogisticaDataBase.PRODUCTS+ "." +ProductsColumns._ID_PRODUCTO
-//                        + " , "+
-//
-//                        LogisticaDataBase.PICKING_ORDERS_DETAIL + "." +  PickingOrdersDetailColumns.REF_PICKING_ORDER_PICKING_ORDERS_DETAIL
 
     )
 

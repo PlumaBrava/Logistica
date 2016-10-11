@@ -98,35 +98,24 @@ implements ItemTouchHelperAdapter{
 
 
 
-        //        public CircleImageView mImageview;
         public ViewHolder(View view) {
             super(view);
             view.setOnClickListener(this);
-            Log.i("OrderDetailCursorAda:", "ViewHolder");
             mphotoProducto = (ImageView) view.findViewById(R.id.photoProducto);
             mTextViewNombre = (TextView) view.findViewById(R.id.nombreProducto);
             mTextViewDescition = (TextView) view.findViewById(R.id.descriptionProducto);
-
             mTextViewPrecio = (TextView) view.findViewById(R.id.precioProducto);
             mTextcantidad = (TextView) view.findViewById(R.id.cantidad);
             mTextToal = (TextView) view.findViewById(R.id.total);
-
             mTextViewPrecioDelivery = (TextView) view.findViewById(R.id.precioProductoDelivery);
             mTextcantidadDelivery = (TextView) view.findViewById(R.id.cantidadDelivery);
             mTextToalDelivery = (TextView) view.findViewById(R.id.totalDelivery);
-
-
-
             mfavorito = (CheckBox) view.findViewById(R.id.favorito);
-
-           mfavorito.setOnClickListener(new View.OnClickListener() {
+            mfavorito.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-
-                    mClickHandler.onFavorite(mDetalleOrderId, ViewHolder.this);
-
-                    Log.i("OrderDetailCursorAda:", "mfavorito "+mfavorito.isChecked());
+                mClickHandler.onFavorite(mDetalleOrderId, ViewHolder.this);
 
                 }
             });
@@ -148,23 +137,16 @@ implements ItemTouchHelperAdapter{
 
         @Override
         public void onItemSelected() {
-            Log.i("TouchHelper:", "Adapter onItemSelected(): ");
             itemView.setBackgroundColor(Color.LTGRAY);
         }
 
         @Override
         public void onItemClear() {
-
-            Log.i("TouchHelper:", "Adapter onItemClear(): ");
             itemView.setBackgroundColor(0);
         }
 
         @Override
         public void onClick(View view) {
-
-            Log.i("onClick", "onClick " + getPosition() + " " + getAdapterPosition());
-            Log.i("onClick", "cursorID " + mDetalleOrderId);
-            Log.i("onClick", "PhotoString " + mphotString);
             mClickHandler.onClick(mDetalleOrderId, this);
 
         }
@@ -174,17 +156,12 @@ implements ItemTouchHelperAdapter{
             public ViewHolder onCreateViewHolder (ViewGroup parent,int viewType){
                 View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.order_detail_item, parent, false);
-                Log.i("OrderDetailCursorAda:", "onCreateViewHolder ");
-//                itemView.setOnClickListener(mContext);
                 ViewHolder vh = new ViewHolder(itemView);
                 mVh = vh;
                 return vh;
             }
 
 
-//    public void setOnClickListener(View.OnClickListener listener) {
-//        this.listener = listener;
-//    }
 
 
 
@@ -193,8 +170,8 @@ implements ItemTouchHelperAdapter{
             public void onBindViewHolder (ViewHolder viewHolder, Cursor cursor){
                 DatabaseUtils.dumpCursor(cursor);
 
-//
-//                 /* 0 */       String proyection1[] = {LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL ,
+
+//       /* 0 */                String proyection1[] = {LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL ,
 //       /* 1 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL ,
 //       /* 2 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL ,
 //       /* 3 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL ,
@@ -204,28 +181,13 @@ implements ItemTouchHelperAdapter{
 //       /* 7 */                LogisticaDataBase.PRODUCTS+"."+ ProductsColumns.IMAGEN_PRODUCTO ,
 //       /* 8 */                LogisticaDataBase.PRODUCTS+"."+ ProductsColumns.DESCRIPCION_PRODUCTO ,
 
-                Log.i("OrderDetailCursorAda:", "onBindViewHolder");
-
                 viewHolder.mDetalleOrderId=cursor.getLong(0);
                 viewHolder.mphotString=cursor.getString(7);
-
-
-//                Drawable d=mContext.getResources(). getDrawable(R.drawable.ic_action_action_redeem);;
-//                d.setColorFilter(new PorterDuffColorFilter(Color.BLUE, PorterDuff.Mode.SCREEN));
-//                if (cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO))==null){
-//
-////                    viewHolder.mphotoProducto.setBackgroundColor(Color.BLUE);
-//
-//                    d.setColorFilter(new PorterDuffColorFilter(Color.BLUE, PorterDuff.Mode.SCREEN));
-//                }
-
-                Log.i("OrderDetailAdapter", "Size:  " +viewHolder.mphotoProducto.getWidth()+"-"+viewHolder.mphotoProducto.getHeight());
                 Drawable drawable = resize(mContext, R.drawable.ic_action_action_redeem);
                 Picasso.with(viewHolder.mphotoProducto.getContext())
 
                         .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
                         .resize(viewHolder.mphotoProducto.getMaxWidth(),viewHolder. mphotoProducto.getMaxHeight())
-//                        .placeholder(R.drawable.ic_action_action_redeem)
                         .placeholder(drawable)
                         .centerCrop()
                         .into(viewHolder.mphotoProducto);
@@ -253,7 +215,6 @@ implements ItemTouchHelperAdapter{
 
                 viewHolder.mTextViewDescition.setText(cursor.getString(8));
                 viewHolder.mfavorito.setChecked(new BoolIntConverter().intToBool(cursor.getInt(3)));
-
                 viewHolder.mRefProduct =cursor.getLong(1) ;
                 viewHolder.mRefCustomer =cursor.getLong(9) ;
 
@@ -262,7 +223,7 @@ implements ItemTouchHelperAdapter{
 
 
 
-    public static interface ProductCursorAdapterOnClickHandler {
+    public interface ProductCursorAdapterOnClickHandler {
         void onClick(long id, ViewHolder vh);
         void onFavorite(long id, ViewHolder vh);
         void onProductDismiss(long id);
@@ -275,7 +236,6 @@ implements ItemTouchHelperAdapter{
 
     @Override
     public void onItemAcepted(int position) {
-        Log.i("TouchHelper:", "onItemAcepted ");
     }
 
 

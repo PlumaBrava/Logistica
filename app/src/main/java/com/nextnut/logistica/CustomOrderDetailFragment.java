@@ -75,12 +75,10 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     /**
      * The dummy content this fragment is presenting.
      */
-//    private DummyContent.DummyItem mItem;
     private long mItem;
-    private long mCustomRef=0;
-    private long mIdDetailCustomOrder_for_favorite=0;
+    private long mCustomRef = 0;
+    private long mIdDetailCustomOrder_for_favorite = 0;
     private CheckBox mCheckBox_for_favorite;
-    private OrderDetailCursorAdapter.ViewHolder mvh_for_favorite;
     private Cursor c_favorite;
 
 
@@ -103,12 +101,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     private static final int CUSTOM_LOADER_NEW = 4;
 
 
-
-
-
-
-
-//    private TextView mCustomId;
+    //    private TextView mCustomId;
 //    private Spinner mSpinner;
 //    CustomAdapter mSpinnerAdapter;
     private TextView mOrderNumber;
@@ -121,7 +114,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     private Double mIvaCalculo;
 
 
-
     public TextView mCantidadTotal;
     public TextView mMontoTotal;
     public TextView mMontoTotalDelivey;
@@ -130,15 +122,10 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     private CheckBox mIsSpecialCustom;
 
 
-    private ImageView mImageCustomer;
     private Button mBotonSeleccionCliente;
-    private Button mBotonSeleccionProduto;
 
     private int mAction;
 
-
-    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1888;
-    private static final int REQUEST_IMAGE_GET = 1889;
     public static final int REQUEST_CUSTOMER = 1234;
     public static final int UPDATE_CUSTOMER = 1236;
     public static final int REQUEST_PRODUCT = 12345;
@@ -146,11 +133,11 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     // This paramenter is use the define the acction we need to do.
     // mAction recibe the information from bundle
     public static final int CUSTOM_ORDER_NEW = 0;  // A new order was created.
-//    public static final int CUSTOM_ORDER_DOUBLE_SCREEN = 1;
+    //    public static final int CUSTOM_ORDER_DOUBLE_SCREEN = 1;
     public static final int CUSTOM_ORDER_SAVE = 2;
 
     public static final int CUSTOM_ORDER_SELECTION = 3; // A order was selected.
-    public static final int ACTION_CUSTOM_ORDER_DELIVERY= 104;
+    public static final int ACTION_CUSTOM_ORDER_DELIVERY = 104;
 
     public static final int STATUS_ORDER_INICIAL = 0;
     public static final int STATUS_ORDER_PICKING = 1;
@@ -162,8 +149,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     private View mRootView;
     RecyclerView mRecyclerView;
     OrderDetailCursorAdapter mAdapter;
-    private ItemTouchHelper mItemTouchHelper;
-
 
 
     // android built in classes for bluetooth operations
@@ -180,8 +165,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     int readBufferPosition;
     volatile boolean stopWorker;
 
-    Button openButton ;
-    Button sendButton ;
+    Button openButton;
+    Button sendButton;
 
     Cursor mCursorTotales;
 
@@ -192,101 +177,57 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOG_TAG, "onCreate");
         if (getArguments().containsKey(ARG_ITEM_ID)) {
 
-            mItem = getArguments().getLong(ARG_ITEM_ID,-1);
-            Log.i(LOG_TAG, "ARG_ITEM_ID: "+mItem);
+            mItem = getArguments().getLong(ARG_ITEM_ID, -1);
         }
-            mAction= getArguments().getInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-            Activity activity = this.getActivity();
-            appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+        mAction = getArguments().getInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
+        Activity activity = this.getActivity();
+        appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
 
 
     }
 
 
-
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(LOG_TAG, "onActivityCreated");
         switch (mAction) {
             case CUSTOM_ORDER_NEW: // Go to the last order
                 getLoaderManager().initLoader(CUSTOM_LOADER_NEW, null, this);
-//                getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
-                Log.e(LOG_TAG, "onActivityCreated-CUSTOM_LOADER_NEW");
                 break;
 
             case CUSTOM_ORDER_SELECTION: // Go to the mItem order.
                 getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
                 getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
-                Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
                 break;
-//            case CUSTOM_ORDER_DOUBLE_SCREEN:
-//                if (mItem == 0) {
-//                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-default DETAIL_PRODUCT_LOADER");
-//                    getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
-//                } else {
-////                    getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
-//                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-DETAIL_PRODUCT_LOADER");
-//                }
-//                break;
             case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
                 getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
                 getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
-                Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
                 openButton.setVisibility(View.VISIBLE);
                 sendButton.setVisibility(View.VISIBLE);
                 break;
-
-
             default:
                 break;
         }
-
-//        getLoaderManager().initLoader(NAME_PRODUCT_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
 
     }
 
     @Override
     public void onResume() {
-        Log.i(LOG_TAG, " onResume");
         switch (mAction) {
             case CUSTOM_ORDER_NEW: // Go to the last order
                 getLoaderManager().restartLoader(CUSTOM_LOADER_NEW, null, this);
-//                getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
-                Log.e(LOG_TAG, "onActivityCreated-CUSTOM_LOADER_NEW");
                 break;
 
             case CUSTOM_ORDER_SELECTION: // Go to the mItem order.
                 getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
                 getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
-                Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
                 break;
-//            case CUSTOM_ORDER_DOUBLE_SCREEN:
-//                if (mItem == 0) {
-//                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-default DETAIL_PRODUCT_LOADER");
-//                    getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
-//                } else {
-////                    getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
-//                    Log.e(LOG_TAG, "onActivityCreated-PRODUCT_DOUBLE_SCREEN-DETAIL_PRODUCT_LOADER");
-//                }
-//                break;
             case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
                 getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
                 getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-//                getLoaderManager().initLoader(TOTALES_LOADER, null, this);
-                Log.e(LOG_TAG, "onActivityCreated-PRODUCT_SELECTION");
                 break;
-
-
             default:
                 break;
         }
@@ -296,7 +237,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     @Override
     public void onPause() {
-        Log.i(LOG_TAG, "onPause");
         try {
             closeBT();
         } catch (IOException e) {
@@ -307,7 +247,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     @Override
     public void onStop() {
-        Log.i(LOG_TAG, "onStop");
         try {
             closeBT();
         } catch (IOException e) {
@@ -317,11 +256,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     }
 
 
-
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        Log.i(LOG_TAG, "setUserVisibleHint" + isVisibleToUser);
-
         super.setUserVisibleHint(isVisibleToUser);
 
     }
@@ -329,7 +265,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.i(LOG_TAG, "onCreateView");
         mRootView = inflater.inflate(R.layout.customorder_detail, container, false);
 
         openButton = (Button) mRootView.findViewById(R.id.open);
@@ -363,23 +298,21 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         mBotonSeleccionCliente = (Button) mRootView.findViewById(R.id.botonSelecionCliente);
         mBotonSeleccionCliente.setVisibility(View.VISIBLE);
 
-        mBotonSeleccionProduto = (Button) mRootView.findViewById(R.id.botonSelecionProdcuto);
+        Button mBotonSeleccionProduto = (Button) mRootView.findViewById(R.id.botonSelecionProdcuto);
         mBotonSeleccionProduto.setVisibility(View.VISIBLE);
 
-//        mCustomId = (TextView) mRootView.findViewById(R.id.custom_Id);
         mCustomName = (TextView) mRootView.findViewById(R.id.custom_name_text);
         mLastName = (TextView) mRootView.findViewById(R.id.product_Lastname);
-//        button = (Button) mRootView.findViewById(R.id.custom_imagen_button);
-        mImageCustomer = (ImageView) mRootView.findViewById(R.id.custom_imagen);
+        ImageView mImageCustomer = (ImageView) mRootView.findViewById(R.id.custom_imagen);
         mDeliveyAddress = (TextView) mRootView.findViewById(R.id.custom_delivery_address);
         mCity = (TextView) mRootView.findViewById(R.id.custom_city);
         mCuit = (TextView) mRootView.findViewById(R.id.CUIT);
         mIva = (TextView) mRootView.findViewById(R.id.IVA);
 
         mIsSpecialCustom = (CheckBox) mRootView.findViewById(R.id.custom_special);
-        mCantidadTotal=(TextView) mRootView.findViewById(R.id.cantidadTotal);;
-        mMontoTotal=(TextView) mRootView.findViewById(R.id.montoToal);;
-        mMontoTotalDelivey=(TextView) mRootView.findViewById(R.id.montoToalDelivery);;
+        mCantidadTotal = (TextView) mRootView.findViewById(R.id.cantidadTotal);
+        mMontoTotal = (TextView) mRootView.findViewById(R.id.montoToal);
+        mMontoTotalDelivey = (TextView) mRootView.findViewById(R.id.montoToalDelivery);
 
 
         mBotonSeleccionCliente.setOnClickListener(new View.OnClickListener() {
@@ -387,25 +320,10 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             public void onClick(View view) {
 
                 Intent intent = new Intent(getContext(), CustomSelectionActivity.class);
-//                getActivity().startActivityForResult(intent, REQUEST_CUSTOMER);
                 getActivity().startActivityForResult(intent, UPDATE_CUSTOMER);
-
-//                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-//                    DialogoSeleccionCliente dialogo = new DialogoSeleccionCliente();
-//                    dialogo.monOptionSelected
-
-//                    dialogo.show(fragmentManager, "tagAlerta");
-
-
             }
 
         });
-
-
-
-//        if (mAction==CustomOrderDetailFragment.CUSTOM_ORDER_NEW){
-//                mBotonSeleccionProduto.setVisibility(View.GONE);}
-//        else {  mBotonSeleccionProduto.setVisibility(View.VISIBLE);}
 
 
         mBotonSeleccionProduto.setOnClickListener(new View.OnClickListener() {
@@ -413,7 +331,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             public void onClick(View view) {
 
                 Intent intent = new Intent(getContext(), ProductSectionActivity.class);
-                intent.putExtra("ITEM",mItem);
                 getActivity().startActivityForResult(intent, REQUEST_PRODUCT);
 
             }
@@ -426,111 +343,94 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         mAdapter = new OrderDetailCursorAdapter(getContext(), null, emptyView, new OrderDetailCursorAdapter.ProductCursorAdapterOnClickHandler() {
             @Override
             public void onClick(long id, OrderDetailCursorAdapter.ViewHolder vh) {
-                Log.i(LOG_TAG, "setupRecyclerView" + id);
-            showDialogNumberPicker( vh);
+                showDialogNumberPicker(vh);
             }
 
             @Override
             public void onFavorite(long id, OrderDetailCursorAdapter.ViewHolder vh) {
-                Log.i(LOG_TAG, "onFavorite55 " + id);
-                mvh_for_favorite=vh;
                 String where =
-                        LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER +" = " +vh.mRefCustomer + " and " +
-                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL +" = " +vh.mRefProduct + " and " +
-                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL +" = 1 ";
+                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER + " = " + vh.mRefCustomer + " and " +
+                                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL + " = " + vh.mRefProduct + " and " +
+                                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL + " = 1 ";
 
-                c_favorite = getActivity().getContentResolver().query( LogisticaProvider.join_customorderDetail_Product_Customer.CONTENT_URI,
+                c_favorite = getActivity().getContentResolver().query(LogisticaProvider.join_customorderDetail_Product_Customer.CONTENT_URI,
                         null,
                         where,
                         null,
-                        null,null);
+                        null, null);
 
 
-                 if (c_favorite.getCount()>=1){
-                     Log.i(LOG_TAG, "ya existe onFavorite" + id+ "cantidad: "+c_favorite.getCount()+ "refCustomer: "+vh.mRefCustomer+ " refProducto: "+vh.mRefProduct);
-;
-                     mIdDetailCustomOrder_for_favorite=vh.mDetalleOrderId;
-                     mCheckBox_for_favorite=vh.mfavorito;
-                     AlertDialog.Builder alert = new AlertDialog.Builder((Activity)getContext());
-                     alert.setTitle(getString(R.string.favoriteAlreadyExisist));
-                     alert.setMessage(getString(R.string.doYouWantToChange));
-                     alert.setNegativeButton(getString(R.string.CANCEL),new DialogInterface.OnClickListener() {
-                         @Override
-                         public void onClick(DialogInterface dialog, int whichButton) {
-                             Log.i("YesNoDialog:", "setNegativeButton" );
-                             mCheckBox_for_favorite.setChecked(mCheckBox_for_favorite.isChecked()?false:true);
-                             dialog.cancel();
-                         }
-                     });
-                     alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
-                         @Override
-                         public void onClick(DialogInterface dialog, int whichButton) {
-                             Log.i("YesNoDialog:", "setPositiveButton " );
+                if (c_favorite.getCount() >= 1) {
+                    mIdDetailCustomOrder_for_favorite = vh.mDetalleOrderId;
+                    mCheckBox_for_favorite = vh.mfavorito;
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setTitle(getString(R.string.favoriteAlreadyExisist));
+                    alert.setMessage(getString(R.string.doYouWantToChange));
+                    alert.setNegativeButton(getString(R.string.CANCEL), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int whichButton) {
 
-                             if (c_favorite!=null && c_favorite.getCount()>0 ) {
-                                 c_favorite.moveToFirst();
-                                 ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(c_favorite.getCount());
-
-                                 do {
-                                     ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrdersDetail.withId(c_favorite.getLong(0)));
+                            mCheckBox_for_favorite.setChecked(!mCheckBox_for_favorite.isChecked());
+                            dialog.cancel();
+                        }
+                    });
+                    alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int whichButton) {
 
 
-                                     builder.withValue(CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL, false);
-                                     batchOperations.add(builder.build());
+                            if (c_favorite != null && c_favorite.getCount() > 0) {
+                                c_favorite.moveToFirst();
+                                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(c_favorite.getCount());
 
-                                     Log.i(LOG_TAG, "onf - ID: " + c_favorite.getLong(0));
-                                     Log.i(LOG_TAG, "onf - REF_CUSTOM: " + c_favorite.getLong(1));
-                                     Log.i(LOG_TAG, "onf - REF_PRODUCT: " + c_favorite.getString(2));
-                                     Log.i(LOG_TAG, "onf - PRODUCT_NAME: " + c_favorite.getString(3));
-                                     Log.i(LOG_TAG, "onf - QUANTITY: " + c_favorite.getString(4));
-                                     Log.i(LOG_TAG, "onf - PRICE_CUSTOM: " + c_favorite.getDouble(5));
-                                     Log.i(LOG_TAG, "onf - FAVORITE_CUSTOM: " + c_favorite.getLong(6));
-                                 } while (c_favorite.moveToNext());
-                             try {
-
-                                 getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-
-                             } catch (RemoteException | OperationApplicationException e) {
-                                 Log.e(LOG_TAG, "Error applying batch insert", e);
-                             }
+                                do {
+                                    ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrdersDetail.withId(c_favorite.getLong(0)));
 
 
-                             }
+                                    builder.withValue(CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL, false);
+                                    batchOperations.add(builder.build());
+
+                                } while (c_favorite.moveToNext());
+                                try {
+
+                                    getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+
+                                } catch (RemoteException | OperationApplicationException e) {
+
+                                }
 
 
-                             ContentValues upDateValues = new ContentValues();
-                             upDateValues.put(CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL, new BoolIntConverter().boolToInt(mCheckBox_for_favorite.isChecked()));
-                             getContext().getContentResolver().update(LogisticaProvider.CustomOrdersDetail.withId(mIdDetailCustomOrder_for_favorite),
-                                     upDateValues, null, null);
-
-                         }
-                     });
-                     alert.create().show();
+                            }
 
 
+                            ContentValues upDateValues = new ContentValues();
+                            upDateValues.put(CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL, new BoolIntConverter().boolToInt(mCheckBox_for_favorite.isChecked()));
+                            getContext().getContentResolver().update(LogisticaProvider.CustomOrdersDetail.withId(mIdDetailCustomOrder_for_favorite),
+                                    upDateValues, null, null);
+
+                        }
+                    });
+                    alert.create().show();
 
 
-                 }else{
+                } else {
 
-                     Log.i(LOG_TAG, "noo existe onFavorite" + id+ "cantidad: "+c_favorite.getCount()+ "refCustomer: "+vh.mRefCustomer+ " refProducto: "+vh.mRefProduct);
+
                     ContentValues upDateValues = new ContentValues();
                     upDateValues.put(CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL, new BoolIntConverter().boolToInt(vh.mfavorito.isChecked()));
                     getContext().getContentResolver().update(LogisticaProvider.CustomOrdersDetail.withId(vh.mDetalleOrderId),
-                    upDateValues, null, null);
-                 }
+                            upDateValues, null, null);
+                }
             }
 
             @Override
             public void onProductDismiss(long id) {
-                Log.i(LOG_TAG, "onProductDismiss, ID:"+id);
-
 
 
                 ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
 
 
-
-                    ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrdersDetail.withId(id));
+                ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(LogisticaProvider.CustomOrdersDetail.withId(id));
 
                 try {
 
@@ -538,38 +438,34 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
 
 
-
                 } catch (RemoteException | OperationApplicationException e) {
-                    Log.e(LOG_TAG, "Error applying batch insert", e);
-                }finally {
+
+                } finally {
                     getLoaderManager().restartLoader(PRODUCTS_LOADER, null, CustomOrderDetailFragment.this);
                     getLoaderManager().restartLoader(TOTALES_LOADER, null, CustomOrderDetailFragment.this);
                     mAdapter.notifyDataSetChanged();
                 }
 
 
-
-
-
             }
 
         });
-        if(mAction==CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY){
+        if (mAction == CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY) {
             mAdapter.setDeliveryState();
         }
 
         assert mRecyclerView != null;
-        setupRecyclerView((RecyclerView) mRecyclerView);
+        setupRecyclerView(mRecyclerView);
 
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter,SimpleItemTouchHelperCallback.ORDER_INICIAL);
-        mItemTouchHelper = new ItemTouchHelper(callback);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter, SimpleItemTouchHelperCallback.ORDER_INICIAL);
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
         return mRootView;
     }
 
-    public void showDialogNumberPicker(final OrderDetailCursorAdapter.ViewHolder vh){
+    public void showDialogNumberPicker(final OrderDetailCursorAdapter.ViewHolder vh) {
 
         {
 
@@ -586,14 +482,12 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                 @Override
                 public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                    Log.i("value is",""+newVal);
                 }
             });
-            b1.setOnClickListener(new View.OnClickListener()
-            {
+            b1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mAction==CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY){
+                    if (mAction == CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY) {
                         vh.mTextcantidadDelivery.setText(String.valueOf(np.getValue()));
                         CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecioDelivery.getText().toString());
                         double total = np.getValue() * price.convert();
@@ -603,7 +497,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
                         d.dismiss();
 
-                    }else {
+                    } else {
                         vh.mTextcantidad.setText(String.valueOf(np.getValue()));
                         CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecio.getText().toString());
                         double total = np.getValue() * price.convert();
@@ -615,8 +509,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     }
                 }
             });
-            b2.setOnClickListener(new  View.OnClickListener()
-            {
+            b2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     d.dismiss();
@@ -640,125 +533,111 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     }
 
 
-
-
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-      switch(id) {
+        switch (id) {
 
-//            case CUSTOM_LOADER:
-//
-//            return new CursorLoader(
-//
-//                    getActivity(),
-//                    LogisticaProvider.Customs.withId(mCustomRef),
-//                    null,
-//                    null,
-//                    null,
-//                    null);
 
             case CUSTOM_ORDER_LOADER:
 
 
-    /*0*/            String proyection[] = {LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER ,
-    /*1*/                    LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER ,
-    /*2*/                    LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
-    /*3*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.NAME_CUSTOM,
-    /*4*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.LASTNAME_CUSTOM,
-    /*5*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.DELIIVERY_ADDRES_CUSTOM,
-    /*6*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.DELIVERY_CITY_CUSTOM,
-    /*7*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.IMAGEN_CUSTOM,
-    /*8*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.SPECIAL_CUSTOM,
-    /*9*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.CUIT_CUSTOM,
-    /*10*/                    LogisticaDataBase.CUSTOMS+"."+ CustomColumns.IVA_CUSTOM
+    /*0*/
+                String proyection[] = {LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
+    /*1*/                    LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
+    /*2*/                    LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
+    /*3*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+    /*4*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+    /*5*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIIVERY_ADDRES_CUSTOM,
+    /*6*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIVERY_CITY_CUSTOM,
+    /*7*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.IMAGEN_CUSTOM,
+    /*8*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.SPECIAL_CUSTOM,
+    /*9*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.CUIT_CUSTOM,
+    /*10*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.IVA_CUSTOM
                 };
-
 
 
                 return new CursorLoader(
                         getActivity(),
                         LogisticaProvider.ShowJoin.CONTENT_URI,
                         proyection,
-                        LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.ID_CUSTOM_ORDER +"="+mItem,
+                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER + "=" + mItem,
                         null,
                         null);
 
-          case CUSTOM_LOADER_NEW:
+            case CUSTOM_LOADER_NEW:
 
 
-/* 0 */              String proyection1[] = {LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER ,
-/* 1 */                      LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER ,
-/* 2 */                      LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
-/* 3 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.NAME_CUSTOM,
-/* 4 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.LASTNAME_CUSTOM,
-/* 5 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.DELIIVERY_ADDRES_CUSTOM,
-/* 6 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.DELIVERY_CITY_CUSTOM,
-/* 7 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.IMAGEN_CUSTOM,
-/* 8 */                      LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.ID_CUSTOM_ORDER,
-/* 9 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.SPECIAL_CUSTOM,
-/* 10 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.CUIT_CUSTOM,
-/* 11 */                      LogisticaDataBase.CUSTOMS+"."+ CustomColumns.IVA_CUSTOM,
-              };
+/* 0 */
+                String proyection1[] = {LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
+/* 1 */                      LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
+/* 2 */                      LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
+/* 3 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+/* 4 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+/* 5 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIIVERY_ADDRES_CUSTOM,
+/* 6 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIVERY_CITY_CUSTOM,
+/* 7 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.IMAGEN_CUSTOM,
+/* 8 */                      LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER,
+/* 9 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.SPECIAL_CUSTOM,
+/* 10 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.CUIT_CUSTOM,
+/* 11 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.IVA_CUSTOM,
+                };
 
 
-
-              return new CursorLoader(
-                      getActivity(),
-                      LogisticaProvider.ShowJoin.CONTENT_URI,
-                      proyection1,
-                      LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.STATUS_CUSTOM_ORDER +"="+CustomOrderDetailFragment.STATUS_ORDER_INICIAL,
-                      null,
-                      null);
-
-
-          case PRODUCTS_LOADER:
-
-              String proyection2[] = {
-       /* 0 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL ,
-       /* 1 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL ,
-       /* 2 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL ,
-       /* 3 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL ,
-       /* 4 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL ,
-       /* 5 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL ,
-       /* 6 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL ,
-       /* 7 */                LogisticaDataBase.PRODUCTS+"."+ ProductsColumns.IMAGEN_PRODUCTO ,
-       /* 8 */                LogisticaDataBase.PRODUCTS+"."+ ProductsColumns.DESCRIPCION_PRODUCTO,
-       /* 9 */                LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
-       /* 10 */               LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL ,
+                return new CursorLoader(
+                        getActivity(),
+                        LogisticaProvider.ShowJoin.CONTENT_URI,
+                        proyection1,
+                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + "=" + CustomOrderDetailFragment.STATUS_ORDER_INICIAL,
+                        null,
+                        null);
 
 
-              };
+            case PRODUCTS_LOADER:
 
-              return new CursorLoader(
-                      getActivity(),
-//                      LogisticaProvider.joinCustomOrder_Product.CONTENT_URI,
-                      LogisticaProvider.join_Product_Detail_order.CONTENT_URI,
-                      proyection2,
-                      LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL +"="+mItem,
-                      null,
-                      null);
+                String proyection2[] = {
+       /* 0 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL,
+       /* 1 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL,
+       /* 2 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL,
+       /* 3 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL,
+       /* 4 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL,
+       /* 5 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL,
+       /* 6 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL,
+       /* 7 */                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
+       /* 8 */                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
+       /* 9 */                LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
+       /* 10 */               LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL,
 
-          case TOTALES_LOADER:
 
-                    String proyection3[] = {
-        /* 0 */   "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " * "+
-                           LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL + " ) ",
+                };
 
-       /* 1 */    "count("  +     LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL+" )"  ,
-      /* 2 */   "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL + " * "+
-                            LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL + " ) "
+                return new CursorLoader(
+                        getActivity(),
+                        LogisticaProvider.join_Product_Detail_order.CONTENT_URI,
+                        proyection2,
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL + "=" + mItem,
+                        null,
+                        null);
 
-                    };
+            case TOTALES_LOADER:
 
-              return new CursorLoader(
+                String proyection3[] = {
+        /* 0 */   "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " * " +
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL + " ) ",
 
-                      getActivity(),
-                      LogisticaProvider.CustomOrdersDetail.CONTENT_URI,
-                      proyection3,
-                      LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL +"="+mItem,
-                      null,
-                      null);
+       /* 1 */    "count(" + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL + " )",
+      /* 2 */   "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL + " * " +
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL + " ) "
+
+                };
+
+                return new CursorLoader(
+
+                        getActivity(),
+                        LogisticaProvider.CustomOrdersDetail.CONTENT_URI,
+                        proyection3,
+                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL + "=" + mItem,
+                        null,
+                        null);
 
             default:
                 return null;
@@ -769,38 +648,11 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.i(LOG_TAG, "onLoadFinished");
-        switch(loader.getId()) {
-
-//            case CUSTOM_LOADER:
-//
-//                if (data != null && data.moveToFirst()) {
-//
-//                    mBotonSeleccionCliente.setVisibility(View.VISIBLE);
-//                    mCustomName.setText(data.getString(data.getColumnIndex(CustomColumns.NAME_CUSTOM)));
-//                    mLastName.setText(data.getString(data.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));
-//                    mDeliveyAddress.setText(data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)));
-//                    mCity.setText(data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
-//                    mCurrentPhotoPath = data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM));
-//                    mIsSpecialCustom.setChecked(data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM))>0 ?true:false);
-//
-//                    Log.i(LOG_TAG, "CUSTOM_LOADER- mIsSpecialCustom: " + mIsSpecialCustom.isChecked());
-//                    Picasso.with(getContext())
-//                            .load(mCurrentPhotoPath)
-//                            .into(mImageCustomer);
-//                    mCuit.setText(data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)));
-//                    mIva.setText(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM)));
-//                    mIvaCalculo=data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
-//
-//                }
-//
-//                break;
-
-
+        switch (loader.getId()) {
             case CUSTOM_LOADER_NEW:
                 if (data != null && data.moveToLast()) {
 
-                    mItem=data.getLong(8);
+                    mItem = data.getLong(8);
                     mOrderNumber.setText(Long.toString(mItem));
                     mBotonSeleccionCliente.setVisibility(View.VISIBLE);
                     mCustomRef = data.getLong(0);
@@ -809,19 +661,14 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     mDeliveyAddress.setText(data.getString(5));
                     mCity.setText(data.getString(6));
                     mCurrentPhotoPath = data.getString(7);
-                    mIsSpecialCustom.setChecked(data.getInt(9)>0 ?true:false);
-
-//                    mIsSpecialCustom=data.getInt(9);
-                    Log.i(LOG_TAG, "CUSTOM_LOADER_NEW- mIsSpecialCustom: " + mIsSpecialCustom.isChecked());
-
+                    mIsSpecialCustom.setChecked(data.getInt(9) > 0);
                     mCuit.setText(data.getString(10));
                     mIva.setText(data.getString(11));
-                    mIvaCalculo=data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
+                    mIvaCalculo = data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
 
                     if (appBarLayout != null) {
 
                         appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + data.getLong(8));
-//                        appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + mItem);
 
                     }
 
@@ -837,7 +684,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
 
                     if (c != null && c.getCount() > 0) {
-                        Log.i(LOG_TAG, "onf - count: " + c.getCount());
                         c.moveToFirst();
                         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(c.getCount());
 
@@ -845,70 +691,44 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
                             ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrdersDetail.CONTENT_URI);
                             builder.withValue(CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL, data.getLong(8));
-
-//                            ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrdersDetail.withRefCustomOrder(data.getLong(8)));
                             builder.withValue(CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL, c.getLong(c.getColumnIndex(CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL)));
                             builder.withValue(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL, c.getLong(c.getColumnIndex(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL)));
                             builder.withValue(CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL, c.getDouble(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
                             builder.withValue(CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL, c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
                             batchOperations.add(builder.build());
-
-//                            Log.i(LOG_TAG, "onf - ID: " + c.getLong(0));
-//                            Log.i(LOG_TAG, "onf - REF_CUSTOM: " + c.getLong(1));
-                            Log.i(LOG_TAG, "onf - REF_PRODUCT: " + c.getLong(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
-                            Log.i(LOG_TAG, "onf - PRODUCT_NAME: " + c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
-                            Log.i(LOG_TAG, "onf - QUANTITY: " + c.getLong(c.getColumnIndex(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL)));
-//                            Log.i(LOG_TAG, "onf - PRICE_CUSTOM: " + c.getDouble(5));
-//                            Log.i(LOG_TAG, "onf - FAVORITE_CUSTOM: " + c.getLong(6));
                         } while (c.moveToNext());
                         try {
-
-
                             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-
-
-
                         } catch (RemoteException | OperationApplicationException e) {
-                            Log.e(LOG_TAG, "Error applying batch insert", e);
-                        }finally {
+                        } finally {
                             getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-//                            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-
                             mAdapter.notifyDataSetChanged();
                         }
 
                         getLoaderManager().initLoader(TOTALES_LOADER, null, this);
                     }
-                } else
-                {
+                } else {
                     mRootView.setVisibility(View.GONE);
                 }
                 break;
 
             case CUSTOM_ORDER_LOADER:
                 if (data != null && data.moveToFirst()) {
-
                     mOrderNumber.setText(Long.toString(mItem));
                     mBotonSeleccionCliente.setVisibility(View.VISIBLE);
-                    mCustomRef=data.getLong(0);
+                    mCustomRef = data.getLong(0);
                     mCustomName.setText(data.getString(3));
                     mLastName.setText(data.getString(4));
                     mDeliveyAddress.setText(data.getString(5));
                     mCity.setText(data.getString(6));
                     mCurrentPhotoPath = data.getString(7);
-                    mIsSpecialCustom.setChecked(data.getInt(8)>0 ?true:false);
-
-
-                    Log.i(LOG_TAG, "CUSTOM_ORDER_LOADER- mIsSpecialCustom: " + mIsSpecialCustom.isChecked());
+                    mIsSpecialCustom.setChecked(data.getInt(8) > 0);
                     if (appBarLayout != null) {
-
-//                        appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + data.getString(0));
                         appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + mItem);
-
                     }
                     mCuit.setText(data.getString(9));
                     mIva.setText(data.getString(10));
-                    mIvaCalculo=data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
+                    mIvaCalculo = data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
                     getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
                 }
                 break;
@@ -916,15 +736,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             case PRODUCTS_LOADER:
                 if (data != null && data.moveToFirst()) {
 
-                    mCursorTotales=data;
-                    do {
-
-                        Log.i(LOG_TAG, "PRODUCTS_LOADER - nombre"+ data.getString(6) );
-                        Log.i(LOG_TAG, "PRODUCTS_LOADER - precio"+ data.getString(4) );
-                        Log.i(LOG_TAG, "PRODUCTS_LOADER - cantidad Orden"+ data.getString(5) );
-                        Log.i(LOG_TAG, "PRODUCTS_LOADER - cantidad Delivery"+ data.getString(10) );
-                        Log.i(LOG_TAG, "PRODUCTS_LOADER - descrition"+ data.getString(8) );
-                    }while (data.moveToNext());
+                    mCursorTotales = data;
                 }
                 mAdapter.swapCursor(data);
 
@@ -933,34 +745,23 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             case TOTALES_LOADER:
                 if (data != null && data.moveToFirst()) {
                     NumberFormat format = NumberFormat.getCurrencyInstance();
-                    mCantidadTotal.setText("cantidad: "+Integer.toString(data.getInt(1)));
-//                    Log.i(LOG_TAG, "TOTALES_LOADER - IVAstring"+ mIva.getText().toString());
-//
-//                    Log.i(LOG_TAG, "TOTALES_LOADER - mIvaCalculo"+ mIvaCalculo);
-//                    Log.i(LOG_TAG, "TOTALES_LOADER - mIsSpecialCustom"+ mIsSpecialCustom.isChecked());
-                    if(mIsSpecialCustom.isChecked()){
-                        mIvaCalculo=0.0;
+                    mCantidadTotal.setText(getResources().getString(R.string.TotalCantidad) + Integer.toString(data.getInt(1)));
+                    if (mIsSpecialCustom.isChecked()) {
+                        mIvaCalculo = 0.0;
                     }
-//                    Log.i(LOG_TAG, "TOTALES_LOADER - mIvaCalculo"+ (1+mIvaCalculo/100));
-                    mMontoTotal.setText("Monto Total:"+ format.format(data.getDouble(0))+"-"+
-                            format.format(data.getDouble(0)*(1+mIvaCalculo/100)));
-                    Log.i(LOG_TAG, "TOTALES_LOADER - IVA"+ mIva.getText().toString() );
-//                    Log.i(LOG_TAG, "TOTALES_LOADER - IVA%"+ (Integer.parseInt(mIva.getText().toString()))/100);
+                    mMontoTotal.setText(getResources().getString(R.string.MontoTotal) + format.format(data.getDouble(0)) + "-" +
+                            format.format(data.getDouble(0) * (1 + mIvaCalculo / 100)));
 
 
-                    mMontoTotalDelivey.setText("Monto Total Delivery:"+ format.format(data.getDouble(2))+"-"+
-                            format.format(data.getDouble(2)*(1+mIvaCalculo/100)));
+                    mMontoTotalDelivey.setText(getResources().getString(R.string.MontoTotalDelivey) + format.format(data.getDouble(2)) + "-" +
+                            format.format(data.getDouble(2) * (1 + mIvaCalculo / 100)));
                     do {
-
-//                        Log.i(LOG_TAG, "TOTALES_LOADER - cantidad"+ Integer.toString(data.getInt(1)) );
-//                        Log.i(LOG_TAG, "TOTALES_LOADER - monto total" +format.format(data.getDouble(0)) );
-                        saveTotalPrice(data.getDouble(0)*(1+mIvaCalculo/100));
-                        if (mAction==CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY){
-                            saveTotalPrice(data.getDouble(2)*(1+mIvaCalculo/100));
+                        saveTotalPrice(data.getDouble(0) * (1 + mIvaCalculo / 100));
+                        if (mAction == CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY) {
+                            saveTotalPrice(data.getDouble(2) * (1 + mIvaCalculo / 100));
                         }
 
-                    }while (data.moveToNext());
-
+                    } while (data.moveToNext());
 
 
                 }
@@ -971,32 +772,28 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.i(LOG_TAG, "onLoaderReset");
         mAdapter.swapCursor(null);
-//        mSpinnerAdapter.swapCursor(null);
 
     }
 
-    public void saveTotalPrice(double totalPrice){
+    public void saveTotalPrice(double totalPrice) {
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
 
         ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mItem));
         builder.withValue(CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER, totalPrice);
 
-        Log.i(LOG_TAG, "saveTotalPrice:"+totalPrice);
 
         batchOperations.add(builder.build());
         try {
 
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
         } catch (RemoteException | OperationApplicationException e) {
-            Log.e(LOG_TAG, "Error applying batch insert", e);
         }
 
 
     }
 
-    public void updateDateFormat(){
+    public void updateDateFormat() {
         try {
             Cursor c = getActivity().getContentResolver().query(LogisticaProvider.CustomOrders.CONTENT_URI,
                     null,
@@ -1005,9 +802,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     null,
                     null);
 
-//            LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO
             if (c != null && c.getCount() > 0) {
-                Log.i(LOG_TAG, "Update - count: " + c.getCount());
                 c.moveToFirst();
 
 
@@ -1021,137 +816,107 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                 } while (c.moveToNext());
 
 
-
-
-
             } else {
-                Log.i(LOG_TAG, "Informe - count: " + "null");
             }
 
         } catch (Exception e) {
-            Log.e(LOG_TAG, " Informe Error applying batch insert", e);
         }
     }
 
 
-
-    public void reportTotalesXProductoy(){
+    public void reportTotalesXProductoy() {
 
         String select[] = {
-
-
-                "strftime('%Y-%m', "+ LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER+ " ) ",
-//     LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
+                "strftime('%Y-%m', " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER + " ) ",
                 LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
                 LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
-                            LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
-                           "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) as Qdeliver ",
-                           "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) as Qorder ",
-                            };
+                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
+                "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL + " ) as Qdeliver ",
+                "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " ) as Qorder ",
+        };
 
-        Log.i(LOG_TAG, "Informe -  select: " +select[0] );
-
-//       Total por Cliente
-//        LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
-//                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
-//                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) ",
-//                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) ",
-//    };
 
         String where =
                 LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER + " = " + mCustomRef + " and " +
                         LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL + " = 1 ";
         try {
-        Cursor c = getActivity().getContentResolver().query(LogisticaProvider.reporte.CONTENT_URI,
-                select,
-                null,
-                null,
-                null,
-                null);
+            Cursor c = getActivity().getContentResolver().query(LogisticaProvider.reporte.CONTENT_URI,
+                    select,
+                    null,
+                    null,
+                    null,
+                    null);
 
-//            LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO
-        if (c != null && c.getCount() > 0) {
-            Log.i(LOG_TAG, "Informe - count: " + c.getCount());
-            c.moveToFirst();
+            if (c != null && c.getCount() > 0) {
+                c.moveToFirst();
 
-            String mes=c.getString(0)+"-";
-            Log.i(LOG_TAG, "Informe -ano mes"+mes);
-            String cliente=c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
-            Log.i(LOG_TAG, "Informe -   Cliente_NAME: " + cliente);
-            String producto=null;
-            do {
-               if(!mes.equals(c.getString(0)+"-")){
-                    mes=c.getString(0)+"-";
-                    Log.i(LOG_TAG, "Informe -ano mes"+mes);
-               }if(!cliente.equals(
-                           c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM))
-                    )) {
-                        cliente=c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
-
-                        Log.i(LOG_TAG, "Informe -   Cliente_NAME: " + cliente);
+                String mes = c.getString(0) + "-";
+                String cliente = c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM)) + " " + c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
+                String producto = null;
+                do {
+                    if (!mes.equals(c.getString(0) + "-")) {
+                        mes = c.getString(0) + "-";
                     }
-                producto=c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
-                Log.i(LOG_TAG, "Informe -     PRODUCT_NAME: " + producto+": "+c.getString(c.getColumnIndex("Qdeliver"))+c.getString(c.getColumnIndex("Qorder")));
+                    if (!cliente.equals(
+                            c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM)) + " " + c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM))
+                    )) {
+                        cliente = c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM)) + " " + c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
+                    }
+                    producto = c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
 
 
-            } while (c.moveToNext());
+                } while (c.moveToNext());
 
 
-        } else {
-            Log.i(LOG_TAG, "Informe - count: " + "null");
-        }
+            } else {
+            }
 
         } catch (Exception e) {
-            Log.e(LOG_TAG, " Informe Error applying batch insert", e);
+            Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
         }
     }
 
     public void deleteCustomOrder() {
-        Log.i(LOG_TAG, "delete");
+        // Custom orders are not deleted
     }
 
     public void upDateCustomer(long customerReference) {
-        Log.i(LOG_TAG, "upDateCustomer");
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-        if ( customerReference!= 0) {
-                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mItem));
-                builder.withValue(CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER, customerReference);
-                SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
-                String formattedDate = df.format(new Date());
-                Log.i(LOG_TAG, "formattedDate:"+formattedDate);
-                builder.withValue(CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER, formattedDate);
-                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, STATUS_ORDER_INICIAL);
-                builder.withValue(CustomOrdersColumns.SALDO_A_PAGAR_PRICE_CUSTOM_ORDER, 0);
-                batchOperations.add(builder.build());
-            }
+        if (customerReference != 0) {
+            ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mItem));
+            builder.withValue(CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER, customerReference);
+            SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
+            String formattedDate = df.format(new Date());
+            builder.withValue(CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER, formattedDate);
+            builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, STATUS_ORDER_INICIAL);
+            builder.withValue(CustomOrdersColumns.SALDO_A_PAGAR_PRICE_CUSTOM_ORDER, 0);
+            batchOperations.add(builder.build());
+        }
 
-            try {
-                getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-            } catch (RemoteException | OperationApplicationException e) {
-                Log.e(LOG_TAG, "Error applying batch insert", e);
-            }
-            finally {
-                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
-            }
+        try {
+            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+        } catch (RemoteException | OperationApplicationException e) {
+        } finally {
+            getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
+        }
 
 
     }
 
-    public  void saveCustomOrderProduct(long refProduct,String productName,String priceSpecial, String price) {
-        Log.i(LOG_TAG, "saveCustomOrderProduct");
+    public void saveCustomOrderProduct(long refProduct, String productName, String priceSpecial, String price) {
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
         if (mCustomRef != 0) {
 //            if ( mItem != 0) {
-            Log.i(LOG_TAG, "saveCustomOrderProduct--mCustomRef != 0");
-            CurrencyToDouble price1 = new CurrencyToDouble( mIsSpecialCustom.isChecked()? priceSpecial: price);
+            CurrencyToDouble price1 = new CurrencyToDouble(mIsSpecialCustom.isChecked() ? priceSpecial : price);
             ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrdersDetail.CONTENT_URI);
             builder.withValue(CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL, mItem);
-            builder.withValue(CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL,refProduct);
+            builder.withValue(CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL, refProduct);
             builder.withValue(CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL, productName);
             builder.withValue(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL, 0);
-            builder.withValue(CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL,price1.convert());
+            builder.withValue(CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL, price1.convert());
             batchOperations.add(builder.build());
-        } try {
+        }
+        try {
 
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
             getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
@@ -1159,80 +924,69 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             mAdapter.notifyDataSetChanged();
 
         } catch (RemoteException | OperationApplicationException e) {
-            Log.e(LOG_TAG, "Error applying batch insert", e);
+            Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
         }
     }
 
-    public void saveCantidad(long id, int cantidad){
+    public void saveCantidad(long id, int cantidad) {
 
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
         if (id != 0) {
 
-            Log.i(LOG_TAG, "save saveCantidad");
             double q = Double.valueOf(cantidad);
             ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrdersDetail.withId(id));
-           if(mAction==CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY){
-               builder.withValue(CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL, cantidad);
-           }else {
+            if (mAction == CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY) {
+                builder.withValue(CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL, cantidad);
+            } else {
 
-               builder.withValue(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL, cantidad);
-           }
+                builder.withValue(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL, cantidad);
+            }
             batchOperations.add(builder.build());
-        } try {
-
+        }
+        try {
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-
-
             getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
-            // XXX
             getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-//            mAdapter.notifyDataSetChanged();
         } catch (RemoteException | OperationApplicationException e) {
-            Log.e(LOG_TAG, "Error applying batch insert", e);
+            Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
         }
 
     }
 
 
-    public void saveCantidadDelivey(long id, int cantidad){
+    public void saveCantidadDelivey(long id, int cantidad) {
 
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
         if (id != 0) {
-
-            Log.i(LOG_TAG, "save saveCantidad");
             double q = Double.valueOf(cantidad);
             ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrdersDetail.withId(id));
             builder.withValue(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL, cantidad);
 
             batchOperations.add(builder.build());
-        } try {
+        }
+        try {
 
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
             getLoaderManager().initLoader(TOTALES_LOADER, null, this);
         } catch (RemoteException | OperationApplicationException e) {
-            Log.e(LOG_TAG, "Error applying batch insert", e);
+            Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
         }
 
     }
 
-    public void saveFavorito(long id, boolean favorito){
+    public void saveFavorito(long id, boolean favorito) {
 
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
         if (id != 0) {
-
-            Log.i(LOG_TAG, "save saveCantidad");
-
             int myInt = (favorito) ? 1 : 0;
             ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrdersDetail.withId(id));
             builder.withValue(CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL, myInt);
-
             batchOperations.add(builder.build());
-        } try {
-
+        }
+        try {
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
             getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
         } catch (RemoteException | OperationApplicationException e) {
-            Log.e(LOG_TAG, "Error applying batch insert", e);
         }
 
     }
@@ -1244,26 +998,17 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         try {
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-            if(mBluetoothAdapter == null) {
-//                myLabel.setText("No bluetooth adapter available");
+            if (mBluetoothAdapter == null) {
             }
 
-            if(!mBluetoothAdapter.isEnabled()) {
+            if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBluetooth, 0);
             }
 
             Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-            Log.i("zebra22","size:" + pairedDevices.size());
-            if(pairedDevices.size() > 0) {
+            if (pairedDevices.size() > 0) {
                 for (BluetoothDevice device : pairedDevices) {
-
-                    // RPP300 is the name of the bluetooth printer device
-                    // we got this name from the list of paired devices
-                    Log.i("zebra22","name:" + device.getName());
-                    Log.i("zebra22","getAddress():" + device.getAddress());
-                    Log.i("zebra22","describeContents():" + device.describeContents());
-                    Log.i("zebra22","BondState():" + device.getBondState());
 
                     if (device.getName().equals("XXXXJ154501680")) {
 
@@ -1274,9 +1019,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                 }
             }
 
-//            myLabel.setText("Bluetooth device found.");
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -1293,8 +1037,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             mmInputStream = mmSocket.getInputStream();
 
             beginListenForData();
-            Log.i("zebra22","openBT() :");
-//            myLabel.setText("Bluetooth Opened");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1308,7 +1050,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     void beginListenForData() {
         try {
             final Handler handler = new Handler();
-            Log.i("zebra22","beginListenForDat :");
             // this is the ASCII code for a newline character
             final byte delimiter = 10;
 
@@ -1326,16 +1067,13 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                             int bytesAvailable = mmInputStream.available();
 
                             if (bytesAvailable > 0) {
-                                Log.i("zebra22","beginListenForDat a:bytesAvailable > 0: "+ bytesAvailable);
                                 byte[] packetBytes = new byte[bytesAvailable];
                                 mmInputStream.read(packetBytes);
 
                                 for (int i = 0; i < bytesAvailable; i++) {
 
                                     byte b = packetBytes[i];
-                                    Log.i("zebra22","beginListenForDat b-: "+ (char) (b & 0xFF));
                                     if (b == delimiter) {
-                                        Log.i("zebra22","beginListenForDat b: "+ "enter");
                                         byte[] encodedBytes = new byte[readBufferPosition];
                                         System.arraycopy(
                                                 readBuffer, 0,
@@ -1345,16 +1083,11 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
                                         // specify US-ASCII encoding
                                         final String data = new String(encodedBytes, "US-ASCII");
-                                        Log.i("zebra22","data received1x :");
-                                        Log.i("zebra22", data);
-//                                        Log.i("zebra22","data received1 :"+ data);
                                         readBufferPosition = 0;
 
                                         // tell the user data were sent to bluetooth printer device
                                         handler.post(new Runnable() {
                                             public void run() {
-//                                                myLabel.setText(data);
-                                                Log.i("zebra22","data received2 :"+ data);
                                             }
                                         });
 
@@ -1363,10 +1096,9 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                                     }
                                 }
                             }
-//                            Log.i("zebra22","beginListenForDat :bytesAvailable <= 0");
 
                         } catch (IOException ex) {
-                            Log.i("zebra22","beginListenForDat :IOException ex");
+                            Log.e(getResources().getString(R.string.InformeError), ex.toString());
                             stopWorker = true;
                         }
 
@@ -1377,7 +1109,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             workerThread.start();
 
         } catch (Exception e) {
-            Log.i("zebra22","beginListenForDat :IOException ex function");
             e.printStackTrace();
         }
     }
@@ -1385,91 +1116,59 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     // this will send text data to be printed by the bluetooth printer
     void sendData() throws IOException {
         try {
-            String msg=null;
-            // the text typed by the user
-//            String msg = myTextbox.getText().toString();
-//            msg += "\n";
-//
-//            mmOutputStream.write(msg.getBytes());
-//
-//              msg="! U1 setvar \"device.languages\" \"zpl\"";
-//            mmOutputStream.write(msg.getBytes());
-////
-//
-//
-//            msg="! U1 getvar \"allcv\"";
-//            msg="! U1 getvar \"device.languages\"";
-//            mmOutputStream.write(msg.getBytes());
-//            msg= "! U1 getvar \"zpl.system_error\"";
+            String msg = null;
 
             // comienzo de comando
-            msg="^XA";
+            msg = "^XA";
             mmOutputStream.write(msg.getBytes());
-//            msg="^LT000";
-//            mmOutputStream.write(msg.getBytes());
-
-//            msg="^HH"; //return configuration Label
-//            mmOutputStream.write(msg.getBytes());
-
-
-//            msg="~WC"; //print configuration Label
-//            mmOutputStream.write(msg.getBytes());
 
 
             //Label Legth  in dots 8dots/mm. (203 dpi)
 
-            msg="^LL600";
+            msg = "^LL600";
             mmOutputStream.write(msg.getBytes());
 
+            int h = 50;
+            int i = 30;
 
-            // FO x,y- x: margen derecho, y: distancia al origen.
-
-            //  ADN:alto de letra,ancho de letra (letra horizontal- normal)
-            //  ADR:alto de letra,ancho de letra (letra vertical-Mira al Margen )
-            //  ADI:alto de letra,ancho de letra (letra horizontal - Invertida)
-            //  ADB:alto de letra,ancho de letra (letra vertical-Mira al centro de la etiqueta)
-
-            int h=50;
-            int i =30;
-
-            msg="^FO5,"+h+"^ADN,36,20^FD"+"Orden Nro: " +mItem+"^FS";
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Orden Nro: " + mItem + "^FS";
             mmOutputStream.write(msg.getBytes());
 
             SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
             String formattedDate = df.format(new Date());
 
-            msg="^FO310,"+h+"^ADN,24,10^FD"+"feecha:"+formattedDate+"^FS";
+            msg = "^FO310," + h + "^ADN,24,10^FD" + "feecha:" + formattedDate + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-            h=h+i+i;
-            msg="^FO5,"+h+"^ADN,36,20^FD"+mCustomName.getText().toString() +" "+mLastName.getText().toString()+"^FS";
+            h = h + i + i;
+            msg = "^FO5," + h + "^ADN,36,20^FD" + mCustomName.getText().toString() + " " + mLastName.getText().toString() + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-            h=h+i+i;
-            msg="^FO5,"+h+"^ADN,24,10^FD"+mDeliveyAddress.getText().toString()+"^FS";
+            h = h + i + i;
+            msg = "^FO5," + h + "^ADN,24,10^FD" + mDeliveyAddress.getText().toString() + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-            h=h+i-5;
-            msg="^FO5,"+h+"^ADN,24,10^FD"+mCity.getText().toString()+"^FS";
+            h = h + i - 5;
+            msg = "^FO5," + h + "^ADN,24,10^FD" + mCity.getText().toString() + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-            h=h+i;
+            h = h + i;
 
-            msg="^FO5,"+(h+i)+"^ADN,24,10^FD"+"Producto"+"^FS";
+            msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + "Producto" + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-            msg="^FO190,"+(h+i)+"^ADN,24,10^FD"+"Cantidad"+"^FS";
+            msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + "Cantidad" + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-            msg="^FO310,"+(h+i)+"^ADN,24,10^FD"+"Precio"+"^FS";
+            msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + "Precio" + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-            msg="^FO430,"+(h+i)+"^ADN,24,10^FD"+"Total"+"^FS";
+            msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + "Total" + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-           h=h+i;
+            h = h + i;
             NumberFormat format = NumberFormat.getCurrencyInstance();
-            Double totalOrden =0.0;
+            Double totalOrden = 0.0;
 
             if (mCursorTotales != null && mCursorTotales.moveToFirst()) {
                 do {
@@ -1493,8 +1192,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     int cantidad = mCursorTotales.getInt(10);
                     Double precio = mCursorTotales.getDouble(4);
                     Double total = precio * cantidad;
-                    totalOrden=totalOrden+total;
-
+                    totalOrden = totalOrden + total;
 
 
                     msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + name + "^FS";
@@ -1503,10 +1201,10 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                     msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + cantidad + "^FS";
                     mmOutputStream.write(msg.getBytes());
 
-                    msg = "^FO310," + (h + i) + "^ADN,24,10^FD" +format.format( precio) + "^FS";
+                    msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + format.format(precio) + "^FS";
                     mmOutputStream.write(msg.getBytes());
 
-                    msg = "^FO430," + (h + i) + "^ADN,24,10^FD" +format.format( total) + "^FS";
+                    msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + format.format(total) + "^FS";
                     mmOutputStream.write(msg.getBytes());
 
 
@@ -1514,98 +1212,40 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                 } while (mCursorTotales.moveToNext());
             }
 
-            h = h + i*3;
+            h = h + i * 3;
 
-            if (mIvaCalculo>0){
-            msg = "^FO5," + h  + "^ADN,36,20^FD" + "SubTotal: " + "^FS";
-            mmOutputStream.write(msg.getBytes());
+            if (mIvaCalculo > 0) {
+                msg = "^FO5," + h + "^ADN,36,20^FD" + "SubTotal: " + "^FS";
+                mmOutputStream.write(msg.getBytes());
 
 
-            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden) + "^FS";
-            mmOutputStream.write(msg.getBytes());
+                msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden) + "^FS";
+                mmOutputStream.write(msg.getBytes());
 
-            h=h+i+i;
+                h = h + i + i;
 
-            msg = "^FO5," + h  + "^ADN,36,20^FD" + "Iva: "+ "^FS";
-            mmOutputStream.write(msg.getBytes());
+                msg = "^FO5," + h + "^ADN,36,20^FD" + "Iva: " + "^FS";
+                mmOutputStream.write(msg.getBytes());
 
-            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden*mIvaCalculo/100) + "^FS";
-            mmOutputStream.write(msg.getBytes());
+                msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden * mIvaCalculo / 100) + "^FS";
+                mmOutputStream.write(msg.getBytes());
 
-            h=h+i+i;
+                h = h + i + i;
 
             }
 
-            msg = "^FO5," + h  + "^ADN,36,20^FD" + "Total: " + "^FS";
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Total: " + "^FS";
             mmOutputStream.write(msg.getBytes());
 
-            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden*(1+mIvaCalculo/100)) + "^FS";
+            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden * (1 + mIvaCalculo / 100)) + "^FS";
             mmOutputStream.write(msg.getBytes());
-            // Print a barCode
-//            msg="^B8N,100,Y,N";
-//            mmOutputStream.write(msg.getBytes());
-//
-//            msg="^FD1234567";
-//            mmOutputStream.write(msg.getBytes());
-
-
-//
-//            msg="^FS";
-//            mmOutputStream.write(msg.getBytes());
-
-
-
-//            This prints a box one wide by one inch long and the thickness of the line is 2 dots.
-////            Width: 1.5 inch; Height: 1 inch; Thickness: 10; Color: default; Rounding: 5
-//            msg="^FO0,0^GB300,200,10,,5^FS";
-//            mmOutputStream.write(msg.getBytes());
-
-
-////            Line. horizontal
-//            msg="^^FO50,300^GB400,1,4,^FS";
-//            mmOutputStream.write(msg.getBytes());
-
-//            //            Print a vertical line.
-//            msg="^FO100,50^GB1,400,4^FS";
-//            mmOutputStream.write(msg.getBytes());
-
-
-            // Imprime en inversa.
-
-//            msg="^PR1";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^FO100,100";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^GB70,70,70,,3^FS";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^FO200,100";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^GB70,70,70,,3^FS";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^FO300,100";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^GB70,70,70,,3^FS";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^FO400,100";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^GB70,70,70,,3^FS";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^FO107,110^CF0,70,93";
-//            mmOutputStream.write(msg.getBytes());
-//            msg="^FR^FDREVERSE^FS";
-//            mmOutputStream.write(msg.getBytes());
 
 
             // Fin  de comando
 
-            msg="^XZ";
+            msg = "^XZ";
             mmOutputStream.write(msg.getBytes());
 
-//            msg="^FD";
-//            mmOutputStream.write(msg.getBytes());
-
-            // tell the user data were sent
-//            myLabel.setText("Data sent.");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1619,7 +1259,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             mmOutputStream.close();
             mmInputStream.close();
             mmSocket.close();
-//            myLabel.setText("Bluetooth Closed");
         } catch (Exception e) {
             e.printStackTrace();
         }

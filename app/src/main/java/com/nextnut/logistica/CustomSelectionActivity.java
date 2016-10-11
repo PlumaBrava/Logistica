@@ -30,11 +30,11 @@ import static com.nextnut.logistica.util.Imagenes.resize;
 
 public class CustomSelectionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     Adapter mAdapter;
+    public static String RESULTADO="resultado";
     private static final int CURSOR_LOADER_ID = 0;
     private static final String LOG_TAG = CustomSelectionActivity.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(LOG_TAG,"onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_selection);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -44,10 +44,8 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
                 Intent intent = new Intent();
-                intent.putExtra("resultado","valor");
+                intent.putExtra(RESULTADO,"valor");
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -133,7 +131,6 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.i(LOG_TAG,"onCreateViewHolder");
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.spiner_custom_layout, parent, false);
             return new ViewHolder(view);
@@ -144,15 +141,10 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
 
 
             if (mCursor == null) {
-                Log.i(LOG_TAG, "cursor Nulo");
             } else{
 
                 mCursor.moveToPosition(position);
 
-
-//                String text1 = mCursor.getString(mCursor.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM))+" | "+
-//                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM))+ " "+
-//                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
                 holder.customCity.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
                 holder.custonName.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM))+ " "+
                         mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));
@@ -162,23 +154,19 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
 
                         .load(mCursor.getString(mCursor.getColumnIndex(CustomColumns.IMAGEN_CUSTOM)))
                         .resize(holder.photoCliente.getMaxWidth(),holder.photoCliente.getMaxHeight())
-//                        .placeholder(R.drawable.ic_action_action_redeem)
                         .placeholder(drawable)
                         .centerCrop()
                         .into(holder.photoCliente);
 
 
-                Log.i("LOG_TAG", "ID: " + Long.toString(getItemId(position)));
 
 
            holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
-                        Log.i(LOG_TAG,"nClickListener"+", valor id:"+getItemId(holder.getAdapterPosition()));
                         Intent intent = new Intent();
-                        intent.putExtra("resultado",getItemId(holder.getAdapterPosition()));
-//                        intent.putExtra("resultado",2);
+                        intent.putExtra(RESULTADO,getItemId(holder.getAdapterPosition()));
                         setResult(RESULT_OK, intent);
                         finish();
 

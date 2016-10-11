@@ -20,7 +20,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -50,25 +49,9 @@ public class LoginActivity
 
         extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = "SignInActivity";
     private static final String USER_LIST = "UserList";
     private static final int RC_SIGN_IN = 9001;
-
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
     private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask = null;
 
     // UI references.
@@ -112,14 +95,10 @@ public class LoginActivity
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-//        Configure sign-in to request the user's ID, email address, and basic
-// profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
 
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-// options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
                         this /* OnConnectionFailedListener */)
@@ -151,7 +130,6 @@ public class LoginActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: requestCode -" + requestCode+", resultCode -"+resultCode);
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
@@ -160,16 +138,9 @@ public class LoginActivity
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-        Log.d(TAG, "handleSignInResult:" + result.getStatus());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            Log.d(TAG, "handleSignInResult: Validacion OK" );
-            Log.d(TAG, "handleSignInResult: getDisplayName"+result.getSignInAccount().getDisplayName() );
-            Log.d(TAG, "handleSignInResult: getEmail"+result.getSignInAccount().getEmail() );
-            Log.d(TAG, "handleSignInResult: getFamilyName"+result.getSignInAccount().getFamilyName() );
-            Log.d(TAG, "handleSignInResult: getGrantedScopes() "+result.getSignInAccount().getGrantedScopes() );
 
             Bundle arguments = new Bundle();
             arguments.putString(MainActivity.USER_DISPLAY_NAME, result.getSignInAccount().getDisplayName());
@@ -180,13 +151,7 @@ public class LoginActivity
             startActivity(intent);
             finish();
 
-//            mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-//
-//            updateUI(true);
-        } else {
-            // Signed out, show unauthenticated UI.
-//            updateUI(false);
-            Log.d(TAG, "handleSignInResult: Validacion error" );
+
         }
     }
 
@@ -297,12 +262,10 @@ public class LoginActivity
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -398,7 +361,7 @@ public class LoginActivity
         };
 
         int ADDRESS = 0;
-        int IS_PRIMARY = 1;
+
     }
 
     /**
@@ -417,39 +380,29 @@ public class LoginActivity
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
 
             SharedPreferences sharedPreferences =
                     PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
             String user = sharedPreferences.getString(USER_LIST, "");
-            String[] userlists= user.split(",");
+            String[] userlists = user.split(",");
 
-//            for (String credential : DUMMY_CREDENTIALS) {
             for (String credential : userlists) {
                 String[] pieces = credential.split(":");
-                Log.d(TAG, "credential:"+ credential );
                 if (pieces[0].equals(mEmail)) {
                     // Account exists, return true if the password matches.
                     return pieces[1].equals(mPassword);
                 }
             }
 
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < userlists.length; i++) {
-                    sb.append(userlists[i]).append(",");
-                }
-                sb.append(user+mEmail+":"+mPassword).append(",");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < userlists.length; i++) {
+                sb.append(userlists[i]).append(",");
+            }
+            sb.append(user + mEmail + ":" + mPassword).append(",");
 
             sharedPreferences.edit().putString(USER_LIST, sb.toString()).apply();
 
-            // TODO: register the new account here.
             return true;
         }
 

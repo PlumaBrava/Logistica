@@ -3,12 +3,9 @@ package com.nextnut.logistica.rest;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.nextnut.logistica.R;
@@ -17,29 +14,11 @@ import com.nextnut.logistica.data.CustomColumns;
 /**
  * Created by perez.juan.jose on 15/06/2016.
  */
-public class CustomAdapter extends CursorAdapter
-//        implements View.OnClickListener
-//        implements AdapterView.OnItemSelectedListener
-{
-
-//    final private CustomsOnClickHandler mClickHandler;
-//
-//    public static interface CustomsOnClickHandler {
-//        void onClick(int id, View v);
-//    }
-
-
-//
-//    public CustomAdapter(Context context, Cursor c, boolean autoRequery,CustomsOnClickHandler onClickHandler) {
-//        super(context, c, autoRequery);
-//        mClickHandler=onClickHandler;
-//
-//    }
-
+public class CustomAdapter extends CursorAdapter {
 
     public CustomAdapter(Context context, Cursor c, boolean autoRequery) {
         super(context, c, autoRequery);
-//        mClickHandler=onClickHandler;
+
 
     }
 
@@ -47,7 +26,6 @@ public class CustomAdapter extends CursorAdapter
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View v = LayoutInflater.from(context).inflate(R.layout.spiner_custom_layout, parent, false);
-//        v.setOnClickListener(this);
         ViewsHolder holder = new ViewsHolder();
         holder.text1 = (TextView) v.findViewById(R.id.customNameSpinner);
         v.setTag(holder);
@@ -61,20 +39,8 @@ public class CustomAdapter extends CursorAdapter
         ViewsHolder holder = (ViewsHolder) view.getTag();
         String text1 = cursor.getString(cursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM))+" "+cursor.getString(cursor.getColumnIndex(CustomColumns.NAME_CUSTOM));
         holder.text1.setText(text1);
-//        holder.idCustomer=cursor.getColumnIndex(CustomColumns.ID_CUSTOM);
-
-
     }
 
-//    @Override
-//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//
-//    }
-//
-//    @Override
-//    public void onNothingSelected(AdapterView<?> parent) {
-//
-//    }
 
     class ViewsHolder {
         TextView text1;
@@ -85,12 +51,4 @@ public class CustomAdapter extends CursorAdapter
         }
     }
 
-//    @Override
-//    public void onClick(View view) {
-//
-//        Log.i("onClick", "onClick " +((ViewsHolder)  view.getTag()).getIdCustomer());
-//
-//        mClickHandler.onClick(((ViewsHolder)  view.getTag()).getIdCustomer(), view);
-//
-//    }
 }

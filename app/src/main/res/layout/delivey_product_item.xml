@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/text_margin"
         android:layout_marginLeft="@dimen/text_margin"
-        android:layout_gravity="left"
+        android:layout_gravity="start"
         android:textStyle="bold"
        />
             <!--android:layout_margin="@dimen/text_margin"-->
@@ -77,7 +77,7 @@
             android:id="@+id/cantidad"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
+            android:layout_gravity="start"
             android:gravity="start"
             android:layout_weight="1"
 

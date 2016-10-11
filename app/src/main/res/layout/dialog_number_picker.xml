@@ -16,14 +16,14 @@
         android:layout_marginLeft="20dp"
         android:layout_marginStart="20dp"
 
-        android:text="Cancel"
+        android:text="@string/dialogNumebrPickerCancel"
         android:layout_below="@+id/numberPicker1" />
     <!--android:layout_toRightOf="@+id/numberPicker1"-->
     <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set"
+        android:text="@string/dialogNumebrPickerSet"
         android:layout_alignTop="@+id/button2"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />

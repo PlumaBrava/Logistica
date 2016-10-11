@@ -3,23 +3,15 @@ package com.nextnut.logistica.swipe_helper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.View;
 
 import com.nextnut.logistica.R;
-import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
-import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 
-import static android.R.drawable.ic_delete;
 import static com.nextnut.logistica.R.drawable.ic_action_action_redeem;
-import static com.nextnut.logistica.R.drawable.ic_action_image_timer_auto;
 
 /**
  * Created by sam_chordas on 8/14/15.
@@ -116,21 +108,16 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
         final int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
-//        final int swipeFlags = ItemTouchHelper.END ;
-        Log.i("TouchHelper:","getMovementFlag, dragFlags: "+dragFlags+"swipeFlags: "+swipeFlags);
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
-        Log.i("TouchHelper:","onMove: "+source.getAdapterPosition()+" to "+target.getAdapterPosition());
-        //mAdapter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
         return true;
     }
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int i) {
-        Log.i("TouchHelper:","onSwiped: "+i);
 
        switch (i){
            case ItemTouchHelper.END:
@@ -149,7 +136,6 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
 
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-        Log.i("TouchHelper:","onSelectedChanged:ACTION_STATE_IDLE (0)="+actionState );
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
             ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
             itemViewHolder.onItemSelected();
@@ -160,9 +146,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
 
     @Override
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        Log.i("TouchHelper:"," clearView: "+viewHolder.getAdapterPosition());
         super.clearView(recyclerView, viewHolder);
-
         ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
         itemViewHolder.onItemClear();
     }

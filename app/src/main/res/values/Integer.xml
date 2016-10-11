@@ -35,4 +35,9 @@
     <integer name="ElvationRaisedbuttonrestingelevation" >2</integer>
     <integer name="ElvationSwitch" >1</integer>
 
+    <integer name="MaxPickerNumber" >5000</integer>
+    <integer name="MinPickerNumber" >1</integer>
+
+
+
     </resources>

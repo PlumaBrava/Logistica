@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 
@@ -12,6 +11,7 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
 extends RecyclerView.Adapter<VH>
 {
     private static final String LOG_TAG = CursorRecyclerViewAdapter.class.getSimpleName();
+    private static final String ID_Adpater = "_id";
     private Context mContext;
     private Cursor mCursor;
     private boolean mDataIsValid;
@@ -23,14 +23,14 @@ extends RecyclerView.Adapter<VH>
         mContext = context;
         mCursor = cursor;
         mDataIsValid = cursor != null;
-        mRowIdColumn = mDataIsValid ? mCursor.getColumnIndex("_id") : -1;
+        mRowIdColumn = mDataIsValid ? mCursor.getColumnIndex(ID_Adpater) : -1;
         mDataSetObserver = new NotifyingDataSetObserver();
         mEmptyView=emptyView;
 
         if (mDataIsValid){
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
-        Log.d(LOG_TAG, "in super");
+
     }
 
     public Cursor getCursor(){
@@ -77,7 +77,7 @@ extends RecyclerView.Adapter<VH>
 
     public Cursor swapCursor(Cursor newCursor) {
         if (newCursor == mCursor) {
-            Log.d(LOG_TAG, "swapCurso ==");
+
             return null;
         }
         final Cursor oldCursor = mCursor;
@@ -89,17 +89,17 @@ extends RecyclerView.Adapter<VH>
             if(mDataSetObserver != null){
                 mCursor.registerDataSetObserver(mDataSetObserver);
             }
-            mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
+            mRowIdColumn = newCursor.getColumnIndexOrThrow(ID_Adpater);
             mDataIsValid = true;
             notifyDataSetChanged();
-            Log.d(LOG_TAG, "swapCurso gone");
+
             mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
         }else{
             mRowIdColumn = -1;
             mDataIsValid = false;
             notifyDataSetChanged();
             mEmptyView.setVisibility(View.VISIBLE );
-            Log.d(LOG_TAG, "swapCurso visible");
+
         }
         return oldCursor;
     }
