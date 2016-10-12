@@ -57,11 +57,9 @@
 
             android:transitionName="@string/detail_icon_transition_name"
         android:padding="8dp"
-        android:hint="@string/product_name_text"
         android:contentDescription="@string/product_name_text"
             />
     </LinearLayout>
-    <!--android:maxLength="@integer/productoNameMaxLength"-->
 
     <LinearLayout
 
@@ -91,7 +89,6 @@
         android:layout_height="wrap_content"
         app:layout_gravity="left"
         android:maxLength="@integer/productoPriceMaxLength"
-        android:hint="@string/enter_price_message"
         android:contentDescription="@string/enter_price_message"
         android:inputType="number|numberDecimal"
             android:transitionName="@string/detail_icon_transition_price"
@@ -128,7 +125,6 @@
             android:layout_height="wrap_content"
             app:layout_gravity="left"
             android:maxLength="@integer/productoPriceMaxLength"
-            android:hint="@string/enter_priceSpecia_message"
             android:contentDescription="@string/enter_priceSpecia_message"
             android:inputType="number|numberDecimal"
             android:padding="8dp" />
@@ -204,7 +200,7 @@
         android:layout_height="wrap_content"
         app:layout_gravity="left"
         android:paddingStart="8dp"
-        android:hint="@string/product_description_hint_text"
+        android:paddingLeft="8dp"
         android:contentDescription="@string/product_description_hint_text"
 
         />

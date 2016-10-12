@@ -28,6 +28,11 @@ import static com.nextnut.logistica.util.Imagenes.resize;
 public class CustomsCursorAdapter extends CursorRecyclerViewAdapter<CustomsCursorAdapter.ViewHolder>
 implements ItemTouchHelperAdapter{
 
+    private static final String PRECIO_PRODUCTO = "PRECIO_PRODUCTO";
+    private static final String IMAGEN_PRODUCTO = "IMAGEN_PRODUCTO";
+    private static final String DESCRIPCION_PRODUCTO = "DESCRIPCION_PRODUCTO";
+    private static final String ID_PRODUCTO = "_ID_PRODUCTO";
+    private static final String PRODUCT_MODIFICACION = "PRODUCT_MODIFICACION";
     Context mContext;
     ViewHolder mVh;
     final private CustomsCursorAdapterOnClickHandler mClickHandler;
@@ -135,11 +140,11 @@ implements ItemTouchHelperAdapter{
                 cv.put(ProductsColumns.PRECIO_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
 
                 Intent intent = new Intent(mContext, ProductDetailActivity.class);
-                intent.putExtra("PRODUCT_MODIFICACION", true);
-                intent.putExtra("_ID_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
-                intent.putExtra("DESCRIPCION_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
-                intent.putExtra("IMAGEN_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
-                intent.putExtra("PRECIO_PRODUCTO", c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+                intent.putExtra(PRODUCT_MODIFICACION, true);
+                intent.putExtra(ID_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)));
+                intent.putExtra(DESCRIPCION_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)));
+                intent.putExtra(IMAGEN_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)));
+                intent.putExtra(PRECIO_PRODUCTO, c.getString(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
 
                 mContext.startActivity(intent);
 

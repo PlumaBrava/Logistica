@@ -45,7 +45,7 @@
     <!--<string name="empty_product_list">No Products to Show</string>-->
     <string name="empty_product_list">No Products to display</string>
     <string name="empty_pickingOrder_list">No Picking Orders to display</string>
-    <string name="empty_custom_Order_list">No Custom Orders  sss to display</string>
+    <string name="empty_custom_Order_list">No Custom Orders to display</string>
 
     <!--Products Detail Activity-->
 
@@ -179,6 +179,7 @@
     <string name="pickng_card_order_number">PICKING ORDER</string>
     <string name="picking_card_empty_custom_list">No Pincking Order to Display </string>
     <string name="picking_card_Text_Coment">Enter your comment </string>
+    <string name="picking_card_saveButton_contentDescription">Save Button</string>
 
 
     <!--Custom ORDER DETAIL ITEM (order_detail_item.xml-->

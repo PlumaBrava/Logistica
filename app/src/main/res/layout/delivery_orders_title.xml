@@ -55,15 +55,19 @@
 
             />
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab_save_picking"
+            <ImageButton
+                android:id="@+id/save_picking_Button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
                 android:gravity="top|end"
                 android:layout_weight="1"
                 android:layout_marginTop="@dimen/fab_margin"
-                android:src="@android:drawable/ic_menu_save" />
+                android:src="@android:drawable/ic_menu_save"
+                android:contentDescription="@string/picking_card_saveButton_contentDescription"
+                android:adjustViewBounds="false"
+                android:cropToPadding="false"
+                android:backgroundTint="@android:color/transparent" />
 
 
 

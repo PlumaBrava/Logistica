@@ -12,7 +12,6 @@ extends RecyclerView.Adapter<VH>
 {
     private static final String LOG_TAG = CursorRecyclerViewAdapter.class.getSimpleName();
     private static final String ID_Adpater = "_id";
-    private Context mContext;
     private Cursor mCursor;
     private boolean mDataIsValid;
     private int mRowIdColumn;
@@ -20,7 +19,7 @@ extends RecyclerView.Adapter<VH>
     private View mEmptyView;
 
     public CursorRecyclerViewAdapter(Context context, Cursor cursor, View emptyView){
-        mContext = context;
+        Context mContext = context;
         mCursor = cursor;
         mDataIsValid = cursor != null;
         mRowIdColumn = mDataIsValid ? mCursor.getColumnIndex(ID_Adpater) : -1;

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
-    package="com.nextnut.logistica"
-    >
+    package="com.nextnut.logistica">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -17,7 +16,6 @@
     <meta-data
         android:name="com.google.android.gms.version"
         android:value="@integer/google_play_services_version" />
-
 
 
     <uses-feature
@@ -73,7 +71,7 @@
         </activity>
 
         <provider
-        android:name=".data.generated.LogisticaProvider"
+            android:name=".data.generated.LogisticaProvider"
             android:authorities="${applicationId}.data.LogisticaProvider"
             android:exported="false" />
 
@@ -150,9 +148,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.MainActivity" />
         </activity>
+
         <activity
             android:name=".ReporteMensualxCliente"
-            android:label="@string/title_activity_reporte_mensualx_cliente"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -161,7 +159,6 @@
         </activity>
         <activity
             android:name=".ReportexMes"
-            android:label="@string/title_activity_reporte_x_Mes"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

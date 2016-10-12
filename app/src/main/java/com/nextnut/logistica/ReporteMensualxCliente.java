@@ -23,11 +23,7 @@ public class ReporteMensualxCliente extends AppCompatActivity {
         setContentView(R.layout.activity_reporte_mensualx_cliente);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        getSupportActionBar().setTitle(getString(R.string.title_activity_reporte_mensualx_cliente_SubTitle));
-        getSupportActionBar().setSubtitle(R.string.title_activity_reporte_mensualx_cliente_SubTitle);
-
-
+        getSupportActionBar().setTitle("");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         modenesXProducto = (TextView)findViewById(R.id.repoteMensualxCliente);

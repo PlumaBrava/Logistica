@@ -6,7 +6,6 @@ import android.database.DatabaseUtils;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +14,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nextnut.logistica.R;
-import com.nextnut.logistica.util.BoolIntConverter;
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
+import com.nextnut.logistica.util.BoolIntConverter;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
@@ -57,10 +56,6 @@ implements ItemTouchHelperAdapter{
         super(context, cursor,empltyView);
         mContext = context;
         mClickHandler = dh;
-//        ((View)empltyView.getParent()).getId();
-        Log.i("OrderDetailCursorAda:", "Constructor");
-
-//        Log.i("OrderDetailCursorAda:", "((View)empltyView.getParent()).getId()" + ((View)empltyView.getParent()).getId());
 
     }
 

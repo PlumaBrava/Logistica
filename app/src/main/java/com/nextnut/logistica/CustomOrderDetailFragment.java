@@ -11,9 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -47,15 +45,12 @@ import com.nextnut.logistica.util.BoolIntConverter;
 import com.nextnut.logistica.util.CurrencyToDouble;
 import com.nextnut.logistica.util.ProductSectionActivity;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * A fragment representing a single CustomOrder detail screen.
@@ -203,8 +198,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
                 getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
                 getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-                openButton.setVisibility(View.VISIBLE);
-                sendButton.setVisibility(View.VISIBLE);
+//                openButton.setVisibility(View.VISIBLE);
+//                sendButton.setVisibility(View.VISIBLE);
                 break;
             default:
                 break;
@@ -237,21 +232,13 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     @Override
     public void onPause() {
-        try {
-            closeBT();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        try {
-            closeBT();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         super.onStop();
     }
 
@@ -272,27 +259,9 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         openButton.setVisibility(View.GONE);
         sendButton.setVisibility(View.GONE);
         // open bluetooth connection
-        openButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                try {
-                    findBT();
-                    openBT();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
 
-        // send data typed by the user to be printed
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                try {
-                    sendData();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
+
+
 
         mOrderNumber = (TextView) mRootView.findViewById(R.id.orderNumber);
         mBotonSeleccionCliente = (Button) mRootView.findViewById(R.id.botonSelecionCliente);
@@ -331,6 +300,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             public void onClick(View view) {
 
                 Intent intent = new Intent(getContext(), ProductSectionActivity.class);
+                intent.putExtra("ITEM",mItem);
                 getActivity().startActivityForResult(intent, REQUEST_PRODUCT);
 
             }
@@ -992,276 +962,6 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     }
 
 
-    // this will find a bluetooth printer device
-    void findBT() {
 
-        try {
-            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-            if (mBluetoothAdapter == null) {
-            }
-
-            if (!mBluetoothAdapter.isEnabled()) {
-                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBluetooth, 0);
-            }
-
-            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-            if (pairedDevices.size() > 0) {
-                for (BluetoothDevice device : pairedDevices) {
-
-                    if (device.getName().equals("XXXXJ154501680")) {
-
-                        mmDevice = device;
-                        sendButton.setBackgroundColor(Color.BLUE);
-                        break;
-                    }
-                }
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // tries to open a connection to the bluetooth printer device
-    void openBT() throws IOException {
-        try {
-
-            // Standard SerialPortService ID
-            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-            mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
-            mmSocket.connect();
-            mmOutputStream = mmSocket.getOutputStream();
-            mmInputStream = mmSocket.getInputStream();
-
-            beginListenForData();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*
- * after opening a connection to bluetooth printer device,
- * we have to listen and check if a data were sent to be printed.
- */
-    void beginListenForData() {
-        try {
-            final Handler handler = new Handler();
-            // this is the ASCII code for a newline character
-            final byte delimiter = 10;
-
-            stopWorker = false;
-            readBufferPosition = 0;
-            readBuffer = new byte[1024];
-
-            workerThread = new Thread(new Runnable() {
-                public void run() {
-
-                    while (!Thread.currentThread().isInterrupted() && !stopWorker) {
-
-                        try {
-
-                            int bytesAvailable = mmInputStream.available();
-
-                            if (bytesAvailable > 0) {
-                                byte[] packetBytes = new byte[bytesAvailable];
-                                mmInputStream.read(packetBytes);
-
-                                for (int i = 0; i < bytesAvailable; i++) {
-
-                                    byte b = packetBytes[i];
-                                    if (b == delimiter) {
-                                        byte[] encodedBytes = new byte[readBufferPosition];
-                                        System.arraycopy(
-                                                readBuffer, 0,
-                                                encodedBytes, 0,
-                                                encodedBytes.length
-                                        );
-
-                                        // specify US-ASCII encoding
-                                        final String data = new String(encodedBytes, "US-ASCII");
-                                        readBufferPosition = 0;
-
-                                        // tell the user data were sent to bluetooth printer device
-                                        handler.post(new Runnable() {
-                                            public void run() {
-                                            }
-                                        });
-
-                                    } else {
-                                        readBuffer[readBufferPosition++] = b;
-                                    }
-                                }
-                            }
-
-                        } catch (IOException ex) {
-                            Log.e(getResources().getString(R.string.InformeError), ex.toString());
-                            stopWorker = true;
-                        }
-
-                    }
-                }
-            });
-
-            workerThread.start();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // this will send text data to be printed by the bluetooth printer
-    void sendData() throws IOException {
-        try {
-            String msg = null;
-
-            // comienzo de comando
-            msg = "^XA";
-            mmOutputStream.write(msg.getBytes());
-
-
-            //Label Legth  in dots 8dots/mm. (203 dpi)
-
-            msg = "^LL600";
-            mmOutputStream.write(msg.getBytes());
-
-            int h = 50;
-            int i = 30;
-
-            msg = "^FO5," + h + "^ADN,36,20^FD" + "Orden Nro: " + mItem + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
-            String formattedDate = df.format(new Date());
-
-            msg = "^FO310," + h + "^ADN,24,10^FD" + "feecha:" + formattedDate + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            h = h + i + i;
-            msg = "^FO5," + h + "^ADN,36,20^FD" + mCustomName.getText().toString() + " " + mLastName.getText().toString() + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            h = h + i + i;
-            msg = "^FO5," + h + "^ADN,24,10^FD" + mDeliveyAddress.getText().toString() + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            h = h + i - 5;
-            msg = "^FO5," + h + "^ADN,24,10^FD" + mCity.getText().toString() + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            h = h + i;
-
-            msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + "Producto" + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + "Cantidad" + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + "Precio" + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + "Total" + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            h = h + i;
-            NumberFormat format = NumberFormat.getCurrencyInstance();
-            Double totalOrden = 0.0;
-
-            if (mCursorTotales != null && mCursorTotales.moveToFirst()) {
-                do {
-
-//
-//                String proyection2[] = {
-//       /* 0 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL ,
-//       /* 1 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL ,
-//       /* 2 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL ,
-//       /* 3 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL ,
-//       /* 4 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL ,
-//       /* 5 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL ,
-//       /* 6 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL ,
-//       /* 7 */                LogisticaDataBase.PRODUCTS+"."+ ProductsColumns.IMAGEN_PRODUCTO ,
-//       /* 8 */                LogisticaDataBase.PRODUCTS+"."+ ProductsColumns.DESCRIPCION_PRODUCTO,
-//       /* 9 */                LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
-//       /* 10 */               LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL ,
-
-
-                    String name = mCursorTotales.getString(6);
-                    int cantidad = mCursorTotales.getInt(10);
-                    Double precio = mCursorTotales.getDouble(4);
-                    Double total = precio * cantidad;
-                    totalOrden = totalOrden + total;
-
-
-                    msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + name + "^FS";
-                    mmOutputStream.write(msg.getBytes());
-
-                    msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + cantidad + "^FS";
-                    mmOutputStream.write(msg.getBytes());
-
-                    msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + format.format(precio) + "^FS";
-                    mmOutputStream.write(msg.getBytes());
-
-                    msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + format.format(total) + "^FS";
-                    mmOutputStream.write(msg.getBytes());
-
-
-                    h = h + i;
-                } while (mCursorTotales.moveToNext());
-            }
-
-            h = h + i * 3;
-
-            if (mIvaCalculo > 0) {
-                msg = "^FO5," + h + "^ADN,36,20^FD" + "SubTotal: " + "^FS";
-                mmOutputStream.write(msg.getBytes());
-
-
-                msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden) + "^FS";
-                mmOutputStream.write(msg.getBytes());
-
-                h = h + i + i;
-
-                msg = "^FO5," + h + "^ADN,36,20^FD" + "Iva: " + "^FS";
-                mmOutputStream.write(msg.getBytes());
-
-                msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden * mIvaCalculo / 100) + "^FS";
-                mmOutputStream.write(msg.getBytes());
-
-                h = h + i + i;
-
-            }
-
-            msg = "^FO5," + h + "^ADN,36,20^FD" + "Total: " + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden * (1 + mIvaCalculo / 100)) + "^FS";
-            mmOutputStream.write(msg.getBytes());
-
-
-            // Fin  de comando
-
-            msg = "^XZ";
-            mmOutputStream.write(msg.getBytes());
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // close the connection to bluetooth printer.
-    void closeBT() throws IOException {
-        try {
-            stopWorker = true;
-            mmOutputStream.close();
-            mmInputStream.close();
-            mmSocket.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 }

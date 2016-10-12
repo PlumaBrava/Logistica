@@ -3,14 +3,12 @@ package com.nextnut.logistica;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
 
 
@@ -36,35 +34,14 @@ public class ProductDetailActivity extends AppCompatActivity {
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Save", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
                 ProductDetailFragment productDetailFragment=(ProductDetailFragment)
                 getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
                 if(productDetailFragment!=null){
                     productDetailFragment.verificationAndsave();
-                    Log.i(LOG_TAG,"no null fragment");
-                }else {
-                    Log.i(LOG_TAG,"null fragment");
                 }
             }
         });
 
-//        FloatingActionButton fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
-//        fab_delete.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Delete", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
-//                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
-//                if(productDetailFragment!=null){
-//                    productDetailFragment.deleteProduct();
-//                    Log.i(LOG_TAG,"no null fragment");
-//                }else {
-//                    Log.i(LOG_TAG,"null fragment");
-//                }
-//            }
-//        });
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -92,18 +69,13 @@ public class ProductDetailActivity extends AppCompatActivity {
             arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(ProductDetailFragment.ARG_ITEM_ID,0));
             int mAction = getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
             arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, mAction);
-            Log.i(LOG_TAG, "CUSTOM_ACTION" + mAction);
             ProductDetailFragment fragment = new ProductDetailFragment();
             fragment.setArguments(arguments);
             if(mAction ==ProductDetailFragment.PRODUCT_NEW){
-//                fab_delete.setVisibility(View.GONE);
                 fab_save.setVisibility(View.VISIBLE);
             }else {
-//                fab_delete.setVisibility(View.VISIBLE);
                 fab_save.setVisibility(View.VISIBLE);
             }
-
-            Log.i(LOG_TAG,"PRODUCT_ACTION"+ getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION,ProductDetailFragment.PRODUCT_SELECTION));
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.product_detail_container, fragment)
                     .commit();

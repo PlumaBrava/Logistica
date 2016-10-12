@@ -94,7 +94,7 @@ public class CustomOrderTest {
 
 
         // Verify totales
-        onView(withId(R.id.cantidadTotal)).check(matches(withText("cantidad: 2")));
+        onView(withId(R.id.cantidadTotal)).check(matches(withText("cantidad:2")));
         onView(withId(R.id.montoToal)).check(matches(withText("Monto Total:$3,249.60-$3,249.60")));
         onView(withId(R.id.montoToal)).perform(pressBack());
 
@@ -151,7 +151,7 @@ public class CustomOrderTest {
 
 
         // Verify totales
-        onView(withId(R.id.cantidadTotal)).check(matches(withText("cantidad: 2")));
+        onView(withId(R.id.cantidadTotal)).check(matches(withText("cantidad:2")));
         onView(withId(R.id.montoToal)).check(matches(withText("Monto Total:$24,372.00-$24,372.00")));
         onView(withId(R.id.montoToal)).perform(pressBack());
 

@@ -21,7 +21,6 @@ public class CustomOrderDetailActivity extends AppCompatActivity {
     private static final String LOG_TAG = CustomOrderDetailActivity.class.getSimpleName();
     private static final String RESULTADO = "resultado";
 
-    private int mAction;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,8 +43,8 @@ public class CustomOrderDetailActivity extends AppCompatActivity {
             Bundle arguments = new Bundle();
             arguments.putLong(CustomOrderDetailFragment.ARG_ITEM_ID,
                     getIntent().getLongExtra(CustomOrderDetailFragment.ARG_ITEM_ID,0));
-            mAction= getIntent().getIntExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION,mAction);
+            int mAction = getIntent().getIntExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
+            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, mAction);
             CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
 
             fragment.setArguments(arguments);

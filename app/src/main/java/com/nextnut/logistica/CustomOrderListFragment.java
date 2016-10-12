@@ -2,21 +2,16 @@ package com.nextnut.logistica;
 
 import android.animation.ObjectAnimator;
 import android.content.ContentProviderOperation;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.OperationApplicationException;
-
 import android.database.Cursor;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
-
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
@@ -26,12 +21,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.MenuItem;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
-
 
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.CustomOrdersColumns;
@@ -41,13 +35,11 @@ import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.rest.CustomsOrdersCursorAdapter;
 import com.nextnut.logistica.rest.OrderDetailCursorAdapter;
-
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 
 import static com.nextnut.logistica.util.MakeCall.makeTheCall;
 import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
@@ -67,7 +59,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
 
     private static final int CUSTOM_LOADER_TOTAL_PRODUCTOS = 1;
-
+    private static final String M_ITEM = "mItem";
 
 
     private CustomsOrdersCursorAdapter mOrdersAdapter;
@@ -99,9 +91,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-
-            mItem = savedInstanceState.getLong("mItem");
-            Log.i(LOG_TAG, "ononCreate ARG_ITEM_ID2 :" + mItem);
+            mItem = savedInstanceState.getLong(M_ITEM);
         }
 
     }
@@ -113,28 +103,20 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         View rootView = inflater.inflate(R.layout.customorder_list_fragment, container, false);
 
 
-
         View emptyViewTotalProducts = rootView.findViewById(R.id.recyclerview_totalproduct_empty);
         recyclerViewTotalProductos = (RecyclerView) rootView.findViewById(R.id.total_products_customOrder);
 
         recyclerViewTotalProductos.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mCursorAdapterTotalProductos = new OrderDetailCursorAdapter(getContext(), null,
-//                null,
                 emptyViewTotalProducts,
                 new OrderDetailCursorAdapter.ProductCursorAdapterOnClickHandler() {
-            @Override
-            public void onClick(long id, OrderDetailCursorAdapter.ViewHolder v) {
-                Log.i(LOG_TAG, "Productos:" + id);
-
-
-                Intent intent = new Intent(getContext(), ProductosEnOrdenes.class);
-
-                Log.i(LOG_TAG, "ARG_ITEM_ID: 1" + id);
-
-                intent.putExtra(ProductosEnOrdenes.ARG_ITEM_ID, id);
-                startActivity(intent);
-            }
+                    @Override
+                    public void onClick(long id, OrderDetailCursorAdapter.ViewHolder v) {
+                        Intent intent = new Intent(getContext(), ProductosEnOrdenes.class);
+                        intent.putExtra(ProductosEnOrdenes.ARG_ITEM_ID, id);
+                        startActivity(intent);
+                    }
 
                     @Override
                     public void onFavorite(long id, OrderDetailCursorAdapter.ViewHolder vh) {
@@ -160,7 +142,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         mOrdersAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyView, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
             @Override
             public void onClick(long id, CustomsOrdersCursorAdapter.ViewHolder vh) {
-                mItem=id;
+                mItem = id;
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
@@ -173,7 +155,6 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                             .addToBackStack(null)
                             .replace(R.id.customorder_detail_container, fragment)
                             .commit();
-
 
 
                 } else {
@@ -199,25 +180,22 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
             @Override
             public void onMakeACall(String ContactID) {
-                makeTheCall(getActivity(),ContactID);
+                makeTheCall(getActivity(), ContactID);
             }
 
             @Override
             public void onDialogAlert(String message) {
 
 
-                AlertDialog.Builder alert ;
+                AlertDialog.Builder alert;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    alert  = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
+                    alert = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
                 } else {
-                    alert  = new AlertDialog.Builder(getContext());
+                    alert = new AlertDialog.Builder(getContext());
                 }
-
-//                AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
-
                 alert.setMessage(message);
                 alert.create().show();
-                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -227,17 +205,17 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
             @Override
             public void onItemDismissCall(long cursorID) {
-                mCustomOrderIdSelected =cursorID;
+                mCustomOrderIdSelected = cursorID;
 
-                AlertDialog.Builder alert ;
+                AlertDialog.Builder alert;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    alert  = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
+                    alert = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
                 } else {
-                    alert  = new AlertDialog.Builder(getContext());
+                    alert = new AlertDialog.Builder(getContext());
                 }
 
                 alert.setMessage(getString(R.string.doYouWantDelete));
-                alert.setNegativeButton(getString(R.string.CANCEL),new DialogInterface.OnClickListener() {
+                alert.setNegativeButton(getString(R.string.CANCEL), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
                         onDataChange();
@@ -258,11 +236,11 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
                         try {
 
-                           getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
 //                    notifyItemRemoved(position);
                         } catch (RemoteException | OperationApplicationException e) {
 
-                        }finally {
+                        } finally {
                             onDataChange();
                         }
                     }
@@ -270,23 +248,20 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                 alert.create().show(); // btw show() creates and shows it..
 
 
-
-
             }
 
             @Override
             public void onItemAceptedCall(long cursorID) {
-                mCustomOrderIdSelected=cursorID;
+                mCustomOrderIdSelected = cursorID;
 
-                if (MainActivity.mPickingOrderSelected==0){
+                if (MainActivity.mPickingOrderSelected == 0) {
 
                     onDialogAlert(getResources().getString(R.string.selectPickingOrderToAssing));
                     onDataChange();
-                }
-                else {
+                } else {
                     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
                     ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
-                    builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_PICKING );
+                    builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_PICKING);
                     SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
                     String formattedDate = df.format(new Date());
                     builder.withValue(CustomOrdersColumns.DATE_OF_PICKING_ASIGNATION_CUSTOM_ORDER, formattedDate);
@@ -294,7 +269,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                     batchOperations.add(builder.build());
                     try {
                         getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-                          onDataChange();
+                        onDataChange();
                     } catch (RemoteException | OperationApplicationException e) {
                         Log.e(getString(R.string.InformeError), getString(R.string.InformeErrorApplyingBatchInsert), e);
 
@@ -306,22 +281,22 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             public void onDataChange() {
                 getLoaderManager().restartLoader(CUSTOM_LOADER_LIST, null, CustomOrderListFragment.this);
                 getLoaderManager().restartLoader(CUSTOM_LOADER_TOTAL_PRODUCTOS, null, CustomOrderListFragment.this);
-                upDateWitget (getContext());
+                upDateWitget(getContext());
 
             }
         }
-       );
+        );
 
 
         recyclerViewOrders.setAdapter(mOrdersAdapter);
 
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mOrdersAdapter,SimpleItemTouchHelperCallback.ORDER_INICIAL);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mOrdersAdapter, SimpleItemTouchHelperCallback.ORDER_INICIAL);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerViewOrders);
 
 
-        if (rootView.findViewById(R.id.customorder_detail_container) != null ) {
+        if (rootView.findViewById(R.id.customorder_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
@@ -332,12 +307,12 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
         }
 
 
-
         return rootView;
     }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putLong("mItem", mItem);
+        outState.putLong(M_ITEM, mItem);
         super.onSaveInstanceState(outState);
     }
 
@@ -350,7 +325,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        if(isVisibleToUser && mOrdersAdapter !=null){
+        if (isVisibleToUser && mOrdersAdapter != null) {
             getLoaderManager().restartLoader(CUSTOM_LOADER_LIST, null, this);
             getLoaderManager().restartLoader(CUSTOM_LOADER_TOTAL_PRODUCTOS, null, CustomOrderListFragment.this);
 
@@ -399,9 +374,8 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                         LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
                         LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
                         LogisticaDataBase.CUSTOMS + "." + CustomColumns.REFERENCE_CUSTOM,
-                        LogisticaDataBase.CUSTOM_ORDERS+"."+CustomOrdersColumns.STATUS_CUSTOM_ORDER
+                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER
                 };
-
 
 
                 return new CursorLoader(
@@ -411,7 +385,6 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                         LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + "=" + 0,
                         null,
                         null);
-
 
 
             case CUSTOM_LOADER_TOTAL_PRODUCTOS:
@@ -426,8 +399,8 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 /* 6 */             LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL,
 /* 7 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
 /* 8 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
-/* 9 */             LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
-/* 10 */            LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL
+/* 9 */             LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
+/* 10 */            LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL
 
                 };
 
@@ -455,22 +428,19 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             case CUSTOM_LOADER_LIST:
                 if (data != null && data.moveToFirst()) {
                     mOrdersAdapter.swapCursor(data);
-                    if(mTwoPane) {
+                    if (mTwoPane) {
 
                     }
                 }
 
 
-
-
                 break;
-
 
 
             case CUSTOM_LOADER_TOTAL_PRODUCTOS:
                 if (data != null && data.moveToFirst()) {
                     mCursorAdapterTotalProductos.swapCursor(data);
-                    }
+                }
 
                 break;
         }
@@ -482,7 +452,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
     }
 
 
-    public void loadDustomDetailFragment(){
+    public void loadDustomDetailFragment() {
         CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
 
         Bundle arguments = new Bundle();

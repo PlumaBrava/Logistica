@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -15,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +28,10 @@ import static com.nextnut.logistica.util.Imagenes.resize;
 
 public class CustomSelectionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     Adapter mAdapter;
-    public static String RESULTADO="resultado";
+    public static String RESULTADO = "resultado";
     private static final int CURSOR_LOADER_ID = 0;
     private static final String LOG_TAG = CustomSelectionActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,16 +39,7 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.putExtra(RESULTADO,"valor");
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-        });
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         View recyclerView = findViewById(R.id.content_custom_selection);
@@ -59,11 +49,8 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
     }
 
 
-
-
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
 
-        Log.i(LOG_TAG,"setupRecyclerView");
         StaggeredGridLayoutManager sglm =
                 new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(sglm);
@@ -74,7 +61,6 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        Log.i(LOG_TAG,"onPostCreate");
         getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         super.onPostCreate(savedInstanceState);
@@ -82,10 +68,9 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.i(LOG_TAG,"onCreateLoader");
 
 
-        String orderBy =CustomColumns.DELIVERY_CITY_CUSTOM  +" ASC, "+ CustomColumns.NAME_CUSTOM  +" ASC, "+ CustomColumns.LASTNAME_CUSTOM +" ASC ";
+        String orderBy = CustomColumns.DELIVERY_CITY_CUSTOM + " ASC, " + CustomColumns.NAME_CUSTOM + " ASC, " + CustomColumns.LASTNAME_CUSTOM + " ASC ";
         return new CursorLoader(
                 this,
                 LogisticaProvider.Customs.CONTENT_URI,
@@ -97,15 +82,13 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data!=null) {
-            Log.i(LOG_TAG,"onLoadFinished");
+        if (data != null) {
             mAdapter.swapCursor(data);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.i(LOG_TAG,"onLoaderReset");
         mAdapter.swapCursor(null);
 
     }
@@ -141,35 +124,32 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
 
 
             if (mCursor == null) {
-            } else{
+            } else {
 
                 mCursor.moveToPosition(position);
 
                 holder.customCity.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
-                holder.custonName.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM))+ " "+
+                holder.custonName.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM)) + " " +
                         mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));
 
                 Drawable drawable = resize(CustomSelectionActivity.this, R.drawable.ic_action_action_redeem);
                 Picasso.with(CustomSelectionActivity.this)
 
                         .load(mCursor.getString(mCursor.getColumnIndex(CustomColumns.IMAGEN_CUSTOM)))
-                        .resize(holder.photoCliente.getMaxWidth(),holder.photoCliente.getMaxHeight())
+                        .resize(holder.photoCliente.getMaxWidth(), holder.photoCliente.getMaxHeight())
                         .placeholder(drawable)
                         .centerCrop()
                         .into(holder.photoCliente);
 
 
-
-
-           holder.mView.setOnClickListener(new View.OnClickListener() {
+                holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
                         Intent intent = new Intent();
-                        intent.putExtra(RESULTADO,getItemId(holder.getAdapterPosition()));
+                        intent.putExtra(RESULTADO, getItemId(holder.getAdapterPosition()));
                         setResult(RESULT_OK, intent);
                         finish();
-
 
 
                     }
@@ -198,7 +178,6 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
             public ViewHolder(View view) {
 
                 super(view);
-                Log.i(LOG_TAG,"ViewHolder(");
                 mView = view;
                 photoCliente = (ImageView) view.findViewById(R.id.photoCliente);
                 customCity = (TextView) view.findViewById(R.id.customCity);

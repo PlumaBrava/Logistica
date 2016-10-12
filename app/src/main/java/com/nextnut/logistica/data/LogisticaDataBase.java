@@ -2,7 +2,6 @@ package com.nextnut.logistica.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import net.simonvt.schematic.annotation.DataType;
 import net.simonvt.schematic.annotation.Database;
@@ -44,7 +43,6 @@ public class LogisticaDataBase {
                         + " ADD COLUMN " + CustomOrdersColumns.SALDO_A_PAGAR_PRICE_CUSTOM_ORDER + " " + DataType.Type.REAL + " DEFAULT 0");
                 db.setTransactionSuccessful();
             } catch (Exception e) {
-                Log.i("UPDATE", "oldVersion:" + e.toString());
 
             } finally {
                 db.endTransaction();
@@ -61,7 +59,6 @@ public class LogisticaDataBase {
                         + " ADD COLUMN " + CustomOrdersColumns.SALDO_A_PAGAR_PRICE_CUSTOM_ORDER + " " + DataType.Type.REAL + " DEFAULT 0");
                 db.setTransactionSuccessful();
             } catch (Exception e) {
-                Log.e("UPDATE", "oldVersion:" + e.toString());
 
             } finally {
                 db.endTransaction();

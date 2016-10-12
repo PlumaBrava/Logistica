@@ -27,6 +27,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
@@ -82,7 +84,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
     private EditText mTilePickingComent;
     private TextView mCreationDate;
 
-    //    private PickingOrdersHandler  mPickingOrdersHandler;
+
 
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_delete;
@@ -90,10 +92,10 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
     private static final int PICKING_ORDER_LOADER = 1;
     private static final int PICKING_LOADER_TOTAL_PRODUCTOS = 2;
     private int mItem = 0;
-//    /**
-//     * The dummy content this fragment is presenting.
-//     */
-//    private DummyContent.DummyItem mItem;
+
+    private LinearLayout mLinearProductos;
+    private LinearLayout mLinearOrders;
+
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -103,10 +105,6 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
     private static final String LOG_TAG = DeliveryListFragment.class.getSimpleName();
 
-
-//    public void setPickingOrdersHandler(PickingOrdersHandler pOH){
-//        mPickingOrdersHandler= pOH;
-//    }
 
     @Override
     public void onAttach(Context context) {
@@ -147,12 +145,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.delivery_list_fragment, container, false);
 
-        View emptyView = rootView.findViewById(R.id.recyclerview_custom_empty);
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.pickingOrder_list);
         mDeliveryOrderTile = (CardView) rootView.findViewById(R.id.deliveryOrderNumbertitleID);
         mDeliveryOrderTile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,13 +163,22 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         mTilePickingComent = (EditText) mDeliveryOrderTile.findViewById(R.id.TitlepickingOrderComents);
         mCreationDate = (TextView) mDeliveryOrderTile.findViewById(R.id.titlePicckinOder_creationdate);
 
-        recyclerView.setLayoutManager(layoutManager);
+        mLinearProductos =(LinearLayout)rootView.findViewById(R.id.linearProductos);
+        mLinearOrders =(LinearLayout)rootView.findViewById(R.id.linearOrders);
 
+
+        View emptyViewPicking = rootView.findViewById(R.id.recyclerview_pickingOrders_empty);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        // Picking Orders
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.pickingOrder_list);
+        recyclerView.setLayoutManager(layoutManager);
 
         mPickinOrdersAdapter = new PickingOrdersCursorAdapter(
                 getContext(),
                 null,
-                emptyView,
+                emptyViewPicking,
                 new PickingOrdersCursorAdapter.PinckingOrdersCursorAdapterOnClickHandler() {
                     @Override
                     public void onClick(long id, PickingOrdersCursorAdapter.ViewHolder vh) {
@@ -190,8 +192,8 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                         getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, DeliveryListFragment.this);
                         mCursorAdapterTotalProductos.notifyDataSetChanged();
                         recyclerView.setVisibility(View.GONE);
-                        recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.VISIBLE);
-                        recyclerViewTotalProductos.setVisibility(View.VISIBLE);
+                        mLinearOrders.setVisibility(View.VISIBLE);
+                        mLinearProductos.setVisibility(View.VISIBLE);
                         mDeliveryOrderTile.setVisibility(View.VISIBLE);
                     }
 
@@ -215,18 +217,13 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
 
                         try {
-
                             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
                             onDataChange();
-
-
                         } catch (RemoteException | OperationApplicationException e) {
-
                         } finally {
                             onDataChange();
                             upDateWitget(getContext());
                         }
-
                     }
 
                     @Override
@@ -237,21 +234,15 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                         ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
                         builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PickingListFragment.PICKING_STATUS_CERRADA);
                         batchOperations.add(builder.build());
-
-
                         try {
-
                             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
                             onDataChange();
-
-
                         } catch (RemoteException | OperationApplicationException e) {
 
                         } finally {
                             onDataChange();
+                            upDateWitget(getContext());
                         }
-
-
                     }
 
                     @Override
@@ -269,25 +260,28 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
 
         recyclerView.setAdapter(mPickinOrdersAdapter);
-
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mPickinOrdersAdapter, SimpleItemTouchHelperCallback.DELIVERY);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
 
 
-        FloatingActionButton fab_save = (FloatingActionButton) mDeliveryOrderTile.findViewById(R.id.fab_save_picking);
+        ImageButton fab_save = (ImageButton) mDeliveryOrderTile.findViewById(R.id.save_picking_Button);
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 mIDPickingOrderSelected = 0;
                 mDeliveryOrderTile.setVisibility(View.GONE);
-                recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
-                recyclerViewTotalProductos.setVisibility(View.GONE);
+                mLinearProductos.setVisibility(View.GONE);
+                mLinearOrders.setVisibility(View.GONE);
+//                recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
+//                recyclerViewTotalProductos.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
 
             }
         });
+
+        // Productos
 
         View emptyViewTotalProducts = rootView.findViewById(R.id.recyclerview_totalproduct_empty);
         recyclerViewTotalProductos = (RecyclerView) rootView.findViewById(R.id.total_products_pickingOrder);
@@ -307,13 +301,13 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
 
         recyclerViewTotalProductos.setAdapter(mCursorAdapterTotalProductos);
-        recyclerViewTotalProductos.setVisibility(View.GONE);
-
-
         recyclerViewCustomOrderInDeliveyOrder = (RecyclerView) rootView.findViewById(R.id.customOrderInpickingOrder_list);
-
         recyclerViewCustomOrderInDeliveyOrder.setLayoutManager(new LinearLayoutManager(getContext()));
 
+
+
+        // Custom Orders
+        View emptyView = rootView.findViewById(R.id.recyclerview_custom_empty);
         mCustomsOrdersCursorAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyView, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
             @Override
             public void onClick(long id, CustomsOrdersCursorAdapter.ViewHolder vh) {
@@ -362,11 +356,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
             @Override
             public void onItemDismissCall(long cursorID) {
-
-
                 mCustomOrderIdSelected = cursorID;
-
-
             }
 
             @Override
@@ -405,7 +395,10 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallbackDeleveyCustomOrder(mCustomsOrdersCursorAdapter);
         ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
         mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderInDeliveyOrder);
-        recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
+
+
+        mLinearOrders.setVisibility(View.GONE);
+        mLinearProductos.setVisibility(View.GONE);
 
         if (rootView.findViewById(R.id.customorder_detail_container) != null) {
             // The detail container view will be present only in the

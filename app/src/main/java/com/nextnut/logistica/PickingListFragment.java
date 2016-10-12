@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -30,6 +29,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
@@ -42,8 +43,8 @@ import com.nextnut.logistica.data.PickingOrdersColumns;
 import com.nextnut.logistica.data.PickingOrdersDetailColumns;
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.rest.CustomsOrdersCursorAdapter;
-import com.nextnut.logistica.rest.PickingOrdersCursorAdapter;
 import com.nextnut.logistica.rest.PickingOrderProductsAdapter;
+import com.nextnut.logistica.rest.PickingOrdersCursorAdapter;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallbackPickingCustomOrder;
 
@@ -76,12 +77,13 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
     private CustomsOrdersCursorAdapter mCustomsOrdersCursorAdapter;
 
     private RecyclerView recyclerViewPickingOrder;
-    private RecyclerView recyclerViewTotalProductos;
-    private RecyclerView recyclerViewCustomOrderInPickingOrder;
     private CardView mPickingOrderTile;
     private TextView mTilePickingOrderNumber;
     private EditText mTilePickingComent;
     private TextView mCreationDate;
+
+    private LinearLayout mLinearProductos;
+    private LinearLayout mLinearOrders;
 
     private PickingOrdersHandler mPickingOrdersHandler;
 
@@ -156,16 +158,20 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
 
         recyclerViewPickingOrder = (RecyclerView) rootView.findViewById(R.id.pickingOrder_list);
         mPickingOrderTile = (CardView) rootView.findViewById(R.id.pickingNumbertitleID);
+        mLinearProductos =(LinearLayout)rootView.findViewById(R.id.linearProductos);
+        mLinearOrders =(LinearLayout)rootView.findViewById(R.id.linearOrders);
 
-        FloatingActionButton fab_save_picking = (FloatingActionButton) mPickingOrderTile.findViewById(R.id.fab_save_picking);
+        ImageButton fab_save_picking = (ImageButton) mPickingOrderTile.findViewById(R.id.save_picking_Button);
         fab_save_picking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 updatePickingOrder(MainActivity.mPickingOrderSelected);
                 mPickingOrdersHandler.onPickingOrderSelected(0);
                 mPickingOrderTile.setVisibility(View.GONE);
-                recyclerViewCustomOrderInPickingOrder.setVisibility(View.GONE);
-                recyclerViewTotalProductos.setVisibility(View.GONE);
+                mLinearProductos.setVisibility(View.GONE);
+                mLinearOrders.setVisibility(View.GONE);
+//                recyclerViewCustomOrderInPickingOrder.setVisibility(View.GONE);
+//                recyclerViewTotalProductos.setVisibility(View.GONE);
                 recyclerViewPickingOrder.setVisibility(View.VISIBLE);
 
             }
@@ -186,7 +192,6 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                 new PickingOrdersCursorAdapter.PinckingOrdersCursorAdapterOnClickHandler() {
                     @Override
                     public void onClick(long id, PickingOrdersCursorAdapter.ViewHolder vh) {
-                        Log.i(LOG_TAG, "onclicka:" + id);
                         if (mPickingOrdersHandler != null) {
 
                             mTilePickingComent.setText(vh.mpickingOrderComents.getText());
@@ -201,8 +206,12 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                             getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, PickingListFragment.this);
                             mCursorAdapterTotalProductos.notifyDataSetChanged();
                             recyclerViewPickingOrder.setVisibility(View.GONE);
-                            recyclerViewCustomOrderInPickingOrder.setVisibility(View.VISIBLE);
-                            recyclerViewTotalProductos.setVisibility(View.VISIBLE);
+
+                            mLinearOrders.setVisibility(View.VISIBLE);
+                            mLinearProductos.setVisibility(View.VISIBLE);
+
+//                            recyclerViewCustomOrderInPickingOrder.setVisibility(View.VISIBLE);
+//                            recyclerViewTotalProductos.setVisibility(View.VISIBLE);
                             mPickingOrderTile.setVisibility(View.VISIBLE);
 
                         }
@@ -344,7 +353,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
 
         View emptyViewTotalProducts = rootView.findViewById(R.id.recyclerview_totalproduct_empty);
 //        emptyViewTotalProducts.setVisibility(View.GONE);
-        recyclerViewTotalProductos = (RecyclerView) rootView.findViewById(R.id.total_products_pickingOrder);
+        RecyclerView recyclerViewTotalProductos = (RecyclerView) rootView.findViewById(R.id.total_products_pickingOrder);
         recyclerViewTotalProductos.setLayoutManager(new LinearLayoutManager(getContext()));
         mCursorAdapterTotalProductos = new PickingOrderProductsAdapter(getContext(), null,
                 emptyViewTotalProducts,
@@ -362,9 +371,9 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
 
 
         recyclerViewTotalProductos.setAdapter(mCursorAdapterTotalProductos);
-        recyclerViewTotalProductos.setVisibility(View.GONE);
+//        recyclerViewTotalProductos.setVisibility(View.GONE);
 
-        recyclerViewCustomOrderInPickingOrder = (RecyclerView) rootView.findViewById(R.id.customOrderInpickingOrder_list);
+        RecyclerView recyclerViewCustomOrderInPickingOrder = (RecyclerView) rootView.findViewById(R.id.customOrderInpickingOrder_list);
 
         recyclerViewCustomOrderInPickingOrder.setLayoutManager(new LinearLayoutManager(getContext()));
         View emptyViewCustomOrder = rootView.findViewById(R.id.recyclerview_custom_empty);
@@ -474,10 +483,11 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
         mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderInPickingOrder);
 
         recyclerViewCustomOrderInPickingOrder.setAdapter(mCustomsOrdersCursorAdapter);
-        recyclerViewCustomOrderInPickingOrder.setVisibility(View.GONE);
-
+//        recyclerViewCustomOrderInPickingOrder.setVisibility(View.GONE);
 //        emptyViewCustomOrder.setVisibility(View.GONE);
 
+        mLinearOrders.setVisibility(View.GONE);
+        mLinearProductos.setVisibility(View.GONE);
 
         if (rootView.findViewById(R.id.customorder_detail_container) != null) {
             // The detail container view will be present only in the
@@ -614,7 +624,6 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                         LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + MainActivity.getmPickingOrderSelected();
 
 
-                Log.i(LOG_TAG, "onCreateLoader");
                 return new CursorLoader(
                         getActivity(),
                         LogisticaProvider.join_customorderDetail_Product_Customer_picking.CONTENT_URI,

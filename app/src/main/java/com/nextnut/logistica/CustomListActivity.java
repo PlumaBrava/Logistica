@@ -18,7 +18,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -163,9 +162,6 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
                     fab_delete.setVisibility(View.GONE);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Log.i("ProductListActivity", "makeSceneTransitionAnimation");
-//                        Pair<View,String> p= new Pair<View, StrinTextViewPreciog>(vh.mphotoProducto, getString(R.string.detail_icon_transition_name));
-//                        Pair<View, String> p1 = Pair.create((View) vh.mphotoCustomer, getString(R.string.custom_icon_transition_imagen));
                         Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
                         Pair<View, String> p3 = Pair.create((View) vh.mSurename, getString(R.string.custom_icon_transition_surname));
                         ActivityOptionsCompat activityOptions =

@@ -77,7 +77,7 @@ public class PinckingTestVerification {
 
 
         // close de picking order
-        onView(allOf(withId(R.id.fab_save_picking),isDisplayed())).perform(click());
+        onView(allOf(withId(R.id.save_picking_Button),isDisplayed())).perform(click());
 
         // Send the Picking Order to deliver
         onView(allOf(withId(R.id.pickingNumberOrderCard), withText("1"))).perform(swipeRight());

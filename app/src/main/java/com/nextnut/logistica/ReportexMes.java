@@ -19,12 +19,11 @@ public class ReportexMes extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reporte_mensualx_cliente);
+        setContentView(R.layout.activity_reporte_x_mes);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getString(R.string.title_activity_reporte_mensualx_month_SubTitle));
-        getSupportActionBar().setSubtitle(R.string.title_activity_reporte_mensualx_month_SubTitle);
 
+        getSupportActionBar().setTitle("");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         modenesXProducto = (TextView)findViewById(R.id.repoteMensualxCliente);

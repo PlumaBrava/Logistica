@@ -26,28 +26,15 @@
             android:textColor="#ffffff"
             android:textSize="24sp"
             android:textStyle="bold|italic" />
-        <!--android:layout_centerVertical="true"-->
-        <!--<FrameLayout-->
             android:id="@+id/widget"
             android:layout_width="match_parent"
             android:layout_height="@dimen/abc_action_bar_default_height_material"
             >
-            <!--&lt;!&ndash;android:background="@color/primary"&ndash;&gt;-->
-            <!--<ImageView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:contentDescription="@string/app_name"-->
-                <!--android:layout_gravity="center"-->
-
-                <!--/>-->
-            <!--android:src="@drawable/manchester_united"-->
-        <!--</FrameLayout>-->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             >
-            <!--android:background="@color/primary_light"-->
             <ListView
                 android:id="@+id/widget_list"
                 android:layout_width="match_parent"
@@ -64,7 +51,6 @@
                 android:textAppearance="?android:textAppearanceLarge"
                 android:text="lista vacia"
                 />
-            <!--android:text="@string/empty_forecast_list"-->
         </FrameLayout>
 
     </LinearLayout>
