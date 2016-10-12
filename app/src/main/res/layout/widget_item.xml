@@ -26,7 +26,7 @@
             android:maxHeight="124dp"
             android:maxWidth="124dp"
             android:background="@color/colorAccent"
-
+            android:contentDescription="@string/contentDescription_PhotoProduct"
             android:layout_gravity="center"/>
 
         <LinearLayout

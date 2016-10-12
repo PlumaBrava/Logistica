@@ -263,6 +263,7 @@
                 android:adjustViewBounds="true"
                 android:maxHeight="96dp"
                 android:maxWidth="96dp"
+                android:contentDescription="@string/contentDescription_customPhoto"
                 app:layout_gravity="center"
                 android:transitionName="@string/custom_icon_transition_imagen"
                 />

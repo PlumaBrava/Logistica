@@ -50,6 +50,7 @@ android:foreground="?selectableItemBackground">
         android:layout_margin="@dimen/text_margin"
         android:maxHeight="96dp"
         android:maxWidth="96dp"
+        android:contentDescription="@string/contentDescription_customPhoto"
         android:transitionName="@string/custom_icon_transition_imagen"
         android:layout_gravity="center_vertical"/>
 

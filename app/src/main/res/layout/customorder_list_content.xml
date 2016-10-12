@@ -115,6 +115,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:gravity="end"
+                    android:contentDescription="@string/contentDescription_butonMakeAcall"
                     android:id="@+id/phoneClallButton"
                     android:src="@android:drawable/sym_action_call"
                 />

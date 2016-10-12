@@ -139,6 +139,11 @@
     <string name="customOrder_last_hint_text">Lastename</string>
     <string name="BotonSeleccionCliente">Customer</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="contentDescription_customPhoto">Custom Photo</string>
+    <string name="contentDescription_butonMakeAcall">Button: Make a Call</string>
+    <string name="contentDescription_butonShare">Button: Share</string>
+    <string name="contentDescription_PhotoProduct">Product Photo</string>
+
 
     <string name="file">file:</string>
     <string name="Product_">Product_</string>
