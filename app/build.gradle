@@ -21,8 +21,8 @@ android {
 
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -36,14 +36,14 @@ android {
     productFlavors {
         free {
             applicationId = "com.nextnut.logistica.free"
-            versionName "1.0-free"
+            versionName "1.1-free"
             minSdkVersion 16
             signingConfig signingConfigs.LogisticaKey
             targetSdkVersion 24
         }
         paid {
             applicationId = "com.nextnut.logistica.paid"
-            versionName "1.0-paid"
+            versionName "1.1-paid"
             minSdkVersion 16
             signingConfig signingConfigs.LogisticaKey
             targetSdkVersion 24
@@ -55,8 +55,7 @@ android {
         javaMaxHeapSize "4g"
 
     }
-    productFlavors {
-    }
+
 }
 
 dependencies {

@@ -277,8 +277,9 @@
 
 
 
-    //Logistica Free
-    <string name="server_client_id">378485183737-cj1pcnet2t14ifrrcc1e9fmvunkqd206.apps.googleusercontent.com</string>
+    //Logistica Paid
+    <!--<string name="server_client_id">378485183737-cj1pcnet2t14ifrrcc1e9fmvunkqd206.apps.googleusercontent.com</string>-->
+    <string name="server_client_id">378485183737-0rknnj5dulrkqnb8khbjbks0a3k2iecf.apps.googleusercontent.com</string>
 
 
 

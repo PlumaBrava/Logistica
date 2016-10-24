@@ -97,12 +97,16 @@ public class LoginActivity
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+//                .requestScopes(new Scope(Scopes.PLUS_LOGIN))
+//                .requestScopes(new Scope(Scopes.PLUS_ME))
                 .build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
                         this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+//                .addConnectionCallbacks(LoginActivity.this)
+//                .addOnConnectionFailedListener(this)
                 .build();
 
         signInButton = (SignInButton) findViewById(R.id.sign_in_button);
