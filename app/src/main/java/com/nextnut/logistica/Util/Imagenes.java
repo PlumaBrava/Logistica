@@ -1,5 +1,6 @@
 package com.nextnut.logistica.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -84,6 +85,39 @@ public class Imagenes {
         });
         builder.show();
     }
+
+    public static void selectImage(final Activity act) {
+        final CharSequence[] items = {act.getResources().getString(R.string.TakePhoto),
+                act.getResources().getString(R.string.ChoosefromLibrary),
+                act.getResources().getString(R.string.Cancel)};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(act);
+        builder.setTitle(act.getResources().getString(R.string.AddPhoto));
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals(act.getResources().getString(R.string.TakePhoto))) {
+
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                    act. startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                } else if (items[item].equals(act.getResources().getString(R.string.ChoosefromLibrary))) {
+
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("image/*");
+                    if (intent.resolveActivity(act.getPackageManager()) != null) {
+                        act. startActivityForResult(intent, REQUEST_IMAGE_GET);
+                    }
+
+
+                } else if (items[item].equals(act.getResources().getString(R.string.Cancel))) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
 
     public static String savePhotoReturnPath(Context context, Bitmap imagen){
         Bitmap bmp = imagen;

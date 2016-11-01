@@ -1,0 +1,125 @@
+{
+  "project_info": {
+    "project_number": "378485183737",
+    "firebase_url": "https://logistica-144918.firebaseio.com",
+    "project_id": "logistica-144918",
+    "storage_bucket": "logistica-144918.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378485183737:android:d8d4add0e9c0c5af",
+        "android_client_info": {
+          "package_name": "com.nextnut.logistica"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378485183737-17t57p5hvs00a9aufdh8534ra876ds6c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nextnut.logistica",
+            "certificate_hash": "4E59E47AFD1006A8BBAA34D5714A510057897E2E"
+          }
+        },
+        {
+          "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATFHPOvPIszswYY0tCgJ06rlyQ24WHDCA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378485183737:android:8a45357665434b96",
+        "android_client_info": {
+          "package_name": "com.nextnut.com.logistica.free"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATFHPOvPIszswYY0tCgJ06rlyQ24WHDCA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378485183737:android:d3ee8bf11736cac7",
+        "android_client_info": {
+          "package_name": "com.nextnut.logistica.paid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378485183737-0rknnj5dulrkqnb8khbjbks0a3k2iecf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nextnut.logistica.paid",
+            "certificate_hash": "4E59E47AFD1006A8BBAA34D5714A510057897E2E"
+          }
+        },
+        {
+          "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATFHPOvPIszswYY0tCgJ06rlyQ24WHDCA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

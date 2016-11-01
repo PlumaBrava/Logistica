@@ -2,28 +2,27 @@ package com.nextnut.logistica;
 
 import android.content.ContentProviderOperation;
 import android.content.Intent;
-import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.nextnut.logistica.data.LogisticaProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.rest.ProductCursorAdapter;
+import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
+import com.nextnut.logistica.viewholder.ProductViewHolder;
 
 import java.util.ArrayList;
 
@@ -32,7 +31,10 @@ import java.util.ArrayList;
 
 
 
-public class ProductListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ProductListActivity extends AppCompatActivity {
+//        implements LoaderManager.LoaderCallbacks<Cursor> {
+    private DatabaseReference mDatabase;
+    private FirebaseRecyclerAdapter<Producto, ProductViewHolder> mAdapter;
     private static final String LOG_TAG = ProductListActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 0;
     private long mItem=0;
@@ -77,7 +79,9 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
-
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//        mUserId= FirebaseAuth.getInstance().getCurrentUser().getUid();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
@@ -122,51 +126,96 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.product_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
-        mCursorAdapter = new ProductCursorAdapter(this, null, emptyView, new ProductCursorAdapter.ProductCursorAdapterOnClickHandler() {
+//        mCursorAdapter = new ProductCursorAdapter(this, null, emptyView, new ProductCursorAdapter.ProductCursorAdapterOnClickHandler() {
+//
+//            @Override
+//            public void onClick(long id, ProductCursorAdapter.ViewHolder vh) {
+//
+//                mItem=id;
+//                if (mTwoPane) {
+//                    Bundle arguments = new Bundle();
+//                     // when rotate the screen the selecction of the second Screen is conserved.
+//                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
+//                    arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
+//
+//                    ProductDetailFragment fragment = new ProductDetailFragment();
+//                    fragment.setArguments(arguments);
+//                    getSupportFragmentManager().beginTransaction()
+//
+//                            .addToBackStack(null)
+//                            .replace(R.id.product_detail_container, fragment)
+//                            .commit();
+//
+//                    fab_new.setVisibility(View.GONE);
+//                    fab_save.setVisibility(View.VISIBLE);
+//
+//                } else {
+//                    Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
+//                    intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
+//                    intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, id);
+//                    fab_new.setVisibility(View.VISIBLE);
+//
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        Pair<View, String> p1 = Pair.create((View) vh.mphotoProducto, getString(R.string.detail_icon_transition_imagen));
+//                        Pair<View, String> p2 = Pair.create((View) vh.mTextViewPrecio, getString(R.string.detail_icon_transition_price));
+//                        Pair<View, String> p3 = Pair.create((View) vh.mTextViewNombre, getString(R.string.detail_icon_transition_name));
+//                        ActivityOptionsCompat activityOptions =
+//                                ActivityOptionsCompat.makeSceneTransitionAnimation(ProductListActivity.this,   p1,p2,p3);
+//                        startActivity(intent, activityOptions.toBundle());
+//
+//                    } else {
+//                        startActivity(intent);
+//                    }
+//                }
+//            }
+//        });
+//        recyclerView.setAdapter(mCursorAdapter);
 
+
+        // Set up FirebaseRecyclerAdapter with the Query
+        Query productosQuery = getQuery(mDatabase);
+        mAdapter = new FirebaseRecyclerAdapter<Producto, ProductViewHolder>(Producto.class, R.layout.product_list_item,
+                ProductViewHolder.class, productosQuery) {
             @Override
-            public void onClick(long id, ProductCursorAdapter.ViewHolder vh) {
+            protected void populateViewHolder(final ProductViewHolder viewHolder, final Producto model, final int position) {
+                final DatabaseReference postRef = getRef(position);
+                Log.i("EmpresasView", "populateViewHolder(postRef)"+postRef.toString());
 
-                mItem=id;
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                     // when rotate the screen the selecction of the second Screen is conserved.
-                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
-                    arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
-
-                    ProductDetailFragment fragment = new ProductDetailFragment();
-                    fragment.setArguments(arguments);
-                    getSupportFragmentManager().beginTransaction()
-
-                            .addToBackStack(null)
-                            .replace(R.id.product_detail_container, fragment)
-                            .commit();
-
-                    fab_new.setVisibility(View.GONE);
-                    fab_save.setVisibility(View.VISIBLE);
-
-                } else {
-                    Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
-                    intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
-                    intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, id);
-                    fab_new.setVisibility(View.VISIBLE);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Pair<View, String> p1 = Pair.create((View) vh.mphotoProducto, getString(R.string.detail_icon_transition_imagen));
-                        Pair<View, String> p2 = Pair.create((View) vh.mTextViewPrecio, getString(R.string.detail_icon_transition_price));
-                        Pair<View, String> p3 = Pair.create((View) vh.mTextViewNombre, getString(R.string.detail_icon_transition_name));
-                        ActivityOptionsCompat activityOptions =
-                                ActivityOptionsCompat.makeSceneTransitionAnimation(ProductListActivity.this,   p1,p2,p3);
-                        startActivity(intent, activityOptions.toBundle());
-
-                    } else {
-                        startActivity(intent);
+                // Set click listener for the whole post view
+                final String postKey = postRef.getKey();
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Launch PostDetailActivity
+//                        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
+//                        intent.putExtra(PostDetailActivity.EXTRA_POST_KEY, postKey);
+//                        startActivity(intent);
                     }
-                }
-            }
-        });
-        recyclerView.setAdapter(mCursorAdapter);
+                });
 
+                // Determine if the current user has liked this post and set UI accordingly
+//                if (model.stars.containsKey(getUid())) {
+//                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_24);
+//                } else {
+//                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_outline_24);
+//                }
+
+                // Bind Post to ViewHolder, setting OnClickListener for the star button
+                viewHolder.bindToPost(model, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View starView) {
+                        // Need to write to both places the post is stored
+//                        DatabaseReference globalPostRef = mDatabase.child("posts").child(postRef.getKey());
+//                        DatabaseReference userPostRef = mDatabase.child("user-posts").child(model.uid).child(postRef.getKey());
+//
+//                        // Run two transactions
+//                        onStarClicked(globalPostRef);
+//                        onStarClicked(userPostRef);
+                    }
+                });
+            }
+        };
+        recyclerView.setAdapter(mAdapter);
 
 
 
@@ -216,34 +265,39 @@ public class ProductListActivity extends AppCompatActivity implements LoaderMana
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
 
-        getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+//        getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         super.onPostCreate(savedInstanceState);
     }
 
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, LogisticaProvider.Products.CONTENT_URI,
-                null,
-                null,
-                null,
-                null);
+//    @Override
+//    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+//        return new CursorLoader(this, LogisticaProvider.Products.CONTENT_URI,
+//                null,
+//                null,
+//                null,
+//                null);
+//
+//    }
 
+//    @Override
+//    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+//        mCursorAdapter.swapCursor(data);
+//    }
+//
+//    @Override
+//    public void onLoaderReset(Loader<Cursor> loader) {
+//        mCursorAdapter.swapCursor(null);
+//    }
+
+
+    public Query getQuery(DatabaseReference databaseReference) {
+//        Log.i("EmpresasView", "getQuery user:"+mUserId);
+        // Todas las empresas de este User
+        return databaseReference.child("empresa-producto");
+//                .child(mUserId);
     }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCursorAdapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mCursorAdapter.swapCursor(null);
-    }
-
-
-
 
 
 }

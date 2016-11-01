@@ -4,8 +4,11 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:fitsSystemWindows">false</item> // permite el scrooll llegue hasta status bar- si es flase pasa por debajo(esto esta bueno para las fotos
-        <item name="android:statusBarColor">@android:color/transparent</item> // hace que status bar sea transparente. Aqui se puede colocar otro color
+        <item name="android:fitsSystemWindows">false</item>
+        // permite el scrooll llegue hasta status bar- si es flase pasa por debajo(esto esta bueno
+        para las fotos
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        // hace que status bar sea transparente. Aqui se puede colocar otro color
 
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowEnterTransitionOverlap">true</item>

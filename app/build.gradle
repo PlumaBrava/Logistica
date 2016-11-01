@@ -14,13 +14,13 @@ android {
             storePassword 'Maria001'
         }
     }
-    compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "com.nextnut.logistica"
 
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 2
         versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -35,21 +35,25 @@ android {
     }
     productFlavors {
         free {
-            applicationId = "com.nextnut.logistica.free"
+            applicationId = "com.nextnut.logistica"
             versionName "1.1-free"
             minSdkVersion 16
             signingConfig signingConfigs.LogisticaKey
-            targetSdkVersion 24
+            targetSdkVersion 25
         }
         paid {
             applicationId = "com.nextnut.logistica.paid"
             versionName "1.1-paid"
             minSdkVersion 16
             signingConfig signingConfigs.LogisticaKey
-            targetSdkVersion 24
+            targetSdkVersion 25
         }
     }
-
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/NOTICE'
+    }
 
     dexOptions {
         javaMaxHeapSize "4g"
@@ -73,7 +77,7 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     // Set this dependency to build and run UI Automator tests
     //    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
-    androidTestCompile 'com.android.support:support-annotations:24.2.1'
+    androidTestCompile 'com.android.support:support-annotations:25.0.0'
     //
     //    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     androidTestCompile('com.android.support.test.espresso:espresso-intents:2.2.2') {
@@ -91,12 +95,12 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
 //        exclude module: 'recyclerview-v7'
     }
-    compile 'com.android.support:support-v4:24.2.1'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
-    compile 'com.android.support:gridlayout-v7:24.2.1'
-    compile 'com.android.support:cardview-v7:24.2.1'
+    compile 'com.android.support:support-v4:25.0.0'
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:design:25.0.0'
+    compile 'com.android.support:recyclerview-v7:25.0.0'
+    compile 'com.android.support:gridlayout-v7:25.0.0'
+    compile 'com.android.support:cardview-v7:25.0.0'
     compile 'net.simonvt.schematic:schematic:0.6.7'
     compile 'net.simonvt.schematic:schematic-compiler:0.6.7'
     compile 'com.squareup.picasso:picasso:2.5.2'
@@ -104,4 +108,13 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:9.6.1'
     // Adds
     compile 'com.google.android.gms:play-services-ads:9.6.1'
+    //Fire base
+    compile 'com.google.firebase:firebase-core:9.6.1'
+    compile 'com.firebaseui:firebase-ui-database:0.6.0'
+    compile 'com.google.firebase:firebase-auth:9.6.1'
+    compile 'com.google.firebase:firebase-storage:9.6.1'
+    compile 'com.google.firebase:firebase-database:9.6.1'
+    compile 'com.facebook.android:facebook-android-sdk:4.16.1'
+
 }
+apply plugin: 'com.google.gms.google-services'

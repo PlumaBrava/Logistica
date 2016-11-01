@@ -15,17 +15,21 @@
       },
       "oauth_client": [
         {
-          "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "378485183737-17t57p5hvs00a9aufdh8534ra876ds6c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nextnut.logistica",
+            "certificate_hash": "4E59E47AFD1006A8BBAA34D5714A510057897E2E"
+          }
         },
         {
-          "client_id": "378485183737-l6gnvdaogiit9if0dfj7g0k69cpkqlqt.apps.googleusercontent.com",
+          "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDvQ-EeQDfAEBlVBsgMrv9PPs1WAXnX1ko"
+          "current_key": "AIzaSyATFHPOvPIszswYY0tCgJ06rlyQ24WHDCA"
         }
       ],
       "services": {
@@ -50,25 +54,13 @@
       },
       "oauth_client": [
         {
-          "client_id": "378485183737-kpgisgn2qdl31hvf8kt3fnd31114p0et.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.nextnut.com.logistica.free",
-            "certificate_hash": "4E59E47AFD1006A8BBAA34D5714A510057897E2E"
-          }
-        },
-        {
           "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "378485183737-l6gnvdaogiit9if0dfj7g0k69cpkqlqt.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDvQ-EeQDfAEBlVBsgMrv9PPs1WAXnX1ko"
+          "current_key": "AIzaSyATFHPOvPIszswYY0tCgJ06rlyQ24WHDCA"
         }
       ],
       "services": {
@@ -76,13 +68,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2

@@ -9,8 +9,10 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -18,6 +20,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,16 +29,28 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
+import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.util.CurrencyToDouble;
 import com.nextnut.logistica.util.DialogAlerta;
 import com.nextnut.logistica.util.Imagenes;
 import com.nextnut.logistica.util.NumberTextWatcher;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.nextnut.logistica.util.Imagenes.resize;
 import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
@@ -87,7 +102,9 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
 
     CollapsingToolbarLayout appBarLayout;
 
-
+    private DatabaseReference mDatabase;
+    private FirebaseStorage mStorage;
+    private String mUserId;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -98,6 +115,13 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // [START initialize_database_ref]
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mStorage = FirebaseStorage.getInstance();
+        mUserId= FirebaseAuth.getInstance().getCurrentUser().getUid();
+        // [END initialize_database_ref]
+
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
 
@@ -387,6 +411,7 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                 CurrencyToDouble price1 = new CurrencyToDouble(mProductPriceSpecial.getText().toString());
                 builder.withValue(ProductsColumns.PRECIO_SPECIAL_PRODUCTO, price1.convert());
                 batchOperations.add(builder.build());
+                fireBaseSaveProducto();
             } else   {
                 ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.Products.withId(mItem));
                 builder.withValue(ProductsColumns.NOMBRE_PRODUCTO, mProductName.getText().toString());
@@ -547,6 +572,69 @@ public class ProductDetailFragment extends Fragment implements LoaderManager.Loa
                 mProductName.setTextColor(getResources().getColor(R.color.ValidationOK));
                 return true;
             }
+        }
+    }
+
+    public void fireBaseSaveProducto(){
+        Log.i("producto","fireBaseSaveProducto");
+
+        mImageProducto.setDrawingCacheEnabled(true);
+        mImageProducto.buildDrawingCache();
+        Bitmap bitmap = mImageProducto.getDrawingCache();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        // Create a storage reference from our app
+        StorageReference storageRef = mStorage.getReferenceFromUrl("gs://logistica-144918.appspot.com");
+
+// Create a reference to "mountains.jpg"
+        StorageReference ImagenRef = storageRef.child("images"+mCurrentPhotoPath);
+
+// Create a reference to 'images/mountains.jpg'
+        StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg");
+
+
+        UploadTask uploadTask = ImagenRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.i("producto","OnFalilure: "+ exception);
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.i("producto","onSuccess: "+ taskSnapshot.toString());
+
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
+                CurrencyToDouble priceEspecial = new CurrencyToDouble(mProductPriceSpecial.getText().toString());
+
+                writeNewProducto(mProductName.getText().toString(),
+                                price.convert(),
+                                priceEspecial.convert(),
+                                mProductDescription.getText().toString(),
+                                downloadUrl.toString(),
+                                mUserId
+                        );
+            }
+        });
+    }
+
+    // [START basic_write]
+    private void writeNewProducto(String nombreProducto , Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto, String uid) {
+        if (true) {//validar formulario
+            Log.i("producto","writeNewProducto: ");
+            String key = mDatabase.child("empresa").child("producto").push().getKey();
+            Producto producto = new Producto(nombreProducto, precio, precioEspcecial,  descripcionProducto, fotoProducto, uid);
+            Map<String, Object> productoValues = producto.toMap();
+            Map<String, Object> childUpdates = new HashMap<>();
+//            childUpdates.put("/empresa/" + key, empresaValues);
+            childUpdates.put("/empresa-producto/" +  key, productoValues);
+            mDatabase.updateChildren(childUpdates);
+
         }
     }
 

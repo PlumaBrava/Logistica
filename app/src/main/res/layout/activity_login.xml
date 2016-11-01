@@ -63,6 +63,29 @@
 
             </android.support.design.widget.TextInputLayout>
 
+        <LinearLayout
+            android:id="@+id/layout_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/password"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_sign_in"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_in" />
+
+
+            <Button
+                android:id="@+id/button_sign_up"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_up" />
+            </LinearLayout>
+
+
             <Button
                 android:id="@+id/email_sign_in_button"
                 style="?android:textAppearanceSmall"
@@ -76,6 +99,14 @@
                 android:id="@+id/sign_in_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/button_facebook_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp" />
 
         </LinearLayout>
     </ScrollView>

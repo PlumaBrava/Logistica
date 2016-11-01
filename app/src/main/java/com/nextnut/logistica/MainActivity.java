@@ -26,6 +26,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.firebase.auth.FirebaseAuth;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.util.ProductSectionActivity;
@@ -300,6 +301,22 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
             ActivityOptionsCompat activityOptions1 =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(this);
             ActivityCompat.startActivity(this, intent1, activityOptions1.toBundle());
+            return true;
+        }
+        if (id == R.id.action_logout) {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return true;
+        }
+
+        if (id == R.id.action_empresa) {
+            startActivity(new Intent(this, EmpresasActivity.class));
+            return true;
+        }
+
+        if (id == R.id.action_empresaList) {
+            startActivity(new Intent(this, EmpresasListActivity.class));
             return true;
         }
 

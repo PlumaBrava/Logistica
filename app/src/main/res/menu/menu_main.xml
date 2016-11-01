@@ -23,6 +23,23 @@
         android:orderInCategory="110"
         android:title="@string/reportesXMes"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_logout"
+        android:title="@string/menu_logout"
+        android:visible="true"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_empresa"
+        android:title="@string/menu_empresa"
+        android:visible="true"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_empresaList"
+        android:title="@string/menu_empresaList"
+        android:visible="true"
+        app:showAsAction="never" />
+
 
 <!-- Revisar iconos -->
 </menu>

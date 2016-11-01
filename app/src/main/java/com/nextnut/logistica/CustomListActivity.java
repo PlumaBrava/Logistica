@@ -2,16 +2,13 @@ package com.nextnut.logistica;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -126,57 +123,61 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.custom_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
-        mCursorAdapter = new CustomsCursorAdapter(this, null, emptyView, new CustomsCursorAdapter.CustomsCursorAdapterOnClickHandler() {
-            @Override
-            public void onClick(long id, CustomsCursorAdapter.ViewHolder vh) {
-                mItem = id; // when rotate the screen the selecction of the second Screen is conserved.
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
+//        mCursorAdapter = new CustomsCursorAdapter(this, null, emptyView, new CustomsCursorAdapter.CustomsCursorAdapterOnClickHandler() {
+//            @Override
+//            public void onClick(long id, CustomsCursorAdapter.ViewHolder vh) {
+//                mItem = id; // when rotate the screen the selecction of the second Screen is conserved.
+//                if (mTwoPane) {
+//                    Bundle arguments = new Bundle();
+//
+//                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
+//                    arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
+//
+//                    CustomDetailFragment fragment = new CustomDetailFragment();
+//                    fragment.setArguments(arguments);
+//                    getSupportFragmentManager().beginTransaction()
+//                            .addToBackStack(null)
+//                            .replace(R.id.custom_detail_container, fragment)
+//                            .commit();
+//
+//                    fab_new.setVisibility(View.GONE);
+//                    fab_save.setVisibility(View.VISIBLE);
+//                    fab_delete.setVisibility(View.VISIBLE);
+//
+//
+//                }else {
+//                    Bundle arguments = new Bundle();
+//
+//                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
+//                    arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
+//                    Intent intent = new Intent(getApplicationContext(), CustomDetailActivity.class);
+//                    intent.putExtras(arguments);
+//
+//
+//                    fab_new.setVisibility(View.VISIBLE);
+//                    fab_save.setVisibility(View.GONE);
+//                    fab_delete.setVisibility(View.GONE);
+//
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
+//                        Pair<View, String> p3 = Pair.create((View) vh.mSurename, getString(R.string.custom_icon_transition_surname));
+//                        ActivityOptionsCompat activityOptions =
+//                                ActivityOptionsCompat.makeSceneTransitionAnimation(CustomListActivity.this,  p2, p3);
+//                        startActivity(intent, activityOptions.toBundle());
+//
+//                    } else {
+//                        startActivity(intent);
+//                    }
+//                }
+//            }
+//        });
+//
+//
+//        recyclerView.setAdapter(mCursorAdapter);
 
-                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
-                    arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
-
-                    CustomDetailFragment fragment = new CustomDetailFragment();
-                    fragment.setArguments(arguments);
-                    getSupportFragmentManager().beginTransaction()
-                            .addToBackStack(null)
-                            .replace(R.id.custom_detail_container, fragment)
-                            .commit();
-
-                    fab_new.setVisibility(View.GONE);
-                    fab_save.setVisibility(View.VISIBLE);
-                    fab_delete.setVisibility(View.VISIBLE);
 
 
-                }else {
-                    Bundle arguments = new Bundle();
 
-                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
-                    arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
-                    Intent intent = new Intent(getApplicationContext(), CustomDetailActivity.class);
-                    intent.putExtras(arguments);
-
-
-                    fab_new.setVisibility(View.VISIBLE);
-                    fab_save.setVisibility(View.GONE);
-                    fab_delete.setVisibility(View.GONE);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
-                        Pair<View, String> p3 = Pair.create((View) vh.mSurename, getString(R.string.custom_icon_transition_surname));
-                        ActivityOptionsCompat activityOptions =
-                                ActivityOptionsCompat.makeSceneTransitionAnimation(CustomListActivity.this,  p2, p3);
-                        startActivity(intent, activityOptions.toBundle());
-
-                    } else {
-                        startActivity(intent);
-                    }
-                }
-            }
-        });
-
-
-        recyclerView.setAdapter(mCursorAdapter);
 
 
         if (findViewById(R.id.custom_detail_container) != null ) {
