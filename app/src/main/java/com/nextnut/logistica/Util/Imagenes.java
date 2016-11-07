@@ -33,16 +33,16 @@ public class Imagenes {
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1888;
     public static final int REQUEST_IMAGE_GET = 1889;
 
-    public static Drawable resize(Context context, int somedrawable) {
+    public static Drawable dimensiona(Context context, int somedrawable) {
 
         // Read your drawable from somewhere
 
-        Drawable dr =context.getResources(). getDrawable(somedrawable);
+        Drawable dr = context.getResources().getDrawable(somedrawable);
         Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
 
         Drawable d = new BitmapDrawable(context.getResources(), Bitmap.createScaledBitmap(bitmap
-                ,context.getResources().getDimensionPixelSize(R.dimen.product_cardPhotoheigth)
-                ,context.getResources().getDimensionPixelSize(R.dimen.product_cardPhotowidth)
+                , context.getResources().getDimensionPixelSize(R.dimen.product_cardPhotoheigth)
+                , context.getResources().getDimensionPixelSize(R.dimen.product_cardPhotowidth)
                 , true));
 // Set your new, scaled drawable "d"
 
@@ -68,13 +68,13 @@ public class Imagenes {
 
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-                   fragment. startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                    fragment.startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
                 } else if (items[item].equals(fragment.getResources().getString(R.string.ChoosefromLibrary))) {
 
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                     intent.setType("image/*");
                     if (intent.resolveActivity(fragment.getContext().getPackageManager()) != null) {
-                        fragment. startActivityForResult(intent, REQUEST_IMAGE_GET);
+                        fragment.startActivityForResult(intent, REQUEST_IMAGE_GET);
                     }
 
 
@@ -100,13 +100,13 @@ public class Imagenes {
 
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-                    act. startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+                    act.startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
                 } else if (items[item].equals(act.getResources().getString(R.string.ChoosefromLibrary))) {
 
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                     intent.setType("image/*");
                     if (intent.resolveActivity(act.getPackageManager()) != null) {
-                        act. startActivityForResult(intent, REQUEST_IMAGE_GET);
+                        act.startActivityForResult(intent, REQUEST_IMAGE_GET);
                     }
 
 
@@ -119,7 +119,7 @@ public class Imagenes {
     }
 
 
-    public static String savePhotoReturnPath(Context context, Bitmap imagen){
+    public static String savePhotoReturnPath(Context context, Bitmap imagen) {
         Bitmap bmp = imagen;
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
@@ -151,7 +151,7 @@ public class Imagenes {
 
     }
 
-    public static String saveImageSelectedReturnPath (Context context,  Intent data) {
+    public static String saveImageSelectedReturnPath(Context context, Intent data) {
         Bitmap bm = null;
         if (data != null) {
             try {
@@ -162,7 +162,6 @@ public class Imagenes {
 
                 bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
-
 
 
                 String filename = new SimpleDateFormat(context.getResources().getString(R.string.yyyyMMdd_HHmmss)).format(new Date());
@@ -190,4 +189,72 @@ public class Imagenes {
         }
         return null;
     }
+//
+////    public static String savePhotoReturnPath(Context context, Bitmap imagen) {
+//public static Uri subirFotoReturnUri(StorageReference ref, Bitmap imagen) {
+//
+//    Log.i("subirFotoReturnUri","subirFotoReturnUri");
+//
+//    // Get the data from an ImageView as bytes
+////    imageView.setDrawingCacheEnabled(true);
+////    imageView.buildDrawingCache();
+////    Bitmap bitmap = imageView.getDrawingCache();
+//    final Uri[] uri = {null};
+//    if (imagen != null) {
+//        Log.i("subirFotoReturnUri","imagen != null");
+//
+//        Map<StorageReference, Bitmap> datos = new HashMap<>();
+//        datos.put(ref, imagen);
+//
+//        new AsyncTask< Map<StorageReference, Bitmap> ,Integer,Void>(){
+//            @Override
+//            protected Void doInBackground(Map<StorageReference, Bitmap>... maps) {
+//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                imagen.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//                byte[] data = baos.toByteArray();
+//
+//                UploadTask uploadTask = ref.putBytes(data);
+//                uploadTask.addOnFailureListener(new
+//
+//                                                        OnFailureListener() {
+//                                                            @Override
+//                                                            public void onFailure(@NonNull Exception exception) {
+//                                                                // Handle unsuccessful uploads
+//                                                                Log.i("subirFotoReturnUri","onFailure: "+exception.toString());
+//
+//                                                            }
+//                                                        }
+//
+//                ).
+//
+//                        addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                                                 @Override
+//                                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                                                     // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+//                                                     Uri downloadUrl = taskSnapshot.getDownloadUrl();
+//                                                     uri[0] = downloadUrl;
+//                                                     Log.i("subirFotoReturnUri","onFailure: "+uri[0].toString());
+//
+//                                                 }
+//                                             }
+//
+//                        );
+//
+//            }
+//
+//
+//
+//            @Override
+//            protected void onPostExecute() {
+//                super.onPostExecute();
+//            }
+//        };
+//
+//
+//
+//    } else {
+//        Log.i("subirFotoReturnUri","imagen = null");
+//        return uri[0];
+//    }
+//}
 }

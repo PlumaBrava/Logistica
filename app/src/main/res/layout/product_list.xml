@@ -25,7 +25,7 @@
         android:text="@string/empty_product_list" />
 
 <android.support.v7.widget.RecyclerView
-    android:id="@+id/product_list"
+    android:id="@+id/product_list_recyclerView"
     android:name="com.nextnut.logistica.ProductListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

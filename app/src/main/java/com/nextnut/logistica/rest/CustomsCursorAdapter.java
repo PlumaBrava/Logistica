@@ -22,7 +22,7 @@ import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 import com.squareup.picasso.Picasso;
 
-import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.dimensiona;
 
 
 public class CustomsCursorAdapter extends CursorRecyclerViewAdapter<CustomsCursorAdapter.ViewHolder>
@@ -106,7 +106,7 @@ implements ItemTouchHelperAdapter{
                 DatabaseUtils.dumpCursor(cursor);
                 viewHolder.mcursorId=cursor.getInt(cursor.getColumnIndex(CustomColumns.ID_CUSTOM));
                 viewHolder.mphotString=cursor.getString(cursor.getColumnIndex(CustomColumns.IMAGEN_CUSTOM));
-                Drawable drawable = resize(mContext, R.drawable.ic_action_image_timer_auto);
+                Drawable drawable = dimensiona(mContext, R.drawable.ic_action_image_timer_auto);
                 Picasso.with(viewHolder.mphotoCustomer.getContext())
 
                         .load(viewHolder.mphotString)

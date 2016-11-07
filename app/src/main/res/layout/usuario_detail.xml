@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/fab_margin"
+    android:orientation="vertical">
+
+
+    <com.rey.material.widget.ProgressView
+        android:id="@+id/progressUsarios"
+        style="@style/Widget.AppCompat.ProgressBar"
+
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+
+        android:indeterminate="true"
+        android:theme="@style/CircularProgress"
+
+        app:pv_autostart="true"
+        app:pv_circular="false"
+        app:pv_progressMode="indeterminate"
+        app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
+
+        />
+
+    <LinearLayout
+        android:id="@+id/form_usuarioDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+        <!--android:max="100"-->
+        <!--android:progress="10"-->
+        <!--android:progressDrawable="@drawable/circular_progress_bar"-->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:gravity="center_horizontal">
+
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="250dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:ellipsize="end"
+                android:hint="@string/prompt_email"
+                android:inputType="textEmailAddress"
+                android:maxLines="1" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <com.rey.material.widget.Switch
+            android:id="@+id/userSwitch"
+            style="@style/Material.Widget.Switch"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:checked="false" />
+
+    </LinearLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start">
+
+        <EditText
+            android:id="@+id/email_confirmation"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:hint="@string/prompt_email"
+            android:inputType="textEmailAddress"
+            android:maxLines="1" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="vertical">
+
+            <com.rey.material.widget.CheckBox
+                android:id="@+id/perfil_usuarios"
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_usuarios" />
+
+            <com.rey.material.widget.CheckBox
+                android:id="@+id/perfil_productos"
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_productos" />
+
+            <com.rey.material.widget.CheckBox
+                android:id="@+id/perfil_clientes"
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_clientes" />
+
+
+            <com.rey.material.widget.CheckBox
+                android:id="@+id/perfil_reportes"
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_reportes" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="vertical">
+
+            <com.rey.material.widget.CheckBox
+                android:id="@+id/perfil_ordenes"
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_ordenes" />
+
+            <com.rey.material.widget.CheckBox
+                android:id="@+id/perfil_preparar"
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_preparar" />
+
+            <com.rey.material.widget.CheckBox
+                android:id="@+id/perfil_entregar"
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_entregar" />
+
+            <com.rey.material.widget.CheckBox
+                android:id="@+id/perfil_pagos"
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_pagos" />
+
+
+            <com.rey.material.widget.CheckBox
+                android:id="@+id/perfil_stock"
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/perfil_stock" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

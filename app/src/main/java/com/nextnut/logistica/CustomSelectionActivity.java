@@ -24,7 +24,7 @@ import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.squareup.picasso.Picasso;
 
-import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.dimensiona;
 
 public class CustomSelectionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     Adapter mAdapter;
@@ -132,7 +132,7 @@ public class CustomSelectionActivity extends AppCompatActivity implements Loader
                 holder.custonName.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM)) + " " +
                         mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));
 
-                Drawable drawable = resize(CustomSelectionActivity.this, R.drawable.ic_action_action_redeem);
+                Drawable drawable = dimensiona(CustomSelectionActivity.this, R.drawable.ic_action_action_redeem);
                 Picasso.with(CustomSelectionActivity.this)
 
                         .load(mCursor.getString(mCursor.getColumnIndex(CustomColumns.IMAGEN_CUSTOM)))

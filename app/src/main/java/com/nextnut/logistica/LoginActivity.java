@@ -5,22 +5,17 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,6 +47,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.nextnut.logistica.modelos.User;
+import com.rey.material.widget.ProgressView;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -61,11 +57,11 @@ import java.security.NoSuchAlgorithmException;
  */
 public class LoginActivity
 
-        extends AppCompatActivity implements  GoogleApiClient.OnConnectionFailedListener {
+        extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
-    private static final String TAG ="LoginActivity";
+    private static final String TAG = "LoginActivity";
     private static final String USER_LIST = "UserList";
     private static final int RC_SIGN_IN = 9001;
     private static final int RC_SIGN_IN_FACEBOOK = 64206;
@@ -77,13 +73,200 @@ public class LoginActivity
     private EditText mPasswordView;
     private Button mSignInButton;
     private Button mSignUpButton;
-    private View mProgressView;
+    private ProgressView mProgressView;
     private View mLoginFormView;
 
     private SignInButton signInButtonGoogle;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private CallbackManager mCallbackManager;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // Check auth on Activity start
+                    if (mAuth.getCurrentUser() != null) {
+                        onAuthSuccess(mAuth.getCurrentUser());
+                    }
+
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        setContentView(R.layout.activity_login);
+        setupActionBar();
+
+        // Set up the login form.
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mPasswordView = (EditText) findViewById(R.id.password);
+//        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+//                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+//                    attemptLogin();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
+
+        // Add code to print out the key hash
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(
+                    "com.nextnut.logistica",
+                    PackageManager.GET_SIGNATURES);
+            Log.d("KeyHash:", "ingreso");
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.d("KeyHash:", "NameNotFoundException " + e.toString());
+        } catch (NoSuchAlgorithmException e) {
+            Log.d("KeyHash:", "NoSuchAlgorithmException " + e.toString());
+
+        }
+
+
+//        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+//        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                attemptLogin();
+//            }
+//        });
+
+        mSignInButton = (Button) findViewById(R.id.button_sign_in);
+        mSignUpButton = (Button) findViewById(R.id.button_sign_up);
+
+        // Click listeners
+        mSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signInFormEmail();
+            }
+        });
+        mSignUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signUp();
+            }
+        });
+
+
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = (ProgressView) findViewById(R.id.login_progress);
+        mProgressView.setVisibility(View.GONE);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(getString(R.string.web_client_id))
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */,
+                        this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        signInButtonGoogle = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButtonGoogle.setSize(SignInButton.SIZE_STANDARD);
+        signInButtonGoogle.setScopes(gso.getScopeArray());
+        signInButtonGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.sign_in_button:
+                        showProgressDialog();
+                        showProgress(true);
+                        signIn();
+                        break;
+                    // ...
+                }
+            }
+        });
+
+        // Initialize Facebook Login button
+        mCallbackManager = CallbackManager.Factory.create();
+
+        LoginButton loginButton = (LoginButton) findViewById(R.id.button_facebook_login);
+        loginButton.setReadPermissions("email", "public_profile");
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showProgressDialog();
+                showProgress(true);
+            }
+        });
+
+        loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(TAG, "signInWithCredentialfacebook:onSuccess:" + loginResult);
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "signInWithCredentialfacebook:onCancel");
+                // ...
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(TAG, "signInWithCredentialfacebook:onError", error);
+                // ...
+            }
+        });
+
+        TextView olvidoContrasena = (TextView) findViewById(R.id.texto_olvidaste_contrasena);
+        olvidoContrasena.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isEmailValid(mEmailView.getText().toString())) {
+                    showProgress(true);
+                    mAuth.sendPasswordResetEmail(mEmailView.getText().toString())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    showProgress(false);
+
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(LoginActivity.this, "Se ha enviado un mail para cabiar la clave.",
+                                                Toast.LENGTH_SHORT).show();
+                                        Log.d(TAG, "Email sent.");
+                                    }
+                                    Toast.makeText(LoginActivity.this, "No se puedo envial un mail.",
+                                            Toast.LENGTH_SHORT).show();
+                                    Log.d(TAG, "Email sent error.");
+                                }
+                            });
+                } else {
+                    Toast.makeText(LoginActivity.this, "EMail incorrecto.",
+                            Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "EMail incorrecto.");
+                }
+            }
+        });
+
+
+    }
+
 
     @Override
     public void onStart() {
@@ -106,11 +289,99 @@ public class LoginActivity
         }
     }
 
-    private void onAuthSuccess(FirebaseUser user) {
-        String username = usernameFromEmail(user.getEmail());
 
-        // Write new user
-        writeNewUser(user.getUid(), username, user.getEmail());
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult:" + requestCode);
+
+        if (requestCode == RC_SIGN_IN_FACEBOOK) { //Facebook result
+            mCallbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = result.getSignInAccount();
+                firebaseAuthWithGoogle(account);
+            } else {
+                // Google Sign In failed, update UI appropriately
+                // ...
+            }
+        }
+
+//
+//        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+//        if (requestCode == RC_SIGN_IN) {
+//            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+//            handleSignInResult(result);
+//        }
+    }
+
+
+    private void handleFacebookAccessToken(AccessToken token) {
+        Log.d(TAG, "signInWithCredentialfacebook:token" + token);
+
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithCredentialfacebook:onComplete:" + task.isSuccessful());
+                        hideProgressDialog();
+                        showProgress(false);
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithCredentialfacebook", task.getException());
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        // ...
+                    }
+                });
+    }
+
+
+    private void signIn() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+
+    private void signInFormEmail() {
+        Log.d(TAG, "signInFormEmail");
+        if (!validateForm()) {
+            return;
+        }
+        showProgress(true);
+        showProgressDialog();
+        String email = mEmailView.getText().toString();
+        String password = mPasswordView.getText().toString();
+
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInFormEmail:onComplete:" + task.isSuccessful());
+                        hideProgressDialog();
+                        showProgress(false);
+                        if (task.isSuccessful()) {
+                            onAuthSuccess(task.getResult().getUser());
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Sign In Failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void onAuthSuccess(FirebaseUser user) {
+
+        Log.d(TAG, "onAuthSuccess:user " + user.toString());
 
         // Go to MainActivity
         startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -152,218 +423,6 @@ public class LoginActivity
     // [END basic_write]
 
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // Check auth on Activity start
-                    if (mAuth.getCurrentUser() != null) {
-                        onAuthSuccess(mAuth.getCurrentUser());
-                    }
-
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-                // ...
-            }
-        };
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        setContentView(R.layout.activity_login);
-        setupActionBar();
-
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        // Add code to print out the key hash
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    "com.nextnut.logistica",
-                    PackageManager.GET_SIGNATURES);
-            Log.d("KeyHash:", "ingreso");
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.d("KeyHash:", "NameNotFoundException "+e.toString());
-        } catch (NoSuchAlgorithmException e) {
-            Log.d("KeyHash:", "NoSuchAlgorithmException "+e.toString());
-
-        }
-
-
-
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
-
-        mSignInButton = (Button) findViewById(R.id.button_sign_in);
-        mSignUpButton = (Button) findViewById(R.id.button_sign_up);
-
-        // Click listeners
-        mSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signInFormEmail();
-            }
-        });
-        mSignUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signUp();
-            }
-        });
-
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken(getString(R.string.web_client_id))
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */,
-                        this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        signInButtonGoogle = (SignInButton) findViewById(R.id.sign_in_button);
-        signInButtonGoogle.setSize(SignInButton.SIZE_STANDARD);
-        signInButtonGoogle.setScopes(gso.getScopeArray());
-        signInButtonGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.sign_in_button:
-                        showProgressDialog();
-                        signIn();
-                        break;
-                    // ...
-                }
-            }
-        });
-
-        // Initialize Facebook Login button
-        mCallbackManager = CallbackManager.Factory.create();
-
-        LoginButton loginButton = (LoginButton) findViewById(R.id.button_facebook_login);
-        loginButton.setReadPermissions("email", "public_profile");
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showProgressDialog();
-            }
-        });
-
-        loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d(TAG, "signInWithCredentialfacebook:onSuccess:" + loginResult);
-                handleFacebookAccessToken(loginResult.getAccessToken());
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d(TAG, "signInWithCredentialfacebook:onCancel");
-                // ...
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.d(TAG, "signInWithCredentialfacebook:onError", error);
-                // ...
-            }
-        });
-
-
-    }
-
-    private void handleFacebookAccessToken(AccessToken token) {
-        Log.d(TAG, "signInWithCredentialfacebook:token" + token);
-
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredentialfacebook:onComplete:" + task.isSuccessful());
-                        hideProgressDialog();
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredentialfacebook", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                        // ...
-                    }
-                });
-    }
-
-    private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-
-    private void signInFormEmail() {
-        Log.d(TAG, "signInFormEmail");
-        if (!validateForm()) {
-            return;
-        }
-
-        showProgressDialog();
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
-
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInFormEmail:onComplete:" + task.isSuccessful());
-                        hideProgressDialog();
-
-                        if (task.isSuccessful()) {
-                            onAuthSuccess(task.getResult().getUser());
-                        } else {
-                            Toast.makeText(LoginActivity.this, "Sign In Failed",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
     private void signUp() {
         Log.d(TAG, "signUp");
         if (!validateForm()) {
@@ -379,10 +438,16 @@ public class LoginActivity
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "createUser:onComplete:" + task.isSuccessful());
+
                         hideProgressDialog();
 
                         if (task.isSuccessful()) {
                             onAuthSuccess(task.getResult().getUser());
+                            String username = usernameFromEmail(task.getResult().getUser().getEmail());
+
+                            // Write new user
+                            writeNewUser(task.getResult().getUser().getUid(), username, task.getResult().getUser().getEmail());
+
                         } else {
                             Toast.makeText(LoginActivity.this, "Sign Up Failed",
                                     Toast.LENGTH_SHORT).show();
@@ -391,34 +456,6 @@ public class LoginActivity
                 });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult:" + requestCode);
-
-        if(requestCode==RC_SIGN_IN_FACEBOOK){ //Facebook result
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
-        }
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
-                firebaseAuthWithGoogle(account);
-            } else {
-                // Google Sign In failed, update UI appropriately
-                // ...
-            }
-        }
-
-//
-//        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-//        if (requestCode == RC_SIGN_IN) {
-//            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-//            handleSignInResult(result);
-//        }
-    }
 
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
@@ -449,6 +486,7 @@ public class LoginActivity
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
                         hideProgressDialog();
+                        showProgress(false);
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
@@ -461,9 +499,6 @@ public class LoginActivity
                     }
                 });
     }
-
-
-
 
 
     /**
@@ -545,8 +580,11 @@ public class LoginActivity
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
+        Log.w(TAG, "showProgress-show" + show);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+            Log.w(TAG, "showProgress-Build.VERSION.SDK_INT a" + Build.VERSION.SDK_INT);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
             mLoginFormView.animate().setDuration(shortAnimTime).alpha(
@@ -566,6 +604,8 @@ public class LoginActivity
                 }
             });
         } else {
+            Log.w(TAG, "showProgress-Build.VERSION.SDK_INT b" + Build.VERSION.SDK_INT);
+
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -574,83 +614,81 @@ public class LoginActivity
     }
 
 
-
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
     }
 
 
-
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-
-
-            SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-            String user = sharedPreferences.getString(USER_LIST, "");
-            String[] userlists = user.split(",");
-
-            for (String credential : userlists) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < userlists.length; i++) {
-                sb.append(userlists[i]).append(",");
-            }
-            sb.append(user + mEmail + ":" + mPassword).append(",");
-
-            sharedPreferences.edit().putString(USER_LIST, sb.toString()).apply();
-
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-//            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                Bundle arguments = new Bundle();
-                arguments.putString(MainActivity.USER_DISPLAY_NAME, mEmail);
-                arguments.putString(MainActivity.USER_ID, null);
-
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.putExtras(arguments);
-                startActivity(intent);
-
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-//            mAuthTask = null;
-            showProgress(false);
-        }
-    }
+//    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+//
+//        private final String mEmail;
+//        private final String mPassword;
+//
+//        UserLoginTask(String email, String password) {
+//            mEmail = email;
+//            mPassword = password;
+//        }
+//
+//        @Override
+//        protected Boolean doInBackground(Void... params) {
+//
+//
+//            SharedPreferences sharedPreferences =
+//                    PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+//            String user = sharedPreferences.getString(USER_LIST, "");
+//            String[] userlists = user.split(",");
+//
+//            for (String credential : userlists) {
+//                String[] pieces = credential.split(":");
+//                if (pieces[0].equals(mEmail)) {
+//                    // Account exists, return true if the password matches.
+//                    return pieces[1].equals(mPassword);
+//                }
+//            }
+//
+//            StringBuilder sb = new StringBuilder();
+//            for (int i = 0; i < userlists.length; i++) {
+//                sb.append(userlists[i]).append(",");
+//            }
+//            sb.append(user + mEmail + ":" + mPassword).append(",");
+//
+//            sharedPreferences.edit().putString(USER_LIST, sb.toString()).apply();
+//
+//            return true;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(final Boolean success) {
+////            mAuthTask = null;
+//            showProgress(false);
+//
+//            if (success) {
+//                Bundle arguments = new Bundle();
+//                arguments.putString(MainActivity.USER_DISPLAY_NAME, mEmail);
+//                arguments.putString(MainActivity.USER_ID, null);
+//
+//                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                intent.putExtras(arguments);
+//                startActivity(intent);
+//
+//                finish();
+//            } else {
+//                mPasswordView.setError(getString(R.string.error_incorrect_password));
+//                mPasswordView.requestFocus();
+//            }
+//        }
+//
+//        @Override
+//        protected void onCancelled() {
+////            mAuthTask = null;
+//            showProgress(false);
+//        }
+//    }
 
     private ProgressDialog mProgressDialog;
 

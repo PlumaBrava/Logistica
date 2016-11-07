@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 
-
 /**
  * An activity representing a single Product detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
@@ -34,9 +33,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
-                getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
-                if(productDetailFragment!=null){
+                ProductDetailFragment productDetailFragment = (ProductDetailFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
+                if (productDetailFragment != null) {
                     productDetailFragment.verificationAndsave();
                 }
             }
@@ -63,17 +62,16 @@ public class ProductDetailActivity extends AppCompatActivity {
             // using a fragment transaction.
 
 
-
-
             Bundle arguments = new Bundle();
-            arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(ProductDetailFragment.ARG_ITEM_ID,0));
+            arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(ProductDetailFragment.ARG_ITEM_ID, 0));
+            arguments.putString(ProductDetailFragment.EXTRA_PRODUCT_KEY, getIntent().getStringExtra(ProductDetailFragment.EXTRA_PRODUCT_KEY));
             int mAction = getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
             arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, mAction);
             ProductDetailFragment fragment = new ProductDetailFragment();
             fragment.setArguments(arguments);
-            if(mAction ==ProductDetailFragment.PRODUCT_NEW){
+            if (mAction == ProductDetailFragment.PRODUCT_NEW) {
                 fab_save.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 fab_save.setVisibility(View.VISIBLE);
             }
             getSupportFragmentManager().beginTransaction()
@@ -81,7 +79,6 @@ public class ProductDetailActivity extends AppCompatActivity {
                     .commit();
         }
     }
-
 
 
     @Override
@@ -101,11 +98,4 @@ public class ProductDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-        super.startActivityForResult(intent, requestCode);
-    }
-    }
+}

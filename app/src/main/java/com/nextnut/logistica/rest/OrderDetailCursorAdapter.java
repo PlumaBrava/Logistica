@@ -22,7 +22,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 
-import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.dimensiona;
 
 //import com.nextnut.distribution.ProductsActivity;
 //import com.nextnut.distribution.R;
@@ -178,7 +178,7 @@ implements ItemTouchHelperAdapter{
 
                 viewHolder.mDetalleOrderId=cursor.getLong(0);
                 viewHolder.mphotString=cursor.getString(7);
-                Drawable drawable = resize(mContext, R.drawable.ic_action_action_redeem);
+                Drawable drawable = dimensiona(mContext, R.drawable.ic_action_action_redeem);
                 Picasso.with(viewHolder.mphotoProducto.getContext())
 
                         .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))

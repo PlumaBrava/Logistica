@@ -28,7 +28,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:windowSoftInputMode="adjustResize">
+        android:windowSoftInputMode="adjustResize"
+        android:name="android.support.multidex.MultiDexApplication">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -200,6 +201,24 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.MainActivity" />
+        </activity>
+        <activity
+            android:name=".UsuarioListActivity"
+            android:label="@string/title_usuario_list"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nextnut.logistica.MainActivity" />
+        </activity>
+        <activity
+            android:name=".UsuarioDetailActivity"
+            android:label="@string/title_usuario_detail"
+            android:parentActivityName=".UsuarioListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nextnut.logistica.UsuarioListActivity" />
         </activity>
     </application>
 

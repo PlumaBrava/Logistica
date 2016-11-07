@@ -168,7 +168,7 @@ public void createCustom0() throws InterruptedException {
 
 // Take Photo!
 
-            onView(withId(R.id.product_imagen_button)).perform(click());
+            onView(withId(R.id.product_imagen)).perform(click());
             onView(withText("Add Photo!")).inRoot(isDialog()).check(matches(isDisplayed()));
             onView(withText("Add Photo!")).perform(pressBack());
             onView(withId(R.id.fab_save)).perform(click());

@@ -17,7 +17,7 @@ import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 import com.squareup.picasso.Picasso;
 
-import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.dimensiona;
 
 //import com.nextnut.distribution.ProductsActivity;
 //import com.nextnut.distribution.R;
@@ -119,7 +119,7 @@ public class PickingOrderProductsAdapter extends CursorRecyclerViewAdapter<Picki
 
         viewHolder.mDetalleOrderId = cursor.getLong(COLUMN_ID_PRODUCTO);
         viewHolder.mphotString = cursor.getString(COLUMN_IMAGEN_PRODUCTO);
-        Drawable drawable = resize(mContext, R.drawable.ic_action_action_redeem);
+        Drawable drawable = dimensiona(mContext, R.drawable.ic_action_action_redeem);
         Picasso.with(viewHolder.mphotoProducto.getContext())
 
                 .load(cursor.getString(COLUMN_IMAGEN_PRODUCTO))

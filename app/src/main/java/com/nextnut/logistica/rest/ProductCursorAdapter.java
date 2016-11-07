@@ -24,7 +24,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 
-import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.dimensiona;
 
 
 public class ProductCursorAdapter extends CursorRecyclerViewAdapter<ProductCursorAdapter.ViewHolder>
@@ -99,7 +99,7 @@ implements ItemTouchHelperAdapter{
                 DatabaseUtils.dumpCursor(cursor);
                 viewHolder.mcursorId=cursor.getLong(cursor.getColumnIndex(ProductsColumns._ID_PRODUCTO));
                 viewHolder.mphotString=cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO));
-                Drawable drawable = resize(mContext, R.drawable.ic_action_action_redeem);
+                Drawable drawable = dimensiona(mContext, R.drawable.ic_action_action_redeem);
                 Picasso.with(viewHolder.mphotoProducto.getContext())
                         .load(cursor.getString(cursor.getColumnIndex(ProductsColumns.IMAGEN_PRODUCTO)))
                         .placeholder( drawable)

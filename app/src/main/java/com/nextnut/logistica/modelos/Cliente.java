@@ -1,9 +1,16 @@
 package com.nextnut.logistica.modelos;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.ServerValue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by perez.juan.jose on 31/10/2016.
  */
-
+@IgnoreExtraProperties
 public class Cliente {
 
     private String nombre;
@@ -36,6 +43,26 @@ public class Cliente {
         this.fechaModificacion = fechaModificacion;
         this.uid = uid;
     }
+
+    // [START post_to_map]
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("nombre", nombre);
+        result.put("apellido", apellido);
+        result.put("fotoCliente", fotoCliente);
+        result.put("direccionDeEntrega", direccionDeEntrega);
+        result.put("ciudad", ciudad);
+        result.put("iva", iva);
+        result.put("ciut", ciut);
+        result.put("especial", especial);
+        result.put("fechaModificacion", ServerValue.TIMESTAMP);
+        result.put("uid", uid);
+
+        return result;
+    }
+    // [END post_to_map]
+
 
     public String getNombre() {
         return nombre;

@@ -29,15 +29,14 @@ import java.util.ArrayList;
 //import com.google.android.gms.common.api.GoogleApiClient;
 
 
-
-
 public class ProductListActivity extends AppCompatActivity {
-//        implements LoaderManager.LoaderCallbacks<Cursor> {
+    //        implements LoaderManager.LoaderCallbacks<Cursor> {
     private DatabaseReference mDatabase;
     private FirebaseRecyclerAdapter<Producto, ProductViewHolder> mAdapter;
     private static final String LOG_TAG = ProductListActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 0;
-    private long mItem=0;
+    private long mItem = 0;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -101,12 +100,12 @@ public class ProductListActivity extends AppCompatActivity {
 
         fab_save = (FloatingActionButton) findViewById(R.id.fab_save);
         fab_save.setVisibility(View.GONE);
-                fab_save.setOnClickListener(new View.OnClickListener() {
+        fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ProductDetailFragment productDetailFragment=(ProductDetailFragment)
+                ProductDetailFragment productDetailFragment = (ProductDetailFragment)
                         getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
-                if(productDetailFragment!=null){
+                if (productDetailFragment != null) {
                     productDetailFragment.verificationAndsave();
                     fab_new.setVisibility(View.VISIBLE);
                     fab_save.setVisibility(View.GONE);
@@ -116,14 +115,13 @@ public class ProductListActivity extends AppCompatActivity {
         });
 
 
-
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         View emptyView = findViewById(R.id.recyclerview_product_empty);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.product_list);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.product_list_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
 //        mCursorAdapter = new ProductCursorAdapter(this, null, emptyView, new ProductCursorAdapter.ProductCursorAdapterOnClickHandler() {
@@ -179,20 +177,57 @@ public class ProductListActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(final ProductViewHolder viewHolder, final Producto model, final int position) {
                 final DatabaseReference postRef = getRef(position);
-                Log.i("EmpresasView", "populateViewHolder(postRef)"+postRef.toString());
+                Log.i("EmpresasView", "populateViewHolder(postRef)" + postRef.toString());
 
                 // Set click listener for the whole post view
                 final String postKey = postRef.getKey();
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Launch PostDetailActivity
-//                        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-//                        intent.putExtra(PostDetailActivity.EXTRA_POST_KEY, postKey);
-//                        startActivity(intent);
-                    }
-                });
 
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                                                           @Override
+                                                           public void onClick(View v) {
+
+                                                               if (mTwoPane) {
+                                                                   Bundle arguments = new Bundle();
+                                                                   // when rotate the screen the selecction of the second Screen is conserved.
+//                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
+//
+                                                                   arguments.putString(ProductDetailFragment.EXTRA_PRODUCT_KEY, postKey);
+                                                                   arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
+
+                                                                   ProductDetailFragment fragment = new ProductDetailFragment();
+                                                                   fragment.setArguments(arguments);
+                                                                   getSupportFragmentManager().beginTransaction()
+                                                                           .addToBackStack(null)
+                                                                           .replace(R.id.product_detail_container, fragment)
+                                                                           .commit();
+
+                                                                   fab_new.setVisibility(View.GONE);
+                                                                   fab_save.setVisibility(View.VISIBLE);
+
+                                                               } else {
+
+                                                                   // Launch PostDetailActivity
+                                                                   Intent intent = new Intent(getApplication(), ProductDetailActivity.class);
+                                                                   intent.putExtra(ProductDetailFragment.EXTRA_PRODUCT_KEY, postKey);
+                                                                   startActivity(intent);
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        Pair<View, String> p1 = Pair.create((View) ((ProductViewHolder)viewHolder.itemView).mphotoProducto, getString(R.string.detail_icon_transition_imagen));
+//                        Pair<View, String> p2 = Pair.create((View) vh.mTextViewPrecio, getString(R.string.detail_icon_transition_price));
+//                        Pair<View, String> p3 = Pair.create((View) vh.mTextViewNombre, getString(R.string.detail_icon_transition_name));
+//                        ActivityOptionsCompat activityOptions =
+//                                ActivityOptionsCompat.makeSceneTransitionAnimation(ProductListActivity.this,   p1,p2,p3);
+//                        startActivity(intent, activityOptions.toBundle());
+//
+//                    } else {
+//                        startActivity(intent);
+//                        }
+                                                               }
+
+                                                           }
+
+                                                       }
+
+                );
                 // Determine if the current user has liked this post and set UI accordingly
 //                if (model.stars.containsKey(getUid())) {
 //                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_24);
@@ -201,25 +236,36 @@ public class ProductListActivity extends AppCompatActivity {
 //                }
 
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
-                viewHolder.bindToPost(model, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View starView) {
-                        // Need to write to both places the post is stored
+                viewHolder.bindToPost(model, new View.OnClickListener()
+
+                        {
+                            @Override
+                            public void onClick(View starView) {
+                                // Need to write to both places the post is stored
 //                        DatabaseReference globalPostRef = mDatabase.child("posts").child(postRef.getKey());
 //                        DatabaseReference userPostRef = mDatabase.child("user-posts").child(model.uid).child(postRef.getKey());
 //
 //                        // Run two transactions
 //                        onStarClicked(globalPostRef);
 //                        onStarClicked(userPostRef);
-                    }
-                });
+                            }
+                        }
+
+                );
             }
-        };
+        }
+
+        ;
         recyclerView.setAdapter(mAdapter);
 
 
+        if (
 
-        if (findViewById(R.id.product_detail_container) != null ) {
+                findViewById(R.id.product_detail_container)
+
+                        != null)
+
+        {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
@@ -240,9 +286,6 @@ public class ProductListActivity extends AppCompatActivity {
     }
 
 
-
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -259,7 +302,6 @@ public class ProductListActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 
     @Override

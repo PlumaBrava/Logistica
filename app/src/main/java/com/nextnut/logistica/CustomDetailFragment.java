@@ -41,7 +41,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
 import static com.nextnut.logistica.util.Imagenes.savePhotoReturnPath;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
@@ -241,7 +241,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                 if (requestCode == Imagenes.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
                     mCurrentPhotoPath = getString(R.string.file) + savePhotoReturnPath(getContext(),(Bitmap) data.getExtras().get(getString(R.string.data)));
 
-                    Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
+                    Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
                     Picasso.with(getContext())
                             .load(mCurrentPhotoPath)
                             .placeholder(drawable)
@@ -251,7 +251,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                 } else if (requestCode == Imagenes.REQUEST_IMAGE_GET) {
                     mCurrentPhotoPath = getString(R.string.file) + saveImageSelectedReturnPath(getContext(), data);
                     mImageCustomer.setBackgroundColor(Color.TRANSPARENT);
-                    Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
+                    Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
                     Picasso.with(getContext())
                             .load(mCurrentPhotoPath)
                             .placeholder(drawable)
@@ -299,7 +299,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
 
         switch (mAction) {
             case CUSTOM_NEW:{
-                Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
+                Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
                 Picasso.with(getContext())
                         .load(mCurrentPhotoPath)
                         .placeholder(drawable)
@@ -506,7 +506,7 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
                 button.setText(getUserName(getContext() ,mIdContact));
             }
 
-            Drawable drawable = resize(getContext(), R.drawable.ic_action_image_timer_auto);
+            Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
             Picasso.with(getContext())
                     .load(mCurrentPhotoPath)
                     .placeholder(drawable)

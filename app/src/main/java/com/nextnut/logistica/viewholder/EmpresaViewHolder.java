@@ -12,7 +12,7 @@ import com.nextnut.logistica.R;
 import com.nextnut.logistica.modelos.Empresa;
 import com.squareup.picasso.Picasso;
 
-import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.dimensiona;
 
 
 public class EmpresaViewHolder extends RecyclerView.ViewHolder {
@@ -47,7 +47,7 @@ public class EmpresaViewHolder extends RecyclerView.ViewHolder {
         codigoPostalView.setText(empresa.getCodigoPostal());
         telefonoView.setText(empresa.getTelefono());
         logo=empresa.getLogo();
-        Drawable drawable = resize(itemView.getContext(), R.drawable.ic_action_image_timer_auto);
+        Drawable drawable = dimensiona(itemView.getContext(), R.drawable.ic_action_image_timer_auto);
         Picasso.with(itemView.getContext())
 
                 .load(empresa.getLogo())

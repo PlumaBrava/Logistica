@@ -13,7 +13,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 
-import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.dimensiona;
 
 
 public class ProductViewHolder extends RecyclerView.ViewHolder {
@@ -49,7 +49,7 @@ public class ProductViewHolder extends RecyclerView.ViewHolder {
         precioEspecial.setText(format.format(producto.getPrecioEspcecial()));
         descripcion.setText(producto.getDescripcionProducto());
 
-        Drawable drawable = resize(itemView.getContext(), R.drawable.ic_action_image_timer_auto);
+        Drawable drawable = dimensiona(itemView.getContext(), R.drawable.ic_action_image_timer_auto);
         Picasso.with(itemView.getContext())
 
                 .load(producto.getFotoProducto())

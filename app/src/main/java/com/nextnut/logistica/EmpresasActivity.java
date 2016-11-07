@@ -34,7 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.nextnut.logistica.util.Imagenes.resize;
+import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
 import static com.nextnut.logistica.util.Imagenes.savePhotoReturnPath;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
@@ -83,7 +83,7 @@ public class EmpresasActivity extends AppCompatActivity {
             }
         });
 
-        Drawable drawable = resize(getApplicationContext(), R.drawable.ic_action_image_timer_auto);
+        Drawable drawable = dimensiona(getApplicationContext(), R.drawable.ic_action_image_timer_auto);
         Picasso.with(getApplicationContext())
                 .load(drawable.toString())
                 .resize(200,200)
@@ -220,7 +220,7 @@ public class EmpresasActivity extends AppCompatActivity {
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Drawable drawable = resize(getApplicationContext(), R.drawable.ic_action_action_redeem);
+        Drawable drawable = dimensiona(getApplicationContext(), R.drawable.ic_action_action_redeem);
         if (resultCode == Activity.RESULT_OK) {
 
             if (requestCode == Imagenes.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
