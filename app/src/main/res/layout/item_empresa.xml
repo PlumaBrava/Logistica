@@ -5,41 +5,29 @@
     android:layout_height="wrap_content"
     android:layout_margin="5dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:padding="10dp">
 
-        <!--<include-->
-            <!--android:id="@+id/post_author_layout"-->
-            <!--layout="@layout/include_post_author"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentLeft="true" />-->
+
+        <ImageView
+            android:id="@+id/itemempresa_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:background="?attr/selectableItemBackground"
+            />
+
 
         <LinearLayout
             android:id="@+id/star_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            android:layout_alignParentRight="true"
-
             android:gravity="center_vertical"
             android:orientation="vertical">
-
-            <!--android:layout_alignBottom="@+id/post_author_layout"-->
-            <!--android:layout_alignTop="@+id/post_author_layout"-->
-
-
-            <ImageView
-                android:id="@+id/itemempresa_logo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="5dp"
-                android:background="?attr/selectableItemBackground"
-                 />
-            <!--android:src="@drawable/ic_toggle_star_outline_24"-->
 
 
 
@@ -47,7 +35,8 @@
                 android:id="@+id/itemempresa_nombre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:textStyle="bold"
+                android:gravity="center_horizontal"
                 />
 
             <TextView
@@ -91,14 +80,7 @@
 
         </LinearLayout>
 
-        <!--<include layout="@layout/include_post_text"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentLeft="true"-->
-            <!--android:layout_below="@+id/post_author_layout"-->
-            <!--android:layout_marginLeft="5dp"-->
-            <!--android:layout_marginTop="10dp" />-->
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </android.support.v7.widget.CardView>

@@ -45,7 +45,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
                 android:ellipsize="end"
-                android:hint="@string/prompt_email"
+                android:hint="@string/usuario_email"
                 android:inputType="textEmailAddress"
                 android:maxLines="1" />
 
@@ -73,7 +73,7 @@
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:hint="@string/prompt_email"
+            android:hint="@string/usuario_emailConfirmacion"
             android:inputType="textEmailAddress"
             android:maxLines="1" />
 

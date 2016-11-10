@@ -27,6 +27,8 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.util.ProductSectionActivity;
@@ -57,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
     public static long getmPickingOrderSelected() {
         return mPickingOrderSelected;
     }
-
+    private DatabaseReference mDatabase;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,20 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            // Check auth on Activity start
+            if (mAuth.getCurrentUser() != null) {
+                Log.d(LOG_TAG, "onAuthStateChanged:signed_in:" + user.getUid()+" - "+user.getDisplayName());
+
+            }
+
+        } else {
+            // User is signed out
+            Log.d(LOG_TAG, "onAuthStateChanged:signed_out");
+        }
+        getSupportActionBar().setSubtitle(user.getDisplayName());
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         /*
@@ -312,6 +329,11 @@ public class MainActivity extends AppCompatActivity implements PickingListFragme
 
         if (id == R.id.action_empresa) {
             startActivity(new Intent(this, EmpresasActivity.class));
+            return true;
+        }
+
+        if (id == R.id.action_empresaList) {
+            startActivity(new Intent(this, EmpresasListActivity.class));
             return true;
         }
 

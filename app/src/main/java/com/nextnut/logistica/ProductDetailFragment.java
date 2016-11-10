@@ -40,6 +40,7 @@ import com.google.firebase.storage.UploadTask;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.modelos.Producto;
+import com.nextnut.logistica.util.Constantes;
 import com.nextnut.logistica.util.CurrencyToDouble;
 import com.nextnut.logistica.util.DialogAlerta;
 import com.nextnut.logistica.util.Imagenes;
@@ -127,7 +128,7 @@ public class ProductDetailFragment extends Fragment
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance();
         mUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        mStorageRef = mStorage.getReferenceFromUrl("gs://logistica-144918.appspot.com");
+        mStorageRef = mStorage.getReferenceFromUrl(Constantes.STORAGE_REFERENCE);
 
         // [END initialize_database_ref]
 
@@ -334,7 +335,7 @@ public class ProductDetailFragment extends Fragment
                     }
                     // ya tenemos los datos que queremos modificar por lo tanto desconectamos el listener!
                     if (mProductListener != null) {
-                        mDatabase.child("empresa-producto").child(mProductKey).removeEventListener(mProductListener);
+                        mDatabase.child(Constantes.ESQUEMA_EMPRESA_PRODUCTO).child(mProductKey).removeEventListener(mProductListener);
                         Log.i("producto", "onDataChange-removeEventListener ");
 
                     }

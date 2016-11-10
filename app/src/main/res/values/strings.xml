@@ -23,7 +23,7 @@
     <string name="perfil_preparar">Preparar</string>
     <string name="perfil_entregar">Entregar</string>
     <string name="perfil_pagos">Pagos</string>
-    <string name="perfil_stock">Entregar</string>
+    <string name="perfil_stock">Stock</string>
 
 
 
@@ -76,12 +76,12 @@
     <!--<string name="product_Id_text">Product Number:</string>-->
     <string name="product_name_text">Name:</string>
     <string name="product_name_error_tooLong">Too Long:</string>
-    <string name="product_name_error_yaexiste">Allready Exisit</string>
+    <string name="product_name_error_yaexiste">Already Exisit</string>
     <string name="product_name_error_cantBeNull">Can not be null</string>
 
     <string name="product_price_text">Price:</string>
     <string name="enter_price_message">Enter Price</string>
-    <string name="price_error_cantBeNull">Cant not be null</string>
+    <string name="price_error_cantBeNull">Can not be null</string>
     <string name="price_error_mustBegraterthan0">must be grater than cero</string>
     <string name="price_error_cantBeCero">Can no be cero </string>
 
@@ -313,8 +313,8 @@
 
 
     // Empresas Activity
-    <string name="title_activity_empesas">Empesa</string>
-    <string name="hint_empresaNombre">Empesas</string>
+    <string name="title_activity_empresas">Empresa</string>
+    <string name="hint_empresaNombre">Empresas</string>
     <string name="hint_empresaCuit">Cuit</string>
     <string name="hint_empresaCiudad">Ciudad</string>
     <string name="hint_empresaDireccion">Direccion</string>
@@ -415,6 +415,8 @@
     <string name="title_usuario_list">Usuarios</string>
     <string name="title_usuario_detail">Usuarios</string>
     <string name="olvidaste_tu_constrase_a">¿Olvidaste tu constraseña?</string>
+    <string name="email_Distinto_emailConfirmation">Maril</string>
+
     <string name="logo">Logo</string>
 
 </resources>

@@ -44,8 +44,13 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.nextnut.logistica.modelos.Perfil;
 import com.nextnut.logistica.modelos.User;
 import com.rey.material.widget.ProgressView;
 
@@ -331,20 +336,40 @@ public class LoginActivity
                         Log.d(TAG, "signInWithCredentialfacebook:onComplete:" + task.isSuccessful());
                         hideProgressDialog();
                         showProgress(false);
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredentialfacebook", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
 
-                        // ...
+                        hideProgressDialog();
+
+                        if (task.isSuccessful()) {
+                            onAuthSuccess(task.getResult().getUser());
+                            Log.d(TAG, "signInWithCredentialfacebook:email:" + task.getResult().getUser().getEmail().toString());
+                            Log.d(TAG, "signInWithCredentialfacebook:Display Name:" + task.getResult().getUser().getDisplayName());
+                            Log.d(TAG, "signInWithCredentialfacebook:PhotoUrl:" + task.getResult().getUser().getPhotoUrl());
+                            Log.d(TAG, "signInWithCredentialfacebook:ProviderData:" + task.getResult().getUser().getProviderData().toString());
+                            Log.d(TAG, "signInWithCredentialfacebook:ProviderID:" + task.getResult().getUser().getProviderId().toString());
+
+                            String userId = task.getResult().getUser().getUid();
+                            String username = usernameFromEmail(task.getResult().getUser().getEmail());
+                            String email = task.getResult().getUser().getEmail();
+                            String photoURL = task.getResult().getUser().getPhotoUrl().toString();
+                            String status = "inicial";
+                            Boolean activo = true;
+                            Perfil perfil = new Perfil();
+                            perfil.setPerfilAdministrador();
+
+                            // Write new user
+                            writeNewUser(userId, username, email, photoURL, status, activo, perfil);
+
+
+                        } else {
+
+                            Log.d(TAG, "signInWithCredentialfacebook:" + task.getException().getMessage().toString());
+                            Toast.makeText(LoginActivity.this, task.getException().getMessage().toString(),
+                                    Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
-    }
 
+    }
 
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -372,14 +397,46 @@ public class LoginActivity
                         if (task.isSuccessful()) {
                             onAuthSuccess(task.getResult().getUser());
                         } else {
-                            Toast.makeText(LoginActivity.this, "Sign In Failed",
-                                    Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "signInFormEmail:" + task.getException().getMessage().toString());
+                            Toast.makeText(LoginActivity.this, task.getException().getMessage().toString(),
+                                    Toast.LENGTH_LONG).show();
                         }
                     }
                 });
     }
 
     private void onAuthSuccess(FirebaseUser user) {
+
+        // Verifica que si existe ese usuario en NewUser
+        Log.d(TAG, "onAuthSuccess: Uid:" + user.getUid());
+        Query userEmpresa= mDatabase.child("usuario-empresa-seleccionada").child(user.getUid());
+        userEmpresa
+
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                       Log.d(TAG, "onAuthSuccess:getChildrenCount: " + dataSnapshot.getChildrenCount());
+
+                        if(dataSnapshot.getChildrenCount()<=0){
+                // Crear una empresa
+                            }
+
+                        else {
+
+                        }
+                        }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "onAuthSuccess "+ databaseError.toString());
+
+                    }
+                })
+
+
+
+        ;
+
+
 
         Log.d(TAG, "onAuthSuccess:user " + user.toString());
 
@@ -416,8 +473,8 @@ public class LoginActivity
     }
 
     // [START basic_write]
-    private void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email);
+    private void writeNewUser(String userId, String username, String email, String photoURL, String status, Boolean activo, Perfil perfil) {
+        User user = new User(username, email, photoURL, status, activo, perfil);
         mDatabase.child("users").child(userId).setValue(user);
     }
     // [END basic_write]
@@ -437,20 +494,36 @@ public class LoginActivity
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "createUser:onComplete:" + task.isSuccessful());
+                        Log.d(TAG, "EmailAndPassword-createUser:onComplete:" + task.isSuccessful());
 
                         hideProgressDialog();
 
                         if (task.isSuccessful()) {
                             onAuthSuccess(task.getResult().getUser());
+                            Log.d(TAG, "EmailAndPassword:email:" + task.getResult().getUser().getEmail().toString());
+                            Log.d(TAG, "EmailAndPassword:Display Name:" + task.getResult().getUser().getDisplayName());
+                            Log.d(TAG, "EmailAndPasswordk:PhotoUrl:" + task.getResult().getUser().getPhotoUrl());
+                            Log.d(TAG, "EmailAndPassword:ProviderData:" + task.getResult().getUser().getProviderData().toString());
+                            Log.d(TAG, "EmailAndPassword:ProviderID:" + task.getResult().getUser().getProviderId().toString());
+
+                            String userId = task.getResult().getUser().getUid();
                             String username = usernameFromEmail(task.getResult().getUser().getEmail());
+                            String email = task.getResult().getUser().getEmail();
+                            String photoURL = null;// no existe la foto al momento de crear el usuario
+                            String status = "inicial";
+                            Boolean activo = true;
+                            Perfil perfil = new Perfil();
+                            perfil.setPerfilAdministrador();
 
                             // Write new user
-                            writeNewUser(task.getResult().getUser().getUid(), username, task.getResult().getUser().getEmail());
+                            writeNewUser(userId, username, email, photoURL, status, activo, perfil);
+
 
                         } else {
-                            Toast.makeText(LoginActivity.this, "Sign Up Failed",
-                                    Toast.LENGTH_SHORT).show();
+
+                           Log.d(TAG, "EmailAndPassword:Error:" + task.getException().getMessage().toString());
+                           Toast.makeText(LoginActivity.this, task.getException().getMessage().toString(),
+                                    Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -487,15 +560,35 @@ public class LoginActivity
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
                         hideProgressDialog();
                         showProgress(false);
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                        hideProgressDialog();
+
+                        if (task.isSuccessful()) {
+                            onAuthSuccess(task.getResult().getUser());
+                            Log.d(TAG, "AuthWithGoogle:email:" + task.getResult().getUser().getEmail().toString());
+                            Log.d(TAG, "AuthWithGoogle:Display Name:" + task.getResult().getUser().getDisplayName());
+                            Log.d(TAG, "AuthWithGoogle:PhotoUrl:" + task.getResult().getUser().getPhotoUrl());
+                            Log.d(TAG, "AuthWithGoogle:ProviderData:" + task.getResult().getUser().getProviderData().toString());
+                            Log.d(TAG, "AuthWithGoogle:ProviderID:" + task.getResult().getUser().getProviderId().toString());
+
+                            String userId = task.getResult().getUser().getUid();
+                            String username = usernameFromEmail(task.getResult().getUser().getEmail());
+                            String email = task.getResult().getUser().getEmail();
+                            String photoURL = task.getResult().getUser().getPhotoUrl().toString();
+                            String status = "inicial";
+                            Boolean activo = true;
+                            Perfil perfil = new Perfil();
+                            perfil.setPerfilAdministrador();
+
+                            // Write new user
+                            writeNewUser(userId, username, email, photoURL, status, activo, perfil);
+
+
+                        } else {
+
+                            Log.d(TAG, "AuthWithGoogle:Error:" + task.getException().getMessage().toString());
+                            Toast.makeText(LoginActivity.this, task.getException().getMessage().toString(),
+                                    Toast.LENGTH_LONG).show();
                         }
-                        // ...
                     }
                 });
     }

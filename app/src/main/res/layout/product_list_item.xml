@@ -22,8 +22,8 @@
 <LinearLayout
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:divider="#FFCC00">
-
+    >
+    <!--android:divider="#FFCC00"-->
     <ImageView
         android:id="@+id/photoProducto"
         android:layout_width="0dp"
@@ -36,11 +36,11 @@
         android:maxWidth="@dimen/product_cardPhotowidth"
         android:transitionName="@string/detail_icon_transition_name"
         android:layout_gravity="center_vertical"/>
-
     <LinearLayout
         android:layout_width="0dp"
         android:layout_weight="3"
         android:gravity="start"
+        android:layout_margin="@dimen/text_margin"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 

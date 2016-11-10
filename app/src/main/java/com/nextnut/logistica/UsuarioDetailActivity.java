@@ -41,8 +41,14 @@ public class UsuarioDetailActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveUsuario();
 
+                UsuarioDetailFragment usuarioDetailFragment = (UsuarioDetailFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.usuario_detail_container);
+                if (usuarioDetailFragment != null) {
+                    usuarioDetailFragment.writeNewUser();
+//                saveUsuario();
+
+                }
             }
         });
         mAuthUser = FirebaseAuth.getInstance();
