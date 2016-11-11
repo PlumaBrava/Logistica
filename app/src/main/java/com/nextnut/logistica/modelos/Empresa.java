@@ -2,6 +2,7 @@ package com.nextnut.logistica.modelos;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.ServerValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,13 +13,15 @@ import java.util.Map;
 // [START blog_user_class]
 @IgnoreExtraProperties
 public class Empresa {
-    public String uid;
+
     private String nombre;
     private String cuit;
     private String ciudad;
     private String direccion;
     private String codigoPostal;
     private String telefono;
+    private long fechaModificacion;
+    private String uid;
 
     private String logo;
 
@@ -107,7 +110,7 @@ public class Empresa {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("uid", uid);
+
         result.put("nombre", nombre);
         result.put("cuit", cuit);
         result.put("ciudad", ciudad);
@@ -115,12 +118,24 @@ public class Empresa {
         result.put("codigoPostal", codigoPostal);
         result.put("telefono", telefono);
         result.put("logo", logo);
-
+        result.put("uid", uid);
+        result.put("fechaModificacion", ServerValue.TIMESTAMP);
         return result;
     }
     // [END post_to_map]
 
 
+    public void setCodigoPostal(String codigoPostal) {
+        this.codigoPostal = codigoPostal;
+    }
+
+    public long getFechaModificacion() {
+        return fechaModificacion;
+    }
+
+    public void setFechaModificacion(long fechaModificacion) {
+        this.fechaModificacion = fechaModificacion;
+    }
 }
 // [END blog_user_class]
 

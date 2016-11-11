@@ -2,6 +2,7 @@ package com.nextnut.logistica.modelos;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.google.firebase.database.ServerValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +23,8 @@ public class Perfil {
     private Boolean entregar;
     private Boolean pagos;
     private Boolean stock;
+    private long fechaModificacion;
+    private String uid;
 
     public Perfil() {
 
@@ -42,7 +45,7 @@ public class Perfil {
     }
 
 
-    public Perfil(Boolean usuarios, Boolean productos, Boolean clientes, Boolean reportes, Boolean ordenes, Boolean preparar, Boolean entregar, Boolean pagos, Boolean stock) {
+    public Perfil(String uid, Boolean usuarios, Boolean productos, Boolean clientes, Boolean reportes, Boolean ordenes, Boolean preparar, Boolean entregar, Boolean pagos, Boolean stock) {
         this.usuarios = usuarios;
         this.productos = productos;
         this.clientes = clientes;
@@ -52,6 +55,7 @@ public class Perfil {
         this.entregar = entregar;
         this.pagos = pagos;
         this.stock = stock;
+        this.uid=uid;
     }
 
     // [START post_to_map]
@@ -67,6 +71,8 @@ public class Perfil {
         result.put("entregar", entregar);
         result.put("pagos", pagos);
         result.put("stock", stock);
+        result.put("uid", uid);
+        result.put("fechaModificacion", ServerValue.TIMESTAMP);
 
         return result;
     }

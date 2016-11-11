@@ -22,15 +22,14 @@ public class Cliente {
     private long iva;
     private String ciut;
     private Boolean especial;
-
-    private String fechaModificacion;
+    private long fechaModificacion;
     private String uid;
 
     public Cliente() {
 
     }
 
-    public Cliente(String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, long iva, String ciut, Boolean especial, String fechaModificacion, String uid) {
+    public Cliente(String uid,String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, long iva, String ciut, Boolean especial, String fechaModificacion) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -40,7 +39,6 @@ public class Cliente {
         this.iva = iva;
         this.ciut = ciut;
         this.especial = especial;
-        this.fechaModificacion = fechaModificacion;
         this.uid = uid;
     }
 
@@ -136,11 +134,11 @@ public class Cliente {
         this.especial = especial;
     }
 
-    public String getFechaModificacion() {
+    public long getFechaModificacion() {
         return fechaModificacion;
     }
 
-    public void setFechaModificacion(String fechaModificacion) {
+    public void setFechaModificacion(long fechaModificacion) {
         this.fechaModificacion = fechaModificacion;
     }
 

@@ -14,20 +14,33 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.nextnut.logistica.modelos.Empresa;
+import com.nextnut.logistica.modelos.EmpresaPerfil;
 import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
-import com.nextnut.logistica.viewholder.EmpresaViewHolder;
+import com.nextnut.logistica.viewholder.EmpresaPerfilViewHolder;
 
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_USER_PROPUETO_EMPRESA;
+import static com.nextnut.logistica.util.KeyMailConverter.getKeyFromEmail;
+
+
+/* Lista los usuarios asignados a USUARIOS_PROPUESTOS-EMPRESA
+
+Utilizando esta lista el usuario pode elegir con que empresa trabajar.
+Al seleccionar una empresa,
+
+Se copia en USUARIO_EMPRESA Y USUARIO_PERFIL los datos de la empresa y del Perfil asignado. Se borran los anteriores.
+Solo tiene que existir una empresa asignada y un perfil
+
+ */
 public class EmpresasListActivity extends AppCompatActivity {
 
     // [START define_database_reference]
     private DatabaseReference mDatabase;
     // [END define_database_reference]
 
-    private FirebaseRecyclerAdapter<Empresa, EmpresaViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<EmpresaPerfil, EmpresaPerfilViewHolder> mAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
-    private String mUserId;
+    private String mUserMail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +52,7 @@ public class EmpresasListActivity extends AppCompatActivity {
         // [START create_database_reference]
         mDatabase = FirebaseDatabase.getInstance().getReference();
 //        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        mUserId= FirebaseAuth.getInstance().getCurrentUser().getUid();
+        mUserMail= FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
         mRecycler=(RecyclerView)findViewById(R.id.recycler_empresas_list);
         mRecycler.setHasFixedSize(true);
@@ -63,10 +76,10 @@ public class EmpresasListActivity extends AppCompatActivity {
 
 
     public Query getQuery(DatabaseReference databaseReference) {
-        Log.i("EmpresasView", "getQuery user:"+mUserId);
+        Log.i("EmpresasView", "getQuery user:"+ getKeyFromEmail(mUserMail));
         // Todas las empresas de este User
-        return databaseReference.child("user-empresa")
-                .child(mUserId);
+        return databaseReference.child(ESQUEMA_USER_PROPUETO_EMPRESA)
+                .child(getKeyFromEmail(mUserMail));
     }
 
     @Override
@@ -83,10 +96,10 @@ public class EmpresasListActivity extends AppCompatActivity {
 
         // Set up FirebaseRecyclerAdapter with the Query
         Query empresasQuery = getQuery(mDatabase);
-        mAdapter = new FirebaseRecyclerAdapter<Empresa, EmpresaViewHolder> (Empresa.class, R.layout.item_empresa,
-                EmpresaViewHolder.class, empresasQuery) {
+        mAdapter = new FirebaseRecyclerAdapter<EmpresaPerfil, EmpresaPerfilViewHolder> (EmpresaPerfil.class, R.layout.item_empresa,
+                EmpresaPerfilViewHolder.class, empresasQuery) {
             @Override
-            protected void populateViewHolder(final EmpresaViewHolder viewHolder, final Empresa model, final int position) {
+            protected void populateViewHolder(final EmpresaPerfilViewHolder viewHolder, final EmpresaPerfil model, final int position) {
                 final DatabaseReference postRef = getRef(position);
                 Log.i("EmpresasView", "populateViewHolder(postRef)"+postRef.toString());
 

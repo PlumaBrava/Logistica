@@ -39,6 +39,8 @@
         android:title="@string/menu_empresaList"
         android:visible="true"
         app:showAsAction="never" />
+
+
     <item
         android:id="@+id/action_usuarios"
         android:title="@string/menu_usuarios"

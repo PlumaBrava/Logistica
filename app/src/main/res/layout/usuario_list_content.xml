@@ -4,17 +4,56 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
+    <ImageView
+        android:id="@+id/fotoUsuarioUsuarioListContent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:gravity="start"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/text_margin"
+        android:contentDescription="@string/photoListItem"
+        android:maxHeight="@dimen/product_cardPhotoheigth"
+        android:maxWidth="@dimen/product_cardPhotowidth"
+        android:transitionName="@string/detail_icon_transition_name"
+        android:layout_gravity="center_vertical"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.rey.material.widget.Switch
+            android:id="@+id/activoSwitchUsuarioListContent"
+            style="@style/Material.Widget.Switch"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:checked="false" />
+
     <TextView
-        android:id="@+id/id"
+        android:id="@+id/emailUsuarioListContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem" />
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/usernameUsuarioListContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem" />
+
+    <TextView
+        android:id="@+id/statusUsuarioListContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:textAppearance="?attr/textAppearanceListItem" />
+
+
+    </LinearLayout>
+
 </LinearLayout>

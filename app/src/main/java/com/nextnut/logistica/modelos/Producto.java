@@ -30,28 +30,27 @@ public class Producto {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Producto(String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto, String uid) {
+    public Producto(String uid,String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto ) {
         this.nombreProducto = nombreProducto;
         this.precio = precio;
         this.precioEspcecial = precioEspcecial;
         this.descripcionProducto = descripcionProducto;
         this.fotoProducto = fotoProducto;
-        this.fechaModificacion = fechaModificacion;
-        this.uid = uid;
+         this.uid = uid;
     }
 
     // [START post_to_map]
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("uid", uid);
+
         result.put("nombreProducto", nombreProducto);
         result.put("precio", precio);
         result.put("precioEspcecial", precioEspcecial);
         result.put("descripcionProducto", descripcionProducto);
         result.put("fotoProducto", fotoProducto);
         result.put("fechaModificacion", ServerValue.TIMESTAMP);
-
+        result.put("uid", uid);
         return result;
     }
     // [END post_to_map]

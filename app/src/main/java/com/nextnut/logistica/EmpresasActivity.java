@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -28,13 +30,20 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.nextnut.logistica.modelos.Empresa;
+import com.nextnut.logistica.modelos.EmpresaPerfil;
+import com.nextnut.logistica.modelos.Perfil;
+import com.nextnut.logistica.modelos.Usuario;
+import com.nextnut.logistica.modelos.UsuarioPerfil;
 import com.nextnut.logistica.util.Constantes;
 import com.nextnut.logistica.util.Imagenes;
 import com.rey.material.widget.ProgressView;
@@ -46,17 +55,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_USUARIOS;
 import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_USERS;
 import static com.nextnut.logistica.util.Constantes.NODO_USER_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.NODO_USER_PERFIL;
 import static com.nextnut.logistica.util.Constantes.NODO_USER_PROPUETO_EMPRESA;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
+import static com.nextnut.logistica.util.KeyMailConverter.getKeyFromEmail;
 
 public class EmpresasActivity extends AppCompatActivity {
     private static final String TAG = " EmpresasActivity";
     private DatabaseReference mDatabase;
     private FirebaseStorage mStorage;
     private StorageReference mStorageRef;
+
+    private ValueEventListener mUserListener;
 
     private EditText mEmpresaNombre;
     private EditText mEmpresaCuit;
@@ -67,6 +82,7 @@ public class EmpresasActivity extends AppCompatActivity {
     private ImageView mEmpresaLogo;
     private String mEmpresaLogoURL;
     private FirebaseUser mUser;
+    private Usuario mUsuario;
     private String mEmpresaKey;
     FloatingActionButton mfab;
     public ProgressView spinner;
@@ -76,6 +92,47 @@ public class EmpresasActivity extends AppCompatActivity {
      */
     private GoogleApiClient client;
 
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // [START post_value_event_listener]
+        final ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onDataChange: ");
+                // Get Post object and use the values to update the UI
+                mUsuario = dataSnapshot.getValue(Usuario.class);
+
+                Log.i(TAG, "onDataChange: User-name "+mUsuario.getUsername());
+                Log.i(TAG, "onDataChange: User-status "+mUsuario.getStatus());
+                Log.i(TAG, "onDataChange: User-activo "+mUsuario.getActivo());
+                // [START_EXCLUDE]
+
+                if (mUserListener != null) {
+                    mDatabase.child(ESQUEMA_USUARIOS).child(mUser.getUid()).removeEventListener(mUserListener);
+                    Log.i("producto", "onDataChange-removeEventListener ");
+
+                }
+                // [END_EXCLUDE]
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.d(TAG, "loadPost:onCancelled", databaseError.toException());
+                // [START_EXCLUDE]
+                Toast.makeText(getApplication(), "Failed to load User.",
+                        Toast.LENGTH_SHORT).show();
+                // [END_EXCLUDE]
+            }
+        };
+        mUserListener = userListener;
+
+        mDatabase.child(ESQUEMA_USUARIOS).child(mUser.getUid())
+                .addValueEventListener(userListener);
+        // [END post_value_event_listener]
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,112 +146,106 @@ public class EmpresasActivity extends AppCompatActivity {
         mStorage = FirebaseStorage.getInstance();
         mStorageRef = mStorage.getReferenceFromUrl(Constantes.STORAGE_REFERENCE);
 
-
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         // [END initialize_database_ref]
+        if (mUser != null) {//Si mProductKey existe leo los datos de Firebase y los muestro.
+            Log.i("producto", "onActivityCreated: " + mUser);
+            // Add value event listener to show the data.
 
-        mEmpresaNombre = (EditText) findViewById(R.id.empresa_nombre);
-        mEmpresaCuit = (EditText) findViewById(R.id.empresa_cuit);
-        mEmpresaCiudad = (EditText) findViewById(R.id.empresa_ciudad);
-        mEmpresaDireccion = (EditText) findViewById(R.id.empresa_Direccion);
-        mEmpresaCodigoPostal = (EditText) findViewById(R.id.empresa_CodigoPostal);
-        mEmpresaTelefono = (EditText) findViewById(R.id.empresa_telefono);
-        mEmpresaLogo = (ImageView) findViewById(R.id.empresa_Logo);
-        mEmpresaLogo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectImage(EmpresasActivity.this);
-            }
-        });
+            mEmpresaNombre = (EditText) findViewById(R.id.empresa_nombre);
+            mEmpresaCuit = (EditText) findViewById(R.id.empresa_cuit);
+            mEmpresaCiudad = (EditText) findViewById(R.id.empresa_ciudad);
+            mEmpresaDireccion = (EditText) findViewById(R.id.empresa_Direccion);
+            mEmpresaCodigoPostal = (EditText) findViewById(R.id.empresa_CodigoPostal);
+            mEmpresaTelefono = (EditText) findViewById(R.id.empresa_telefono);
+            mEmpresaLogo = (ImageView) findViewById(R.id.empresa_Logo);
+            mEmpresaLogo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectImage(EmpresasActivity.this);
+                }
+            });
 
-        Drawable drawable = dimensiona(getApplicationContext(), R.drawable.ic_action_image_timer_auto);
-        Picasso.with(getApplicationContext())
-                .load(drawable.toString())
-                .resize(200, 200)
-                .placeholder(drawable)
-                .centerCrop()
-                .into(mEmpresaLogo);
-
-
-        mfab = (FloatingActionButton) findViewById(R.id.fab);
-        mfab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setEditingEnabled(false);
-
-                writeNewEmpresa(mUser, mEmpresaNombre.getText().toString(), mEmpresaCuit.getText().toString(), mEmpresaCiudad.getText().toString(), mEmpresaDireccion.getText().toString(), mEmpresaCodigoPostal.getText().toString(), mEmpresaTelefono.getText().toString(), mEmpresaLogoURL);
-
-//                // Get the data from an ImageView as bytes
-//                mEmpresaLogo.setDrawingCacheEnabled(true);
-//                mEmpresaLogo.buildDrawingCache();
-//                Bitmap bitmap = mEmpresaLogo.getDrawingCache();
-//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//                byte[] data = baos.toByteArray();
-//
-//                // Create a storage reference from our app
-//                StorageReference storageRef = mStorage.getReferenceFromUrl("gs://logistica-144918.appspot.com");
-//
-//// Create a reference to "mountains.jpg"
-//                StorageReference mountainsRef = storageRef.child("mountains.jpg");
-//
-//// Create a reference to 'images/mountains.jpg'
-//                StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg");
-//
-//
-//                UploadTask uploadTask = mountainsRef.putBytes(data);
-//                uploadTask.addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception exception) {
-//                        Log.i("foto","OnFalilure: "+ exception);
-//                        // Handle unsuccessful uploads
-//                    }
-//                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                        Log.i("foto","onSuccess: "+ taskSnapshot.toString());
-//
-//                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-//                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
-//
-//                    }
-//                });
-//
-//
-//
-//
-
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        spinner = (ProgressView) findViewById(R.id.progressBarEmpresa);
-        spinner.setVisibility(View.GONE);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            Drawable drawable = dimensiona(getApplicationContext(), R.drawable.ic_action_image_timer_auto);
+            Picasso.with(getApplicationContext())
+                    .load(drawable.toString())
+                    .resize(200, 200)
+                    .placeholder(drawable)
+                    .centerCrop()
+                    .into(mEmpresaLogo);
 
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+            mfab = (FloatingActionButton) findViewById(R.id.fab);
+            mfab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    setEditingEnabled(false);
+
+                    writeNewEmpresa(mUser, mEmpresaNombre.getText().toString(), mEmpresaCuit.getText().toString(), mEmpresaCiudad.getText().toString(), mEmpresaDireccion.getText().toString(), mEmpresaCodigoPostal.getText().toString(), mEmpresaTelefono.getText().toString(), mEmpresaLogoURL);
+
+
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
+            spinner = (ProgressView) findViewById(R.id.progressBarEmpresa);
+            spinner.setVisibility(View.GONE);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+            // ATTENTION: This was auto-generated to implement the App Indexing API.
+            // See https://g.co/AppIndexing/AndroidStudio for more information.
+            client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        }
     }
 
 
     // [START basic_write]
-    private void writeNewEmpresa(FirebaseUser user, String nombre, String cuit, String ciudad, String direccion, String codigoPostal, String telegono, String logo) {
+
+    private void writeNewEmpresa(FirebaseUser userFirebase, String nombre, String cuit, String ciudad, String direccion, String codigoPostal, String telegono, String logo) {
         if (validateForm()) {
             if (mEmpresaKey == null) {
                 mEmpresaKey = mDatabase.child(ESQUEMA_EMPRESA).push().getKey();
             }
             Log.d(TAG, "mEmpresaKey:" + mEmpresaKey);
-            Log.d(TAG, "user.getEmail():" + user.getEmail());
-            Log.d(TAG, "user.getUid():" + user.getUid());
+            Log.d(TAG, "user.getEmail():" + userFirebase.getEmail());
+            Log.d(TAG, "user.getUid():" + userFirebase.getUid());
 
-            Empresa empresa = new Empresa(user.getUid(), nombre, cuit, ciudad, direccion, codigoPostal, telegono, logo);
+            Empresa empresa = new Empresa(userFirebase.getUid(), nombre, cuit, ciudad, direccion, codigoPostal, telegono, logo);
+            Perfil perfil = new Perfil();
+            perfil.setPerfilAdministrador();
+
+
+            EmpresaPerfil empresaPerfil = new EmpresaPerfil(userFirebase.getUid(), empresa, perfil);
+            UsuarioPerfil usuarioPerfil = new UsuarioPerfil(userFirebase.getUid(), mUsuario, perfil);
+
+
+
             Map<String, Object> empresaValues = empresa.toMap();
+            Map<String, Object> empresaPerfilValues = empresaPerfil.toMap();
+            Map<String, Object> perfilValues = perfil.toMap();
+            Map<String, Object> usuarioPerfilValues = usuarioPerfil.toMap();
+
+
+
             Map<String, Object> childUpdates = new HashMap<>();
+
+
+            //Creacion de la empresa
             childUpdates.put(NODO_EMPRESA + mEmpresaKey, empresaValues);
-            childUpdates.put(NODO_USER_EMPRESA + user.getUid() + "/" + mEmpresaKey, empresaValues);
-            childUpdates.put(NODO_USER_PROPUETO_EMPRESA+ getKeyFromEmail(user.getEmail() )+ "/" + mEmpresaKey, empresaValues);
+            // para el asignar la empresa actual al Usuario
+            // ToDO: En caso de modificaciones en la empresa, impactar a todos los usuarios que tienen a esta empresa.
+            childUpdates.put(NODO_USER_EMPRESA + userFirebase.getUid() + "/" + mEmpresaKey, empresaValues);
+            // para asignar el perfil actual al usuario
+            // ToDO: En caso de modificaciones en la empresa, impactar a todos los usuarios que tienen a esta empresa.
+            childUpdates.put(NODO_USER_PERFIL + userFirebase.getUid(), perfilValues);
+            // para el listado de empresas porpuesta para el usuario
+            // ToDO: En caso de modificaciones en la empresa, impactar a todos los usuarios que tienen a esta empresa.
+            childUpdates.put(NODO_USER_PROPUETO_EMPRESA + getKeyFromEmail(userFirebase.getEmail())+"/"+mEmpresaKey  , empresaPerfilValues);
+
+            // para el listado de usuarios y su Perfiles por empresa
+            childUpdates.put(NODO_EMPRESA_USERS + "/"+mEmpresaKey+"/"+userFirebase.getUid() , usuarioPerfilValues);
+
             mDatabase.updateChildren(childUpdates)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -215,18 +266,6 @@ public class EmpresasActivity extends AppCompatActivity {
         setEditingEnabled(true);
     }
 
-    private String getKeyFromEmail(String email) {
-        if ( email !=null){
-            String a =email.toLowerCase()
-                    .replace('.','-')
-                    .replace('#','N')
-                    .replace('[','P')
-                    .replace(']','p')
-                    .replace('/','B');
-            return a;
-        }
-        return email;
-    }
 
     private void setEditingEnabled(boolean enabled) {
         mEmpresaNombre.setEnabled(enabled);

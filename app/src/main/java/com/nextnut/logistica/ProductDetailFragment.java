@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
@@ -335,7 +336,7 @@ public class ProductDetailFragment extends Fragment
                     }
                     // ya tenemos los datos que queremos modificar por lo tanto desconectamos el listener!
                     if (mProductListener != null) {
-                        mDatabase.child(Constantes.ESQUEMA_EMPRESA_PRODUCTO).child(mProductKey).removeEventListener(mProductListener);
+                        mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mProductKey).removeEventListener(mProductListener);
                         Log.i("producto", "onDataChange-removeEventListener ");
 
                     }
@@ -645,7 +646,7 @@ public class ProductDetailFragment extends Fragment
             Log.i("producto", "writeNewProducto: fotoProducto " + fotoProducto);
             Log.i("producto", "writeNewProducto: uid " + uid);
 
-            Producto producto = new Producto(nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto, uid);
+            Producto producto = new Producto(uid,nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto );
             Map<String, Object> productoValues = producto.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
 //            childUpdates.put("/empresa/" + key, empresaValues);

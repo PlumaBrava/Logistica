@@ -18,7 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.nextnut.logistica.modelos.Perfil;
-import com.nextnut.logistica.modelos.User;
+import com.nextnut.logistica.modelos.Usuario;
 import com.nextnut.logistica.util.DialogAlerta;
 import com.rey.material.widget.CheckBox;
 import com.rey.material.widget.ProgressView;
@@ -155,8 +155,8 @@ public class UsuarioDetailFragment extends Fragment {
                             for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
 //                                String category = (String) messageSnapshot.child("category").getValue();
                                 Log.d(TAG, "mail key snapshot"+ messageSnapshot.getKey());
-                                User u = messageSnapshot.getValue(User.class);
-                                Log.d(TAG, "mail user:"+ u.getEmail()+" - "+u.getPerfil().getClientes());
+                                Usuario u = messageSnapshot.getValue(Usuario.class);
+//                                Log.d(TAG, "mail user:"+ u.getEmail()+" - "+u.getPerfil().getClientes());
                             }
 
                             return ;
@@ -178,11 +178,11 @@ public class UsuarioDetailFragment extends Fragment {
             String keyUsuario = referenceEmpresa_NewUser.child(empresaKey).push().getKey();
             String photoUrl =null;
 
-            Perfil perfil = new Perfil(mPerfil_usuarios.isChecked(), mPerfil_productos.isChecked(),
+            Perfil perfil = new Perfil(keyUsuario,mPerfil_usuarios.isChecked(), mPerfil_productos.isChecked(),
                     mPerfil_clientes.isChecked(), mPerfil_reportes.isChecked(),mPerfil_ordenes.isChecked(),
                     mPerfil_preparar.isChecked(), mPerfil_entregar.isChecked(), mPerfil_pagos.isChecked(), mPerfil_stock.isChecked());
 
-            User user =new User("new",mEmail.getText().toString(),photoUrl,"inicial",false,perfil) ;
+            Usuario user =new Usuario("new",mEmail.getText().toString(),photoUrl,"inicial",false) ;
 
             Map<String, Object> userValues = user.toMap();
 

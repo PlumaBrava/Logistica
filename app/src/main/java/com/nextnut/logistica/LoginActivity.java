@@ -50,12 +50,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.nextnut.logistica.modelos.Perfil;
-import com.nextnut.logistica.modelos.User;
+import com.nextnut.logistica.modelos.EmpresaPerfil;
+import com.nextnut.logistica.modelos.Usuario;
 import com.rey.material.widget.ProgressView;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_USER_PROPUETO_EMPRESA;
+import static com.nextnut.logistica.util.KeyMailConverter.getKeyFromEmail;
 
 /**
  * A login screen that offers login via email/password.
@@ -353,11 +356,11 @@ public class LoginActivity
                             String photoURL = task.getResult().getUser().getPhotoUrl().toString();
                             String status = "inicial";
                             Boolean activo = true;
-                            Perfil perfil = new Perfil();
-                            perfil.setPerfilAdministrador();
+//                            Perfil perfil = new Perfil();
+//                            perfil.setPerfilAdministrador();
 
                             // Write new user
-                            writeNewUser(userId, username, email, photoURL, status, activo, perfil);
+                            writeNewUser(userId, username, email, photoURL, status, activo);
 
 
                         } else {
@@ -409,20 +412,27 @@ public class LoginActivity
 
         // Verifica que si existe ese usuario en NewUser
         Log.d(TAG, "onAuthSuccess: Uid:" + user.getUid());
-        Query userEmpresa= mDatabase.child("usuario-empresa-seleccionada").child(user.getUid());
-        userEmpresa
-
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        Query userEmpresa= mDatabase.child(ESQUEMA_USER_PROPUETO_EMPRESA).child(getKeyFromEmail(user.getEmail() ));
+        userEmpresa.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                        Log.d(TAG, "onAuthSuccess:getChildrenCount: " + dataSnapshot.getChildrenCount());
 
                         if(dataSnapshot.getChildrenCount()<=0){
                 // Crear una empresa
-                            }
+                            Log.d(TAG, "onAuthSuccess:getChildrenCount()<=0- Crear Empresa " );
+
+                        }
 
                         else {
-
+                            Log.d(TAG, "onAuthSuccess:getChildrenCount: - Elegir  o Crear Empresa ");
+                            for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
+//                                String category = (String) messageSnapshot.child("category").getValue();
+                                Log.d(TAG, "onAuthSuccess-KEY"+ messageSnapshot.getKey());
+                                EmpresaPerfil u = messageSnapshot.getValue(EmpresaPerfil.class);
+                                Log.d(TAG, "onAuthSuccess-EMPRESA NOMBRE:"+ u.getEmpresa().getNombre()+" - "+u.getEmpresa().getCiudad());
+                                Log.d(TAG, "onAuthSuccess-Perfil:"+ u.getPerfil().getClientes()+" - "+u.getPerfil().getUsuarios());
+                            }
                         }
                         }
                     @Override
@@ -473,8 +483,8 @@ public class LoginActivity
     }
 
     // [START basic_write]
-    private void writeNewUser(String userId, String username, String email, String photoURL, String status, Boolean activo, Perfil perfil) {
-        User user = new User(username, email, photoURL, status, activo, perfil);
+    private void writeNewUser(String userId, String username, String email, String photoURL, String status, Boolean activo) {
+        Usuario user = new Usuario(username, email, photoURL, status, activo);
         mDatabase.child("users").child(userId).setValue(user);
     }
     // [END basic_write]
@@ -512,11 +522,11 @@ public class LoginActivity
                             String photoURL = null;// no existe la foto al momento de crear el usuario
                             String status = "inicial";
                             Boolean activo = true;
-                            Perfil perfil = new Perfil();
-                            perfil.setPerfilAdministrador();
+//                            Perfil perfil = new Perfil();
+//                            perfil.setPerfilAdministrador();
 
                             // Write new user
-                            writeNewUser(userId, username, email, photoURL, status, activo, perfil);
+                            writeNewUser(userId, username, email, photoURL, status, activo);
 
 
                         } else {
@@ -576,11 +586,11 @@ public class LoginActivity
                             String photoURL = task.getResult().getUser().getPhotoUrl().toString();
                             String status = "inicial";
                             Boolean activo = true;
-                            Perfil perfil = new Perfil();
-                            perfil.setPerfilAdministrador();
+//                            Perfil perfil = new Perfil();
+//                            perfil.setPerfilAdministrador();
 
                             // Write new user
-                            writeNewUser(userId, username, email, photoURL, status, activo, perfil);
+                            writeNewUser(userId, username, email, photoURL, status, activo);
 
 
                         } else {
