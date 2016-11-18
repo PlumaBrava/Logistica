@@ -21,9 +21,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -55,7 +53,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA;
-import static com.nextnut.logistica.util.Constantes.ESQUEMA_USUARIOS;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_USERS;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_USER_EMPRESA;
 import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA;
 import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_USERS;
 import static com.nextnut.logistica.util.Constantes.NODO_USER_EMPRESA;
@@ -86,11 +85,7 @@ public class EmpresasActivity extends AppCompatActivity {
     private String mEmpresaKey;
     FloatingActionButton mfab;
     public ProgressView spinner;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private Empresa mEmpresa;
 
 
     @Override
@@ -110,7 +105,7 @@ public class EmpresasActivity extends AppCompatActivity {
                 // [START_EXCLUDE]
 
                 if (mUserListener != null) {
-                    mDatabase.child(ESQUEMA_USUARIOS).child(mUser.getUid()).removeEventListener(mUserListener);
+                    mDatabase.child(ESQUEMA_USERS).child(mUser.getUid()).removeEventListener(mUserListener);
                     Log.i("producto", "onDataChange-removeEventListener ");
 
                 }
@@ -129,7 +124,7 @@ public class EmpresasActivity extends AppCompatActivity {
         };
         mUserListener = userListener;
 
-        mDatabase.child(ESQUEMA_USUARIOS).child(mUser.getUid())
+        mDatabase.child(ESQUEMA_USERS).child(mUser.getUid())
                 .addValueEventListener(userListener);
         // [END post_value_event_listener]
     }
@@ -195,7 +190,7 @@ public class EmpresasActivity extends AppCompatActivity {
 
             // ATTENTION: This was auto-generated to implement the App Indexing API.
             // See https://g.co/AppIndexing/AndroidStudio for more information.
-            client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+//            client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         }
     }
 
@@ -211,17 +206,17 @@ public class EmpresasActivity extends AppCompatActivity {
             Log.d(TAG, "user.getEmail():" + userFirebase.getEmail());
             Log.d(TAG, "user.getUid():" + userFirebase.getUid());
 
-            Empresa empresa = new Empresa(userFirebase.getUid(), nombre, cuit, ciudad, direccion, codigoPostal, telegono, logo);
-            Perfil perfil = new Perfil();
+            mEmpresa = new Empresa(userFirebase.getUid(), nombre, cuit, ciudad, direccion, codigoPostal, telegono, logo);
+            final Perfil perfil = new Perfil();
             perfil.setPerfilAdministrador();
 
 
-            EmpresaPerfil empresaPerfil = new EmpresaPerfil(userFirebase.getUid(), empresa, perfil);
+            EmpresaPerfil empresaPerfil = new EmpresaPerfil(userFirebase.getUid(), mEmpresa, perfil);
             UsuarioPerfil usuarioPerfil = new UsuarioPerfil(userFirebase.getUid(), mUsuario, perfil);
 
 
 
-            Map<String, Object> empresaValues = empresa.toMap();
+            Map<String, Object> empresaValues = mEmpresa.toMap();
             Map<String, Object> empresaPerfilValues = empresaPerfil.toMap();
             Map<String, Object> perfilValues = perfil.toMap();
             Map<String, Object> usuarioPerfilValues = usuarioPerfil.toMap();
@@ -230,6 +225,7 @@ public class EmpresasActivity extends AppCompatActivity {
 
             Map<String, Object> childUpdates = new HashMap<>();
 
+            mDatabase.child(ESQUEMA_USER_EMPRESA).child( userFirebase.getUid()).removeValue();
 
             //Creacion de la empresa
             childUpdates.put(NODO_EMPRESA + mEmpresaKey, empresaValues);
@@ -252,6 +248,14 @@ public class EmpresasActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<Void> task) {
                             Log.d(TAG, "task.isSuccessful(): " + task.isSuccessful());
                             if (task.isSuccessful()) {
+                            onBackPressed();
+                                // Seleccionar una empresa o crear una
+//                                Intent intent = new Intent(getApplication(), MainActivity.class);
+//                            intent.putExtra(EXTRA_EMPRESA_KEY, mEmpresaKey);
+////                            Log.d(TAG, "onAuthSuccess:getChildrenCount()<=0- Crear Empresa " );
+//                            intent.putExtra(EXTRA_EMPRESA,mEmpresa);
+//                            intent.putExtra(EXTRA_PERFIL,perfil );
+//                                startActivity(intent);
 
                             } else {
                                 Log.d(TAG, "task.error: " + task.getException().getMessage().toString());
@@ -450,8 +454,8 @@ public class EmpresasActivity extends AppCompatActivity {
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+//        client.connect();
+//        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
     @Override
@@ -460,7 +464,7 @@ public class EmpresasActivity extends AppCompatActivity {
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
+//        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+//        client.disconnect();
     }
 }

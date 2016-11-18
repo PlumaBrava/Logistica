@@ -126,9 +126,11 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if (isVisibleToUser) {
-            getLoaderManager().restartLoader(PICKING_ORDER_LOADER, null, this);
-            getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, this);
-            getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
+
+      //TODO: revisar que se hace con esta parte del codigo que se usaba para que no quede vacio el fragmento al hacer swipe
+//            getLoaderManager().restartLoader(PICKING_ORDER_LOADER, null, this);
+//            getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, this);
+//            getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
         }
         super.setUserVisibleHint(isVisibleToUser);
     }

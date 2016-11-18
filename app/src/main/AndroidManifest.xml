@@ -36,10 +36,20 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
+                android:launchMode="singleTop"
                 android:value="com.nextnut.logistica.LoginActivity" />
         </activity>
         <activity
             android:name=".ProductListActivity"
+            android:label="@string/title_product_list"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nextnut.logistica.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ProductClienteListActivity"
             android:label="@string/title_product_list"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -87,6 +97,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.MainActivity" />
         </activity>
+
         <activity
             android:name=".CustomDetailActivity"
             android:label="@string/title_custom_detail"

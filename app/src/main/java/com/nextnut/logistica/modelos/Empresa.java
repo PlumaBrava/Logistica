@@ -1,5 +1,8 @@
 package com.nextnut.logistica.modelos;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.ServerValue;
@@ -12,8 +15,8 @@ import java.util.Map;
  */
 // [START blog_user_class]
 @IgnoreExtraProperties
-public class Empresa {
-
+public class Empresa implements Parcelable{
+    public static int NUMERO_DE_VARIABLES =9;
     private String nombre;
     private String cuit;
     private String ciudad;
@@ -135,6 +138,49 @@ public class Empresa {
 
     public void setFechaModificacion(long fechaModificacion) {
         this.fechaModificacion = fechaModificacion;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(nombre);
+        parcel.writeString(cuit);
+        parcel.writeString(ciudad);
+        parcel.writeString(direccion);
+        parcel.writeString(codigoPostal);
+        parcel.writeString(telefono);
+        parcel.writeLong(fechaModificacion);
+        parcel.writeString(uid);
+        parcel.writeString(logo);
+
+    }
+    // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
+    public static final Parcelable.Creator<Empresa> CREATOR = new Parcelable.Creator<Empresa>() {
+        public Empresa createFromParcel(Parcel in) {
+            return new Empresa(in);
+        }
+
+        public Empresa[] newArray(int size) {
+            return new Empresa[size];
+        }
+    };
+
+    // example constructor that takes a Parcel and gives you an object populated with it's values
+    private Empresa(Parcel in) {
+        nombre=in.readString();
+        cuit=in.readString();
+        ciudad=in.readString();
+        direccion=in.readString();
+        codigoPostal= in.readString();
+        telefono= in.readString();
+        fechaModificacion= in.readLong();
+        uid= in.readString();
+        logo =in.readString();
+
     }
 }
 // [END blog_user_class]

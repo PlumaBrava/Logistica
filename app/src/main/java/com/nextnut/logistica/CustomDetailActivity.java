@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +15,7 @@ import android.view.View;
  * item details are presented side-by-side with a list of items
  * in a {@link CustomListActivity}.
  */
-public class CustomDetailActivity extends AppCompatActivity {
+public class CustomDetailActivity extends ActivityBasic {
     private static final String LOG_TAG = CustomDetailActivity.class.getSimpleName();
 
     @Override
@@ -30,16 +29,11 @@ public class CustomDetailActivity extends AppCompatActivity {
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
-
                 CustomDetailFragment customDetailFragment=(CustomDetailFragment)
                         getSupportFragmentManager().findFragmentById(R.id.custom_detail_container);
                 if (customDetailFragment!=null){
                     customDetailFragment.verificationAndsave();
                 }
-
-
             }
 
         });
@@ -48,8 +42,6 @@ public class CustomDetailActivity extends AppCompatActivity {
         fab_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
                 CustomDetailFragment customDetailFragment=(CustomDetailFragment)
                         getSupportFragmentManager().findFragmentById(R.id.custom_detail_container);
                 if (customDetailFragment!=null){
@@ -77,14 +69,19 @@ public class CustomDetailActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(CustomDetailFragment.ARG_ITEM_ID,0));
-            int mAction = getIntent().getIntExtra(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
-            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, mAction);
 
 
+            Bundle arguments =  putBundleFirebase();
+//            Bundle arguments = new Bundle();
+//            arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(CustomDetailFragment.ARG_ITEM_ID,0));
+//            int mAction = getIntent().getIntExtra(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
+//            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, mActCion);
+//
+//            arguments.putParcelable(EXTRA_EMPRESA, getIntent().getParcelableExtra(EXTRA_EMPRESA));
+//            arguments.putString(EXTRA_EMPRESA_KEY, getIntent().getStringExtra(EXTRA_EMPRESA_KEY));
+//            arguments.putParcelable(EXTRA_PERFIL,getIntent().getParcelableExtra(EXTRA_PERFIL));
 
-            if(mAction ==CustomDetailFragment.CUSTOM_NEW){
+            if(mClienteKey==null){//Si la key es null se trata de un cliente Nuevo
                 fab_delete.setVisibility(View.GONE);
                 fab_save.setVisibility(View.VISIBLE);
             }else {
@@ -93,10 +90,7 @@ public class CustomDetailActivity extends AppCompatActivity {
             }
 
 
-
-
             CustomDetailFragment fragment = new CustomDetailFragment();
-            fragment.setArguments(arguments);
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.custom_detail_container, fragment)

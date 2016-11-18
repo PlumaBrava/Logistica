@@ -93,7 +93,7 @@ implements ItemTouchHelperAdapter{
             @Override
             public ViewHolder onCreateViewHolder (ViewGroup parent,int viewType){
                 View itemView = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.custom_list_content, parent, false);
+                        .inflate(R.layout.custom_list_item, parent, false);
                 ViewHolder vh = new ViewHolder(itemView);
                 mVh = vh;
                 return vh;

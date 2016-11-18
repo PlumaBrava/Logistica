@@ -10,15 +10,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.nextnut.logistica.modelos.Empresa;
 import com.nextnut.logistica.modelos.Perfil;
 import com.nextnut.logistica.modelos.Usuario;
+import com.nextnut.logistica.modelos.UsuarioPerfil;
+import com.nextnut.logistica.util.Constantes;
 import com.nextnut.logistica.util.DialogAlerta;
 import com.rey.material.widget.CheckBox;
 import com.rey.material.widget.ProgressView;
@@ -26,6 +31,11 @@ import com.rey.material.widget.Switch;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA_KEY;
+import static com.nextnut.logistica.util.Constantes.EXTRA_USER_KEY;
+import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_USERS;
 
 /**
  * A fragment representing a single Usuario detail screen.
@@ -40,6 +50,9 @@ public class UsuarioDetailFragment extends Fragment {
      */
     public static final String ARG_ITEM_ID = "item_id";
     private static final String DIALOG_FRAGMENT = "Dialog Fragment";
+
+
+    public static  final String LOG_TAG ="UsuarioDetalle";
 
     private EditText mEmail;
     private EditText mEmailConfirmation;
@@ -60,6 +73,12 @@ public class UsuarioDetailFragment extends Fragment {
     private ProgressView mSpinner;
     private View mFormulario;
     private static final String TAG = "UsuarioDetailFragmet";
+
+    private String mUserKey;
+    private String mEmpresaKey;
+    private Empresa mEmpresa;
+    private String mUserId;
+
 
     private DatabaseReference mDatabase;
     /**
@@ -87,9 +106,27 @@ public class UsuarioDetailFragment extends Fragment {
         }
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        mUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        mStorageRef = mStorage.getReferenceFromUrl(Constantes.STORAGE_REFERENCE);
 
 
 
+        // Get post key from intent
+        mUserKey = getArguments().getString(EXTRA_USER_KEY);
+        mEmpresaKey = getArguments().getString(EXTRA_EMPRESA_KEY);
+        mEmpresa= (Empresa) getArguments().getParcelable(EXTRA_EMPRESA);
+        Log.d(TAG, "empresa: Nombre " +  mEmpresa.getNombre());
+        Log.d(TAG, "empresa: Ciudad " +  mEmpresa.getCiudad());
+        Log.d(TAG, "empresa: Direccion " +  mEmpresa.getDireccion());
+        Log.d(TAG, "empresa: Cuit " +  mEmpresa.getCuit());
+
+        if (mUserKey != null) { // Si exite mProductKey es que estamos modificando un producto.
+            // Initialize Database
+//            mDatabase = FirebaseDatabase.getInstance().getReference();
+
+//                    .child("empresa").child("producto").push().getKey();
+
+        }
 
     }
 
@@ -125,6 +162,85 @@ public class UsuarioDetailFragment extends Fragment {
         return rootView;
     }
 
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+
+
+        if (mUserKey != null) {//Si mProductKey existe leo los datos de Firebase y los muestro.
+            Log.i(LOG_TAG, "onActivityCreated: " + mUserKey);
+            // Add value event listener to show the data.
+            // [START post_value_event_listener]
+            ValueEventListener userListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.i(LOG_TAG, "onDataChange: ");
+                    // Get Post object and use the values to update the UI
+                    UsuarioPerfil usuarioPerfil = dataSnapshot.getValue(UsuarioPerfil.class);
+
+                    mEmail.setText(usuarioPerfil.getUsuario().getEmail());
+                    mEmailConfirmation.setVisibility(View.GONE);
+                    mUserSwitch.setChecked(usuarioPerfil.getUsuario().getActivo());
+                    mPerfil_usuarios.setChecked(usuarioPerfil.getPerfil().getUsuarios());
+                    mPerfil_productos.setChecked(usuarioPerfil.getPerfil().getProductos());
+                    mPerfil_clientes.setChecked(usuarioPerfil.getPerfil().getClientes());
+                    mPerfil_reportes.setChecked(usuarioPerfil.getPerfil().getReportes());
+                    mPerfil_ordenes.setChecked(usuarioPerfil.getPerfil().getOrdenes());
+                    mPerfil_preparar.setChecked(usuarioPerfil.getPerfil().getPreparar());
+                    mPerfil_entregar.setChecked(usuarioPerfil.getPerfil().getEntregar());
+                    mPerfil_pagos.setChecked(usuarioPerfil.getPerfil().getPagos());
+                    mPerfil_stock.setChecked(usuarioPerfil.getPerfil().getStock());
+
+
+//                    Log.i("producto", "onDataChange-mCurrentPhotoPath: " + mCurrentPhotoPath);
+
+//                    Picasso.with(getActivity())
+//                            .load(mCurrentPhotoPath)
+//                            .placeholder(R.drawable.ic_action_action_redeem)
+//                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+//                            .into(mImageProducto);
+//
+//                    if (appBarLayout != null) {
+//                        {
+//                            appBarLayout.setTitle(producto.getNombreProducto());
+//                        }
+//                    }
+//                    // ya tenemos los datos que queremos modificar por lo tanto desconectamos el listener!
+//                    if (mProductListener != null) {
+//                        mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mProductKey).removeEventListener(mProductListener);
+//                        Log.i("producto", "onDataChange-removeEventListener ");
+//
+//                    }
+                    // [END_EXCLUDE]
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Getting Post failed, log a message
+                    Log.w(LOG_TAG, "loadPost:onCancelled", databaseError.toException());
+                    // [START_EXCLUDE]
+                    Toast.makeText(getContext(), "Failed to load Products.",
+                            Toast.LENGTH_SHORT).show();
+                    // [END_EXCLUDE]
+                }
+            };
+
+            mDatabase.child(NODO_EMPRESA_USERS).child(mEmpresaKey).child(mUserKey).addListenerForSingleValueEvent(userListener);
+
+            // [END post_value_event_listener]
+
+            // Keep copy of post listener so we can remove it when app stops
+
+
+
+        } else {
+            Log.i("producto", "onActivityCreated: mProductKey: Null");
+
+        }
+
+        super.onActivityCreated(savedInstanceState);
+    }
+
     public String getmEmail() {
         return mEmail.getText().toString();
     }
@@ -134,18 +250,20 @@ public class UsuarioDetailFragment extends Fragment {
         if (validateForm()) {
 
 
-            String empresaKey ="-KV63YXYpmtO_bRnVfQk";
-            DatabaseReference referenceEmpresa_NewUser =mDatabase.child("empresa-NewUser");
+//            String empresaKey ="-KV63YXYpmtO_bRnVfQk";
+            DatabaseReference referenceEmpresaUser =mDatabase.child(Constantes.NODO_EMPRESA_USERS);
 
             // Verifica que si existe ese usuario en NewUser
-            Query myNewUsers= referenceEmpresa_NewUser.child(empresaKey).orderByChild("email");
+            Query myNewUsers= referenceEmpresaUser.child(mEmpresaKey).orderByChild("usuario/email");
             myNewUsers
                     .startAt(mEmail.getText().toString())
                     .endAt(mEmail.getText().toString())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.getChildrenCount()<=0){
+                            Log.d(TAG, "mail Children count"+ dataSnapshot.getChildrenCount());
+                            Log.d(TAG, "mail key"+ dataSnapshot.getKey());
+                            if(dataSnapshot.getChildrenCount()>0){
                                 DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproducNametcantbenull));
                                 // Show DialogFragment
                                 mEmail.setError(getString(R.string.usuario_emailyaExisite));
@@ -169,13 +287,9 @@ public class UsuarioDetailFragment extends Fragment {
                             Log.d(TAG, "mail Cancelled "+ databaseError.toString());
 
                         }
-                    })
+                    });
 
-
-
-            ;
-
-            String keyUsuario = referenceEmpresa_NewUser.child(empresaKey).push().getKey();
+            String keyUsuario = referenceEmpresaUser.child(mEmpresaKey).push().getKey();
             String photoUrl =null;
 
             Perfil perfil = new Perfil(keyUsuario,mPerfil_usuarios.isChecked(), mPerfil_productos.isChecked(),
@@ -184,11 +298,13 @@ public class UsuarioDetailFragment extends Fragment {
 
             Usuario user =new Usuario("new",mEmail.getText().toString(),photoUrl,"inicial",false) ;
 
-            Map<String, Object> userValues = user.toMap();
+            UsuarioPerfil usuarioPerfil =new UsuarioPerfil (mUserId, user,perfil);
+            Map<String, Object> usuarioPerfilValues = usuarioPerfil.toMap();
 
             Map<String, Object> childUpdates = new HashMap<>();
 //            childUpdates.put("/empresa/" + key, empresaValues);
-            childUpdates.put("/empresa-NewUser/" + empresaKey+ "/" + keyUsuario , userValues);
+            childUpdates.put(Constantes.NODO_EMPRESA_USERS + mEmpresaKey+ "/" + keyUsuario , usuarioPerfilValues);
+//            childUpdates.put(Constantes.NODO_USER_PROPUETO_EMPRESA + mEmpresaKey+ "/" + keyUsuario , usuarioPerfilValues);
             mDatabase.updateChildren(childUpdates);
 
         }

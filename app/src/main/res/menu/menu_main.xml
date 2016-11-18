@@ -3,31 +3,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.nextnut.logistica.MainActivity">
     <!--<item-->
-        <!--android:id="@+id/action_settings"-->
-        <!--android:orderInCategory="100"-->
-        <!--android:title="@string/action_settings"-->
-        <!--app:showAsAction="never" />-->
-    <item android:id="@+id/productos"
-        android:icon="@drawable/ic_action_action_redeem"
-        android:title="@string/products"
-        app:showAsAction="always"/>
-    <item android:id="@+id/customs"
-        android:icon="@drawable/ic_action_image_timer_auto"
-        android:title="@string/customs"
-        app:showAsAction="always"/>
-    <item android:id="@+id/reportexCliente"
-        android:orderInCategory="110"
-        android:title="@string/reportesXcliente"
-        app:showAsAction="never"/>
-    <item android:id="@+id/reportexMes"
-        android:orderInCategory="110"
-        android:title="@string/reportesXMes"
-        app:showAsAction="never"/>
+    <!--android:id="@+id/action_settings"-->
+    <!--android:orderInCategory="100"-->
+    <!--android:title="@string/action_settings"-->
+    <!--app:showAsAction="never" />-->
+    <group android:id="@+id/productos_">
+        <item
+            android:id="@+id/productos"
+            android:icon="@drawable/ic_action_action_redeem"
+            android:title="@string/products"
+            app:showAsAction="always" />
+    </group>
+    <group android:id="@+id/customs_">
+        <item
+            android:id="@+id/customs"
+            android:icon="@drawable/ic_action_image_timer_auto"
+            android:title="@string/customs"
+            app:showAsAction="always" />
+    </group>
     <item
         android:id="@+id/action_logout"
         android:title="@string/menu_logout"
         android:visible="true"
         app:showAsAction="never" />
+
+
+    <!-- menu group -->
     <item
         android:id="@+id/action_empresa"
         android:title="@string/menu_empresa"
@@ -41,12 +42,37 @@
         app:showAsAction="never" />
 
 
+    <group android:id="@+id/action_usuarios_">
+        <item
+            android:id="@+id/action_usuarios"
+            android:title="@string/menu_usuarios"
+            android:visible="true"
+            app:showAsAction="never" />
+    </group>
+    <!-- Grupo de reportes -->
+    <group
+        android:id="@+id/grupo_reportes"
+        android:menuCategory="container">
     <item
-        android:id="@+id/action_usuarios"
-        android:title="@string/menu_usuarios"
-        android:visible="true"
-        app:showAsAction="never" />
+    android:id="@+id/reportes_"
+    android:title="@string/menu_grupoReportes"
+    android:visible="true"
+    app:showAsAction="never" >
+    <menu>
 
+            <item
+                android:id="@+id/reportexCliente"
+                android:orderInCategory="110"
+                android:title="@string/reportesXcliente"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/reportexMes"
+                android:orderInCategory="110"
+                android:title="@string/reportesXMes"
+                app:showAsAction="never" />
 
-<!-- Revisar iconos -->
+        </menu>
+        </item>
+    </group>
+    <!-- Revisar iconos -->
 </menu>

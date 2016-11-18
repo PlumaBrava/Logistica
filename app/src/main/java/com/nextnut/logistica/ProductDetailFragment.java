@@ -39,6 +39,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
+import com.nextnut.logistica.modelos.Empresa;
+import com.nextnut.logistica.modelos.Perfil;
 import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.util.Constantes;
 import com.nextnut.logistica.util.CurrencyToDouble;
@@ -56,6 +58,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA_KEY;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PERFIL;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
+import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_PRODUCTOS;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
@@ -76,7 +83,7 @@ public class ProductDetailFragment extends Fragment
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
-    public static final String EXTRA_PRODUCT_KEY = "product_key";
+
 
 
     public static final String PRODUCT_ACTION = "product_action";
@@ -112,8 +119,10 @@ public class ProductDetailFragment extends Fragment
     private DatabaseReference mDatabase;
     private FirebaseStorage mStorage;
     private StorageReference mStorageRef;
-    private String mUserId;
-
+    private String mUserKey;
+    private Empresa mEmpresa;
+    private String mEmpresaKey;
+    private Perfil mPerfil;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -128,9 +137,11 @@ public class ProductDetailFragment extends Fragment
         // [START initialize_database_ref]
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance();
-        mUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        mUserKey = FirebaseAuth.getInstance().getCurrentUser().getUid();
         mStorageRef = mStorage.getReferenceFromUrl(Constantes.STORAGE_REFERENCE);
-
+        mPerfil=(Perfil) getArguments().getParcelable(EXTRA_PERFIL);
+        mEmpresa= (Empresa) getArguments().getParcelable(EXTRA_EMPRESA);
+        mEmpresaKey=  getArguments().getString( EXTRA_EMPRESA_KEY);
         // [END initialize_database_ref]
 
 
@@ -354,7 +365,7 @@ public class ProductDetailFragment extends Fragment
                 }
             };
 
-            mDatabase.child("empresa-producto").child(mProductKey).addValueEventListener(productListener);
+            mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mProductKey).addValueEventListener(productListener);
             // [END post_value_event_listener]
 
             // Keep copy of post listener so we can remove it when app stops
@@ -391,7 +402,7 @@ public class ProductDetailFragment extends Fragment
             if (bitmap != null) {
                 // Create a storage reference from our app
                 if (mProductKey == null) {
-                    mProductKey = mDatabase.child("empresa-producto").push().getKey();
+                    mProductKey = mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).push().getKey();
                 }
                 // Crear una referencia a la foto. (directorio Imagenes/mProductoKey
                 StorageReference ImagenRef = mStorageRef.child("images/" + mProductKey);
@@ -631,7 +642,7 @@ public class ProductDetailFragment extends Fragment
                 priceEspecial.convert(),
                 mProductDescription.getText().toString(),
                 mCurrentPhotoPath,
-                mUserId
+                mUserKey
         );
     }
 
@@ -653,7 +664,7 @@ public class ProductDetailFragment extends Fragment
             childUpdates.put("/empresa-producto/" + mProductKey, productoValues);
             // Remove post value event listener
             if (mProductListener != null) {
-                mDatabase.child("empresa-producto").child(mProductKey).removeEventListener(mProductListener);
+                mDatabase.child(NODO_EMPRESA_PRODUCTOS).child(mEmpresaKey).child(mProductKey).removeEventListener(mProductListener);
                 Log.i("producto", "removeEventListener");
 
             }

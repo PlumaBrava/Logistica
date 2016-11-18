@@ -89,11 +89,11 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
         mModelLayout = modelLayout;
         mViewHolderClass = viewHolderClass;
         mSnapshots = new FirebaseArray(ref);
-        Log.i("EmpresasView", "FirebaseRecyclerAdapter-constructor-Query ref");
+        Log.i("ClienteViewHolder", "FirebaseRecyclerAdapter-constructor-Query ref");
         mSnapshots.setOnChangedListener(new FirebaseArray.OnChangedListener() {
             @Override
             public void onChanged(EventType type, int index, int oldIndex) {
-                Log.i("EmpresasView", "FirebaseRecyclerAdapter-onChanged-type"+type.toString()+"-index: "+index+"- oldindex: "+oldIndex);
+                Log.i("ClienteViewHolder", "FirebaseRecyclerAdapter-onChanged-type"+type.toString()+"-index: "+index+"- oldindex: "+oldIndex);
                 switch (type) {
                     case ADDED:
                         notifyItemInserted(index);
@@ -114,7 +114,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
             
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.i("EmpresasView", "FirebaseRecyclerAdapter-onCancelled"+databaseError);
+                Log.i("ClienteViewHolder", "FirebaseRecyclerAdapter-onCancelled"+databaseError);
 
                 FirebaseRecyclerAdapter.this.onCancelled(databaseError);
             }
@@ -132,22 +132,22 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
     public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, DatabaseReference ref) {
 
         this(modelClass, modelLayout, viewHolderClass, (Query) ref);
-        Log.i("EmpresasView", "FirebaseRecyclerAdapter- Constructor -DatabaseReference ref");
+        Log.i("ClienteViewHolder", "FirebaseRecyclerAdapter- solo");
     }
 
     public void cleanup() {
-        Log.i("EmpresasView", "cleanup");
+        Log.i("ClienteViewHolder", "cleanup");
         mSnapshots.cleanup();
     }
 
     @Override
     public int getItemCount() {
-        Log.i("EmpresasView", "mSnapshots.getCount(): "+mSnapshots.getCount());
+        Log.i("ClienteViewHolder", "mSnapshots.getCount(): "+mSnapshots.getCount());
         return mSnapshots.getCount();
     }
 
     public T getItem(int position) {
-        Log.i("EmpresasView", "position: "+position+" getItem: "+mSnapshots.getItem(position));
+        Log.i("ClienteViewHolder", "position: "+position+" getItem: "+mSnapshots.getItem(position));
         return parseSnapshot(mSnapshots.getItem(position));
     }
 
@@ -163,7 +163,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
     }
 
     public DatabaseReference getRef(int position) {
-        Log.i("EmpresasView", "position: "+position+" mSnapshots.getItem(position).getRef(): "+mSnapshots.getItem(position).getRef());
+        Log.i("ClienteViewHolder", "position: "+position+" mSnapshots.getItem(position).getRef(): "+mSnapshots.getItem(position).getRef());
         return mSnapshots.getItem(position).getRef(); }
 
     @Override
@@ -174,7 +174,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.i("EmpresasView", "onCreateViewHolder");
+        Log.i("ClienteViewHolder", "onCreateViewHolder  xx: "+parent.toString());
         View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
         try {
             Constructor<VH> constructor = mViewHolderClass.getConstructor(View.class);
@@ -191,7 +191,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
     }
     @Override
     public void onBindViewHolder(VH viewHolder, int position) {
-        Log.i("EmpresasView", "onBindViewHolder");
+        Log.i("ClienteViewHolder", "onBindViewHolder");
         T model = getItem(position);
         populateViewHolder(viewHolder, model, position);
     }
@@ -208,7 +208,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
      * @param databaseError A description of the error that occurred
      */
     protected void onCancelled(DatabaseError databaseError) {
-        Log.w("FirebaseRecyclerAdapter", databaseError.toException());
+        Log.w("ClienteViewHolder", databaseError.toException());
     }
 
     /**

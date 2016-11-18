@@ -19,16 +19,16 @@ import android.view.View;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Empresa;
 import com.nextnut.logistica.modelos.Perfil;
-import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.rest.ProductCursorAdapter;
 import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
-import com.nextnut.logistica.viewholder.ProductViewHolder;
+import com.nextnut.logistica.viewholder.ClienteViewHolder;
 
 import java.util.ArrayList;
 
-import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
 import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
 import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PERFIL;
@@ -37,17 +37,14 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 //import com.google.android.gms.common.api.GoogleApiClient;
 
 
-public class ProductListActivity extends AppCompatActivity {
+public class ProductClienteListActivity extends AppCompatActivity {
     //        implements LoaderManager.LoaderCallbacks<Cursor> {
     private DatabaseReference mDatabase;
-    private FirebaseRecyclerAdapter<Producto, ProductViewHolder> mAdapter;
-    private static final String LOG_TAG = ProductListActivity.class.getSimpleName();
+    private FirebaseRecyclerAdapter<Cliente, ClienteViewHolder> mAdapter;
+    private static final String LOG_TAG = ProductClienteListActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 0;
     private long mItem = 0;
 
-    private Empresa mEmpresa;
-    private String mEmpresaKey;
-    private Perfil mPerfil;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -72,7 +69,9 @@ public class ProductListActivity extends AppCompatActivity {
 
     private ItemTouchHelper mItemTouchHelper;
 
-
+    private Empresa mEmpresa;
+    private String mEmpresaKey;
+    private Perfil mPerfil;
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_save;
     private FloatingActionButton fab_delete;
@@ -104,41 +103,51 @@ public class ProductListActivity extends AppCompatActivity {
         Log.i("ClienteViewHolder", "mPerfil" + mPerfil.getClientes());
         Log.i("ClienteViewHolder", "mEmpresaKey" + mEmpresaKey);
         Log.i("ClienteViewHolder", "mEmpresa" + mEmpresa.getNombre());
+
         fab_new = (FloatingActionButton) findViewById(R.id.fab_new);
         fab_new.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
+
+                Intent intent = new Intent(getApplicationContext(), CustomDetailActivity.class);
                 intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, 0);
                 intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_NEW);
+                intent.putExtra(EXTRA_EMPRESA, mEmpresa);
+                intent.putExtra(EXTRA_EMPRESA_KEY, mEmpresaKey);
+                intent.putExtra(EXTRA_PERFIL, mPerfil);
                 fab_new.setVisibility(View.VISIBLE);
+                fab_save.setVisibility(View.GONE);
+//                fab_delete.setVisibility(View.GONE);
                 startActivity(intent);
             }
         });
 
         fab_save = (FloatingActionButton) findViewById(R.id.fab_save);
         fab_save.setVisibility(View.GONE);
+
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ProductDetailFragment productDetailFragment = (ProductDetailFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.product_detail_container);
-                if (productDetailFragment != null) {
-                    productDetailFragment.verificationAndsave();
+
+                CustomDetailFragment customDetailFragment = (CustomDetailFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.custom_detail_container);
+                if (customDetailFragment != null) {
+                    customDetailFragment.verificationAndsave();
                     fab_new.setVisibility(View.VISIBLE);
                     fab_save.setVisibility(View.GONE);
+//                    fab_delete.setVisibility(View.GONE);
+                } else {
                 }
             }
 
         });
-
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        final View emptyView = findViewById(R.id.recyclerview_product_empty);
+        View emptyView = findViewById(R.id.recyclerview_product_empty);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.product_list_recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
@@ -190,13 +199,13 @@ public class ProductListActivity extends AppCompatActivity {
 
         // Set up FirebaseRecyclerAdapter with the Query
         Query productosQuery = getQuery(mDatabase);
-        mAdapter = new FirebaseRecyclerAdapter<Producto, ProductViewHolder>(Producto.class, R.layout.product_list_item,
-                ProductViewHolder.class, productosQuery) {
+        mAdapter = new FirebaseRecyclerAdapter<Cliente, ClienteViewHolder>(Cliente.class, R.layout.custom_list_item,
+                ClienteViewHolder.class, productosQuery) {
             @Override
-            protected void populateViewHolder(final ProductViewHolder viewHolder, final Producto model, final int position) {
+            protected void populateViewHolder(final ClienteViewHolder viewHolder, final Cliente model, final int position) {
                 final DatabaseReference postRef = getRef(position);
-                Log.i("ProductView", "populateViewHolder(postRef)" + postRef.toString());
-                emptyView.setVisibility(View.GONE);
+                Log.i("ClienteViewHolder", "populateViewHolder(postRef)" + postRef.toString());
+
                 // Set click listener for the whole post view
                 final String productKey = postRef.getKey();
 
@@ -227,9 +236,6 @@ public class ProductListActivity extends AppCompatActivity {
                                                                    // Launch PostDetailActivity
                                                                    Intent intent = new Intent(getApplication(), ProductDetailActivity.class);
                                                                    intent.putExtra(EXTRA_PRODUCT_KEY, productKey);
-                                                                   intent.putExtra(EXTRA_EMPRESA, mEmpresa);
-                                                                   intent.putExtra(EXTRA_EMPRESA_KEY, mEmpresaKey);
-                                                                   intent.putExtra(EXTRA_PERFIL, mPerfil);
                                                                    startActivity(intent);
 
                                                                }
@@ -307,31 +313,9 @@ public class ProductListActivity extends AppCompatActivity {
     }
 
 
-//    @Override
-//    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        return new CursorLoader(this, LogisticaProvider.Products.CONTENT_URI,
-//                null,
-//                null,
-//                null,
-//                null);
-//
-//    }
-
-//    @Override
-//    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//        mCursorAdapter.swapCursor(data);
-//    }
-//
-//    @Override
-//    public void onLoaderReset(Loader<Cursor> loader) {
-//        mCursorAdapter.swapCursor(null);
-//    }
-
 
     public Query getQuery(DatabaseReference databaseReference) {
-
-        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey);
-
+        return databaseReference.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey);
     }
 
 

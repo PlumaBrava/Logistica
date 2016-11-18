@@ -10,6 +10,9 @@ import android.view.MenuItem;
 
 import com.nextnut.logistica.util.ProductSectionActivity;
 
+import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
+import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
+
 /**
  * An activity representing a single CustomOrder detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
@@ -76,7 +79,7 @@ public class CustomOrderDetailActivity extends AppCompatActivity {
                                  int resultCode, Intent data) {
 
         ////////////////// UPDATE CUSTOMER /////////
-        if (requestCode == CustomOrderDetailFragment. UPDATE_CUSTOMER && resultCode == RESULT_OK) {
+        if (requestCode ==UPDATE_CUSTOMER && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
 
             if (bundle != null) {
@@ -95,7 +98,7 @@ public class CustomOrderDetailActivity extends AppCompatActivity {
             }
         }
 
-        if (requestCode == CustomOrderDetailFragment. REQUEST_PRODUCT && resultCode == RESULT_OK) {
+        if (requestCode ==REQUEST_PRODUCT && resultCode == RESULT_OK) {
             String res = data.getExtras().getString(RESULTADO);
             CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
             if (fragmentCustomOrder != null) {

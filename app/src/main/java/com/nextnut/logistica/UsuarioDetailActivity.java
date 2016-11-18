@@ -17,6 +17,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.nextnut.logistica.modelos.Empresa;
+
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA_KEY;
+import static com.nextnut.logistica.util.Constantes.EXTRA_USER_KEY;
 
 /**
  * An activity representing a single Usuario detail screen. This
@@ -87,6 +92,16 @@ public class UsuarioDetailActivity extends AppCompatActivity {
             Bundle arguments = new Bundle();
             arguments.putString(UsuarioDetailFragment.ARG_ITEM_ID,
                     getIntent().getStringExtra(UsuarioDetailFragment.ARG_ITEM_ID));
+
+            arguments.putString(EXTRA_USER_KEY, getIntent().getStringExtra(EXTRA_USER_KEY));
+            arguments.putString(EXTRA_EMPRESA_KEY, getIntent().getStringExtra(EXTRA_EMPRESA_KEY));
+            arguments.putParcelable(EXTRA_EMPRESA, getIntent().getParcelableExtra(EXTRA_EMPRESA));
+            Empresa empresa= (Empresa) getIntent().getParcelableExtra("Empresa");
+            Log.d(TAG, "empresa: Nombre " + empresa.getNombre());
+            Log.d(TAG, "empresa: Ciudad " + empresa.getCiudad());
+            Log.d(TAG, "empresa: Direccion " + empresa.getDireccion());
+            Log.d(TAG, "empresa: Cuit " + empresa.getCuit());
+
             UsuarioDetailFragment fragment = new UsuarioDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

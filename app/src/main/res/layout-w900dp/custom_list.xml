@@ -43,7 +43,7 @@
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
         tools:context="com.nextnut.logistica.CustomListActivity"
-        tools:listitem="@layout/custom_list_content" />
+        tools:listitem="@layout/custom_list_item" />
 
     <FrameLayout
         android:id="@+id/custom_detail_container"

@@ -52,6 +52,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
+import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
+
 /**
  * A fragment representing a single CustomOrder detail screen.
  * This fragment is either contained in a {@link CustomOrderListFragment}
@@ -121,9 +124,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     private int mAction;
 
-    public static final int REQUEST_CUSTOMER = 1234;
-    public static final int UPDATE_CUSTOMER = 1236;
-    public static final int REQUEST_PRODUCT = 12345;
+
 
     // This paramenter is use the define the acction we need to do.
     // mAction recibe the information from bundle

@@ -1,5 +1,8 @@
 package com.nextnut.logistica.modelos;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.ServerValue;
@@ -11,7 +14,7 @@ import java.util.Map;
  * Created by perez.juan.jose on 31/10/2016.
  */
 @IgnoreExtraProperties
-public class Cliente {
+public class Cliente implements Parcelable {
 
     private String nombre;
     private String apellido;
@@ -20,16 +23,16 @@ public class Cliente {
     private String direccionDeEntrega;
     private String ciudad;
     private long iva;
-    private String ciut;
+    private String cuit;
     private Boolean especial;
     private long fechaModificacion;
     private String uid;
 
     public Cliente() {
-
+        // Default constructor required for calls to DataSnapshot.getValue(Cliente.class)
     }
 
-    public Cliente(String uid,String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, long iva, String ciut, Boolean especial, String fechaModificacion) {
+    public Cliente(String uid,String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, long iva, String cuit, Boolean especial) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -37,7 +40,7 @@ public class Cliente {
         this.direccionDeEntrega = direccionDeEntrega;
         this.ciudad = ciudad;
         this.iva = iva;
-        this.ciut = ciut;
+        this.cuit = cuit;
         this.especial = especial;
         this.uid = uid;
     }
@@ -52,7 +55,7 @@ public class Cliente {
         result.put("direccionDeEntrega", direccionDeEntrega);
         result.put("ciudad", ciudad);
         result.put("iva", iva);
-        result.put("ciut", ciut);
+        result.put("cuit", cuit);
         result.put("especial", especial);
         result.put("fechaModificacion", ServerValue.TIMESTAMP);
         result.put("uid", uid);
@@ -118,12 +121,12 @@ public class Cliente {
         this.iva = iva;
     }
 
-    public String getCiut() {
-        return ciut;
+    public String getCuit() {
+        return cuit;
     }
 
-    public void setCiut(String ciut) {
-        this.ciut = ciut;
+    public void setCuit(String ciut) {
+        this.cuit = ciut;
     }
 
     public Boolean getEspecial() {
@@ -148,6 +151,55 @@ public class Cliente {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
+        parcel.writeString(nombre);
+        parcel.writeString(apellido);
+        parcel.writeString(telefono);
+        parcel.writeString(fotoCliente);
+        parcel.writeString(direccionDeEntrega);
+        parcel.writeString(ciudad);
+        parcel.writeLong(iva);
+        parcel.writeString(cuit);
+        parcel.writeByte((byte)(especial?1:0));
+        parcel.writeLong(fechaModificacion);
+        parcel.writeString(uid);
+
+    }
+
+    // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
+    public static final Parcelable.Creator<Cliente> CREATOR = new Parcelable.Creator<Cliente>() {
+        public Cliente createFromParcel(Parcel in) {
+            return new Cliente(in);
+        }
+
+        public Cliente[] newArray(int size) {
+            return new Cliente[size];
+        }
+    };
+
+    // example constructor that takes a Parcel and gives you an object populated with it's values
+    private Cliente(Parcel in) {
+        nombre=in.readString();
+        apellido=in.readString();
+        telefono =in.readString();
+        fotoCliente= in.readString();
+        direccionDeEntrega=in.readString();
+        ciudad=in.readString();
+        iva =in.readLong();
+        cuit=in.readString();
+        especial= in.readByte()!=0;
+        fechaModificacion=in.readLong();
+        uid= in.readString();
+
     }
 }
 

@@ -1,26 +1,27 @@
 package com.nextnut.logistica;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.nextnut.logistica.data.CustomColumns;
-import com.nextnut.logistica.data.LogisticaProvider;
-import com.nextnut.logistica.rest.CustomsCursorAdapter;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.nextnut.logistica.modelos.Cliente;
+import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
+import com.nextnut.logistica.viewholder.ClienteViewHolder;
+
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
+import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
 
 /**
  * An activity representing a list of Customs. This activity
@@ -30,16 +31,20 @@ import com.nextnut.logistica.rest.CustomsCursorAdapter;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class CustomListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CustomListActivity extends ActivityBasic {
 
-    private CustomsCursorAdapter mCursorAdapter;
-
+//    private CustomsCursorAdapter mCursorAdapter;
+    private FirebaseRecyclerAdapter<Cliente, ClienteViewHolder> mAdapter;
     private ItemTouchHelper mItemTouchHelper;
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_save;
     private FloatingActionButton fab_delete;
     private static final int CURSOR_LOADER_ID = 0;
     private long mItem = 0;
+
+
+    private RecyclerView mRecyclerView;
+    private LinearLayoutManager mManager;
 
     private static final String LOG_TAG = CustomListActivity.class.getSimpleName();
     /**
@@ -54,10 +59,19 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
         setContentView(R.layout.activity_custom_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
 
+        Log.i("ClienteViewHolder", "mPerfil" + mPerfil.getClientes());
+        Log.i("ClienteViewHolder", "mEmpresaKey" + mEmpresaKey);
+        Log.i("ClienteViewHolder", "mEmpresa" + mEmpresa.getNombre());
+
+        final View emptyView = findViewById(R.id.recyclerview_custom_empty);
+        mRecyclerView = (RecyclerView) findViewById(R.id.custom_list_recyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager( mRecyclerView.getContext()));
 
         fab_new = (FloatingActionButton) findViewById(R.id.fab_new);
         fab_new.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +81,7 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
 
                 Intent intent = new Intent(getApplicationContext(), CustomDetailActivity.class);
                 intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, 0);
-                intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_NEW);
+                putExtraFirebase(intent);
                 fab_new.setVisibility(View.VISIBLE);
                 fab_save.setVisibility(View.GONE);
                 fab_delete.setVisibility(View.GONE);
@@ -82,14 +96,14 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
             @Override
             public void onClick(View view) {
 
-                CustomDetailFragment customDetailFragment=(CustomDetailFragment)
+                CustomDetailFragment customDetailFragment = (CustomDetailFragment)
                         getSupportFragmentManager().findFragmentById(R.id.custom_detail_container);
-                if(customDetailFragment!=null){
+                if (customDetailFragment != null) {
                     customDetailFragment.verificationAndsave();
                     fab_new.setVisibility(View.VISIBLE);
                     fab_save.setVisibility(View.GONE);
                     fab_delete.setVisibility(View.GONE);
-                }else {
+                } else {
                 }
             }
 
@@ -101,14 +115,14 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
             @Override
             public void onClick(View view) {
 
-                CustomDetailFragment customDetailFragment=(CustomDetailFragment)
+                CustomDetailFragment customDetailFragment = (CustomDetailFragment)
                         getSupportFragmentManager().findFragmentById(R.id.custom_detail_container);
-                if(customDetailFragment!=null){
+                if (customDetailFragment != null) {
                     customDetailFragment.deleteCustomer();
                     fab_new.setVisibility(View.VISIBLE);
                     fab_save.setVisibility(View.GONE);
                     fab_delete.setVisibility(View.GONE);
-                }else {
+                } else {
                 }
             }
         });
@@ -119,68 +133,75 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        View emptyView = findViewById(R.id.recyclerview_custom_empty);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.custom_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        // Set up FirebaseRecyclerAdapter with the Query
+        Query clientesQuery = getQuery(mDatabase);
+        mAdapter = new FirebaseRecyclerAdapter<Cliente, ClienteViewHolder>(Cliente.class, R.layout.custom_list_item,
+                ClienteViewHolder.class, clientesQuery) {
+            @Override
+            protected void populateViewHolder(final ClienteViewHolder viewHolder, final Cliente model, final int position) {
+                final DatabaseReference postRef = getRef(position);
+                emptyView.setVisibility(View.GONE);
+                Log.i("ClienteViewHolder", "populateViewHolder(postRef)" + postRef.toString());
 
-//        mCursorAdapter = new CustomsCursorAdapter(this, null, emptyView, new CustomsCursorAdapter.CustomsCursorAdapterOnClickHandler() {
-//            @Override
-//            public void onClick(long id, CustomsCursorAdapter.ViewHolder vh) {
-//                mItem = id; // when rotate the screen the selecction of the second Screen is conserved.
-//                if (mTwoPane) {
-//                    Bundle arguments = new Bundle();
+                // Set click listener for the whole post view
+                final String customKey = postRef.getKey();
+
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                                                           @Override
+                                                           public void onClick(View v) {
+
+                                                               if (mTwoPane) {
+                                                                   Bundle arguments = new Bundle();
+                                                                   // when rotate the screen the selecction of the second Screen is conserved.
+//                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
 //
-//                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
-//                    arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
-//
-//                    CustomDetailFragment fragment = new CustomDetailFragment();
-//                    fragment.setArguments(arguments);
-//                    getSupportFragmentManager().beginTransaction()
-//                            .addToBackStack(null)
-//                            .replace(R.id.custom_detail_container, fragment)
-//                            .commit();
-//
-//                    fab_new.setVisibility(View.GONE);
-//                    fab_save.setVisibility(View.VISIBLE);
-//                    fab_delete.setVisibility(View.VISIBLE);
-//
-//
-//                }else {
-//                    Bundle arguments = new Bundle();
-//
-//                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
-//                    arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
-//                    Intent intent = new Intent(getApplicationContext(), CustomDetailActivity.class);
-//                    intent.putExtras(arguments);
-//
-//
-//                    fab_new.setVisibility(View.VISIBLE);
-//                    fab_save.setVisibility(View.GONE);
-//                    fab_delete.setVisibility(View.GONE);
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                        Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
-//                        Pair<View, String> p3 = Pair.create((View) vh.mSurename, getString(R.string.custom_icon_transition_surname));
-//                        ActivityOptionsCompat activityOptions =
-//                                ActivityOptionsCompat.makeSceneTransitionAnimation(CustomListActivity.this,  p2, p3);
-//                        startActivity(intent, activityOptions.toBundle());
-//
-//                    } else {
-//                        startActivity(intent);
-//                    }
-//                }
-//            }
-//        });
-//
-//
-//        recyclerView.setAdapter(mCursorAdapter);
+                                                                   arguments.putString(EXTRA_CLIENTE_KEY, customKey);
+                                                                   arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
+
+                                                                   ProductDetailFragment fragment = new ProductDetailFragment();
+                                                                   fragment.setArguments(arguments);
+                                                                   getSupportFragmentManager().beginTransaction()
+                                                                           .addToBackStack(null)
+                                                                           .replace(R.id.product_detail_container, fragment)
+                                                                           .commit();
+
+                                                                   fab_new.setVisibility(View.GONE);
+                                                                   fab_save.setVisibility(View.VISIBLE);
+
+                                                               } else {
+
+                                                                   // Launch PostDetailActivity
+                                                                   Intent intent = new Intent(getApplication(), CustomDetailActivity.class);
+                                                                   mClienteKey=customKey;
+                                                                   putExtraFirebase(intent);
+                                                                   startActivity(intent);
+
+                                                               }
+
+                                                           }
+
+                                                       }
+
+                );
+
+                viewHolder.bindToPost(model, new View.OnClickListener()
+
+                        {
+                            @Override
+                            public void onClick(View starView) {
+
+                            }
+                        }
+
+                );
+            }
+        }
+
+        ;
+        mRecyclerView.setAdapter(mAdapter);
 
 
-
-
-
-
-        if (findViewById(R.id.custom_detail_container) != null ) {
+        if (findViewById(R.id.custom_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
@@ -193,16 +214,90 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
             CustomDetailFragment fragment = new CustomDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.custom_detail_container,fragment)
+                    .add(R.id.custom_detail_container, fragment)
                     .commit();
         }
     }
 
-    @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        getSupportLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
-        super.onPostCreate(savedInstanceState);
-    }
+//    @Override
+//    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+//       super.onPostCreate(savedInstanceState);
+//        // Set up FirebaseRecyclerAdapter with the Query
+//
+//        // Set up Layout Manager, reverse layout
+//        mManager = new LinearLayoutManager(this);
+//        mManager.setReverseLayout(true);
+//        mManager.setStackFromEnd(true);
+//
+//        mRecyclerView.setLayoutManager(mManager);
+//        mRecyclerView.setHasFixedSize(true);
+//        Query customQuery =getQuery(mDatabase);
+////                mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey);
+//        mAdapter = new FirebaseRecyclerAdapter<Cliente, Cliente1ViewHolder>(Cliente.class, R.layout.custom_list_item,
+//                Cliente1ViewHolder.class, customQuery) {
+//            @Override
+//            protected void populateViewHolder( final Cliente1ViewHolder viewHolder, final Cliente model, final int position) {
+//
+//                final DatabaseReference postRef = getRef(position);
+//                Log.i("ClienteViewHolder", "populateViewHolder(postRef)" + postRef.toString());
+//
+//                // Set click listener for the whole post view
+//                final String clienteKey = postRef.getKey();
+//
+//                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//                                                           @Override
+//                                                           public void onClick(View v) {
+//
+//                                                               if (mTwoPane) {
+//                                                                   Bundle arguments = new Bundle();
+//                                                                   // when rotate the screen the selecction of the second Screen is conserved.
+////                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
+////  todo: revisar para que funciones bien con clientes, esto es pegado de productos
+//                                                                   arguments.putString(EXTRA_CLIENTE_KEY, clienteKey);
+//                                                                   arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
+//
+//                                                                   CustomDetailFragment fragment = new CustomDetailFragment();
+//                                                                   fragment.setArguments(arguments);
+//                                                                   getSupportFragmentManager().beginTransaction()
+//                                                                           .addToBackStack(null)
+//                                                                           .replace(R.id.product_detail_container, fragment)
+//                                                                           .commit();
+//
+//                                                                   fab_new.setVisibility(View.GONE);
+//                                                                   fab_save.setVisibility(View.VISIBLE);
+//
+//                                                               } else {
+//
+//                                                                   // Launch PostDetailActivity
+//                                                                   Intent intent = new Intent(getApplication(), CustomDetailActivity.class);
+//                                                                   intent.putExtra(EXTRA_PRODUCT_KEY, clienteKey);
+//                                                                   startActivity(intent);
+//                                                               }
+//
+//                                                           }
+//
+//                                                       }
+//
+//                );
+//
+//                viewHolder.bindToPost(model, new View.OnClickListener()
+//
+//                        {
+//                            @Override
+//                            public void onClick(View starView) {
+//                                // Need to write to both places the post is stored
+////                        DatabaseReference globalPostRef = mDatabase.child("posts").child(postRef.getKey());
+////                        DatabaseReference userPostRef = mDatabase.child("user-posts").child(model.uid).child(postRef.getKey());
+////
+////                        // Run two transactions
+////                        onStarClicked(globalPostRef);
+////                        onStarClicked(userPostRef);
+//                            }
+//                        });
+//            }
+//        } ;
+//        mRecyclerView.setAdapter(mAdapter);
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -215,30 +310,20 @@ public class CustomListActivity extends AppCompatActivity implements LoaderManag
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
+
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, LogisticaProvider.Customs.CONTENT_URI,
-                null,
-                null,
-                null,
-                CustomColumns.LASTNAME_CUSTOM +" ASC , "+CustomColumns.NAME_CUSTOM+" ASC  ");
-    }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCursorAdapter.swapCursor(data);
-    }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mCursorAdapter.swapCursor(null);
 
+
+
+    public Query getQuery(DatabaseReference databaseReference) {
+        return databaseReference.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey);
     }
 
 }

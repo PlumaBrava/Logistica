@@ -47,18 +47,26 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.nextnut.logistica.modelos.EmpresaPerfil;
+import com.nextnut.logistica.modelos.Empresa;
+import com.nextnut.logistica.modelos.Perfil;
 import com.nextnut.logistica.modelos.Usuario;
 import com.rey.material.widget.ProgressView;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static com.nextnut.logistica.util.Constantes.ESQUEMA_USER_PROPUETO_EMPRESA;
-import static com.nextnut.logistica.util.KeyMailConverter.getKeyFromEmail;
+import static android.content.Intent.EXTRA_USER;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_USERS;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_USER_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_USER_PERFIL;
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA_KEY;
+import static com.nextnut.logistica.util.Constantes.EXTRA_FIREBASE_URL;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PERFIL;
+import static com.nextnut.logistica.util.Constantes.EXTRA_USER_KEY;
+import static com.nextnut.logistica.util.UtilFirebase.getDatabase;
 
 /**
  * A login screen that offers login via email/password.
@@ -89,10 +97,21 @@ public class LoginActivity
     private FirebaseAuth.AuthStateListener mAuthListener;
     private CallbackManager mCallbackManager;
 
+    private String mEmpresaKey;
+    private Empresa mEmpresa;
+
+    private String mUserKey;
+    private Usuario mUsuario;
+
+    private Perfil mPerfil;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = getDatabase().getReference();
+        Log.d(TAG, "mDatabase:" + mDatabase.toString());
+
         mAuth = FirebaseAuth.getInstance();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -102,7 +121,7 @@ public class LoginActivity
                 if (user != null) {
                     // Check auth on Activity start
                     if (mAuth.getCurrentUser() != null) {
-                        onAuthSuccess(mAuth.getCurrentUser());
+                        onAuthSuccess(mAuth.getCurrentUser().getUid());
                     }
 
                     // User is signed in
@@ -340,10 +359,9 @@ public class LoginActivity
                         hideProgressDialog();
                         showProgress(false);
 
-                        hideProgressDialog();
 
                         if (task.isSuccessful()) {
-                            onAuthSuccess(task.getResult().getUser());
+                            onAuthSuccess(task.getResult().getUser().getUid());
                             Log.d(TAG, "signInWithCredentialfacebook:email:" + task.getResult().getUser().getEmail().toString());
                             Log.d(TAG, "signInWithCredentialfacebook:Display Name:" + task.getResult().getUser().getDisplayName());
                             Log.d(TAG, "signInWithCredentialfacebook:PhotoUrl:" + task.getResult().getUser().getPhotoUrl());
@@ -356,8 +374,7 @@ public class LoginActivity
                             String photoURL = task.getResult().getUser().getPhotoUrl().toString();
                             String status = "inicial";
                             Boolean activo = true;
-//                            Perfil perfil = new Perfil();
-//                            perfil.setPerfilAdministrador();
+                            ;
 
                             // Write new user
                             writeNewUser(userId, username, email, photoURL, status, activo);
@@ -398,7 +415,8 @@ public class LoginActivity
                         hideProgressDialog();
                         showProgress(false);
                         if (task.isSuccessful()) {
-                            onAuthSuccess(task.getResult().getUser());
+                            // No es necesario llamar a esta funcion esta el listener escuchando y la llama directamente
+//                            onAuthSuccess(task.getResult().getUser().getUid());
                         } else {
                             Log.d(TAG, "signInFormEmail:" + task.getException().getMessage().toString());
                             Toast.makeText(LoginActivity.this, task.getException().getMessage().toString(),
@@ -408,52 +426,194 @@ public class LoginActivity
                 });
     }
 
-    private void onAuthSuccess(FirebaseUser user) {
+    private void onAuthSuccess(final String userKey) {
 
-        // Verifica que si existe ese usuario en NewUser
-        Log.d(TAG, "onAuthSuccess: Uid:" + user.getUid());
-        Query userEmpresa= mDatabase.child(ESQUEMA_USER_PROPUETO_EMPRESA).child(getKeyFromEmail(user.getEmail() ));
+
+        /*  Desde este metodo se disparna:
+        *       buscarUsuario(userKey)
+        *       buscarPerfil(userKey)
+        *       buscarEmpresa(userJey)
+        *
+        *   Se dejan 3 nodos por separado para modificar el perfil de usuario y los datos de la empresa sin tocar a Usario
+        *   son mas llamados a la base pero se hacen en una única vez.
+        *
+        *   Luego estos datos se pasan de una actividad a la otra evitando los llamados a la base.
+        *
+         */
+
+        buscarUsuario(userKey);
+
+    }
+
+    private void buscarUsuario(final String userKey) {
+        /*
+        *    Busca los datos de usuario, y se llena la variable global que luego se enviará al resto de las actividades.
+        */
+
+        Log.d(TAG, "buscarUsuario: Uid:" + userKey);
+        Query userPerfil = mDatabase.child(ESQUEMA_USERS).child(userKey);
+        userPerfil.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "buscarUsuario:onDataChange getChildrenCount: " + dataSnapshot.getChildrenCount());
+
+                if (dataSnapshot.getChildrenCount() <= 0) {
+                    // Este caso seria un error no deberiamos tener usuarios sin su Key en este nodo
+                    // Nos quedamos en esta pantalla y comunicamos el error
+                    Toast.makeText(LoginActivity.this, getString(R.string.error_usuario), Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "buscarUsuario:getChildrenCount: )<=0 - " + dataSnapshot.getChildrenCount() + "- ERROR ");
+
+                } else {
+                    // Existe el usuario
+                    // llenamos la variable global y pasamos a buscar el perfil
+
+                    Log.d(TAG, "buscarUsuario:getChildrenCount: - Existe Usuario ");
+                    mUserKey = userKey;
+                    mUsuario = dataSnapshot.getValue(Usuario.class);
+                    buscarPerfil(userKey);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "buscarUsuario: cancelado " + databaseError.toString());
+
+            }
+        });
+    }
+
+    private void buscarPerfil(final String userKey) {
+        Log.d(TAG, "buscarPerfil: Uid:" + userKey);
+        Query userPerfil = mDatabase.child(ESQUEMA_USER_PERFIL).child(userKey);
+        userPerfil.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "buscarPerfil:onDataChange getChildrenCount: " + dataSnapshot.getChildrenCount());
+
+                if (dataSnapshot.getChildrenCount() <= 0) {
+                    // puede ser que el usuario nunca asigno una empresa, por lo tanto no tiene un perfil
+                    // En tal caso asignamos un perfil administrado y seguimos a buscar la empresa.
+
+                    mPerfil = new Perfil();
+                    mPerfil.setPerfilAdministrador();
+                    buscarEmpresa(mUserKey);
+                    Log.d(TAG, "buscarPerfils:getChildrenCount: )<=0 - " + dataSnapshot.getChildrenCount() + "- ERROR ");
+
+                } else if (dataSnapshot.getChildrenCount() == Perfil.NUMERO_DE_VARIABLES) {// 10 por el Numero de variables del modelo Perfil
+                    // Existe el perfil, lo seleccionamos y buscamos la empresa
+                    // Tiene que existir un solo perfil por usuario.
+
+                    Log.d(TAG, "buscarPerfil:getChildrenCount()==1 ");
+
+                    mPerfil = dataSnapshot.getValue(Perfil.class);
+
+                    buscarEmpresa(userKey);
+
+
+                } else {
+                    Log.d(TAG, "buscarPerfil:getChildrenCount()>NUMERO_DE_VARIABLES ");
+
+                    // es un error tiene que existir un solo perfil asignado al usuario
+                    Toast.makeText(LoginActivity.this, getString(R.string.error_perfil), Toast.LENGTH_SHORT).show();
+                    FirebaseAuth.getInstance().signOut();
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "buscarPerfil: cancelado " + databaseError.toString());
+
+            }
+        });
+    }
+
+    private void buscarEmpresa(final String userKey) {
+        // Verifica que el usuario ha elegido una empresa para trabajar
+        // si no lo ha hecho lo envia a Elegir una empresa o Crear una (Empesas List Activity)
+        // Para verificar si el usuario ha elegido una empresa nos fijamos en USUARIO_EMPRESA
+        //   USUARIO_EMPRESA: Tiene la empresa seleccionda. Siempre tiene que se una solamente
+        //                   Modelo: Empresa
+        //
+
+
+        Log.d(TAG, "buscarEmpres: Uid:" + userKey);
+        Query userEmpresa = mDatabase.child(ESQUEMA_USER_EMPRESA).child(userKey);
         userEmpresa.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                       Log.d(TAG, "onAuthSuccess:getChildrenCount: " + dataSnapshot.getChildrenCount());
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "buscarEmpres:getChildrenCount: " + dataSnapshot.getChildrenCount());
+                Log.d(TAG, "buscarEmpres:getKey: " + dataSnapshot.getKey());
 
-                        if(dataSnapshot.getChildrenCount()<=0){
-                // Crear una empresa
-                            Log.d(TAG, "onAuthSuccess:getChildrenCount()<=0- Crear Empresa " );
+                if (dataSnapshot.getChildrenCount() <= 0) {
+                    // Seleccionar una empresa o crear una
+                    Intent intent = new Intent(getApplication(), EmpresasListActivity.class);
+                    intent.putExtra(EXTRA_FIREBASE_URL, mDatabase.getRef().toString());
+                    intent.putExtra(EXTRA_USER_KEY, mUserKey);
+                    Log.d(TAG, "buscarEmpres:Usuario: " + mUsuario.getUsername());
+                    Log.d(TAG, "buscarEmpres:Email: " + mUsuario.getEmail());
+                    Log.d(TAG, "buscarEmpres:Status: " + mUsuario.getStatus());
+                    Log.d(TAG, "buscarEmpres:Activo: " + mUsuario.getActivo());
+                    intent.putExtra(EXTRA_USER, mUsuario);
+                    intent.putExtra(EXTRA_EMPRESA_KEY, mEmpresaKey);
+                    intent.putExtra(EXTRA_EMPRESA, mEmpresa);
+                    intent.putExtra(EXTRA_PERFIL, mPerfil);
+//                            intent.putExtra(UsuarioDetailFragment.EXTRA_EMPRESA_KEY, mEmpresaKey);
+//                            Log.d(TAG, "onAuthSuccess:getChildrenCount()<=0- Crear Empresa " );
+//                            intent.putExtra(UsuarioDetailFragment.EXTRA_EMPRESA,mEmpresa);
+                    startActivity(intent);
+                    // Finalizar esta actividad
+                    finish();
+
+                } else {
+                    if (dataSnapshot.getChildrenCount() == 1) {
+
+                        Log.d(TAG, "buscarEmpres:getChildrenCount()==1  ");
+                        for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                            Log.d(TAG, "buscarEmpres-mEmpresaKey" + messageSnapshot.getKey());
+
+                            mEmpresaKey = messageSnapshot.getKey();
+                            mEmpresa = (Empresa) messageSnapshot.getValue(Empresa.class);
+                            Log.d(TAG, "buscarEmpres-empresaNombre" + mEmpresa.getNombre());
+
 
                         }
+                        // ya tenemos todos los datos y llamamos a Main activity
+                        Intent intent = new Intent(getApplication(), MainActivity.class);
+                        intent.putExtra(EXTRA_FIREBASE_URL, mDatabase.getRef().toString());
+                        intent.putExtra(EXTRA_USER_KEY, mUserKey);
+                        intent.putExtra(EXTRA_USER, mUsuario);
+                        intent.putExtra(EXTRA_EMPRESA_KEY, mEmpresaKey);
+                        intent.putExtra(EXTRA_EMPRESA, mEmpresa);
+                        intent.putExtra(EXTRA_PERFIL, mPerfil);
+                        startActivity(intent);
 
-                        else {
-                            Log.d(TAG, "onAuthSuccess:getChildrenCount: - Elegir  o Crear Empresa ");
-                            for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
-//                                String category = (String) messageSnapshot.child("category").getValue();
-                                Log.d(TAG, "onAuthSuccess-KEY"+ messageSnapshot.getKey());
-                                EmpresaPerfil u = messageSnapshot.getValue(EmpresaPerfil.class);
-                                Log.d(TAG, "onAuthSuccess-EMPRESA NOMBRE:"+ u.getEmpresa().getNombre()+" - "+u.getEmpresa().getCiudad());
-                                Log.d(TAG, "onAuthSuccess-Perfil:"+ u.getPerfil().getClientes()+" - "+u.getPerfil().getUsuarios());
-                            }
-                        }
-                        }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d(TAG, "onAuthSuccess "+ databaseError.toString());
+                        // Finalizar esta actividad
+                        finish();
+
+
+                    } else {
+                        // es un error tiene que existir solo una empresa asignada al usuario.
+                        Toast.makeText(LoginActivity.this, getString(R.string.error_empresa), Toast.LENGTH_SHORT).show();
+                        FirebaseAuth.getInstance().signOut();
+                        Log.d(TAG, "buscarEmpres:getChildrenCount()>1  ");
+
 
                     }
-                })
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "onAuthSuccess " + databaseError.toString());
+
+            }
+        });
 
 
-
-        ;
-
-
-
-        Log.d(TAG, "onAuthSuccess:user " + user.toString());
-
-        // Go to MainActivity
-        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-        finish();
     }
+
 
     private String usernameFromEmail(String email) {
         if (email.contains("@")) {
@@ -495,7 +655,7 @@ public class LoginActivity
         if (!validateForm()) {
             return;
         }
-
+        showProgress(true);
         showProgressDialog();
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
@@ -509,7 +669,8 @@ public class LoginActivity
                         hideProgressDialog();
 
                         if (task.isSuccessful()) {
-                            onAuthSuccess(task.getResult().getUser());
+                            showProgress(false);
+                            onAuthSuccess(task.getResult().getUser().getUid());
                             Log.d(TAG, "EmailAndPassword:email:" + task.getResult().getUser().getEmail().toString());
                             Log.d(TAG, "EmailAndPassword:Display Name:" + task.getResult().getUser().getDisplayName());
                             Log.d(TAG, "EmailAndPasswordk:PhotoUrl:" + task.getResult().getUser().getPhotoUrl());
@@ -522,8 +683,7 @@ public class LoginActivity
                             String photoURL = null;// no existe la foto al momento de crear el usuario
                             String status = "inicial";
                             Boolean activo = true;
-//                            Perfil perfil = new Perfil();
-//                            perfil.setPerfilAdministrador();
+
 
                             // Write new user
                             writeNewUser(userId, username, email, photoURL, status, activo);
@@ -531,8 +691,8 @@ public class LoginActivity
 
                         } else {
 
-                           Log.d(TAG, "EmailAndPassword:Error:" + task.getException().getMessage().toString());
-                           Toast.makeText(LoginActivity.this, task.getException().getMessage().toString(),
+                            Log.d(TAG, "EmailAndPassword:Error:" + task.getException().getMessage().toString());
+                            Toast.makeText(LoginActivity.this, task.getException().getMessage().toString(),
                                     Toast.LENGTH_LONG).show();
                         }
                     }
@@ -545,15 +705,15 @@ public class LoginActivity
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
 
-            Bundle arguments = new Bundle();
-            arguments.putString(MainActivity.USER_DISPLAY_NAME, result.getSignInAccount().getDisplayName());
-            arguments.putString(MainActivity.USER_ID, result.getSignInAccount().getId());
+//            Bundle arguments = new Bundle();
+//            arguments.putString(MainActivity.USER_DISPLAY_NAME, result.getSignInAccount().getDisplayName());
+//            arguments.putString(MainActivity.USER_ID, result.getSignInAccount().getId());
             firebaseAuthWithGoogle(account);
 
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.putExtras(arguments);
-            startActivity(intent);
-            finish();
+//            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//            intent.putExtras(arguments);
+//            startActivity(intent);
+//            finish();
 
 
         }
@@ -573,7 +733,7 @@ public class LoginActivity
                         hideProgressDialog();
 
                         if (task.isSuccessful()) {
-                            onAuthSuccess(task.getResult().getUser());
+                            onAuthSuccess(task.getResult().getUser().getUid());
                             Log.d(TAG, "AuthWithGoogle:email:" + task.getResult().getUser().getEmail().toString());
                             Log.d(TAG, "AuthWithGoogle:Display Name:" + task.getResult().getUser().getDisplayName());
                             Log.d(TAG, "AuthWithGoogle:PhotoUrl:" + task.getResult().getUser().getPhotoUrl());
@@ -586,8 +746,7 @@ public class LoginActivity
                             String photoURL = task.getResult().getUser().getPhotoUrl().toString();
                             String status = "inicial";
                             Boolean activo = true;
-//                            Perfil perfil = new Perfil();
-//                            perfil.setPerfilAdministrador();
+
 
                             // Write new user
                             writeNewUser(userId, username, email, photoURL, status, activo);
@@ -621,9 +780,7 @@ public class LoginActivity
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-//        if (mAuthTask != null) {
-//            return;
-//        }
+
 
         // Reset errors.
         mEmailView.setError(null);
@@ -672,7 +829,7 @@ public class LoginActivity
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() > 6;
     }
 
     /**
@@ -722,76 +879,6 @@ public class LoginActivity
 
     }
 
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-//    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-//
-//        private final String mEmail;
-//        private final String mPassword;
-//
-//        UserLoginTask(String email, String password) {
-//            mEmail = email;
-//            mPassword = password;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(Void... params) {
-//
-//
-//            SharedPreferences sharedPreferences =
-//                    PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-//            String user = sharedPreferences.getString(USER_LIST, "");
-//            String[] userlists = user.split(",");
-//
-//            for (String credential : userlists) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Account exists, return true if the password matches.
-//                    return pieces[1].equals(mPassword);
-//                }
-//            }
-//
-//            StringBuilder sb = new StringBuilder();
-//            for (int i = 0; i < userlists.length; i++) {
-//                sb.append(userlists[i]).append(",");
-//            }
-//            sb.append(user + mEmail + ":" + mPassword).append(",");
-//
-//            sharedPreferences.edit().putString(USER_LIST, sb.toString()).apply();
-//
-//            return true;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(final Boolean success) {
-////            mAuthTask = null;
-//            showProgress(false);
-//
-//            if (success) {
-//                Bundle arguments = new Bundle();
-//                arguments.putString(MainActivity.USER_DISPLAY_NAME, mEmail);
-//                arguments.putString(MainActivity.USER_ID, null);
-//
-//                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                intent.putExtras(arguments);
-//                startActivity(intent);
-//
-//                finish();
-//            } else {
-//                mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                mPasswordView.requestFocus();
-//            }
-//        }
-//
-//        @Override
-//        protected void onCancelled() {
-////            mAuthTask = null;
-//            showProgress(false);
-//        }
-//    }
 
     private ProgressDialog mProgressDialog;
 

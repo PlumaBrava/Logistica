@@ -1,5 +1,8 @@
 package com.nextnut.logistica.modelos;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.google.firebase.database.ServerValue;
@@ -11,9 +14,9 @@ import java.util.Map;
  * Created by perez.juan.jose on 31/10/2016.
  */
 @IgnoreExtraProperties
-public class Perfil {
+public class Perfil implements Parcelable {
 
-
+    public static int NUMERO_DE_VARIABLES =10;
     private Boolean usuarios;
     private Boolean productos;
     private Boolean clientes;
@@ -31,7 +34,7 @@ public class Perfil {
     }
 
 
-    public void setPerfilAdministrador () {
+    public void setPerfilAdministrador() {
         this.usuarios = true;
         this.productos = true;
         this.clientes = true;
@@ -55,7 +58,7 @@ public class Perfil {
         this.entregar = entregar;
         this.pagos = pagos;
         this.stock = stock;
-        this.uid=uid;
+        this.uid = uid;
     }
 
     // [START post_to_map]
@@ -78,6 +81,22 @@ public class Perfil {
     }
     // [END post_to_map]
 
+
+    public long getFechaModificacion() {
+        return fechaModificacion;
+    }
+
+    public void setFechaModificacion(long fechaModificacion) {
+        this.fechaModificacion = fechaModificacion;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
     public Boolean getUsuarios() {
         return usuarios;
@@ -149,6 +168,56 @@ public class Perfil {
 
     public void setStock(Boolean stock) {
         this.stock = stock;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeByte((byte) (usuarios ? 1 : 0));
+        parcel.writeByte((byte) (productos ? 1 : 0));
+        parcel.writeByte((byte) (clientes ? 1 : 0));
+        parcel.writeByte((byte) (reportes ? 1 : 0));
+        parcel.writeByte((byte) (ordenes ? 1 : 0));
+        parcel.writeByte((byte) (preparar ? 1 : 0));
+        parcel.writeByte((byte) (entregar ? 1 : 0));
+        parcel.writeByte((byte) (pagos ? 1 : 0));
+        parcel.writeByte((byte) (stock ? 1 : 0));
+        parcel.writeLong(fechaModificacion);
+        parcel.writeString(uid);
+
+    }
+
+    // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
+    public static final Parcelable.Creator<Perfil> CREATOR = new Parcelable.Creator<Perfil>() {
+        public Perfil createFromParcel(Parcel in) {
+            return new Perfil(in);
+        }
+
+        public Perfil[] newArray(int size) {
+            return new Perfil[size];
+        }
+    };
+
+    // example constructor that takes a Parcel and gives you an object populated with it's values
+    private Perfil(Parcel in) {
+
+        usuarios = in.readByte() != 0;     //myBoolean == true if byte != 0;
+        productos = in.readByte() != 0;
+        clientes = in.readByte() != 0;
+        reportes = in.readByte() != 0;
+        ordenes = in.readByte() != 0;
+        preparar = in.readByte() != 0;
+        entregar = in.readByte() != 0;
+        pagos = in.readByte() != 0;
+        stock = in.readByte() != 0;
+        fechaModificacion = in.readLong();
+        uid = in.readString();
+
+
     }
 }
 

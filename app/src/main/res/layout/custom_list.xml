@@ -10,10 +10,11 @@
 <TextView
     android:id="@+id/recyclerview_custom_empty"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_anchor="@+id/custom_list"
-    app:layout_anchorGravity="fill"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
     android:gravity="center_horizontal"
+
+
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingEnd="@dimen/activity_horizontal_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -23,7 +24,7 @@
     android:text="@string/custom_card_empty_custom_list" />
 
 <android.support.v7.widget.RecyclerView
-    android:id="@+id/custom_list"
+    android:id="@+id/custom_list_recyclerView"
     android:name="com.nextnut.logistica.CustomListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -31,6 +32,6 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.nextnut.logistica.CustomListActivity"
-    tools:listitem="@layout/custom_list_content" />
+    tools:listitem="@layout/custom_list_item"  />
 
     </LinearLayout>

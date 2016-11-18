@@ -10,6 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
+
 
 /**
  * An activity representing a single Product detail screen. This
@@ -64,7 +66,10 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             Bundle arguments = new Bundle();
             arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(ProductDetailFragment.ARG_ITEM_ID, 0));
-            arguments.putString(ProductDetailFragment.EXTRA_PRODUCT_KEY, getIntent().getStringExtra(ProductDetailFragment.EXTRA_PRODUCT_KEY));
+            arguments.putString(EXTRA_PRODUCT_KEY, getIntent().getStringExtra(EXTRA_PRODUCT_KEY));
+
+
+
             int mAction = getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
             arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, mAction);
             ProductDetailFragment fragment = new ProductDetailFragment();

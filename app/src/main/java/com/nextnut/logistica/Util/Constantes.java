@@ -9,7 +9,7 @@ public class Constantes {
 
 
     //usuarios
-    public static String ESQUEMA_USUARIOS = "users";
+    public static String ESQUEMA_USERS = "users";
 
     // Lleva la empresa elegida para trabajar por cada usuario-La vigente
     public static String ESQUEMA_USER_EMPRESA = "user-empresa";
@@ -37,10 +37,29 @@ public class Constantes {
 
     // Listado de productos de una empresa.
     public static String ESQUEMA_EMPRESA_PRODUCTOS = "empresa-productos";
+    public static String NODO_EMPRESA_PRODUCTOS ="/" + ESQUEMA_EMPRESA_PRODUCTOS+ "/";
 
 
     // Listado de CLIENTES de una empresa.
     public static String ESQUEMA_EMPRESA_CLIENTES = "empresa-clientes";
+    public static String NODO_EMPRESA_CLIENTES ="/" + ESQUEMA_EMPRESA_CLIENTES+ "/";
 
+
+    // Constantes para pasar datos entre actividades.
+    public static  final String EXTRA_FIREBASE_URL ="FIREBASE_URL";
+    public static  final String EXTRA_USER_KEY ="user_key";
+    public static  final String EXTRA_EMPRESA_KEY ="empresa_key";
+    public static  final String EXTRA_EMPRESA ="empresa";
+    public static  final String EXTRA_PERFIL ="perfil";
+    public static final String EXTRA_PRODUCT_KEY = "product_key";
+    public static final String EXTRA_CLIENTE_KEY = "cliente_key";
+    public static final String EXTRA_CLIENTE= "cliente";
+
+
+    // Activity For Result
+    public static final int REQUEST_EMPRESA = 7777; // Se llama para seleccionar la empresa con la cual queremos trabajar en la aplicacion
+    public static final int REQUEST_CUSTOMER = 1234;// Se para elegir al cliente en la creacion de una orden
+    public static final int UPDATE_CUSTOMER = 1236;// Se para elegir al cliente en la Modificación de una orden
+    public static final int REQUEST_PRODUCT = 12345;// Se para elegir productos en la creacion de una orden
 
 }

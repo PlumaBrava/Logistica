@@ -1,10 +1,10 @@
 package com.nextnut.logistica;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -12,11 +12,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.nextnut.logistica.modelos.Empresa;
@@ -27,22 +25,32 @@ import com.nextnut.logistica.viewholder.UsuarioPerfilViewHolder;
 import static android.support.v4.app.NavUtils.navigateUpFromSameTask;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_USERS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_USER_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA_KEY;
 
 /**
- * An activity representing a list of Usuarios. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link UsuarioDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
+ * This activity representing a list of Usuarios que administra una empresa.
+ *
+ *      Nodo /EMPRESA_USERS/
+ *      modelo de datos: UsuarioPerfil
+ *
+ *  Desde esta actividad se ven los usuarios y si su usuario tiene a la empresa seleccionada para trabajar.
+ *
+ *  Desde aqui se pueden: dar de alta Nuevos Usuarios
+ *                        modificar su perfil
+ *                        desactivarlos.
+ *
+ *
+ *
+ *
  */
-public class UsuarioListActivity extends AppCompatActivity {
+public class UsuarioListActivity extends ActivityBasic{
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
-    private DatabaseReference mDatabase;
+
     // [END define_database_reference]
 
     private FirebaseRecyclerAdapter<UsuarioPerfil, UsuarioPerfilViewHolder> mAdapter;
@@ -50,8 +58,7 @@ public class UsuarioListActivity extends AppCompatActivity {
     private static final String TAG = "UsuarioListActivity";
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
-    private String mUserKey;
-    private String mEmpresaKey;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +69,8 @@ public class UsuarioListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        mUserKey= FirebaseAuth.getInstance().getCurrentUser().getUid();
+        mRecycler=(RecyclerView)findViewById(R.id.usuario_list);
+        mRecycler.setHasFixedSize(true);
 
         Query userEmpresa= mDatabase.child(ESQUEMA_USER_EMPRESA).child(mUserKey);
         userEmpresa.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -84,11 +90,14 @@ public class UsuarioListActivity extends AppCompatActivity {
 //                                String category = (String) messageSnapshot.child("category").getValue();
                         Log.d(TAG, "onAuthSuccess-KEY"+ messageSnapshot.getKey());
                         Empresa u = messageSnapshot.getValue(Empresa.class);
+                        mEmpresa=u;
                         mEmpresaKey=messageSnapshot.getKey();
                         Log.d(TAG, "onAuthSuccess-EMPRESA Key:"+mEmpresaKey);
                         Log.d(TAG, "onAuthSuccess-EMPRESA NOMBRE:"+ u.getNombre()+" - "+u.getCiudad());
+                        startAdapter();
+
                     }
-                    startAdapter();
+
                 }
             }
             @Override
@@ -96,12 +105,7 @@ public class UsuarioListActivity extends AppCompatActivity {
                 Log.d(TAG, "onAuthSuccess "+ databaseError.toString());
 
             }
-        })
-
-
-
-        ;
-
+        });
 
 //        mRecycler=(RecyclerView)findViewById(R.id.recycler_empresas_list);
 //        mRecycler.setHasFixedSize(true);
@@ -111,6 +115,15 @@ public class UsuarioListActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(getApplication(), UsuarioDetailActivity.class);
+//                intent.putExtra(UsuarioDetailFragment.EXTRA_USER_KEY, null);
+                intent.putExtra(EXTRA_EMPRESA_KEY, mEmpresaKey);
+                Log.d(TAG, "empresa: Nombre " + mEmpresa.getNombre());
+                Log.d(TAG, "empresa: Ciudad " + mEmpresa.getCiudad());
+                Log.d(TAG, "empresa: Direccion " + mEmpresa.getDireccion());
+                Log.d(TAG, "empresa: Cuit " + mEmpresa.getCuit());
+                intent.putExtra(EXTRA_EMPRESA,mEmpresa);
+                startActivity(intent);
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -122,8 +135,7 @@ public class UsuarioListActivity extends AppCompatActivity {
         }
 
 
-        mRecycler=(RecyclerView)findViewById(R.id.usuario_list);
-        mRecycler.setHasFixedSize(true);
+
 
 
         if (findViewById(R.id.usuario_detail_container) != null) {
@@ -176,18 +188,20 @@ public class UsuarioListActivity extends AppCompatActivity {
                 UsuarioPerfilViewHolder.class, empresasQuery) {
             @Override
             protected void populateViewHolder(final UsuarioPerfilViewHolder viewHolder, final UsuarioPerfil model, final int position) {
-                final DatabaseReference postRef = getRef(position);
-                Log.d(TAG, "populateViewHolder(postRef)"+postRef.toString());
+                final DatabaseReference empresa_usuarioRef = getRef(position);
+                Log.d(TAG, "populateViewHolder(postRef)"+empresa_usuarioRef.toString());
 
                 // Set click listener for the whole post view
-                final String postKey = postRef.getKey();
+                final String userKey = empresa_usuarioRef.getKey();
+                Log.d(TAG, "populateViewHolder(postRef)"+empresa_usuarioRef.toString());
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Launch PostDetailActivity
-//                        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-//                        intent.putExtra(PostDetailActivity.EXTRA_POST_KEY, postKey);
-//                        startActivity(intent);
+                        // Launch UserDetailActivity
+                      Intent intent = new Intent(getApplication(), UsuarioDetailActivity.class);
+                      putExtraFirebase(intent);
+                      intent.putExtra(EXTRA_EMPRESA,mEmpresa);
+                      startActivity(intent);
                     }
                 });
 

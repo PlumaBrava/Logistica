@@ -110,7 +110,7 @@ public void createCustom0() throws InterruptedException {
 //        pauseTestFor(5000); //wait to display the add
 
 //        onData(withText("Juan0"))
-//                .inAdapterView(withId(R.id.custom_list_content))
+//                .inAdapterView(withId(R.id.custom_list_item))
 //                .perform(click());
 
         onView(withId(R.id.custom_list))

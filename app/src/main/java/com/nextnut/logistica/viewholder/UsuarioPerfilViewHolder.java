@@ -35,7 +35,7 @@ public class UsuarioPerfilViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void bindToPost(UsuarioPerfil usuarioPerfil, View.OnClickListener starClickListener) {
+    public void bindToPost(UsuarioPerfil usuarioPerfil, View.OnClickListener usuarioPerfilClickListener) {
         Usuario usuario = usuarioPerfil.getUsuario();
         Log.d(TAG, "bindToPost-nombre: " + usuario.getUsername());
         Log.d(TAG, "bindToPost-email: " + usuario.getEmail());
@@ -45,11 +45,13 @@ public class UsuarioPerfilViewHolder extends RecyclerView.ViewHolder {
         mEmail.setText(usuario.getEmail());
         mNombre.setText(usuario.getUsername());
         mStatus.setText(usuario.getStatus());
-        mActivoSwitch.setEnabled(usuario.getActivo());
+//        mActivoSwitch.setEnabled(true);
+        mActivoSwitch.setChecked(usuario.getActivo());
+//        mActivoSwitch.setEnabled(usuario.getActivo());
 
 
 
-        Drawable drawable = dimensiona(itemView.getContext(), R.drawable.ic_action_image_timer_auto);
+        Drawable drawable = dimensiona(itemView.getContext(), R.drawable.ic_action_account_circle_40);
         Picasso.with(itemView.getContext())
 
                 .load(usuario.getPhotoURL())
@@ -59,6 +61,6 @@ public class UsuarioPerfilViewHolder extends RecyclerView.ViewHolder {
                 .into(mFotoUsuario);
 
 
-       mEmail.setOnClickListener(starClickListener);
+        ((View)mEmail.getParent()).setOnClickListener(usuarioPerfilClickListener);
     }
 }

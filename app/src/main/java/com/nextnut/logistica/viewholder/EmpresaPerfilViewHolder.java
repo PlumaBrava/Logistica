@@ -25,9 +25,11 @@ public class EmpresaPerfilViewHolder extends RecyclerView.ViewHolder {
     private TextView telefonoView;
     private String logo;
     public ImageView logoView;
+//    public View mItemView;
 
     public EmpresaPerfilViewHolder(View itemView) {
         super(itemView);
+//        mItemView=itemView;
         Log.i("EmpresasView", "EmpresaViewHolder");
         nombreView = (TextView) itemView.findViewById(R.id.itemempresa_nombre);
         cuitView = (TextView) itemView.findViewById(R.id.itemempresa_cuit);
@@ -40,7 +42,7 @@ public class EmpresaPerfilViewHolder extends RecyclerView.ViewHolder {
 
     public void bindToPost(EmpresaPerfil empresaPerfil, View.OnClickListener starClickListener) {
         Empresa empresa = empresaPerfil.getEmpresa();
-        Log.i("EmpresasView", "bindToPost-nombre: " + empresa.getNombre());
+           Log.i("EmpresasView", "bindToPost-nombre: " + empresa.getNombre());
         nombreView.setText(empresa.getNombre());
         cuitView.setText(empresa.getCuit());
         ciudadView.setText(empresa.getCiudad());

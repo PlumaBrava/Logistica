@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -12,16 +11,12 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,16 +26,27 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.nextnut.logistica.data.CustomColumns;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.nextnut.logistica.data.LogisticaProvider;
+import com.nextnut.logistica.modelos.Cliente;
+import com.nextnut.logistica.util.Constantes;
 import com.nextnut.logistica.util.CustomTextWatcher;
 import com.nextnut.logistica.util.Imagenes;
 import com.nextnut.logistica.util.MakeCall;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
+import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_CLIENTES;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
 import static com.nextnut.logistica.util.Imagenes.savePhotoReturnPath;
@@ -53,7 +59,7 @@ import static com.nextnut.logistica.util.MakeCall.getUserName;
  * in two-pane mode (on tablets) or a {@link CustomDetailActivity}
  * on handsets.
  */
-public class CustomDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CustomDetailFragment extends FragmentBasic  {
 
     /**
      * The fragment argument representing the item ID that this fragment
@@ -88,6 +94,10 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     private int mAction;
 
 
+    private ValueEventListener mCustomListener;
+
+    private FirebaseStorage mStorage;
+    private StorageReference mStorageRef;
 
 
     CollapsingToolbarLayout appBarLayout;
@@ -108,6 +118,14 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        mStorage = FirebaseStorage.getInstance();
+        Log.d(LOG_TAG, "onCreate-msavedInstanceState:" + savedInstanceState);
+        Log.d(LOG_TAG, "onCreate-mStorage:" + mStorage.toString());
+
+        mStorageRef = mStorage.getReferenceFromUrl(Constantes.STORAGE_REFERENCE);
+        Log.d(LOG_TAG, "onCreate-mStorageRef:" + mStorageRef.toString());
+
         if (getArguments().containsKey(ARG_ITEM_ID)) {
 
             mItem = getArguments().getLong(ARG_ITEM_ID);
@@ -123,6 +141,8 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         if (getArguments().containsKey(CUSTOM_ACTION)) {
             mAction = getArguments().getInt(CUSTOM_ACTION);
         }
+        //            getIntent().getStringExtra(EXTRA_USER_KEY);
+
     }
 
     @Override
@@ -297,30 +317,118 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
 
-        switch (mAction) {
-            case CUSTOM_NEW:{
-                Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
-                Picasso.with(getContext())
-                        .load(mCurrentPhotoPath)
-                        .placeholder(drawable)
-                        .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-                        .into(mImageCustomer);
-                break;
+
+
+
+            if (mClienteKey != null) {//Si mProductKey existe leo los datos de Firebase y los muestro.
+                Log.i("producto", "onActivityCreated-mClienteKey: " + mClienteKey);
+                Log.i("producto", "onActivityCreated:- mEmpresaKey;  " + mEmpresaKey);
+                // Add value event listener to show the data.
+                // [START post_value_event_listener]
+                ValueEventListener customListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.i("producto", "onDataChange: ");
+                        Log.i("producto", "onDataChange: count "+dataSnapshot.getChildrenCount());
+                        // Get Post object and use the values to update the UI
+                        Cliente cliente = (Cliente) dataSnapshot.getValue(Cliente.class);
+                        // [START_EXCLUDE]
+                        Log.i("producto", "onDataChange:cliente.getNombre() "+cliente.getNombre());
+
+                        mCustomName.setText(cliente.getNombre());
+                        mLastName.setText(cliente.getApellido());
+                        mDeliveyAddress.setText(cliente.getDireccionDeEntrega());
+                        mCity.setText(cliente.getCiudad());
+                        mCurrentPhotoPath=cliente.getFotoCliente();
+                        // todo: reemplazar por un listado de telefonos.
+                        mIdContact=null;// aqui deber ir la referencia al Id Android de contacto.
+
+                        mCuit.setText(cliente.getCuit());
+                        mIva.setText(Long.toString(cliente.getIva()));
+                        mSpecial.setChecked(cliente.getEspecial());
+
+
+                        if (mIdContact != null){
+                            button.setBackgroundColor(Color.GREEN);
+                            button.setText(getUserName(getContext() ,mIdContact));
+                        }
+
+                        Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
+                        Picasso.with(getContext())
+                                .load(mCurrentPhotoPath)
+                                .placeholder(drawable)
+                                .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+                                .into(mImageCustomer);
+
+
+
+                        if (appBarLayout != null) {
+                            {
+                                appBarLayout.setTitle(cliente.getNombre()+" "+cliente.getApellido());
+                            }
+                        }
+                        // ya tenemos los datos que queremos modificar por lo tanto desconectamos el listener!
+//                        if ( mCustomListener != null) {
+//                            mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).child(mClienteKey).removeEventListener(mCustomListener);
+//                            Log.i("producto", "onDataChange-removeEventListener ");
+//
+//                        }
+                        // [END_EXCLUDE]
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Getting Post failed, log a message
+                        Log.w(LOG_TAG, "loadPost:onCancelled", databaseError.toException());
+                        // [START_EXCLUDE]
+                        Toast.makeText(getContext(), "Failed to load Products.",
+                                Toast.LENGTH_SHORT).show();
+                        // [END_EXCLUDE]
+                    }
+                };
+                Log.i(LOG_TAG ," mDatabase: "+ mDatabase);
+                mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).child(mClienteKey).addListenerForSingleValueEvent(customListener);
+
+                // [END post_value_event_listener]
+
+                // Keep copy of post listener so we can remove it when app stops
+//                mCustomListener = customListener;
+
+
+            } else {
+                Log.i("producto", "onActivityCreated: mProductKey: Null");
+
             }
 
-            case CUSTOM_DOUBLE_SCREEN:
-                if (mItem == 0) {
-                    getLoaderManager().initLoader(DEFAULT_DETAIL_CUSTOM_LOADER, null, this);
-                } else {
-                    getLoaderManager().initLoader(DETAIL_CUSTOM_LOADER, null, this);
-                }
-                break;
-            case CUSTOM_SELECTION:
-                getLoaderManager().initLoader(DETAIL_CUSTOM_LOADER, null, this);
-                break;
-            default:
-                break;
-        }
+            super.onActivityCreated(savedInstanceState);
+
+
+
+
+//        switch (mAction) {
+//            case CUSTOM_NEW:{
+//                Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
+//                Picasso.with(getContext())
+//                        .load(mCurrentPhotoPath)
+//                        .placeholder(drawable)
+//                        .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+//                        .into(mImageCustomer);
+//                break;
+//            }
+//
+//            case CUSTOM_DOUBLE_SCREEN:
+//                if (mItem == 0) {
+//                    getLoaderManager().initLoader(DEFAULT_DETAIL_CUSTOM_LOADER, null, this);
+//                } else {
+//                    getLoaderManager().initLoader(DETAIL_CUSTOM_LOADER, null, this);
+//                }
+//                break;
+//            case CUSTOM_SELECTION:
+//                getLoaderManager().initLoader(DETAIL_CUSTOM_LOADER, null, this);
+//                break;
+//            default:
+//                break;
+//        }
 
         super.onActivityCreated(savedInstanceState);
 
@@ -340,45 +448,116 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
     public void verificationAndsave() {
 
         if (verification()) {
-            ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-            if (mAction == CUSTOM_NEW && mItem == 0) {
-
-                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.Customs.CONTENT_URI);
-                builder.withValue(CustomColumns.NAME_CUSTOM, mCustomName.getText().toString());
-                builder.withValue(CustomColumns.LASTNAME_CUSTOM, mLastName.getText().toString());
-                builder.withValue(CustomColumns.DELIIVERY_ADDRES_CUSTOM, mDeliveyAddress.getText().toString());
-                builder.withValue(CustomColumns.DELIVERY_CITY_CUSTOM, mCity.getText().toString());
-                builder.withValue(CustomColumns.IMAGEN_CUSTOM, mCurrentPhotoPath);
-                builder.withValue(CustomColumns.REFERENCE_CUSTOM, mIdContact);
-                builder.withValue(CustomColumns.CUIT_CUSTOM, mCuit.getText().toString());
-                builder.withValue(CustomColumns.IVA_CUSTOM, mIva.getText().toString());
-                builder.withValue(CustomColumns.SPECIAL_CUSTOM,mSpecial.isChecked()?1:0);
-
-                batchOperations.add(builder.build());
-            } else
-            {
-                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.Customs.withId(mItem));
-                builder.withValue(CustomColumns.NAME_CUSTOM, mCustomName.getText().toString());
-                builder.withValue(CustomColumns.LASTNAME_CUSTOM, mLastName.getText().toString());
-                builder.withValue(CustomColumns.DELIIVERY_ADDRES_CUSTOM, mDeliveyAddress.getText().toString());
-                builder.withValue(CustomColumns.DELIVERY_CITY_CUSTOM, mCity.getText().toString());
-                builder.withValue(CustomColumns.IMAGEN_CUSTOM, mCurrentPhotoPath);
-                builder.withValue(CustomColumns.REFERENCE_CUSTOM, mIdContact);
-                builder.withValue(CustomColumns.CUIT_CUSTOM, mCuit.getText().toString());
-                builder.withValue(CustomColumns.IVA_CUSTOM, mIva.getText().toString());
-                builder.withValue(CustomColumns.SPECIAL_CUSTOM,mSpecial.isChecked()?1:0);
-                batchOperations.add(builder.build());
-
-            }
-
-            try {
-                getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-            } catch (RemoteException | OperationApplicationException e) {
-            }
+            fireBaseSaveCliente();
+//            ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+//            if (mAction == CUSTOM_NEW && mItem == 0) {
+//
+//                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.Customs.CONTENT_URI);
+//                builder.withValue(CustomColumns.NAME_CUSTOM, mCustomName.getText().toString());
+//                builder.withValue(CustomColumns.LASTNAME_CUSTOM, mLastName.getText().toString());
+//                builder.withValue(CustomColumns.DELIIVERY_ADDRES_CUSTOM, mDeliveyAddress.getText().toString());
+//                builder.withValue(CustomColumns.DELIVERY_CITY_CUSTOM, mCity.getText().toString());
+//                builder.withValue(CustomColumns.IMAGEN_CUSTOM, mCurrentPhotoPath);
+//                builder.withValue(CustomColumns.REFERENCE_CUSTOM, mIdContact);
+//                builder.withValue(CustomColumns.CUIT_CUSTOM, mCuit.getText().toString());
+//                builder.withValue(CustomColumns.IVA_CUSTOM, mIva.getText().toString());
+//                builder.withValue(CustomColumns.SPECIAL_CUSTOM,mSpecial.isChecked()?1:0);
+//
+//                batchOperations.add(builder.build());
+//            } else
+//            {
+//                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.Customs.withId(mItem));
+//                builder.withValue(CustomColumns.NAME_CUSTOM, mCustomName.getText().toString());
+//                builder.withValue(CustomColumns.LASTNAME_CUSTOM, mLastName.getText().toString());
+//                builder.withValue(CustomColumns.DELIIVERY_ADDRES_CUSTOM, mDeliveyAddress.getText().toString());
+//                builder.withValue(CustomColumns.DELIVERY_CITY_CUSTOM, mCity.getText().toString());
+//                builder.withValue(CustomColumns.IMAGEN_CUSTOM, mCurrentPhotoPath);
+//                builder.withValue(CustomColumns.REFERENCE_CUSTOM, mIdContact);
+//                builder.withValue(CustomColumns.CUIT_CUSTOM, mCuit.getText().toString());
+//                builder.withValue(CustomColumns.IVA_CUSTOM, mIva.getText().toString());
+//                builder.withValue(CustomColumns.SPECIAL_CUSTOM,mSpecial.isChecked()?1:0);
+//                batchOperations.add(builder.build());
+//
+//            }
+//
+//            try {
+//                getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//            } catch (RemoteException | OperationApplicationException e) {
+//            }
             getActivity().onBackPressed();
         }
     // The data is not valid
 
+    }
+
+    public void fireBaseSaveCliente() {
+        Log.i("producto", "fireBaseSaveProducto");
+
+
+        writeNewCliente(mUserKey,
+                mCustomName.getText().toString(),
+                mLastName.getText().toString(),
+                mIdContact,//todo ver este tema para pasar lo Nros de telefonos
+                mCurrentPhotoPath,
+                mDeliveyAddress.getText().toString(),
+                mCity.getText().toString(),
+               21,// Long.getLong(mIva.getText().toString()),
+                mCuit.getText().toString(),
+                mSpecial.isChecked()
+        );
+    }
+
+    // [START basic_write]
+    private void writeNewCliente(String uid,
+            String nombre,
+            String apellido,
+            String telefono,
+             String fotoCliente,
+             String direccionDeEntrega,
+             String ciudad,
+             long iva,
+            String cuit,
+            Boolean especial){
+        if (true) {//validar formulario
+            Log.i("producto", "writeNewClient: nombre " + nombre);
+            Log.i("producto", "writeNewClient: apellido " + apellido);
+            Log.i("producto", "writeNewClient: telefono " + telefono);
+            Log.i("producto", "writeNewClient: fotoCliente " + fotoCliente);
+            Log.i("producto", "writeNewClient: direccionDeEntrega " + direccionDeEntrega);
+            Log.i("producto", "writeNewClient: ciudad " + ciudad);
+            Log.i("producto", "writeNewClient: IVA " + iva);
+            Log.i("producto", "writeNewClient: cUIT " + cuit);
+            Log.i("producto", "writeNewClient: especial " + especial);
+
+
+            Cliente cliente = new Cliente(uid,
+            nombre,
+            apellido,
+            telefono,
+            fotoCliente,
+            direccionDeEntrega,
+            ciudad,
+            iva,
+            cuit,
+            especial);
+
+            if (mClienteKey == null) {
+                mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();
+            }
+
+//                    uid,nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto );
+            Map<String, Object> productoValues =  cliente.toMap();
+            Map<String, Object> childUpdates = new HashMap<>();
+//            childUpdates.put("/empresa/" + key, empresaValues);
+            childUpdates.put(NODO_EMPRESA_CLIENTES + mEmpresaKey +"/"+ mClienteKey, productoValues);
+            // Remove post value event listener
+            if (mCustomListener != null) {
+                mDatabase.child(NODO_EMPRESA_CLIENTES).child(mEmpresaKey).child(mClienteKey).removeEventListener(mCustomListener);
+                Log.i("producto", "removeEventListener");
+            }
+            mDatabase.updateChildren(childUpdates);
+            getActivity().onBackPressed();
+        }
     }
 
     public void deleteCustomer() {
@@ -446,81 +625,81 @@ public class CustomDetailFragment extends Fragment implements LoaderManager.Load
         return isvalid;
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            case DETAIL_CUSTOM_LOADER:
-
-                // Now create and return a CursorLoader that will take care of
-                // creating a Cursor for the data being displayed.
-                return new CursorLoader(
-                        getActivity(),
-                        LogisticaProvider.Customs.withId(mItem),
-                        null,
-                        null,
-                        null,
-                        null);
-
-
-            case DEFAULT_DETAIL_CUSTOM_LOADER:
-                return new CursorLoader(
-                        getActivity(),
-                        LogisticaProvider.Customs.CONTENT_URI,
-                        null,
-                        null,
-                        null,
-                        null);
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data != null && data.moveToFirst()) {
-            switch (loader.getId()) {
-                case DETAIL_CUSTOM_LOADER:
-                    if (data != null && data.moveToFirst()) {
-                    }
-                    break;
-                case DEFAULT_DETAIL_CUSTOM_LOADER:
-                    if (data != null && data.moveToFirst()) {
-                    }
-                    break;
-
-
-            }
-            mCustomName.setText(data.getString(data.getColumnIndex(CustomColumns.NAME_CUSTOM)));
-            mLastName.setText(data.getString(data.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));
-            mDeliveyAddress.setText(data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)));
-            mCity.setText(data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
-            mCurrentPhotoPath=data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM));
-            mIdContact=data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM));
-            mCuit.setText(data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)));
-            mIva.setText(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM)));
-            mSpecial.setChecked(data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0);
-
-
-            if (mIdContact != null){
-            button.setBackgroundColor(Color.GREEN);
-                button.setText(getUserName(getContext() ,mIdContact));
-            }
-
-            Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
-            Picasso.with(getContext())
-                    .load(mCurrentPhotoPath)
-                    .placeholder(drawable)
-                    .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-                    .into(mImageCustomer);
-
-
-
-
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
+//    @Override
+//    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+//        switch (id) {
+//            case DETAIL_CUSTOM_LOADER:
+//
+//                // Now create and return a CursorLoader that will take care of
+//                // creating a Cursor for the data being displayed.
+//                return new CursorLoader(
+//                        getActivity(),
+//                        LogisticaProvider.Customs.withId(mItem),
+//                        null,
+//                        null,
+//                        null,
+//                        null);
+//
+//
+//            case DEFAULT_DETAIL_CUSTOM_LOADER:
+//                return new CursorLoader(
+//                        getActivity(),
+//                        LogisticaProvider.Customs.CONTENT_URI,
+//                        null,
+//                        null,
+//                        null,
+//                        null);
+//            default:
+//                return null;
+//        }
+//    }
+//
+//    @Override
+//    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+//        if (data != null && data.moveToFirst()) {
+//            switch (loader.getId()) {
+//                case DETAIL_CUSTOM_LOADER:
+//                    if (data != null && data.moveToFirst()) {
+//                    }
+//                    break;
+//                case DEFAULT_DETAIL_CUSTOM_LOADER:
+//                    if (data != null && data.moveToFirst()) {
+//                    }
+//                    break;
+//
+//
+//            }
+//            mCustomName.setText(data.getString(data.getColumnIndex(CustomColumns.NAME_CUSTOM)));
+//            mLastName.setText(data.getString(data.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));
+//            mDeliveyAddress.setText(data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)));
+//            mCity.setText(data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
+//            mCurrentPhotoPath=data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM));
+//            mIdContact=data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM));
+//            mCuit.setText(data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)));
+//            mIva.setText(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM)));
+//            mSpecial.setChecked(data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0);
+//
+//
+//            if (mIdContact != null){
+//            button.setBackgroundColor(Color.GREEN);
+//                button.setText(getUserName(getContext() ,mIdContact));
+//            }
+//
+//            Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
+//            Picasso.with(getContext())
+//                    .load(mCurrentPhotoPath)
+//                    .placeholder(drawable)
+//                    .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+//                    .into(mImageCustomer);
+//
+//
+//
+//
+//        }
+//    }
+//
+//    @Override
+//    public void onLoaderReset(Loader<Cursor> loader) {
+//
+//    }
 }
