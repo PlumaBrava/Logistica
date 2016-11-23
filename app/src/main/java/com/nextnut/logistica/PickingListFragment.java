@@ -66,7 +66,6 @@ import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
  */
 public class PickingListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final String ARG_ITEM_ID = "item_id";
 
     private long mCustomOrderIdSelected;
 
@@ -388,7 +387,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
-                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
+//                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
 
                     arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
 
@@ -403,7 +402,7 @@ public class PickingListFragment extends Fragment implements LoaderManager.Loade
                 } else {
                     Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
                     intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
+//                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
 
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

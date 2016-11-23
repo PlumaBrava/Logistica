@@ -3,17 +3,10 @@ package com.nextnut.logistica;
 import android.app.Activity;
 import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,46 +18,26 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.nextnut.logistica.data.LogisticaProvider;
-import com.nextnut.logistica.data.ProductsColumns;
-import com.nextnut.logistica.modelos.Empresa;
-import com.nextnut.logistica.modelos.Perfil;
 import com.nextnut.logistica.modelos.Producto;
-import com.nextnut.logistica.util.Constantes;
 import com.nextnut.logistica.util.CurrencyToDouble;
 import com.nextnut.logistica.util.DialogAlerta;
-import com.nextnut.logistica.util.Imagenes;
 import com.nextnut.logistica.util.NumberTextWatcher;
 import com.rey.material.widget.ProgressView;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
-import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
-import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA_KEY;
-import static com.nextnut.logistica.util.Constantes.EXTRA_PERFIL;
-import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
+import static com.nextnut.logistica.util.Constantes.IMAGENES_PRODUCTOS;
 import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_PRODUCTOS;
-import static com.nextnut.logistica.util.Imagenes.dimensiona;
-import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
 
 /**
@@ -73,7 +46,7 @@ import static com.nextnut.logistica.util.Imagenes.selectImage;
  * in two-pane mode (on tablets) or a {@link ProductDetailActivity}
  * on handsets.
  */
-public class ProductDetailFragment extends Fragment
+public class ProductDetailFragment extends FragmentBasic
 //        implements LoaderManager.LoaderCallbacks<Cursor>
 {
 
@@ -82,8 +55,6 @@ public class ProductDetailFragment extends Fragment
      * The fragment argument representing the item ID that this fragment
      * represents.
      */
-    public static final String ARG_ITEM_ID = "item_id";
-
 
 
     public static final String PRODUCT_ACTION = "product_action";
@@ -98,7 +69,6 @@ public class ProductDetailFragment extends Fragment
     private static final String LOG_TAG = ProductDetailFragment.class.getSimpleName();
     private static final String DIALOG_FRAGMENT = "Dialog Fragment";
 
-    private long mItem = 0;
 
     private EditText mProductName;
     private EditText mProductPrice;
@@ -106,23 +76,18 @@ public class ProductDetailFragment extends Fragment
     private EditText mProductDescription;
     private ImageButton mImageProducto;
     public ProgressView spinner;
-    private String mProductKey;
 
-    String mCurrentPhotoPath = null;
+
+
+
+//    String mCurrentPhotoPath = null;
 
 
     private int mAction;
 
     CollapsingToolbarLayout appBarLayout;
 
-    private ValueEventListener mProductListener;
-    private DatabaseReference mDatabase;
-    private FirebaseStorage mStorage;
-    private StorageReference mStorageRef;
-    private String mUserKey;
-    private Empresa mEmpresa;
-    private String mEmpresaKey;
-    private Perfil mPerfil;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -134,44 +99,19 @@ public class ProductDetailFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // [START initialize_database_ref]
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mStorage = FirebaseStorage.getInstance();
-        mUserKey = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        mStorageRef = mStorage.getReferenceFromUrl(Constantes.STORAGE_REFERENCE);
-        mPerfil=(Perfil) getArguments().getParcelable(EXTRA_PERFIL);
-        mEmpresa= (Empresa) getArguments().getParcelable(EXTRA_EMPRESA);
-        mEmpresaKey=  getArguments().getString( EXTRA_EMPRESA_KEY);
-        // [END initialize_database_ref]
 
+        Activity activity = this.getActivity();
+        appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
 
-        // Get post key from intent
-        mProductKey = getArguments().getString(EXTRA_PRODUCT_KEY);
-        if (mProductKey != null) { // Si exite mProductKey es que estamos modificando un producto.
-            // Initialize Database
-//            mDatabase = FirebaseDatabase.getInstance().getReference();
-
-//                    .child("empresa").child("producto").push().getKey();
-
-        }
-
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-
-            mItem = getArguments().getLong(ARG_ITEM_ID);
-            Activity activity = this.getActivity();
-            appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-
-
-            if (appBarLayout != null) {
-                if (mAction == PRODUCT_NEW) {
-                    appBarLayout.setTitle(getResources().getString(R.string.pruductDetailBar_NEW_PRODUCT));
-                }
-            }
-
-        }
         if (getArguments().containsKey(PRODUCT_ACTION)) {
             mAction = getArguments().getInt(PRODUCT_ACTION);
         }
+        if (appBarLayout != null) {
+            if (mAction == PRODUCT_NEW) {
+                appBarLayout.setTitle(getResources().getString(R.string.pruductDetailBar_NEW_PRODUCT));
+            }
+        }
+
     }
 
     @Override
@@ -278,17 +218,15 @@ public class ProductDetailFragment extends Fragment
             }
 
         });
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                selectImage(ProductDetailFragment.this);
 
 
-//            }
-//
-//        });
+
         spinner = (ProgressView) rootView.findViewById(R.id.progressBarProducto);
         spinner.setVisibility(View.GONE);
+
+
+
+
         if (mAction == PRODUCT_NEW) {
             if (appBarLayout != null) {
                 appBarLayout.setTitle(getResources().getString(R.string.pruductDetailBar_NEW_PRODUCT));
@@ -345,13 +283,6 @@ public class ProductDetailFragment extends Fragment
                             appBarLayout.setTitle(producto.getNombreProducto());
                         }
                     }
-                    // ya tenemos los datos que queremos modificar por lo tanto desconectamos el listener!
-                    if (mProductListener != null) {
-                        mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mProductKey).removeEventListener(mProductListener);
-                        Log.i("producto", "onDataChange-removeEventListener ");
-
-                    }
-                    // [END_EXCLUDE]
                 }
 
                 @Override
@@ -365,11 +296,11 @@ public class ProductDetailFragment extends Fragment
                 }
             };
 
-            mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mProductKey).addValueEventListener(productListener);
+            mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).child(mProductKey).addListenerForSingleValueEvent(productListener);
             // [END post_value_event_listener]
 
             // Keep copy of post listener so we can remove it when app stops
-            mProductListener = productListener;
+//            mProductListener = productListener;
 
 
         } else {
@@ -381,99 +312,19 @@ public class ProductDetailFragment extends Fragment
     }
 
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Bitmap bitmap = null;
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == Imagenes.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) { // cuando sacamos una foto.
-                bitmap = (Bitmap) data.getExtras().get(getString(R.string.data));
-
-            } else if (requestCode == Imagenes.REQUEST_IMAGE_GET) {// cuando leemos un archivo foto.
-
-                mCurrentPhotoPath = getString(R.string.file) + saveImageSelectedReturnPath(getContext(), data);
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), data.getData());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            if (bitmap != null) {
-                // Create a storage reference from our app
-                if (mProductKey == null) {
-                    mProductKey = mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).push().getKey();
-                }
-                // Crear una referencia a la foto. (directorio Imagenes/mProductoKey
-                StorageReference ImagenRef = mStorageRef.child("images/" + mProductKey);
-                Log.i("subirFotoReturnUri", "onFailure: -spinner ON 11" +mProductKey );
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                byte[] datosFoto = baos.toByteArray();
-                spinner.setVisibility(View.VISIBLE);
-                mImageProducto.setVisibility(View.GONE);
-                UploadTask uploadTask = ImagenRef.putBytes(datosFoto);
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception exception) {
-                                                        // Handle unsuccessful uploads
-                                                        spinner.setVisibility(View.GONE);
-                                                        mImageProducto.setVisibility(View.VISIBLE);
-                                                        Log.i("subirFotoReturnUri", "onFailure: -spinner off " + exception.toString());
-
-                                                    }
-                                                }
-
-                ).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                           @Override
-                                           public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                               // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                                               Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                                               Log.i("subirFotoReturnUri", "onSuccess: Spinner Off");
-                                               Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_action_redeem);
-//                                               mCurrentPhotoPath = getString(R.string.file) + savePhotoReturnPath(getContext(), (Bitmap) data.getExtras().get(getString(R.string.data)));
-                                               mCurrentPhotoPath = downloadUrl.toString();
-
-                                               Picasso.with(getContext())
-                                                       .load(mCurrentPhotoPath)
-//                                                       .placeholder(drawable)
-                                                       .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-                                                       .into(mImageProducto);
-                                               mImageProducto.setVisibility(View.VISIBLE);
-                                               spinner.setVisibility(View.GONE);
-                                           }
-                                       }
-
-                ).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                        double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                        spinner.setProgress((float) progress);
-                        Log.i("subirFotoReturnUri", "spinner progress"+progress);
-
-                        System.out.println("Upload is " + progress + "% done");
-                    }
-                });
-            }
-        }
-    }
-
-
     public void deleteProduct() {
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-        if (mAction == PRODUCT_SELECTION && mItem != 0) {
-
-            getActivity().onBackPressed();
-        }
+//        if (mAction == PRODUCT_SELECTION && mItem != 0) {
+//
+//            getActivity().onBackPressed();
+//        }
 
     }
 
     public void verificationAndsave() {
 
-        if (verification()) {
-            fireBaseSaveProducto();
+        if (verificationFromulario()) {
+            existeProductName(mProductName.getText().toString());// Desde aqui se llama a SaveFirebase
 
         }
     }
@@ -482,26 +333,33 @@ public class ProductDetailFragment extends Fragment
     /// Validations!!!!
 
 
-    public boolean verification() {
-
+    public boolean verificationFromulario() {
+        boolean verification = true;
         if (!verifyName(mProductName.getText().toString())) {
-            return false;
-        } else if (!isthePriceCorrect()) {
-
-            return false;
+            verification = false;
         }
-        return isDescriptionMaxLengthCorrect(mProductDescription.getText().toString());
+        if (!isthePriceCorrect()) {
+            verification = false;
+        }
+        if (!istheSpecialPriceCorrect()) {
+            verification = false;
+        }
+        if (!isDescriptionMaxLengthCorrect(mProductDescription.getText().toString())) {
+            verification = false;
+
+        }
+        return verification;
     }
 
 
     public boolean verifyName(String name) {
         if (!isNameMaxLengthCorrect(name)) {
             return false;
-        } else return !existeProductName(name);
+        } else {return true;}
 
     }
 
-    public boolean existeProductName(String productName) {
+    public void existeProductName(String productName) {
 
 //return true if the product exist or can not be saved because its a modification, else false
         if (productName.equals("")) {
@@ -511,47 +369,55 @@ public class ProductDetailFragment extends Fragment
 
             dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
-            return true;
+            return ;
         }
-        String select = "((" + ProductsColumns.NOMBRE_PRODUCTO + " NOTNULL) AND ("
-                + ProductsColumns.NOMBRE_PRODUCTO + " =?))";
-        String projection[] = {ProductsColumns.NOMBRE_PRODUCTO, ProductsColumns._ID_PRODUCTO};
-        String arg[] = {productName};
-
-        Cursor c = getActivity().getContentResolver().query(LogisticaProvider.Products.CONTENT_URI,
-                null,
-                select,
-                arg,
-                null);
-        if (c == null || c.getCount() == 0) {
-            return false;
-        } else {
-            c.moveToFirst();
-            if (mAction == PRODUCT_NEW && c.getCount() != 0) {
-                //its a new producto and the product name exist
-                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproducNametExist));
-                // Show DialogFragment
-                dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
-                mProductName.setError(getResources().getString(R.string.product_name_error_yaexiste));
-
-                mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
-                return true;
-            } else if (mAction == PRODUCT_SELECTION && c.getCount() >= 1 && c.getInt(c.getColumnIndex(ProductsColumns._ID_PRODUCTO)) != mItem) {
-                //its a Modification producto and the product name exist in other register
-                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproducNametExist));
-                mProductName.setError(getResources().getString(R.string.product_name_error_yaexiste));
-                // Show DialogFragment
-                dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
-                mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
-                return true;
-
-            } else {
-                mProductName.setTextColor(getResources().getColor(R.color.ValidationOK));
-                return false;
-            }
 
 
-        }
+        // Verifica que si existe ese usuario en NewUser
+        Query myNewUsers= mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).orderByChild("nombreProducto");
+        myNewUsers
+                .startAt(mProductName.getText().toString())
+                .endAt(mProductName.getText().toString())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(LOG_TAG, "mProductName count"+ dataSnapshot.getChildrenCount());
+                        Log.d(LOG_TAG, "mProductName-KEY1: "+ dataSnapshot.getKey());
+                        if (dataSnapshot.getChildrenCount()==0){ fireBaseSaveProducto();}//El producto no exisite en el listado
+
+                        else if(dataSnapshot.getChildrenCount()>0){//El producto existe
+
+                            Log.d(LOG_TAG, "mProductName- count"+ dataSnapshot.getChildrenCount());
+                            Log.d(LOG_TAG, "mProductName-KEY2: "+ dataSnapshot.getKey());
+                            for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
+                                Log.d(LOG_TAG, "mmProductName-KEY3:"+ messageSnapshot.getKey());
+                                if (messageSnapshot.getKey().equals(mProductKey)){
+                                    Log.d(LOG_TAG, "mmProductName-Es una modificacio de ProductKey:"+ mProductKey);
+                                    fireBaseSaveProducto();
+                                    return;
+                                }
+
+                            }
+
+                            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.product_name_error_yaexiste));
+                            // Show DialogFragment
+                            mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                            mProductName.setError(getResources().getString(R.string.product_name_error_yaexiste));
+                            dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(LOG_TAG, "Producto Cancelled "+ databaseError.toString());
+
+                    }
+                });
+
+
+
+
     }
 
     public boolean isNameMaxLengthCorrect(String name) {
@@ -630,12 +496,49 @@ public class ProductDetailFragment extends Fragment
         }
     }
 
+    public boolean istheSpecialPriceCorrect() {
+        Double specialPrice = null;
+        if (mProductPriceSpecial.getText().toString() == null) {
+
+            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+            // Show DialogFragment
+            dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
+            mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
+            mProductPriceSpecial.setError(getResources().getString(R.string.price_error_cantBeNull));
+            return false;
+
+        } else {
+            specialPrice = new CurrencyToDouble(mProductPriceSpecial.getText().toString()).convert();
+
+            if (specialPrice == null) {
+
+                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+                // Show DialogFragment
+                mProductPriceSpecial.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
+                mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                return false;
+            } else if (specialPrice <= 0) {
+
+                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+                // Show DialogFragment
+                mProductPriceSpecial.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
+                mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                return false;
+            } else {
+
+                mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationOK));
+                return true;
+            }
+        }
+    }
+
     public void fireBaseSaveProducto() {
         Log.i("producto", "fireBaseSaveProducto");
 
         CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
         CurrencyToDouble priceEspecial = new CurrencyToDouble(mProductPriceSpecial.getText().toString());
         Log.i("producto", "onSuccess: nombre " + mProductName.getText().toString());
+        Log.i("producto", "mCurrentPhotoPath " + mCurrentPhotoPath);
 
         writeNewProducto(mProductName.getText().toString(),
                 price.convert(),
@@ -656,18 +559,18 @@ public class ProductDetailFragment extends Fragment
             Log.i("producto", "writeNewProducto: precioEspcecial " + precioEspcecial);
             Log.i("producto", "writeNewProducto: fotoProducto " + fotoProducto);
             Log.i("producto", "writeNewProducto: uid " + uid);
+            Log.i("producto", "writeNewProducto: mProductKey " + mProductKey);
 
-            Producto producto = new Producto(uid,nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto );
+            Producto producto = new Producto(uid, nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto);
             Map<String, Object> productoValues = producto.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
-//            childUpdates.put("/empresa/" + key, empresaValues);
-            childUpdates.put("/empresa-producto/" + mProductKey, productoValues);
-            // Remove post value event listener
-            if (mProductListener != null) {
-                mDatabase.child(NODO_EMPRESA_PRODUCTOS).child(mEmpresaKey).child(mProductKey).removeEventListener(mProductListener);
-                Log.i("producto", "removeEventListener");
 
+
+            if (mProductKey == null) { // Si exite mProductKey es que estamos modificando un producto.
+                mProductKey = mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).push().getKey();
             }
+            childUpdates.put(NODO_EMPRESA_PRODUCTOS + mEmpresaKey + "/" + mProductKey, productoValues);
+
             mDatabase.updateChildren(childUpdates);
             getActivity().onBackPressed();
         }
@@ -678,10 +581,21 @@ public class ProductDetailFragment extends Fragment
         super.onStop();
         Log.i("producto", "onStop");
 
-        // Remove post value event listener
-        if (mProductListener != null) {
-            mDatabase.child("empresa-producto").child(mProductKey).removeEventListener(mProductListener);
-        }
 
     }
+
+    @Override
+    public void savePhoto(Bitmap bitmap) {
+        if (mProductKey == null) {
+            mProductKey = mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).push().getKey();
+        }
+        StorageReference ImagenRef = mStorageRef.child(IMAGENES_PRODUCTOS).child(mEmpresaKey).child(mProductKey);
+        uploadImagen(bitmap, ImagenRef, mImageProducto, spinner);
+        Log.i("subirFotoReturnUri", "onSuccess: photoPath[0]" + mCurrentPhotoPath);
+
+
+    }
+
+    ;
+
 }

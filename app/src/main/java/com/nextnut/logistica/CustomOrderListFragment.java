@@ -146,7 +146,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
-                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
+//                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
                     arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
 
                     CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
@@ -160,7 +160,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
                 } else {
                     Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
                     intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
+//                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
 
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -302,7 +302,8 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
             // If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
-            loadDustomDetailFragment();
+            // TOdo: levanar el detalle de ordenes cuando esta la tableta en horizontal
+            //loadDustomDetailFragment();
 
         }
 
@@ -457,7 +458,7 @@ public class CustomOrderListFragment extends Fragment implements LoaderManager.L
 
         Bundle arguments = new Bundle();
 
-        arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
+//        arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
         if (mItem != 0) {
             arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
         } else {

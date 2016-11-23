@@ -33,10 +33,10 @@
     <!--@dimen/abc_list_item_padding_horizontal_material-->
     <!--</dimen>-->
     <dimen name="custom_cardViewElevation">4dp</dimen>
-    <dimen name="custom_cardViewMarginLeft">4dp</dimen>
-    <dimen name="custom_cardViewtMarginTop">4dp</dimen>
-    <dimen name="custom_cardViewMarginRight">4dp</dimen>
-    <dimen name="custom_cardViewMarginBottom">4dp</dimen>
+    <dimen name="custom_cardViewMarginLeft">8dp</dimen>
+    <dimen name="custom_cardViewtMarginTop">8dp</dimen>
+    <dimen name="custom_cardViewMarginRight">8dp</dimen>
+    <dimen name="custom_cardViewMarginBottom">8dp</dimen>
 
 
     <!--<dimen name="offset_y">300dp</dimen>-->

@@ -5,12 +5,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-
-import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 
 
 /**
@@ -19,7 +16,7 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
  * item details are presented side-by-side with a list of items
  * in a {@link ProductListActivity}.
  */
-public class ProductDetailActivity extends AppCompatActivity {
+public class ProductDetailActivity extends ActivityBasic{
     private static final String LOG_TAG = ProductDetailActivity.class.getSimpleName();
 
     @Override
@@ -64,14 +61,15 @@ public class ProductDetailActivity extends AppCompatActivity {
             // using a fragment transaction.
 
 
-            Bundle arguments = new Bundle();
-            arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(ProductDetailFragment.ARG_ITEM_ID, 0));
-            arguments.putString(EXTRA_PRODUCT_KEY, getIntent().getStringExtra(EXTRA_PRODUCT_KEY));
+            Bundle arguments = putBundleFirebase();
+//            arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(ProductDetailFragment.ARG_ITEM_ID, 0));
+//            arguments.putString(EXTRA_PRODUCT_KEY, getIntent().getStringExtra(EXTRA_PRODUCT_KEY));
 
 
 
             int mAction = getIntent().getIntExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
             arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, mAction);
+
             ProductDetailFragment fragment = new ProductDetailFragment();
             fragment.setArguments(arguments);
             if (mAction == ProductDetailFragment.PRODUCT_NEW) {

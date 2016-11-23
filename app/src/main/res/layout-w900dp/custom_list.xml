@@ -34,7 +34,7 @@
 
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/custom_list"
+        android:id="@+id/custom_list_recyclerView"
         android:name="com.nextnut.logistica.CustomListFragment"
         android:layout_width="@dimen/item_width"
         android:layout_weight="3"

@@ -1,57 +1,42 @@
 package com.nextnut.logistica;
 
-import android.content.ContentProviderOperation;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.nextnut.logistica.modelos.Empresa;
-import com.nextnut.logistica.modelos.Perfil;
 import com.nextnut.logistica.modelos.Producto;
-import com.nextnut.logistica.rest.ProductCursorAdapter;
 import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
 import com.nextnut.logistica.viewholder.ProductViewHolder;
 
-import java.util.ArrayList;
-
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
-import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
-import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA_KEY;
-import static com.nextnut.logistica.util.Constantes.EXTRA_PERFIL;
-import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 
 //import com.google.android.gms.common.api.GoogleApiClient;
 
 
-public class ProductListActivity extends AppCompatActivity {
+public class ProductListActivity extends ActivityBasic {
     //        implements LoaderManager.LoaderCallbacks<Cursor> {
-    private DatabaseReference mDatabase;
+//    private static final String LOG_TAG = ProductDetailFragment.class.getSimpleName();
     private FirebaseRecyclerAdapter<Producto, ProductViewHolder> mAdapter;
     private static final String LOG_TAG = ProductListActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 0;
     private long mItem = 0;
 
-    private Empresa mEmpresa;
-    private String mEmpresaKey;
-    private Perfil mPerfil;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
+    private RecyclerView mRecyclerView;
 
 
     @Override
@@ -67,17 +52,17 @@ public class ProductListActivity extends AppCompatActivity {
     }
 
 
-    private ProductCursorAdapter mCursorAdapter;
-
-
-    private ItemTouchHelper mItemTouchHelper;
+//    private ProductCursorAdapter mCursorAdapter;
+//
+//
+//    private ItemTouchHelper mItemTouchHelper;
 
 
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_save;
     private FloatingActionButton fab_delete;
 
-    private ArrayList<ContentProviderOperation> batchOperations;
+//    private ArrayList<ContentProviderOperation> batchOperations;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -88,8 +73,9 @@ public class ProductListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_product_list);
         setContentView(R.layout.activity_product_list);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+//        mDatabase = FirebaseDatabase.getInstance().getReference();
 //        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 //        mUserId= FirebaseAuth.getInstance().getCurrentUser().getUid();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -97,19 +83,20 @@ public class ProductListActivity extends AppCompatActivity {
         toolbar.setTitle(getTitle());
 
 //            getIntent().getStringExtra(EXTRA_USER_KEY);
-        mPerfil = (Perfil) getIntent().getParcelableExtra(EXTRA_PERFIL);
-        mEmpresaKey = getIntent().getStringExtra(EXTRA_EMPRESA_KEY);
-        mEmpresa = (Empresa) getIntent().getParcelableExtra(EXTRA_EMPRESA);
+//        mPerfil = (Perfil) getIntent().getParcelableExtra(EXTRA_PERFIL);
+//        mEmpresaKey = getIntent().getStringExtra(EXTRA_EMPRESA_KEY);
+//        mEmpresa = (Empresa) getIntent().getParcelableExtra(EXTRA_EMPRESA);
 
-        Log.i("ClienteViewHolder", "mPerfil" + mPerfil.getClientes());
-        Log.i("ClienteViewHolder", "mEmpresaKey" + mEmpresaKey);
-        Log.i("ClienteViewHolder", "mEmpresa" + mEmpresa.getNombre());
+        Log.i("Producto", "mPerfil" + mPerfil.getClientes());
+        Log.i("Producto", "mEmpresaKey" + mEmpresaKey);
+        Log.i("Producto", "mEmpresa" + mEmpresa.getNombre());
         fab_new = (FloatingActionButton) findViewById(R.id.fab_new);
         fab_new.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
-                intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, 0);
+                putExtraFirebase(intent);
+//                intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, 0);
                 intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_NEW);
                 fab_new.setVisibility(View.VISIBLE);
                 startActivity(intent);
@@ -138,54 +125,11 @@ public class ProductListActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+//        final View emptyView = findViewById(R.id.recyclerview_product_empty);
         final View emptyView = findViewById(R.id.recyclerview_product_empty);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.product_list_recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-
-//        mCursorAdapter = new ProductCursorAdapter(this, null, emptyView, new ProductCursorAdapter.ProductCursorAdapterOnClickHandler() {
-//
-//            @Override
-//            public void onClick(long id, ProductCursorAdapter.ViewHolder vh) {
-//
-//                mItem=id;
-//                if (mTwoPane) {
-//                    Bundle arguments = new Bundle();
-//                     // when rotate the screen the selecction of the second Screen is conserved.
-//                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
-//                    arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
-//
-//                    ProductDetailFragment fragment = new ProductDetailFragment();
-//                    fragment.setArguments(arguments);
-//                    getSupportFragmentManager().beginTransaction()
-//
-//                            .addToBackStack(null)
-//                            .replace(R.id.product_detail_container, fragment)
-//                            .commit();
-//
-//                    fab_new.setVisibility(View.GONE);
-//                    fab_save.setVisibility(View.VISIBLE);
-//
-//                } else {
-//                    Intent intent = new Intent(getApplicationContext(), ProductDetailActivity.class);
-//                    intent.putExtra(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
-//                    intent.putExtra(ProductDetailFragment.ARG_ITEM_ID, id);
-//                    fab_new.setVisibility(View.VISIBLE);
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                        Pair<View, String> p1 = Pair.create((View) vh.mphotoProducto, getString(R.string.detail_icon_transition_imagen));
-//                        Pair<View, String> p2 = Pair.create((View) vh.mTextViewPrecio, getString(R.string.detail_icon_transition_price));
-//                        Pair<View, String> p3 = Pair.create((View) vh.mTextViewNombre, getString(R.string.detail_icon_transition_name));
-//                        ActivityOptionsCompat activityOptions =
-//                                ActivityOptionsCompat.makeSceneTransitionAnimation(ProductListActivity.this,   p1,p2,p3);
-//                        startActivity(intent, activityOptions.toBundle());
-//
-//                    } else {
-//                        startActivity(intent);
-//                    }
-//                }
-//            }
-//        });
-//        recyclerView.setAdapter(mCursorAdapter);
+//        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.product_list_recyclerView);
+        mRecyclerView = (RecyclerView) findViewById(R.id.product_list_recyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mRecyclerView.getContext()));
 
 
         // Set up FirebaseRecyclerAdapter with the Query
@@ -195,7 +139,7 @@ public class ProductListActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(final ProductViewHolder viewHolder, final Producto model, final int position) {
                 final DatabaseReference postRef = getRef(position);
-                Log.i("ProductView", "populateViewHolder(postRef)" + postRef.toString());
+                Log.i("Producto", "populateViewHolder(postRef)" + postRef.toString());
                 emptyView.setVisibility(View.GONE);
                 // Set click listener for the whole post view
                 final String productKey = postRef.getKey();
@@ -205,12 +149,9 @@ public class ProductListActivity extends AppCompatActivity {
                                                            public void onClick(View v) {
 
                                                                if (mTwoPane) {
-                                                                   Bundle arguments = new Bundle();
-                                                                   // when rotate the screen the selecction of the second Screen is conserved.
-//                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
-//
-                                                                   arguments.putString(EXTRA_PRODUCT_KEY, productKey);
-                                                                   arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
+                                                                   mProductKey=productKey;
+                                                                   Bundle arguments = putBundleFirebase();
+                                                                   mProductKey=null;
 
                                                                    ProductDetailFragment fragment = new ProductDetailFragment();
                                                                    fragment.setArguments(arguments);
@@ -225,11 +166,10 @@ public class ProductListActivity extends AppCompatActivity {
                                                                } else {
 
                                                                    // Launch PostDetailActivity
+                                                                   mProductKey=productKey;
                                                                    Intent intent = new Intent(getApplication(), ProductDetailActivity.class);
-                                                                   intent.putExtra(EXTRA_PRODUCT_KEY, productKey);
-                                                                   intent.putExtra(EXTRA_EMPRESA, mEmpresa);
-                                                                   intent.putExtra(EXTRA_EMPRESA_KEY, mEmpresaKey);
-                                                                   intent.putExtra(EXTRA_PERFIL, mPerfil);
+                                                                   putExtraFirebase(intent);
+                                                                   mProductKey=null;
                                                                    startActivity(intent);
 
                                                                }
@@ -254,7 +194,7 @@ public class ProductListActivity extends AppCompatActivity {
         }
 
         ;
-        recyclerView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);
 
 
         if (findViewById(R.id.product_detail_container) != null)
@@ -267,9 +207,7 @@ public class ProductListActivity extends AppCompatActivity {
             mTwoPane = true;
 
 
-            Bundle arguments = new Bundle();
-            arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, mItem);// Fragmet load de last ID.
-            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_DOUBLE_SCREEN);
+            Bundle arguments = putBundleFirebase();
             ProductDetailFragment fragment = new ProductDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
@@ -330,8 +268,11 @@ public class ProductListActivity extends AppCompatActivity {
 
     public Query getQuery(DatabaseReference databaseReference) {
 
-        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey);
 
+        Log.i("Producto", "ESQUEMA_EMPRESA_PRODUCTOS)-->" + ESQUEMA_EMPRESA_PRODUCTOS+"/"+mEmpresaKey);
+
+        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey);
+//        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS);
     }
 
 

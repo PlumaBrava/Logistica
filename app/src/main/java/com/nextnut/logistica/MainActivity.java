@@ -23,7 +23,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.firebase.auth.FirebaseAuth;
-import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.util.ProductSectionActivity;
 
 import java.util.ArrayList;
@@ -211,10 +210,10 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             Bundle bundle = data.getExtras();
 
             mClienteKey =bundle.getString(EXTRA_CLIENTE_KEY);
-            Cliente cliente=bundle.getParcelable(EXTRA_CLIENTE);
+            mCliente=bundle.getParcelable(EXTRA_CLIENTE);
             Log.e(LOG_TAG, "mClienteKey: " +mClienteKey);
-            Log.e(LOG_TAG, "cliente-apellido: " +cliente.getNombre());
-            Log.e(LOG_TAG, "cliente-Nombre: " +cliente.getApellido());
+            Log.e(LOG_TAG, "cliente-apellido: " +mCliente.getNombre());
+            Log.e(LOG_TAG, "cliente-Nombre: " +mCliente.getApellido());
 
 
 //            long customRef = bundle.getLong(CustomSelectionActivity.RESULTADO);
@@ -244,7 +243,6 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
             Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
             putExtraFirebase(intent);
-
             intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
 
             startActivity(intent);
@@ -448,15 +446,19 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             switch (mSeccionesDisponibles.get(position)) {
 
                 case CUSTOM_ORDER_FRAGMENT:
-                    return new CustomOrderListFragment();
-
-                case PICKING_FRAGMENT:
-                    PickingListFragment a = new PickingListFragment();
+                    CustomOrderListFragment a= new CustomOrderListFragment();
+                    a.setArguments(putBundleFirebase());
                     return a;
 
-                case DELIVERY_FRAGMENT:
-                    DeliveryListFragment b = new DeliveryListFragment();
+                case PICKING_FRAGMENT:
+                    PickingListFragment b = new PickingListFragment();
+                    b.setArguments(putBundleFirebase());
                     return b;
+
+                case DELIVERY_FRAGMENT:
+                    DeliveryListFragment c = new DeliveryListFragment();
+                    c.setArguments(putBundleFirebase());
+                    return c;
 
                 default:
 

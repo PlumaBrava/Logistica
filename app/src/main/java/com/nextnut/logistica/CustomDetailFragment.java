@@ -1,11 +1,8 @@
 package com.nextnut.logistica;
 
-import android.app.Activity;
-import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -14,6 +11,8 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -21,8 +20,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,14 +30,12 @@ import android.widget.Toast;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.modelos.Cliente;
-import com.nextnut.logistica.util.Constantes;
 import com.nextnut.logistica.util.CustomTextWatcher;
-import com.nextnut.logistica.util.Imagenes;
 import com.nextnut.logistica.util.MakeCall;
+import com.rey.material.widget.CheckBox;
+import com.rey.material.widget.ProgressView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -46,10 +43,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
+import static com.nextnut.logistica.util.Constantes.IMAGENES_CLIENTES;
 import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_CLIENTES;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
-import static com.nextnut.logistica.util.Imagenes.saveImageSelectedReturnPath;
-import static com.nextnut.logistica.util.Imagenes.savePhotoReturnPath;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
 import static com.nextnut.logistica.util.MakeCall.getUserName;
 
@@ -66,17 +62,6 @@ public class CustomDetailFragment extends FragmentBasic  {
      * represents.
      */
 
-    public static final String ARG_ITEM_ID = "item_id";
-    public static final String CUSTOM_ACTION = "product_action";
-    public static final int CUSTOM_NEW = 0;
-    public static final int CUSTOM_DOUBLE_SCREEN = 1;
-    public static final int CUSTOM_SAVE = 2;
-    public static final int CUSTOM_SELECTION = 3;
-    private static final int DETAIL_CUSTOM_LOADER = 0;
-    private static final int DEFAULT_DETAIL_CUSTOM_LOADER = 1;
-
-
-    String mCurrentPhotoPath = null;
 
 
     private TextView mCustomId;
@@ -89,21 +74,17 @@ public class CustomDetailFragment extends FragmentBasic  {
     private EditText mCuit;
     private EditText mIva;
     private CheckBox mSpecial;
-
-
-    private int mAction;
-
-
-    private ValueEventListener mCustomListener;
-
-    private FirebaseStorage mStorage;
-    private StorageReference mStorageRef;
+    public ProgressView spinner;
+    private EditText mTipoTelefono;
+    private EditText mTelefono;
+    private com.rey.material.widget.Button mBotonAgregarTelefono;
+    private RecyclerView mListadeTelefonos;
+    private Map<String, String> telefonos= new HashMap<>();
+    private MyAdapter mAdapterTelefonos;
 
 
     CollapsingToolbarLayout appBarLayout;
 
-
-    private long mItem = 0;
 
     private static final String LOG_TAG = CustomDetailFragment.class.getSimpleName();
 
@@ -118,30 +99,17 @@ public class CustomDetailFragment extends FragmentBasic  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        mStorage = FirebaseStorage.getInstance();
-        Log.d(LOG_TAG, "onCreate-msavedInstanceState:" + savedInstanceState);
-        Log.d(LOG_TAG, "onCreate-mStorage:" + mStorage.toString());
-
-        mStorageRef = mStorage.getReferenceFromUrl(Constantes.STORAGE_REFERENCE);
         Log.d(LOG_TAG, "onCreate-mStorageRef:" + mStorageRef.toString());
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
+        AppCompatActivity activity = (AppCompatActivity) this.getContext();
+        appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+        if (appBarLayout != null) {
+            if (mClienteKey==null){
+                appBarLayout.setTitle(getResources().getString(R.string.custom_new));
+            }else
+                appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" " );
+        }
 
-            mItem = getArguments().getLong(ARG_ITEM_ID);
-            AppCompatActivity activity = (AppCompatActivity) this.getContext();
-             appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                if (mItem==0){
-                    appBarLayout.setTitle(getResources().getString(R.string.custom_new)+ mItem);
-                }else
-                    appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" "+ mItem);
-            }
-        }
-        if (getArguments().containsKey(CUSTOM_ACTION)) {
-            mAction = getArguments().getInt(CUSTOM_ACTION);
-        }
-        //            getIntent().getStringExtra(EXTRA_USER_KEY);
 
     }
 
@@ -171,6 +139,21 @@ public class CustomDetailFragment extends FragmentBasic  {
                 selectImage(CustomDetailFragment.this);
             }
         });
+        spinner = (ProgressView) rootView.findViewById(R.id.progressBarCliente);
+        spinner.setVisibility(View.GONE);
+        if (mCurrentPhotoPath == null) {
+            mImageCustomer.setBackgroundColor(Color.BLUE);
+        } else {
+            mImageCustomer.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+
+        Picasso.with(getActivity())
+                .load(mCurrentPhotoPath)
+                .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
+                .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+                .into(mImageCustomer);
+
         mDeliveyAddress = (EditText) rootView.findViewById(R.id.custom_delivery_address);
         mCity = (EditText) rootView.findViewById(R.id.custom_city);
 
@@ -211,77 +194,168 @@ public class CustomDetailFragment extends FragmentBasic  {
 
 
         mCuit = (EditText) rootView.findViewById(R.id.custom_cuit);
-        mIva = (EditText) rootView.findViewById(R.id.custom_iva);
+        mCuit.addTextChangedListener(new TextWatcher() {
+                                        int length_before = 0;
+                                         @Override
+                                         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                             length_before = charSequence.length();
+                                         }
+
+                                         @Override
+                                         public void onTextChanged(CharSequence s, int in, int i1, int i2) {
+                                             Boolean modifyText =false;
+                                             Log.d(LOG_TAG, "onTextChanged:" + s.toString()+"-"+in+"-"+i1+"-"+i2);
+                                             StringBuilder b = new StringBuilder();
+                                             for (int i = 0; i < s.length(); i++) {
+                                                 if (s.charAt(i) == '\n') {
+                                                     Log.d(LOG_TAG, "onTextChanged:" + s.charAt(i));
+                                                     modifyText = true;
+                                                 } else {
+                                                     b.append(s.charAt(i));
+                                                 }
+                                                 if (modifyText) {
+                                                     // hide keyboard before calling the done action
+                                                     InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
+                                                             Context.INPUT_METHOD_SERVICE);
+                                                     View view = getActivity().getCurrentFocus();
+                                                     if (view != null) {
+                                                         inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                                                     }
+                                                     mCuit.setText(b.toString());
+                                                 }
+
+                                         }}
+
+                                         @Override
+                                         public void afterTextChanged(Editable s) {
+                                             if (length_before < s.length()) {
+                                                 if (s.length() == 2 || s.length() == 11)
+                                                     s.append("-");
+                                                 if (s.length() > 2) {
+                                                     if (Character.isDigit(s.charAt(2)))
+                                                         s.insert(2, "-");
+                                                 }
+                                                 if (s.length() > 11) {
+                                                     if (Character.isDigit(s.charAt(11)))
+                                                         s.insert(11, "-");
+                                                 }
+                                             }
+                                         }
+                                     });
+
+
+                mIva = (EditText) rootView.findViewById(R.id.custom_iva);
         mSpecial = (CheckBox) rootView.findViewById(R.id.custom_special);
+
+        mTipoTelefono=(EditText) rootView.findViewById(R.id.tipoTelefonoCliente);
+        mTelefono=(EditText) rootView.findViewById(R.id.telefonoCliente);
+        mBotonAgregarTelefono=(com.rey.material.widget.Button) rootView.findViewById(R.id.botonAgregarTelefono);
+        mBotonAgregarTelefono.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                telefonos.put(mTipoTelefono.getText().toString(),mTelefono.getText().toString());
+                mTipoTelefono.setText("");
+                mTelefono.setText("");
+                mAdapterTelefonos.swap(telefonos);
+            }
+        });
+        mListadeTelefonos=(RecyclerView) rootView.findViewById(R.id.listaTelefonos);
+        // use a linear layout manager
+        mListadeTelefonos.setHasFixedSize(true);
+        mListadeTelefonos.setLayoutManager(new LinearLayoutManager(getContext()));
+        telefonos.put("home10","123i456");
+        telefonos.put("home11","1273456");
+        telefonos.put("home12","1423456");
+        telefonos.put("work9","111199999");
+        telefonos.put("work1","22299999");
+        telefonos.put("work9","2222299999");
+        mAdapterTelefonos = new MyAdapter(telefonos);
+
+
+
+        mListadeTelefonos.setAdapter(mAdapterTelefonos);
+
+        Log.i("TelefonosArrayAdapter", "telefonos .size() on create" + telefonos.entrySet().size());
         return rootView;
     }
 
     static final int PICK_CONTACT_REQUEST = 1;  // The request code
     String number;
     String mIdContact;
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//
+//            // Make sure the request was successful
+//            if (resultCode == Activity.RESULT_OK) {
+//
+//                // Check which request it is that we're responding to
+//                if (requestCode == PICK_CONTACT_REQUEST) {
+//                // Get the URI that points to the selected contact
+//                Uri contactUri = data.getData();
+//                // We only need the NUMBER column, because there will be only one row in the result
+//                String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER,
+//                ContactsContract.CommonDataKinds.Phone._ID,
+//                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+//               ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
+//
+//                // Perform the query on the contact to get the NUMBER column
+//                // We don't need a selection or sort order (there's only one result for the given URI)
+//                // CAUTION: The query() method should be called from a separate thread to avoid blocking
+//                // your app's UI thread. (For simplicity of the sample, this code doesn't do that.)
+//                // Consider using CursorLoader to perform the query.
+//                Cursor cursor = getContext().getContentResolver()
+//                        .query(contactUri, projection, null, null, null);
+//                cursor.moveToFirst();
+//
+//                // Retrieve the phone number from the NUMBER column
+//                int column1 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+//                int column2 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+//                int column3 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
+//               number = cursor.getString(column1);
+//                String name = cursor.getString(column2);
+//                mIdContact = cursor.getString(column3);
+//                if (mCustomId!=null){
+//                    button.setBackgroundColor(Color.GREEN);
+//
+//                }
+//
+//                button.setText(name);
+//            }
+//                if (requestCode == Imagenes.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+//                    mCurrentPhotoPath = getString(R.string.file) + savePhotoReturnPath(getContext(),(Bitmap) data.getExtras().get(getString(R.string.data)));
+//
+//                    Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
+//                    Picasso.with(getContext())
+//                            .load(mCurrentPhotoPath)
+//                            .placeholder(drawable)
+//                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+//                            .into(mImageCustomer);
+//
+//                } else if (requestCode == Imagenes.REQUEST_IMAGE_GET) {
+//                    mCurrentPhotoPath = getString(R.string.file) + saveImageSelectedReturnPath(getContext(), data);
+//                    mImageCustomer.setBackgroundColor(Color.TRANSPARENT);
+//                    Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
+//                    Picasso.with(getContext())
+//                            .load(mCurrentPhotoPath)
+//                            .placeholder(drawable)
+//                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+//                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+//                            .into(mImageCustomer);
+//                }
+//
+//            }
+//    }
+
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void savePhoto(Bitmap bitmap){
+        if (mClienteKey == null) {
+            mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();
+        }
+        StorageReference ImagenRef = mStorageRef.child(IMAGENES_CLIENTES).child(mEmpresaKey).child( mClienteKey);
+         uploadImagen(bitmap,ImagenRef,mImageCustomer,spinner);
+        Log.i("subirFotoReturnUri", "onSuccess: mCurrentPhotoPath"+ mCurrentPhotoPath);
 
-            // Make sure the request was successful
-            if (resultCode == Activity.RESULT_OK) {
-
-                // Check which request it is that we're responding to
-                if (requestCode == PICK_CONTACT_REQUEST) {
-                // Get the URI that points to the selected contact
-                Uri contactUri = data.getData();
-                // We only need the NUMBER column, because there will be only one row in the result
-                String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER,
-                ContactsContract.CommonDataKinds.Phone._ID,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-               ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
-
-                // Perform the query on the contact to get the NUMBER column
-                // We don't need a selection or sort order (there's only one result for the given URI)
-                // CAUTION: The query() method should be called from a separate thread to avoid blocking
-                // your app's UI thread. (For simplicity of the sample, this code doesn't do that.)
-                // Consider using CursorLoader to perform the query.
-                Cursor cursor = getContext().getContentResolver()
-                        .query(contactUri, projection, null, null, null);
-                cursor.moveToFirst();
-
-                // Retrieve the phone number from the NUMBER column
-                int column1 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                int column2 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-                int column3 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
-               number = cursor.getString(column1);
-                String name = cursor.getString(column2);
-                mIdContact = cursor.getString(column3);
-                if (mCustomId!=null){
-                    button.setBackgroundColor(Color.GREEN);
-
-                }
-
-                button.setText(name);
-            }
-                if (requestCode == Imagenes.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-                    mCurrentPhotoPath = getString(R.string.file) + savePhotoReturnPath(getContext(),(Bitmap) data.getExtras().get(getString(R.string.data)));
-
-                    Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
-                    Picasso.with(getContext())
-                            .load(mCurrentPhotoPath)
-                            .placeholder(drawable)
-                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-                            .into(mImageCustomer);
-
-                } else if (requestCode == Imagenes.REQUEST_IMAGE_GET) {
-                    mCurrentPhotoPath = getString(R.string.file) + saveImageSelectedReturnPath(getContext(), data);
-                    mImageCustomer.setBackgroundColor(Color.TRANSPARENT);
-                    Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
-                    Picasso.with(getContext())
-                            .load(mCurrentPhotoPath)
-                            .placeholder(drawable)
-                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-                            .into(mImageCustomer);
-                }
-
-            }
-    }
+    };
 
 
     @Override
@@ -339,21 +413,34 @@ public class CustomDetailFragment extends FragmentBasic  {
                         mLastName.setText(cliente.getApellido());
                         mDeliveyAddress.setText(cliente.getDireccionDeEntrega());
                         mCity.setText(cliente.getCiudad());
-                        mCurrentPhotoPath=cliente.getFotoCliente();
+                        mCurrentPhotoPath =cliente.getFotoCliente();
                         // todo: reemplazar por un listado de telefonos.
                         mIdContact=null;// aqui deber ir la referencia al Id Android de contacto.
 
                         mCuit.setText(cliente.getCuit());
-                        mIva.setText(Long.toString(cliente.getIva()));
+                        mIva.setText(Double.toString(cliente.getIva()));
                         mSpecial.setChecked(cliente.getEspecial());
+                        Log.i("TelefonosArrayAdapter", "telefonos .size()antes" + telefonos.entrySet().size());
 
+                        telefonos=cliente.getTelefonos();
+                        Log.i("TelefonosArrayAdapter", "telefonos .size()" + telefonos.entrySet().size());
+//                        telefonos.clear();
+                        for(Map.Entry<String,String> entry : cliente.getTelefonos().entrySet()) {
+                            telefonos.put(entry.getKey(),entry.getValue());
+                            Log.i("TelefonosArrayAdapter", "telefonos .key" + entry.getKey());
+                            Log.i("TelefonosArrayAdapter", "telefonos .value" + entry.getValue());
+                        }
+                        mAdapterTelefonos.swap(telefonos);
+//                        mListadeTelefonos.invalidate();
+//                        mAdapterTelefonos.notifyDataSetChanged();
+//                        mAdapterTelefonos.notifyAll();
 
                         if (mIdContact != null){
                             button.setBackgroundColor(Color.GREEN);
                             button.setText(getUserName(getContext() ,mIdContact));
                         }
 
-                        Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
+                        Drawable drawable = dimensiona(getContext(), R.drawable.com_facebook_profile_picture_blank_square);
                         Picasso.with(getContext())
                                 .load(mCurrentPhotoPath)
                                 .placeholder(drawable)
@@ -367,13 +454,7 @@ public class CustomDetailFragment extends FragmentBasic  {
                                 appBarLayout.setTitle(cliente.getNombre()+" "+cliente.getApellido());
                             }
                         }
-                        // ya tenemos los datos que queremos modificar por lo tanto desconectamos el listener!
-//                        if ( mCustomListener != null) {
-//                            mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).child(mClienteKey).removeEventListener(mCustomListener);
-//                            Log.i("producto", "onDataChange-removeEventListener ");
-//
-//                        }
-                        // [END_EXCLUDE]
+
                     }
 
                     @Override
@@ -389,46 +470,12 @@ public class CustomDetailFragment extends FragmentBasic  {
                 Log.i(LOG_TAG ," mDatabase: "+ mDatabase);
                 mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).child(mClienteKey).addListenerForSingleValueEvent(customListener);
 
-                // [END post_value_event_listener]
-
-                // Keep copy of post listener so we can remove it when app stops
-//                mCustomListener = customListener;
 
 
             } else {
                 Log.i("producto", "onActivityCreated: mProductKey: Null");
 
             }
-
-            super.onActivityCreated(savedInstanceState);
-
-
-
-
-//        switch (mAction) {
-//            case CUSTOM_NEW:{
-//                Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);
-//                Picasso.with(getContext())
-//                        .load(mCurrentPhotoPath)
-//                        .placeholder(drawable)
-//                        .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-//                        .into(mImageCustomer);
-//                break;
-//            }
-//
-//            case CUSTOM_DOUBLE_SCREEN:
-//                if (mItem == 0) {
-//                    getLoaderManager().initLoader(DEFAULT_DETAIL_CUSTOM_LOADER, null, this);
-//                } else {
-//                    getLoaderManager().initLoader(DETAIL_CUSTOM_LOADER, null, this);
-//                }
-//                break;
-//            case CUSTOM_SELECTION:
-//                getLoaderManager().initLoader(DETAIL_CUSTOM_LOADER, null, this);
-//                break;
-//            default:
-//                break;
-//        }
 
         super.onActivityCreated(savedInstanceState);
 
@@ -438,10 +485,10 @@ public class CustomDetailFragment extends FragmentBasic  {
     public void onResume() {
         super.onResume();
         if (appBarLayout != null) {
-            if (mItem==0){
-                appBarLayout.setTitle(getResources().getString(R.string.custom_new)+ mItem);
-            }else
-                appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" "+ mItem);
+//            if (mItem==0){
+//                appBarLayout.setTitle(getResources().getString(R.string.custom_new)+ mItem);
+//            }else
+//                appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" "+ mItem);
         }
     }
 
@@ -484,7 +531,7 @@ public class CustomDetailFragment extends FragmentBasic  {
 //                getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
 //            } catch (RemoteException | OperationApplicationException e) {
 //            }
-            getActivity().onBackPressed();
+//            getActivity().onBackPressed();
         }
     // The data is not valid
 
@@ -493,6 +540,9 @@ public class CustomDetailFragment extends FragmentBasic  {
     public void fireBaseSaveCliente() {
         Log.i("producto", "fireBaseSaveProducto");
 
+        Map<String,String>telefonosMap= new HashMap<>();
+        telefonosMap.put("home","123456");
+        telefonosMap.put("work","99999");
 
         writeNewCliente(mUserKey,
                 mCustomName.getText().toString(),
@@ -501,10 +551,10 @@ public class CustomDetailFragment extends FragmentBasic  {
                 mCurrentPhotoPath,
                 mDeliveyAddress.getText().toString(),
                 mCity.getText().toString(),
-               21,// Long.getLong(mIva.getText().toString()),
+                Double.parseDouble(mIva.getText().toString()),
                 mCuit.getText().toString(),
-                mSpecial.isChecked()
-        );
+                mSpecial.isChecked(),
+                telefonosMap);
     }
 
     // [START basic_write]
@@ -515,9 +565,10 @@ public class CustomDetailFragment extends FragmentBasic  {
              String fotoCliente,
              String direccionDeEntrega,
              String ciudad,
-             long iva,
+             Double iva,
             String cuit,
-            Boolean especial){
+            Boolean especial,Map<String, String> telefonos
+                                 ){
         if (true) {//validar formulario
             Log.i("producto", "writeNewClient: nombre " + nombre);
             Log.i("producto", "writeNewClient: apellido " + apellido);
@@ -539,22 +590,17 @@ public class CustomDetailFragment extends FragmentBasic  {
             ciudad,
             iva,
             cuit,
-            especial);
+            especial,telefonos);
 
             if (mClienteKey == null) {
                 mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();
             }
 
-//                    uid,nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto );
-            Map<String, Object> productoValues =  cliente.toMap();
+            Map<String, Object> clienteValues =  cliente.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
-//            childUpdates.put("/empresa/" + key, empresaValues);
-            childUpdates.put(NODO_EMPRESA_CLIENTES + mEmpresaKey +"/"+ mClienteKey, productoValues);
-            // Remove post value event listener
-            if (mCustomListener != null) {
-                mDatabase.child(NODO_EMPRESA_CLIENTES).child(mEmpresaKey).child(mClienteKey).removeEventListener(mCustomListener);
-                Log.i("producto", "removeEventListener");
-            }
+
+            childUpdates.put(NODO_EMPRESA_CLIENTES + mEmpresaKey +"/"+ mClienteKey, clienteValues);
+
             mDatabase.updateChildren(childUpdates);
             getActivity().onBackPressed();
         }
@@ -562,12 +608,14 @@ public class CustomDetailFragment extends FragmentBasic  {
 
     public void deleteCustomer() {
 
-        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-        if (mAction == CUSTOM_SELECTION && mItem != 0) {
-            getActivity().getContentResolver().delete(
-                    LogisticaProvider.Customs.withId(mItem), null, null);
-            getActivity().onBackPressed();
-        }
+        //TODO: Evaluar el delete del customer.
+
+//        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+//        if (mAction == CUSTOM_SELECTION && mItem != 0) {
+//            getActivity().getContentResolver().delete(
+//                    LogisticaProvider.Customs.withId(mItem), null, null);
+//            getActivity().onBackPressed();
+//        }
 
     }
 
@@ -612,7 +660,7 @@ public class CustomDetailFragment extends FragmentBasic  {
         } else {
             mCuit.setBackgroundColor(Color.TRANSPARENT);
         }
-       if( mIva.getText().toString().equals(""))
+       if( mIva.getText().toString().equals("")) //todo: validar que el valor sea mayor que cero y menor a 100%
        {
            isvalid =false;
            mIva.setBackgroundColor(Color.RED);
@@ -702,4 +750,137 @@ public class CustomDetailFragment extends FragmentBasic  {
 //    public void onLoaderReset(Loader<Cursor> loader) {
 //
 //    }
-}
+
+    private class TelefonosArrayAdapter extends BaseAdapter {
+        private final ArrayList mData;
+
+        public TelefonosArrayAdapter(Map<String, String> map) {
+            Log.i("TelefonosArrayAdapter", "constructor " + map.entrySet().size());
+
+            mData = new ArrayList();
+            mData.addAll(map.entrySet());
+        }
+
+        @Override
+        public int getCount() {
+            Log.i("TelefonosArrayAdapter", "getCount() " +mData.size());
+
+            return mData.size();
+        }
+
+        @Override
+        public Map.Entry<String, String> getItem(int position) {
+            return (Map.Entry) mData.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            Log.i("TelefonosArrayAdapter", "getItemId " +position);
+
+            // TODO implement you own logic with ID
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            final View result;
+
+            if (convertView == null) {
+                result = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+            } else {
+                result = convertView;
+            }
+
+            final Map.Entry<String, String> item = getItem(position);
+            Log.i("TelefonosArrayAdapter", "getItem(position)" +position+" -+ "+ item.getValue());
+
+            // TODO replace findViewById by ViewHolder
+            ((TextView) result.findViewById(android.R.id.text1)).setText(item.getKey()+" : "+item.getValue());
+//            ((TextView) result.findViewById(android.R.id.text2)).setText(item.getValue());
+            result.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i("TelefonosArrayAdapter", "gonClick- + "+ item.getValue());
+                    mTipoTelefono.setText(item.getKey());
+                    mTelefono.setText(item.getValue());
+                }
+            });
+            return result;
+        }
+    }
+
+
+    public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+
+
+        private  ArrayList mData;
+
+
+        // Provide a reference to the views for each data item
+        // Complex data items may need more than one view per item, and
+        // you provide access to all the views for a data item in a view holder
+        public  class ViewHolder extends RecyclerView.ViewHolder {
+            // each data item is just a string in this case
+            public TextView mTextView;
+            public ViewHolder(TextView v) {
+                super(v);
+                mTextView = v;
+            }
+        }
+
+        // Provide a suitable constructor (depends on the kind of dataset)
+        public MyAdapter(Map<String, String> map) {
+
+            mData = new ArrayList();
+            mData.addAll(map.entrySet());
+
+        }
+
+        // Create new views (invoked by the layout manager)
+        @Override
+        public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                       int viewType) {
+            // create a new view
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(android.R.layout.simple_list_item_1, parent, false);
+            // set the view's size, margins, paddings and layout parameters
+
+
+            ViewHolder vh = new ViewHolder((TextView) v);
+
+            return vh;
+        }
+
+        // Replace the contents of a view (invoked by the layout manager)
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            // - get element from your dataset at this position
+            // - replace the contents of the view with that element
+            final Map.Entry<String, String> item = (Map.Entry) mData.get(position);
+            Log.i("TelefonosArrayAdapter", "getItem(position)" +position+" -+ "+ item.getValue());
+            holder.mTextView.setText(item.getKey()+" : "+item.getValue());
+            holder.mTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i("TelefonosArrayAdapter", "gonClick- + "+ item.getValue());
+                    mTipoTelefono.setText(item.getKey());
+                    mTelefono.setText(item.getValue());
+                }
+            });
+
+        }
+
+        // Return the size of your dataset (invoked by the layout manager)
+        @Override
+        public int getItemCount() {
+          return mData.size();
+        }
+
+        public void swap(Map<String, String> map){
+            mData.clear();
+            mData.addAll(map.entrySet());
+            notifyDataSetChanged();
+        }
+    }
+
+    }

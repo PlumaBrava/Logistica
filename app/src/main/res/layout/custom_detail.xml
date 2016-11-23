@@ -1,177 +1,115 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-
-
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginStart="@dimen/custom_cardViewMarginLeft"
-    android:layout_marginLeft="@dimen/custom_cardViewMarginLeft"
-    android:layout_marginEnd="@dimen/custom_cardViewMarginRight"
-    android:layout_marginRight="@dimen/custom_cardViewMarginRight"
-    android:layout_marginTop="@dimen/custom_cardViewtMarginTop"
     android:layout_marginBottom="@dimen/custom_cardViewMarginBottom"
+    android:layout_marginEnd="@dimen/custom_cardViewMarginRight"
+    android:layout_marginLeft="@dimen/custom_cardViewMarginLeft"
+    android:layout_marginRight="@dimen/custom_cardViewMarginRight"
+    android:layout_marginStart="@dimen/custom_cardViewMarginLeft"
+    android:layout_marginTop="@dimen/custom_cardViewtMarginTop"
     android:elevation="@dimen/custom_cardViewElevation"
 
     android:focusable="true"
     android:foreground="?selectableItemBackground">
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
+        android:layout_margin="@dimen/custom_cardViewMarginRight"
         android:orientation="vertical"
         tools:context="com.nextnut.logistica.ProductDetailFragment">
 
-
-
-        <!--Product Name-->
         <LinearLayout
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
             android:orientation="horizontal">
 
 
-            <TextView
+            <!--Custom Photo-->
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?android:attr/titleTextStyle"
-                app:layout_gravity="left"
-                app:layout_columnWeight="1"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:padding="16dp"
-                android:textStyle="bold"
-                android:text="@string/custom_name_text"
-                android:contentDescription="@string/custom_name_text"/>
-            <!--android:singleLine="true"-->
-            <EditText
-                android:id="@+id/custom_name_text"
+                android:layout_height="match_parent"
+                android:layout_margin="16dp"
+                android:orientation="horizontal"
 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_gravity="right"
-                android:contentDescription="@string/custom_name_text"
-                android:transitionName="@string/detail_icon_transition_name"
-                android:padding="8dp"
-                android:inputType="text"
-                android:maxLength="@integer/customNameMaxLength" />
-        </LinearLayout>
-
-        <!--Product LastName-->
-        <LinearLayout
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="?android:attr/titleTextStyle"
-            app:layout_gravity="left"
-            app:layout_columnWeight="1"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:padding="16dp"
-            android:textStyle="bold"
-            android:text="@string/custom_last_text"
-            android:contentDescription="@string/custom_last_text"
-            />
-        <!--android:singleLine="true"-->
-        <EditText
-            android:id="@+id/product_Lastname"
-
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_gravity="right"
-
-            android:transitionName="@string/custom_icon_transition_surname"
-            android:contentDescription="@string/custom_last_text"
-            android:padding="8dp"
-            android:inputType="text"
-            android:maxLength="@integer/customNameMaxLength"/>
+                >
 
 
-    </LinearLayout>
+                <ImageView
+                    android:id="@+id/custom_imagen"
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/custom_photo"
+                    android:maxHeight="104dp"
+                    android:maxWidth="104dp"
+                    android:src="@drawable/com_facebook_profile_picture_blank_square"
+                    android:transitionName="@string/custom_icon_transition_imagen" />
+
+                <com.rey.material.widget.ProgressView
+                    android:id="@+id/progressBarCliente"
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
+                    android:layout_gravity="center"
+                    app:pv_autostart="true"
+                    app:pv_circular="true"
+                    app:pv_progressMode="indeterminate"
+                    app:pv_progressStyle="@style/Material.Drawable.CircularProgress" />
+
+            </LinearLayout>
 
 
-        <!--Custom Photo-->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            <LinearLayout
 
-            <!--Product Photo-->
-            <Button
-                android:id="@+id/custom_imagen_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?android:attr/titleTextStyle"
-                android:text="@string/custom_photo_text"
-                android:contentDescription="@string/custom_photo_text"
-                android:textStyle="bold"
-                app:layout_gravity="left"
-                android:padding="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                />
-
-            <!--android:padding="16dp"-->
-            <!--app:layout_gravity="center"-->
-
-            <ImageView
-                android:id="@+id/custom_imagen"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:maxHeight="96dp"
-                android:maxWidth="96dp"
-                app:layout_gravity="center"
-                android:transitionName="@string/custom_icon_transition_imagen"
-                android:contentDescription="@string/custom_photo"
-                />
+                android:orientation="vertical">
 
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <!--app:counterEnabled="true"-->
+                    <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+                    <EditText
+                        android:id="@+id/custom_name_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/custom_name_text"
+                        android:hint="@string/custom_name_text"
+                        android:inputType="text"
+                        android:maxLength="@integer/customNameMaxLength"
+                        android:padding="8dp"
+                        android:transitionName="@string/detail_icon_transition_name" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <!--app:counterEnabled="true"-->
+                    <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+
+                    <EditText
+                        android:id="@+id/product_Lastname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/custom_last_text"
+                        android:hint="@string/custom_last_text"
+                        android:inputType="text"
+                        android:maxLength="@integer/customNameMaxLength"
+                        android:transitionName="@string/custom_icon_transition_surname" />
+
+                </android.support.design.widget.TextInputLayout>
+
+
+            </LinearLayout>
         </LinearLayout>
-
-
-        <!--Custom Delivey Address-->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?android:attr/titleTextStyle"
-                app:layout_gravity="left"
-                app:layout_columnWeight="1"
-                android:paddingLeft="16dp"
-                android:paddingStart="16dp"
-                android:paddingRight="16dp"
-                android:paddingEnd="16dp"
-
-                android:textStyle="bold"
-                android:contentDescription="@string/custom_delivery_address_text"
-                android:text="@string/custom_delivery_address_text"/>
-            <EditText
-                android:id="@+id/custom_delivery_address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_gravity="left"
-                android:paddingStart="8dp"
-                android:paddingLeft="8dp"
-                android:contentDescription="@string/custom_delivery_address_text"
-                android:maxLength="@integer/customAddressMaxLength"/>
-
-
-        </LinearLayout>
-
         <!--Custom City-->
         <LinearLayout
             android:layout_width="match_parent"
@@ -179,33 +117,52 @@
             android:orientation="horizontal">
 
 
-            <TextView
-                android:layout_width="wrap_content"
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="?android:attr/titleTextStyle"
-                app:layout_gravity="left"
-                app:layout_columnWeight="1"
-                android:paddingLeft="16dp"
-                android:paddingStart="16dp"
-                android:paddingRight="16dp"
-                android:paddingEnd="16dp"
+                android:layout_margin="16dp">
 
-                android:textStyle="bold"
-                android:text="@string/custom_city_text"
-                android:contentDescription="@string/custom_city_text"/>
-            <EditText
-                android:id="@+id/custom_city"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_gravity="left"
-                android:paddingStart="8dp"
-                android:paddingLeft="8dp"
-                android:contentDescription="@string/custom_city_hint_text"
-                android:maxLength="@integer/customCityMaxLength"
-                />
-
+                <EditText
+                    android:id="@+id/custom_city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/custom_city_hint_text"
+                    android:hint="@string/custom_city_hint_text"
+                    android:inputType="text"
+                    android:maxLength="@integer/customCityMaxLength"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+            </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
+
+        <!--Custom Delivey Address-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/custom_delivery_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/custom_delivery_address_text"
+                    android:hint="@string/custom_delivery_address_text"
+                    android:inputType="text"
+                    android:maxLength="@integer/customAddressMaxLength"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
 
         <!--Custom Cuit-->
         <LinearLayout
@@ -213,91 +170,159 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?android:attr/titleTextStyle"
-                app:layout_gravity="left"
-                app:layout_columnWeight="1"
-                android:paddingLeft="16dp"
-                android:paddingStart="16dp"
-                android:paddingRight="16dp"
-                android:paddingEnd="16dp"
-
-                android:textStyle="bold"
-                android:contentDescription="@string/custom_Cuit_text"
-                android:text="@string/custom_Cuit_text"/>
-            <EditText
-                android:id="@+id/custom_cuit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_gravity="left"
-                android:paddingStart="8dp"
-                android:paddingLeft="8dp"
-                android:contentDescription="@string/custom_Cuit_text"
-                android:hint="@string/custom_Cuit_hint_text"
-                android:maxLength="@integer/customCuitMaxLength"
-                android:digits="0,1,2,3,4,5,6,7,8,9,-"
-                android:inputType="text" />
-
-        </LinearLayout>
-
-            <!--Custom IVA-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="?android:attr/titleTextStyle"
-                    app:layout_gravity="left"
-                    app:layout_columnWeight="1"
-                    android:paddingLeft="16dp"
-                    android:paddingStart="16dp"
-                    android:paddingRight="16dp"
-                    android:paddingEnd="16dp"
-
-                    android:textStyle="bold"
-                    android:contentDescription="@string/custom_IVA_text"
-                    android:text="@string/custom_IVA_text"/>
-                <EditText
-                    android:id="@+id/custom_iva"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_gravity="left"
-                    android:paddingLeft="8dp"
-                    android:paddingStart="8dp"
-                    android:hint="@string/custom_IVA_hint_text"
-                    android:contentDescription="@string/custom_IVA_text"
-                    android:maxLength="@integer/customIvaMaxLength"
-
-                    android:inputType="number" />
-            </LinearLayout>
-
-            <!--Custom Special-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-            <CheckBox
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="start"
-                android:text="@string/custom_Special_text"
+                android:layout_weight="3"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/custom_cuit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/custom_Cuit_text"
+                    android:digits="0,1,2,3,4,5,6,7,8,9,-,'\n'"
+                    android:hint="@string/custom_Cuit_hint_text"
+                    android:inputType="text"
+                    android:maxLength="@integer/customCuitMaxLength"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <com.rey.material.widget.CheckBox
                 android:id="@+id/custom_special"
-                android:contentDescription="@string/custom_Special_text"
-                android:layout_weight="1"/>
+                style="@style/Material.Drawable.CheckBox"
+                android:layout_width="wrap_content"
+
+                android:layout_height="match_parent"
+                android:paddingEnd="8dp"
+                android:paddingRight="8dp"
+                android:text="@string/custom_Special_text" />
+
+        </LinearLayout>
+        <!--Custom IVA-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
 
-            </LinearLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/custom_iva"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/custom_IVA_text"
+                    android:hint="@string/custom_IVA_hint_text"
+                    android:inputType="numberDecimal"
+                    android:maxLength="@integer/customIvaMaxLength"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+
+                    app:layout_gravity="left" />
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:orientation="horizontal"
+            android:layout_margin="16dp">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/tipoTelefonoCliente"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:contentDescription="@string/custom_NumeroTelefono_text"
+                    android:hint="@string/custom_TipoTelefono_text"
+                    android:inputType="text"
+                    android:maxLength="@integer/customMaxTipoTelefono"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/telefonoCliente"
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+
+                    android:contentDescription="@string/custom_NumeroTelefono_text"
+                    android:hint="@string/custom_NumeroTelefono_text"
+                    android:inputType="phone"
+
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+
+                android:orientation="vertical">
+
+                <com.rey.material.widget.Button
+                    android:id="@+id/botonAgregarTelefono"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="@string/custom_AgregarTelefono_text"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/custom_imagen_button"
+                    style="?android:attr/titleTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/custom_photo_text"
+                    android:text="@string/custom_agenda_text"
+                    android:textStyle="bold"
+                    app:layout_gravity="left" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_margin="16dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listaTelefonos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp">
+
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+    </LinearLayout>
 
 
 </android.support.v7.widget.CardView>

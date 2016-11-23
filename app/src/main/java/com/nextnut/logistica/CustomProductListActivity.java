@@ -15,11 +15,11 @@ import android.view.View;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
-import com.nextnut.logistica.modelos.Cliente;
+import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
-import com.nextnut.logistica.viewholder.ClienteViewHolder;
+import com.nextnut.logistica.viewholder.ProductViewHolder;
 
-import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
 
 /**
  * An activity representing a list of Customs. This activity
@@ -29,22 +29,22 @@ import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class CustomListActivity extends ActivityBasic {
+public class CustomProductListActivity extends ActivityBasic {
 
-
-    private FirebaseRecyclerAdapter<Cliente, ClienteViewHolder> mAdapter;
+//    private CustomsCursorAdapter mCursorAdapter;
+    private FirebaseRecyclerAdapter<Producto, ProductViewHolder> mAdapter;
     private ItemTouchHelper mItemTouchHelper;
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_save;
     private FloatingActionButton fab_delete;
-
+    private static final int CURSOR_LOADER_ID = 0;
     private long mItem = 0;
 
 
     private RecyclerView mRecyclerView;
+    private LinearLayoutManager mManager;
 
-
-    private static final String LOG_TAG = CustomListActivity.class.getSimpleName();
+    private static final String LOG_TAG = CustomProductListActivity.class.getSimpleName();
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -57,15 +57,15 @@ public class CustomListActivity extends ActivityBasic {
         setContentView(R.layout.activity_custom_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
+//        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
 
-        Log.i("ClienteViewHolder", "mPerfil" + mPerfil.getClientes());
-        Log.i("ClienteViewHolder", "mEmpresaKey" + mEmpresaKey);
-        Log.i("ClienteViewHolder", "mEmpresa" + mEmpresa.getNombre());
+        Log.i("ClienteViewHolder", "Custom Producto mPerfil" + mPerfil.getClientes());
+        Log.i("ClienteViewHolder", "Custom Producto  mEmpresaKey" + mEmpresaKey);
+        Log.i("ClienteViewHolder", "Custom Producto mEmpresa" + mEmpresa.getNombre());
 
         final View emptyView = findViewById(R.id.recyclerview_custom_empty);
         mRecyclerView = (RecyclerView) findViewById(R.id.custom_list_recyclerView);
@@ -132,14 +132,14 @@ public class CustomListActivity extends ActivityBasic {
         }
 
         // Set up FirebaseRecyclerAdapter with the Query
-        Query clientesQuery = getQuery(mDatabase);
-        mAdapter = new FirebaseRecyclerAdapter<Cliente, ClienteViewHolder>(Cliente.class, R.layout.custom_list_item,
-                ClienteViewHolder.class, clientesQuery) {
+        Query clientesPQuery = getQuery(mDatabase);
+        mAdapter = new FirebaseRecyclerAdapter<Producto, ProductViewHolder>(Producto.class, R.layout.product_list_item,
+                ProductViewHolder.class, clientesPQuery) {
             @Override
-            protected void populateViewHolder(final ClienteViewHolder viewHolder, final Cliente model, final int position) {
+            protected void populateViewHolder(final ProductViewHolder viewHolder, final Producto model, final int position) {
                 final DatabaseReference postRef = getRef(position);
                 emptyView.setVisibility(View.GONE);
-                Log.i("ClienteViewHolder", "populateViewHolder(postRef)" + postRef.toString());
+                Log.i("ClienteViewHolder", "CustomProduct populateViewHolder(postRef)" + postRef.toString());
 
                 // Set click listener for the whole post view
                 final String customKey = postRef.getKey();
@@ -151,6 +151,7 @@ public class CustomListActivity extends ActivityBasic {
                                                                if (mTwoPane) {
                                                                    mClienteKey=customKey;
                                                                    Bundle arguments = putBundleFirebase();
+
                                                                    mClienteKey=null;
                                                                    // when rotate the screen the selecction of the second Screen is conserved.
 //                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
@@ -158,11 +159,11 @@ public class CustomListActivity extends ActivityBasic {
 //                                                                   arguments.putString(EXTRA_CLIENTE_KEY, customKey);
 //                                                                   arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
 
-                                                                   CustomDetailFragment fragment = new CustomDetailFragment();
+                                                                   ProductDetailFragment fragment = new ProductDetailFragment();
                                                                    fragment.setArguments(arguments);
                                                                    getSupportFragmentManager().beginTransaction()
                                                                            .addToBackStack(null)
-                                                                           .replace(R.id.custom_detail_container, fragment)
+                                                                           .replace(R.id.product_detail_container, fragment)
                                                                            .commit();
 
                                                                    fab_new.setVisibility(View.GONE);
@@ -209,7 +210,7 @@ public class CustomListActivity extends ActivityBasic {
             // activity should be in two-pane mode.
             mTwoPane = true;
 
-            Bundle arguments = putBundleFirebase();
+            Bundle arguments =  putBundleFirebase();
 //            arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);// Fragmet load de last ID.
 //            arguments.putInt(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_DOUBLE_SCREEN);
             CustomDetailFragment fragment = new CustomDetailFragment();
@@ -324,9 +325,7 @@ public class CustomListActivity extends ActivityBasic {
 
 
     public Query getQuery(DatabaseReference databaseReference) {
-        return databaseReference.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey);
+        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey);
     }
-
-
 
 }

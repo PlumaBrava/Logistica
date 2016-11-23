@@ -25,7 +25,7 @@
 
 <android.support.v7.widget.RecyclerView
     android:id="@+id/custom_list_recyclerView"
-    android:name="com.nextnut.logistica.CustomListFragment"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="16dp"
@@ -35,3 +35,4 @@
     tools:listitem="@layout/custom_list_item"  />
 
     </LinearLayout>
+    <!--android:name="com.nextnut.logistica.CustomListFragment"-->

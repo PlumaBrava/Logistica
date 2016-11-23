@@ -11,14 +11,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -45,12 +44,15 @@ import com.nextnut.logistica.util.BoolIntConverter;
 import com.nextnut.logistica.util.CurrencyToDouble;
 import com.nextnut.logistica.util.ProductSectionActivity;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
 
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
@@ -61,7 +63,7 @@ import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
  * in two-pane mode (on tablets) or a {@link CustomOrderDetailActivity}
  * on handsets.
  */
-public class CustomOrderDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CustomOrderDetailFragment extends FragmentBasic {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -102,6 +104,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     //    private TextView mCustomId;
 //    private Spinner mSpinner;
 //    CustomAdapter mSpinnerAdapter;
+
     private TextView mOrderNumber;
     private TextView mCustomName;
     private TextView mLastName;
@@ -110,20 +113,17 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     private TextView mCuit;
     private TextView mIva;
     private Double mIvaCalculo;
-
+    String mCurrentPhotoPath = null;
+    private CheckBox mIsSpecialCustom;
 
     public TextView mCantidadTotal;
     public TextView mMontoTotal;
     public TextView mMontoTotalDelivey;
 
-    String mCurrentPhotoPath = null;
-    private CheckBox mIsSpecialCustom;
-
 
     private Button mBotonSeleccionCliente;
 
     private int mAction;
-
 
 
     // This paramenter is use the define the acction we need to do.
@@ -184,49 +184,54 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
     }
 
-
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        switch (mAction) {
-            case CUSTOM_ORDER_NEW: // Go to the last order
-                getLoaderManager().initLoader(CUSTOM_LOADER_NEW, null, this);
-                break;
-
-            case CUSTOM_ORDER_SELECTION: // Go to the mItem order.
-                getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
-                getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-                break;
-            case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
-                getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
-                getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-//                openButton.setVisibility(View.VISIBLE);
-//                sendButton.setVisibility(View.VISIBLE);
-                break;
-            default:
-                break;
-        }
-        super.onActivityCreated(savedInstanceState);
+    public void savePhoto(Bitmap bitmap) {
 
     }
 
+
+//    @Override
+//    public void onActivityCreated(Bundle savedInstanceState) {
+//        switch (mAction) {
+//            case CUSTOM_ORDER_NEW: // Go to the last order
+//                getLoaderManager().initLoader(CUSTOM_LOADER_NEW, null, this);
+//                break;
+//
+//            case CUSTOM_ORDER_SELECTION: // Go to the mItem order.
+//                getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
+//                getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
+//                break;
+//            case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
+//                getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
+//                getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
+////                openButton.setVisibility(View.VISIBLE);
+////                sendButton.setVisibility(View.VISIBLE);
+//                break;
+//            default:
+//                break;
+//        }
+//        super.onActivityCreated(savedInstanceState);
+//
+//    }
+
     @Override
     public void onResume() {
-        switch (mAction) {
-            case CUSTOM_ORDER_NEW: // Go to the last order
-                getLoaderManager().restartLoader(CUSTOM_LOADER_NEW, null, this);
-                break;
-
-            case CUSTOM_ORDER_SELECTION: // Go to the mItem order.
-                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
-                getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-                break;
-            case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
-                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
-                getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-                break;
-            default:
-                break;
-        }
+//        switch (mAction) {
+//            case CUSTOM_ORDER_NEW: // Go to the last order
+//                getLoaderManager().restartLoader(CUSTOM_LOADER_NEW, null, this);
+//                break;
+//
+//            case CUSTOM_ORDER_SELECTION: // Go to the mItem order.
+//                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
+//                getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
+//                break;
+//            case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
+//                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
+//                getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
+//                break;
+//            default:
+//                break;
+//        }
 
         super.onResume();
     }
@@ -260,9 +265,27 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         openButton.setVisibility(View.GONE);
         sendButton.setVisibility(View.GONE);
         // open bluetooth connection
+        openButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    findBT();
+                    openBT();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
-
-
+        // send data typed by the user to be printed
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    sendData();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         mOrderNumber = (TextView) mRootView.findViewById(R.id.orderNumber);
         mBotonSeleccionCliente = (Button) mRootView.findViewById(R.id.botonSelecionCliente);
@@ -290,6 +313,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             public void onClick(View view) {
 
                 Intent intent = new Intent(getContext(), CustomSelectionActivity.class);
+                putExtraFirebase_Fragment(intent);
                 getActivity().startActivityForResult(intent, UPDATE_CUSTOMER);
             }
 
@@ -301,7 +325,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             public void onClick(View view) {
 
                 Intent intent = new Intent(getContext(), ProductSectionActivity.class);
-                intent.putExtra("ITEM",mItem);
+                intent.putExtra("ITEM", mItem);
                 getActivity().startActivityForResult(intent, REQUEST_PRODUCT);
 
             }
@@ -412,8 +436,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
                 } catch (RemoteException | OperationApplicationException e) {
 
                 } finally {
-                    getLoaderManager().restartLoader(PRODUCTS_LOADER, null, CustomOrderDetailFragment.this);
-                    getLoaderManager().restartLoader(TOTALES_LOADER, null, CustomOrderDetailFragment.this);
+//                    getLoaderManager().restartLoader(PRODUCTS_LOADER, null, CustomOrderDetailFragment.this);
+//                    getLoaderManager().restartLoader(TOTALES_LOADER, null, CustomOrderDetailFragment.this);
                     mAdapter.notifyDataSetChanged();
                 }
 
@@ -435,6 +459,24 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
 
         return mRootView;
     }
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mOrderNumber.setText("Definir Nro");
+        mCustomName.setText(mCliente.getNombre());
+        mLastName.setText(mCliente.getApellido());
+        mDeliveyAddress.setText(mCliente.getDireccionDeEntrega());
+        mCity.setText(mCliente.getCiudad());
+        mCuit.setText(mCliente.getCuit());
+        mIva.setText(Double.toString(mCliente.getIva()));
+        mIvaCalculo = mCliente.getIva();
+        mCurrentPhotoPath = null;
+        mIsSpecialCustom.setChecked(mCliente.getEspecial());
+
+    }
+
 
     public void showDialogNumberPicker(final OrderDetailCursorAdapter.ViewHolder vh) {
 
@@ -504,248 +546,250 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
     }
 
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        switch (id) {
+//    @Override
+//    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+//        switch (id) {
+//
+//
+//            case CUSTOM_ORDER_LOADER:
+//
+//
+//    /*0*/
+//                String proyection[] = {LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
+//    /*1*/                    LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
+//    /*2*/                    LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
+//    /*3*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+//    /*4*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+//    /*5*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIIVERY_ADDRES_CUSTOM,
+//    /*6*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIVERY_CITY_CUSTOM,
+//    /*7*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.IMAGEN_CUSTOM,
+//    /*8*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.SPECIAL_CUSTOM,
+//    /*9*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.CUIT_CUSTOM,
+//    /*10*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.IVA_CUSTOM
+//                };
+//
+//
+//                return new CursorLoader(
+//                        getActivity(),
+//                        LogisticaProvider.ShowJoin.CONTENT_URI,
+//                        proyection,
+//                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER + "=" + mItem,
+//                        null,
+//                        null);
+//
+//            case CUSTOM_LOADER_NEW:
+//
+//
+///* 0 */
+//                String proyection1[] = {LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
+///* 1 */                      LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
+///* 2 */                      LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
+///* 3 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+///* 4 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+///* 5 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIIVERY_ADDRES_CUSTOM,
+///* 6 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIVERY_CITY_CUSTOM,
+///* 7 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.IMAGEN_CUSTOM,
+///* 8 */                      LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER,
+///* 9 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.SPECIAL_CUSTOM,
+///* 10 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.CUIT_CUSTOM,
+///* 11 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.IVA_CUSTOM,
+//                };
+//
+//
+//                return new CursorLoader(
+//                        getActivity(),
+//                        LogisticaProvider.ShowJoin.CONTENT_URI,
+//                        proyection1,
+//                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + "=" + CustomOrderDetailFragment.STATUS_ORDER_INICIAL,
+//                        null,
+//                        null);
+//
+//
+//            case PRODUCTS_LOADER:
+//
+//                String proyection2[] = {
+//       /* 0 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL,
+//       /* 1 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL,
+//       /* 2 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL,
+//       /* 3 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL,
+//       /* 4 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL,
+//       /* 5 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL,
+//       /* 6 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL,
+//       /* 7 */                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
+//       /* 8 */                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
+//       /* 9 */                LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
+//       /* 10 */               LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL,
+//
+//
+//                };
+//
+//                return new CursorLoader(
+//                        getActivity(),
+//                        LogisticaProvider.join_Product_Detail_order.CONTENT_URI,
+//                        proyection2,
+//                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL + "=" + mItem,
+//                        null,
+//                        null);
+//
+//            case TOTALES_LOADER:
+//
+//                String proyection3[] = {
+//        /* 0 */   "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " * " +
+//                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL + " ) ",
+//
+//       /* 1 */    "count(" + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL + " )",
+//      /* 2 */   "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL + " * " +
+//                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL + " ) "
+//
+//                };
+//
+//                return new CursorLoader(
+//
+//                        getActivity(),
+//                        LogisticaProvider.CustomOrdersDetail.CONTENT_URI,
+//                        proyection3,
+//                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL + "=" + mItem,
+//                        null,
+//                        null);
+//
+//            default:
+//                return null;
+//
+//        }
+//
+//    }
 
-
-            case CUSTOM_ORDER_LOADER:
-
-
-    /*0*/
-                String proyection[] = {LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
-    /*1*/                    LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
-    /*2*/                    LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
-    /*3*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
-    /*4*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
-    /*5*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIIVERY_ADDRES_CUSTOM,
-    /*6*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIVERY_CITY_CUSTOM,
-    /*7*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.IMAGEN_CUSTOM,
-    /*8*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.SPECIAL_CUSTOM,
-    /*9*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.CUIT_CUSTOM,
-    /*10*/                    LogisticaDataBase.CUSTOMS + "." + CustomColumns.IVA_CUSTOM
-                };
-
-
-                return new CursorLoader(
-                        getActivity(),
-                        LogisticaProvider.ShowJoin.CONTENT_URI,
-                        proyection,
-                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER + "=" + mItem,
-                        null,
-                        null);
-
-            case CUSTOM_LOADER_NEW:
-
-
-/* 0 */
-                String proyection1[] = {LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
-/* 1 */                      LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
-/* 2 */                      LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
-/* 3 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
-/* 4 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
-/* 5 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIIVERY_ADDRES_CUSTOM,
-/* 6 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.DELIVERY_CITY_CUSTOM,
-/* 7 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.IMAGEN_CUSTOM,
-/* 8 */                      LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER,
-/* 9 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.SPECIAL_CUSTOM,
-/* 10 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.CUIT_CUSTOM,
-/* 11 */                      LogisticaDataBase.CUSTOMS + "." + CustomColumns.IVA_CUSTOM,
-                };
-
-
-                return new CursorLoader(
-                        getActivity(),
-                        LogisticaProvider.ShowJoin.CONTENT_URI,
-                        proyection1,
-                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + "=" + CustomOrderDetailFragment.STATUS_ORDER_INICIAL,
-                        null,
-                        null);
-
-
-            case PRODUCTS_LOADER:
-
-                String proyection2[] = {
-       /* 0 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL,
-       /* 1 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL,
-       /* 2 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL,
-       /* 3 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL,
-       /* 4 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL,
-       /* 5 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL,
-       /* 6 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL,
-       /* 7 */                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
-       /* 8 */                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
-       /* 9 */                LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
-       /* 10 */               LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL,
-
-
-                };
-
-                return new CursorLoader(
-                        getActivity(),
-                        LogisticaProvider.join_Product_Detail_order.CONTENT_URI,
-                        proyection2,
-                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL + "=" + mItem,
-                        null,
-                        null);
-
-            case TOTALES_LOADER:
-
-                String proyection3[] = {
-        /* 0 */   "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " * " +
-                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL + " ) ",
-
-       /* 1 */    "count(" + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL + " )",
-      /* 2 */   "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL + " * " +
-                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL + " ) "
-
-                };
-
-                return new CursorLoader(
-
-                        getActivity(),
-                        LogisticaProvider.CustomOrdersDetail.CONTENT_URI,
-                        proyection3,
-                        LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL + "=" + mItem,
-                        null,
-                        null);
-
-            default:
-                return null;
-
-        }
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-            case CUSTOM_LOADER_NEW:
-                if (data != null && data.moveToLast()) {
-
-                    mItem = data.getLong(8);
-                    mOrderNumber.setText(Long.toString(mItem));
-                    mBotonSeleccionCliente.setVisibility(View.VISIBLE);
-                    mCustomRef = data.getLong(0);
-                    mCustomName.setText(data.getString(3));
-                    mLastName.setText(data.getString(4));
-                    mDeliveyAddress.setText(data.getString(5));
-                    mCity.setText(data.getString(6));
-                    mCurrentPhotoPath = data.getString(7);
-                    mIsSpecialCustom.setChecked(data.getInt(9) > 0);
-                    mCuit.setText(data.getString(10));
-                    mIva.setText(data.getString(11));
-                    mIvaCalculo = data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
-
-                    if (appBarLayout != null) {
-
-                        appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + data.getLong(8));
-
-                    }
-
-                    String where =
-                            LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER + " = " + mCustomRef + " and " +
-                                    LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL + " = 1 ";
-
-                    Cursor c = getActivity().getContentResolver().query(LogisticaProvider.join_customorderDetail_Product_Customer.CONTENT_URI,
-                            null,
-                            where,
-                            null,
-                            null, null);
-
-
-                    if (c != null && c.getCount() > 0) {
-                        c.moveToFirst();
-                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(c.getCount());
-
-                        do {
-
-                            ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrdersDetail.CONTENT_URI);
-                            builder.withValue(CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL, data.getLong(8));
-                            builder.withValue(CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL, c.getLong(c.getColumnIndex(CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL)));
-                            builder.withValue(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL, c.getLong(c.getColumnIndex(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL)));
-                            builder.withValue(CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL, c.getDouble(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
-                            builder.withValue(CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL, c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
-                            batchOperations.add(builder.build());
-                        } while (c.moveToNext());
-                        try {
-                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-                        } catch (RemoteException | OperationApplicationException e) {
-                        } finally {
-                            getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-                            mAdapter.notifyDataSetChanged();
-                        }
-
-                        getLoaderManager().initLoader(TOTALES_LOADER, null, this);
-                    }
-                } else {
-                    mRootView.setVisibility(View.GONE);
-                }
-                break;
-
-            case CUSTOM_ORDER_LOADER:
-                if (data != null && data.moveToFirst()) {
-                    mOrderNumber.setText(Long.toString(mItem));
-                    mBotonSeleccionCliente.setVisibility(View.VISIBLE);
-                    mCustomRef = data.getLong(0);
-                    mCustomName.setText(data.getString(3));
-                    mLastName.setText(data.getString(4));
-                    mDeliveyAddress.setText(data.getString(5));
-                    mCity.setText(data.getString(6));
-                    mCurrentPhotoPath = data.getString(7);
-                    mIsSpecialCustom.setChecked(data.getInt(8) > 0);
-                    if (appBarLayout != null) {
-                        appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + mItem);
-                    }
-                    mCuit.setText(data.getString(9));
-                    mIva.setText(data.getString(10));
-                    mIvaCalculo = data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
-                    getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
-                }
-                break;
-
-            case PRODUCTS_LOADER:
-                if (data != null && data.moveToFirst()) {
-
-                    mCursorTotales = data;
-                }
-                mAdapter.swapCursor(data);
-
-                break;
-
-            case TOTALES_LOADER:
-                if (data != null && data.moveToFirst()) {
-                    NumberFormat format = NumberFormat.getCurrencyInstance();
-                    mCantidadTotal.setText(getResources().getString(R.string.TotalCantidad) + Integer.toString(data.getInt(1)));
-                    if (mIsSpecialCustom.isChecked()) {
-                        mIvaCalculo = 0.0;
-                    }
-                    mMontoTotal.setText(getResources().getString(R.string.MontoTotal) + format.format(data.getDouble(0)) + "-" +
-                            format.format(data.getDouble(0) * (1 + mIvaCalculo / 100)));
-
-
-                    mMontoTotalDelivey.setText(getResources().getString(R.string.MontoTotalDelivey) + format.format(data.getDouble(2)) + "-" +
-                            format.format(data.getDouble(2) * (1 + mIvaCalculo / 100)));
-                    do {
-                        saveTotalPrice(data.getDouble(0) * (1 + mIvaCalculo / 100));
-                        if (mAction == CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY) {
-                            saveTotalPrice(data.getDouble(2) * (1 + mIvaCalculo / 100));
-                        }
-
-                    } while (data.moveToNext());
-
-
-                }
-
-                break;
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.swapCursor(null);
-
-    }
+//    @Override
+//    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+//        switch (loader.getId()) {
+//            case CUSTOM_LOADER_NEW:
+//                if (data != null && data.moveToLast()) {
+//
+//                    mItem = data.getLong(8);
+//                    mOrderNumber.setText(Long.toString(mItem));
+//                    mBotonSeleccionCliente.setVisibility(View.VISIBLE);
+//                    mCustomRef = data.getLong(0);
+//                    mCustomName.setText(data.getString(3));
+//                    mLastName.setText(data.getString(4));
+//                    mDeliveyAddress.setText(data.getString(5));
+//                    mCity.setText(data.getString(6));
+//                    mCurrentPhotoPath = data.getString(7);
+//                    mIsSpecialCustom.setChecked(data.getInt(9) > 0);
+//                    mCuit.setText(data.getString(10));
+//                    mIva.setText(data.getString(11));
+//                    mIvaCalculo = data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
+//
+//                    if (appBarLayout != null) {
+//
+//                        appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + data.getLong(8));
+//
+//                    }
+//
+//
+//                    /// Carga de los FAvoritos
+//                    String where =
+//                            LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER + " = " + mCustomRef + " and " +
+//                                    LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL + " = 1 ";
+//
+//                    Cursor c = getActivity().getContentResolver().query(LogisticaProvider.join_customorderDetail_Product_Customer.CONTENT_URI,
+//                            null,
+//                            where,
+//                            null,
+//                            null, null);
+//
+//
+//                    if (c != null && c.getCount() > 0) {
+//                        c.moveToFirst();
+//                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(c.getCount());
+//
+//                        do {
+//
+//                            ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrdersDetail.CONTENT_URI);
+//                            builder.withValue(CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL, data.getLong(8));
+//                            builder.withValue(CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL, c.getLong(c.getColumnIndex(CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL)));
+//                            builder.withValue(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL, c.getLong(c.getColumnIndex(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL)));
+//                            builder.withValue(CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL, c.getDouble(c.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)));
+//                            builder.withValue(CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL, c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)));
+//                            batchOperations.add(builder.build());
+//                        } while (c.moveToNext());
+//                        try {
+//                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//                        } catch (RemoteException | OperationApplicationException e) {
+//                        } finally {
+//                            getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
+//                            mAdapter.notifyDataSetChanged();
+//                        }
+//
+//                        getLoaderManager().initLoader(TOTALES_LOADER, null, this);
+//                    }
+//                } else {
+//                    mRootView.setVisibility(View.GONE);
+//                }
+//                break;
+//
+//            case CUSTOM_ORDER_LOADER:
+//                if (data != null && data.moveToFirst()) {
+//                    mOrderNumber.setText(Long.toString(mItem));
+//                    mBotonSeleccionCliente.setVisibility(View.VISIBLE);
+//                    mCustomRef = data.getLong(0);
+//                    mCustomName.setText(data.getString(3));
+//                    mLastName.setText(data.getString(4));
+//                    mDeliveyAddress.setText(data.getString(5));
+//                    mCity.setText(data.getString(6));
+//                    mCurrentPhotoPath = data.getString(7);
+//                    mIsSpecialCustom.setChecked(data.getInt(8) > 0);
+//                    if (appBarLayout != null) {
+//                        appBarLayout.setTitle(getResources().getString(R.string.title_Order_Number) + mItem);
+//                    }
+//                    mCuit.setText(data.getString(9));
+//                    mIva.setText(data.getString(10));
+//                    mIvaCalculo = data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM));
+//                    getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
+//                }
+//                break;
+//
+//            case PRODUCTS_LOADER:
+//                if (data != null && data.moveToFirst()) {
+//
+//                    mCursorTotales = data;
+//                }
+//                mAdapter.swapCursor(data);
+//
+//                break;
+//
+//            case TOTALES_LOADER:
+//                if (data != null && data.moveToFirst()) {
+//                    NumberFormat format = NumberFormat.getCurrencyInstance();
+//                    mCantidadTotal.setText(getResources().getString(R.string.TotalCantidad) + Integer.toString(data.getInt(1)));
+//                    if (mIsSpecialCustom.isChecked()) {
+//                        mIvaCalculo = 0.0;
+//                    }
+//                    mMontoTotal.setText(getResources().getString(R.string.MontoTotal) + format.format(data.getDouble(0)) + "-" +
+//                            format.format(data.getDouble(0) * (1 + mIvaCalculo / 100)));
+//
+//
+//                    mMontoTotalDelivey.setText(getResources().getString(R.string.MontoTotalDelivey) + format.format(data.getDouble(2)) + "-" +
+//                            format.format(data.getDouble(2) * (1 + mIvaCalculo / 100)));
+//                    do {
+//                        saveTotalPrice(data.getDouble(0) * (1 + mIvaCalculo / 100));
+//                        if (mAction == CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY) {
+//                            saveTotalPrice(data.getDouble(2) * (1 + mIvaCalculo / 100));
+//                        }
+//
+//                    } while (data.moveToNext());
+//
+//
+//                }
+//
+//                break;
+//        }
+//    }
+//
+//    @Override
+//    public void onLoaderReset(Loader<Cursor> loader) {
+//        mAdapter.swapCursor(null);
+//
+//    }
 
     public void saveTotalPrice(double totalPrice) {
         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
@@ -868,7 +912,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
         } catch (RemoteException | OperationApplicationException e) {
         } finally {
-            getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
+//            getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
         }
 
 
@@ -890,8 +934,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         try {
 
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
+//            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
+//            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
             mAdapter.notifyDataSetChanged();
 
         } catch (RemoteException | OperationApplicationException e) {
@@ -916,8 +960,8 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         }
         try {
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
-            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
+//            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
+//            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
         } catch (RemoteException | OperationApplicationException e) {
             Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
         }
@@ -938,7 +982,7 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         try {
 
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-            getLoaderManager().initLoader(TOTALES_LOADER, null, this);
+//            getLoaderManager().initLoader(TOTALES_LOADER, null, this);
         } catch (RemoteException | OperationApplicationException e) {
             Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
         }
@@ -956,13 +1000,396 @@ public class CustomOrderDetailFragment extends Fragment implements LoaderManager
         }
         try {
             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
+//            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
         } catch (RemoteException | OperationApplicationException e) {
         }
 
     }
 
 
+    // this will find a bluetooth printer device
+    void findBT() {
 
+        try {
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+            if (mBluetoothAdapter == null) {
+//                myLabel.setText("No bluetooth adapter available");
+            }
+
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBluetooth, 0);
+            }
+
+            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            Log.i("zebra22", "size:" + pairedDevices.size());
+            if (pairedDevices.size() > 0) {
+                for (BluetoothDevice device : pairedDevices) {
+
+                    // RPP300 is the name of the bluetooth printer device
+                    // we got this name from the list of paired devices
+                    Log.i("zebra22", "name:" + device.getName());
+                    Log.i("zebra22", "getAddress():" + device.getAddress());
+                    Log.i("zebra22", "describeContents():" + device.describeContents());
+                    Log.i("zebra22", "BondState():" + device.getBondState());
+
+                    if (device.getName().equals("XXXXJ154501680")) {
+
+                        mmDevice = device;
+                        sendButton.setBackgroundColor(Color.BLUE);
+                        break;
+                    }
+                }
+            }
+
+//            myLabel.setText("Bluetooth device found.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // tries to open a connection to the bluetooth printer device
+    void openBT() throws IOException {
+        try {
+
+            // Standard SerialPortService ID
+            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+            mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
+            mmSocket.connect();
+            mmOutputStream = mmSocket.getOutputStream();
+            mmInputStream = mmSocket.getInputStream();
+
+            beginListenForData();
+            Log.i("zebra22", "openBT() :");
+//            myLabel.setText("Bluetooth Opened");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+ * after opening a connection to bluetooth printer device,
+ * we have to listen and check if a data were sent to be printed.
+ */
+    void beginListenForData() {
+        try {
+            final Handler handler = new Handler();
+            Log.i("zebra22", "beginListenForDat :");
+            // this is the ASCII code for a newline character
+            final byte delimiter = 10;
+
+            stopWorker = false;
+            readBufferPosition = 0;
+            readBuffer = new byte[1024];
+
+            workerThread = new Thread(new Runnable() {
+                public void run() {
+
+                    while (!Thread.currentThread().isInterrupted() && !stopWorker) {
+
+                        try {
+
+                            int bytesAvailable = mmInputStream.available();
+
+                            if (bytesAvailable > 0) {
+                                Log.i("zebra22", "beginListenForDat a:bytesAvailable > 0: " + bytesAvailable);
+                                byte[] packetBytes = new byte[bytesAvailable];
+                                mmInputStream.read(packetBytes);
+
+                                for (int i = 0; i < bytesAvailable; i++) {
+
+                                    byte b = packetBytes[i];
+                                    Log.i("zebra22", "beginListenForDat b-: " + (char) (b & 0xFF));
+                                    if (b == delimiter) {
+                                        Log.i("zebra22", "beginListenForDat b: " + "enter");
+                                        byte[] encodedBytes = new byte[readBufferPosition];
+                                        System.arraycopy(
+                                                readBuffer, 0,
+                                                encodedBytes, 0,
+                                                encodedBytes.length
+                                        );
+
+                                        // specify US-ASCII encoding
+                                        final String data = new String(encodedBytes, "US-ASCII");
+                                        Log.i("zebra22", "data received1x :");
+                                        Log.i("zebra22", data);
+//                                        Log.i("zebra22","data received1 :"+ data);
+                                        readBufferPosition = 0;
+
+                                        // tell the user data were sent to bluetooth printer device
+                                        handler.post(new Runnable() {
+                                            public void run() {
+//                                                myLabel.setText(data);
+                                                Log.i("zebra22", "data received2 :" + data);
+                                            }
+                                        });
+
+                                    } else {
+                                        readBuffer[readBufferPosition++] = b;
+                                    }
+                                }
+                            }
+//                            Log.i("zebra22","beginListenForDat :bytesAvailable <= 0");
+
+                        } catch (IOException ex) {
+                            Log.i("zebra22", "beginListenForDat :IOException ex");
+                            stopWorker = true;
+                        }
+
+                    }
+                }
+            });
+
+            workerThread.start();
+
+        } catch (Exception e) {
+            Log.i("zebra22", "beginListenForDat :IOException ex function");
+            e.printStackTrace();
+        }
+    }
+
+    // this will send text data to be printed by the bluetooth printer
+    void sendData() throws IOException {
+        try {
+            String msg = null;
+            // the text typed by the user
+//            String msg = myTextbox.getText().toString();
+//            msg += "\n";
+//
+//            mmOutputStream.write(msg.getBytes());
+//
+//              msg="! U1 setvar \"device.languages\" \"zpl\"";
+//            mmOutputStream.write(msg.getBytes());
+////
+//
+//
+//            msg="! U1 getvar \"allcv\"";
+//            msg="! U1 getvar \"device.languages\"";
+//            mmOutputStream.write(msg.getBytes());
+//            msg= "! U1 getvar \"zpl.system_error\"";
+
+            // comienzo de comando
+            msg = "^XA";
+            mmOutputStream.write(msg.getBytes());
+//            msg="^LT000";
+//            mmOutputStream.write(msg.getBytes());
+
+//            msg="^HH"; //return configuration Label
+//            mmOutputStream.write(msg.getBytes());
+
+
+//            msg="~WC"; //print configuration Label
+//            mmOutputStream.write(msg.getBytes());
+
+
+            //Label Legth  in dots 8dots/mm. (203 dpi)
+
+            msg = "^LL600";
+            mmOutputStream.write(msg.getBytes());
+
+
+            // FO x,y- x: margen derecho, y: distancia al origen.
+
+            //  ADN:alto de letra,ancho de letra (letra horizontal- normal)
+            //  ADR:alto de letra,ancho de letra (letra vertical-Mira al Margen )
+            //  ADI:alto de letra,ancho de letra (letra horizontal - Invertida)
+            //  ADB:alto de letra,ancho de letra (letra vertical-Mira al centro de la etiqueta)
+
+            int h = 50;
+            int i = 30;
+
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Orden Nro: " + mItem + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
+            String formattedDate = df.format(new Date());
+
+            msg = "^FO310," + h + "^ADN,24,10^FD" + "feecha:" + formattedDate + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            h = h + i + i;
+            msg = "^FO5," + h + "^ADN,36,20^FD" + mCustomName.getText().toString() + " " + mLastName.getText().toString() + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            h = h + i + i;
+            msg = "^FO5," + h + "^ADN,24,10^FD" + mDeliveyAddress.getText().toString() + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            h = h + i - 5;
+            msg = "^FO5," + h + "^ADN,24,10^FD" + mCity.getText().toString() + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            h = h + i;
+
+            msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + "Producto" + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + "Cantidad" + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + "Precio" + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + "Total" + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            h = h + i;
+            NumberFormat format = NumberFormat.getCurrencyInstance();
+            Double totalOrden = 0.0;
+
+            if (mCursorTotales != null && mCursorTotales.moveToFirst()) {
+                do {
+
+//
+//                String proyection2[] = {
+//       /* 0 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL ,
+//       /* 1 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.REF_PRODUCT_CUSTOM_ORDER_DETAIL ,
+//       /* 2 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.REF_CUSTOM_ORDER_CUSTOM_ORDER_DETAIL ,
+//       /* 3 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL ,
+//       /* 4 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.PRICE_CUSTOM_ORDER_DETAIL ,
+//       /* 5 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL ,
+//       /* 6 */                LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.PRODUCT_NAME_CUSTOM_ORDER_DETAIL ,
+//       /* 7 */                LogisticaDataBase.PRODUCTS+"."+ ProductsColumns.IMAGEN_PRODUCTO ,
+//       /* 8 */                LogisticaDataBase.PRODUCTS+"."+ ProductsColumns.DESCRIPCION_PRODUCTO,
+//       /* 9 */                LogisticaDataBase.CUSTOM_ORDERS+"."+ CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER,
+//       /* 10 */               LogisticaDataBase.CUSTOM_ORDERS_DETAIL+"."+ CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL ,
+
+
+                    String name = mCursorTotales.getString(6);
+                    int cantidad = mCursorTotales.getInt(10);
+                    Double precio = mCursorTotales.getDouble(4);
+                    Double total = precio * cantidad;
+                    totalOrden = totalOrden + total;
+
+
+                    msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + name + "^FS";
+                    mmOutputStream.write(msg.getBytes());
+
+                    msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + cantidad + "^FS";
+                    mmOutputStream.write(msg.getBytes());
+
+                    msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + format.format(precio) + "^FS";
+                    mmOutputStream.write(msg.getBytes());
+
+                    msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + format.format(total) + "^FS";
+                    mmOutputStream.write(msg.getBytes());
+
+
+                    h = h + i;
+                } while (mCursorTotales.moveToNext());
+            }
+
+            h = h + i * 3;
+
+            if (mIvaCalculo > 0) {
+                msg = "^FO5," + h + "^ADN,36,20^FD" + "SubTotal: " + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+
+                msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden) + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                h = h + i + i;
+
+                msg = "^FO5," + h + "^ADN,36,20^FD" + "Iva: " + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden * mIvaCalculo / 100) + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                h = h + i + i;
+
+            }
+
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Total: " + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden * (1 + mIvaCalculo / 100)) + "^FS";
+            mmOutputStream.write(msg.getBytes());
+            // Print a barCode
+//            msg="^B8N,100,Y,N";
+//            mmOutputStream.write(msg.getBytes());
+//
+//            msg="^FD1234567";
+//            mmOutputStream.write(msg.getBytes());
+
+
+//
+//            msg="^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+
+//            This prints a box one wide by one inch long and the thickness of the line is 2 dots.
+////            Width: 1.5 inch; Height: 1 inch; Thickness: 10; Color: default; Rounding: 5
+//            msg="^FO0,0^GB300,200,10,,5^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+
+////            Line. horizontal
+//            msg="^^FO50,300^GB400,1,4,^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+//            //            Print a vertical line.
+//            msg="^FO100,50^GB1,400,4^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+
+            // Imprime en inversa.
+
+//            msg="^PR1";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO100,100";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^GB70,70,70,,3^FS";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO200,100";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^GB70,70,70,,3^FS";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO300,100";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^GB70,70,70,,3^FS";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO400,100";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^GB70,70,70,,3^FS";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO107,110^CF0,70,93";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FR^FDREVERSE^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+
+            // Fin  de comando
+
+            msg = "^XZ";
+            mmOutputStream.write(msg.getBytes());
+
+//            msg="^FD";
+//            mmOutputStream.write(msg.getBytes());
+
+            // tell the user data were sent
+//            myLabel.setText("Data sent.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // close the connection to bluetooth printer.
+    void closeBT() throws IOException {
+        try {
+            stopWorker = true;
+            mmOutputStream.close();
+            mmInputStream.close();
+            mmSocket.close();
+//            myLabel.setText("Bluetooth Closed");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

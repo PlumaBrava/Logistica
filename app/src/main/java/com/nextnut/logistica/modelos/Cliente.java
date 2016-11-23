@@ -22,17 +22,28 @@ public class Cliente implements Parcelable {
     private String fotoCliente;
     private String direccionDeEntrega;
     private String ciudad;
-    private long iva;
+    private double iva;
     private String cuit;
     private Boolean especial;
     private long fechaModificacion;
+    private Map<String, String> telefonos= new HashMap<>();;
     private String uid;
+
+    public Map<String, String> getTelefonos() {
+        return telefonos;
+    }
+
+    public void setTelefonos(Map<String, String> telefonos) {
+        this.telefonos = telefonos;
+    }
+
+
 
     public Cliente() {
         // Default constructor required for calls to DataSnapshot.getValue(Cliente.class)
     }
 
-    public Cliente(String uid,String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, long iva, String cuit, Boolean especial) {
+    public Cliente(String uid,String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, double iva, String cuit, Boolean especial,Map<String, String> telefonos) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -43,6 +54,7 @@ public class Cliente implements Parcelable {
         this.cuit = cuit;
         this.especial = especial;
         this.uid = uid;
+        this.telefonos =telefonos;
     }
 
     // [START post_to_map]
@@ -59,6 +71,7 @@ public class Cliente implements Parcelable {
         result.put("especial", especial);
         result.put("fechaModificacion", ServerValue.TIMESTAMP);
         result.put("uid", uid);
+        result.put("telefonos",telefonos);
 
         return result;
     }
@@ -113,11 +126,11 @@ public class Cliente implements Parcelable {
         this.ciudad = ciudad;
     }
 
-    public long getIva() {
+    public double getIva() {
         return iva;
     }
 
-    public void setIva(long iva) {
+    public void setIva(double iva) {
         this.iva = iva;
     }
 
@@ -167,12 +180,16 @@ public class Cliente implements Parcelable {
         parcel.writeString(fotoCliente);
         parcel.writeString(direccionDeEntrega);
         parcel.writeString(ciudad);
-        parcel.writeLong(iva);
+        parcel.writeDouble(iva);
         parcel.writeString(cuit);
         parcel.writeByte((byte)(especial?1:0));
         parcel.writeLong(fechaModificacion);
         parcel.writeString(uid);
-
+        parcel.writeInt(telefonos.size());
+        for(Map.Entry<String,String> entry : telefonos.entrySet()) {
+            parcel.writeString(entry.getKey());
+            parcel.writeString(entry.getValue());
+        }
     }
 
     // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
@@ -194,12 +211,17 @@ public class Cliente implements Parcelable {
         fotoCliente= in.readString();
         direccionDeEntrega=in.readString();
         ciudad=in.readString();
-        iva =in.readLong();
+        iva =in.readDouble();
         cuit=in.readString();
         especial= in.readByte()!=0;
         fechaModificacion=in.readLong();
         uid= in.readString();
-
+        int size = in.readInt();
+        for(int i = 0; i < size; i++){
+            String key = in.readString();
+            String value = in.readString();
+            telefonos.put(key,value);
+        }
     }
 }
 

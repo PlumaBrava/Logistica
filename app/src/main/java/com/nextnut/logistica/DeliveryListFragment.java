@@ -315,7 +315,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
 
-                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
+//                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
                     arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
                     CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
                     fragment.setArguments(arguments);
@@ -326,7 +326,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                 } else {
                     Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
                     intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY);
-                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
+//                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
 
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

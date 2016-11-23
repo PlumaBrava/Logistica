@@ -6,6 +6,8 @@ package com.nextnut.logistica.util;
 
 public class Constantes {
     public static String STORAGE_REFERENCE = "gs://logistica-144918.appspot.com";
+    public static String IMAGENES_PRODUCTOS = "/imagenes/productos";
+    public static String IMAGENES_CLIENTES = "/imagenes/clientes";
 
 
     //usuarios
@@ -52,6 +54,7 @@ public class Constantes {
     public static  final String EXTRA_EMPRESA ="empresa";
     public static  final String EXTRA_PERFIL ="perfil";
     public static final String EXTRA_PRODUCT_KEY = "product_key";
+    public static final String EXTRA_PRODUCT= "product";
     public static final String EXTRA_CLIENTE_KEY = "cliente_key";
     public static final String EXTRA_CLIENTE= "cliente";
 

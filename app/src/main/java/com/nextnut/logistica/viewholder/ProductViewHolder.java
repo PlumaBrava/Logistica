@@ -49,16 +49,16 @@ public class ProductViewHolder extends RecyclerView.ViewHolder {
         precioEspecial.setText(format.format(producto.getPrecioEspcecial()));
         descripcion.setText(producto.getDescripcionProducto());
 
-        Drawable drawable = dimensiona(itemView.getContext(), R.drawable.ic_action_image_timer_auto);
+        Drawable drawable = dimensiona(itemView.getContext(), R.drawable.ic_action_action_redeem);
         Picasso.with(itemView.getContext())
 
                 .load(producto.getFotoProducto())
-                .resize(200,200)
+                .resize(fotoProducto.getResources().getDimensionPixelSize(R.dimen.product_picture_w), fotoProducto.getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                 .placeholder(drawable)
                 .centerCrop()
                 .into(fotoProducto);
 
 
-        nombreProducto.setOnClickListener(starClickListener);
+//        nombreProducto.setOnClickListener(starClickListener);
     }
 }

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
@@ -19,7 +18,7 @@ import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
  * item details are presented side-by-side with a list of items
  * in a {@link CustomOrderListFragment}.
  */
-public class CustomOrderDetailActivity extends AppCompatActivity {
+public class CustomOrderDetailActivity extends ActivityBasic {
 
     private static final String LOG_TAG = CustomOrderDetailActivity.class.getSimpleName();
     private static final String RESULTADO = "resultado";
@@ -44,10 +43,13 @@ public class CustomOrderDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
+
             arguments.putLong(CustomOrderDetailFragment.ARG_ITEM_ID,
                     getIntent().getLongExtra(CustomOrderDetailFragment.ARG_ITEM_ID,0));
             int mAction = getIntent().getIntExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
             arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, mAction);
+            arguments=putBundleFirebase();
+
             CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
 
             fragment.setArguments(arguments);
@@ -88,10 +90,8 @@ public class CustomOrderDetailActivity extends AppCompatActivity {
                 if (customRef != 0) {
 
                     CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
-
-
                     if (fragmentCustomOrder != null) {
-                        fragmentCustomOrder.upDateCustomer(customRef);
+                         fragmentCustomOrder.upDateCustomer(customRef);
                     } else {
                     }
                 }

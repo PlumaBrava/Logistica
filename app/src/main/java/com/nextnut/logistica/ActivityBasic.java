@@ -7,16 +7,20 @@ import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
+import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Empresa;
 import com.nextnut.logistica.modelos.Perfil;
+import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.modelos.Usuario;
 
 import static android.content.Intent.EXTRA_USER;
+import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
 import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_FIREBASE_URL;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PERFIL;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_USER_KEY;
 import static com.nextnut.logistica.util.UtilFirebase.getDatabase;
@@ -54,6 +58,8 @@ public class ActivityBasic extends AppCompatActivity {
     public Perfil mPerfil;
     public String mClienteKey;
     public String mProductKey;
+    public Cliente mCliente;
+    public Producto mProducto;
     public static final String LOG_TAG = "ActivityBasic";
 
     public boolean mTwoPane;
@@ -71,6 +77,8 @@ public class ActivityBasic extends AppCompatActivity {
             mPerfil = (Perfil) getIntent().getParcelableExtra(EXTRA_PERFIL);
             mClienteKey =  getIntent().getStringExtra(EXTRA_CLIENTE_KEY);
             mProductKey =  getIntent().getStringExtra(EXTRA_PRODUCT_KEY);
+            mProducto =  getIntent().getParcelableExtra(EXTRA_PRODUCT);
+            mCliente =  getIntent().getParcelableExtra(EXTRA_CLIENTE);
 
             Log.d(LOG_TAG, "savedInstanceState == nullmFirebaseUrl:" + mFirebaseUrl);
             Log.d(LOG_TAG, "savedInstanceState == null-mUserKey:" + mUserKey);
@@ -115,7 +123,8 @@ public class ActivityBasic extends AppCompatActivity {
             savedInstanceState.putParcelable(EXTRA_PERFIL, mPerfil);
             savedInstanceState.putString(EXTRA_CLIENTE_KEY,mClienteKey);
             savedInstanceState.putString(EXTRA_PRODUCT_KEY,mProductKey);
-
+            savedInstanceState.putParcelable(EXTRA_PRODUCT,mProducto );
+            savedInstanceState.putParcelable(EXTRA_CLIENTE, mCliente);
 
             // Always call the superclass so it can save the view hierarchy state
             super.onSaveInstanceState(savedInstanceState);
@@ -134,6 +143,9 @@ public class ActivityBasic extends AppCompatActivity {
             mPerfil= savedInstanceState.getParcelable(EXTRA_PERFIL);
             mClienteKey = savedInstanceState.getString(EXTRA_CLIENTE_KEY);
             mProductKey = savedInstanceState.getString(EXTRA_PRODUCT_KEY);
+            mProducto =  savedInstanceState.getParcelable(EXTRA_PRODUCT);
+            mCliente =  savedInstanceState.getParcelable(EXTRA_CLIENTE);
+
             // Always call the superclass so it can restore the view hierarchy
             super.onRestoreInstanceState(savedInstanceState);
 
@@ -147,7 +159,7 @@ public class ActivityBasic extends AppCompatActivity {
             Log.d(LOG_TAG, "onRestoreInstanceState-Perfil:" + mPerfil.getClientes());
         }
 
-        public void leerVariablesGlobales(Bundle savedInstanceState ){
+        public void leerVariablesGlobales(Bundle savedInstanceState ){  // lee las variables que se enviaron a una actividad o se grabaron al destruirla
             mFirebaseUrl=savedInstanceState.getString(EXTRA_FIREBASE_URL);
             mUserKey= savedInstanceState.getString(EXTRA_USER_KEY);
             mUsuario= savedInstanceState.getParcelable(EXTRA_USER);
@@ -156,6 +168,8 @@ public class ActivityBasic extends AppCompatActivity {
             mPerfil= savedInstanceState.getParcelable(EXTRA_PERFIL);
             mClienteKey = savedInstanceState.getString(EXTRA_CLIENTE_KEY);
             mProductKey = savedInstanceState.getString(EXTRA_PRODUCT_KEY);
+            mProducto =  savedInstanceState.getParcelable(EXTRA_PRODUCT);
+            mCliente =  savedInstanceState.getParcelable(EXTRA_CLIENTE);
 
             // Always call the superclass so it can restore the view hierarchy
 
@@ -169,7 +183,7 @@ public class ActivityBasic extends AppCompatActivity {
             Log.d(LOG_TAG, "leerVariablesGlobales-Perfil,Cliente:" + mPerfil.getClientes());
         }
 
-public void putExtraFirebase(Intent intent){
+public void putExtraFirebase(Intent intent){   // para pasar información a una actividad
     intent.putExtra(EXTRA_FIREBASE_URL, mDatabase.getRef().toString());
     intent.putExtra(EXTRA_USER_KEY, mUserKey);
     intent.putExtra(EXTRA_USER, mUsuario);
@@ -178,6 +192,8 @@ public void putExtraFirebase(Intent intent){
     intent.putExtra(EXTRA_PERFIL, mPerfil);
     intent.putExtra(EXTRA_CLIENTE_KEY, mClienteKey);
     intent.putExtra(EXTRA_PRODUCT_KEY, mProductKey);
+    intent.putExtra(EXTRA_PRODUCT, mProducto);
+    intent.putExtra(EXTRA_CLIENTE, mCliente);
     Log.d(LOG_TAG, "putExtraFirebase-mFirebaseUrl:" + mFirebaseUrl);
     Log.d(LOG_TAG, "putExtraFirebase-:mUserKey:" + mUserKey);
     Log.d(LOG_TAG, "putExtraFirebase-:mUsuario:" + mUsuario.getUsername()+" - "+mUsuario.getEmail());
@@ -186,7 +202,7 @@ public void putExtraFirebase(Intent intent){
     Log.d(LOG_TAG, "putExtraFirebase-Perfil,Cliente:" + mPerfil.getClientes());
 }
 
-public Bundle putBundleFirebase()
+public Bundle putBundleFirebase()  // Se usa para enviar información desde una Actividad a un fragment
 
     {
         Bundle arguments = new Bundle();
@@ -199,6 +215,8 @@ public Bundle putBundleFirebase()
         arguments.putParcelable(EXTRA_PERFIL, mPerfil);
         arguments.putString(EXTRA_CLIENTE_KEY, mClienteKey);
         arguments.putString(EXTRA_PRODUCT_KEY, mProductKey);
+        arguments.putParcelable(EXTRA_PRODUCT, mProducto);
+        arguments.putParcelable(EXTRA_CLIENTE, mCliente);
         Log.d(LOG_TAG, "putBundleFirebase-mFirebaseUrl:" + mFirebaseUrl);
         Log.d(LOG_TAG, "putBundleFirebase-:mUserKey:" + mUserKey);
         Log.d(LOG_TAG, "putBundleFirebase-:mUsuario:" + mUsuario.getUsername()+" - "+mUsuario.getEmail());
