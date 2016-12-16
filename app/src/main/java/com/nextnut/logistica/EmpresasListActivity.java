@@ -209,6 +209,16 @@ public class EmpresasListActivity extends ActivityBasic {
                     }
                 });
             }
+
+            @Override
+            protected void onItemDismissHolder(EmpresaPerfil model, int position) {
+
+            }
+
+            @Override
+            protected void onItemAcceptedHolder(EmpresaPerfil model, int position) {
+
+            }
         };
         mRecycler.setAdapter(mAdapter);
     }

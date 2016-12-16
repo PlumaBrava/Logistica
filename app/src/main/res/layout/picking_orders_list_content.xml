@@ -25,7 +25,8 @@
     <!--android:foreground="?selectableItemBackground"-->
 
     <LinearLayout
-        android:orientation="horizontal" android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >
 
@@ -104,6 +105,15 @@
                     android:gravity="start"
                     android:layout_margin="@dimen/text_margin"
 
+                   >
+                 </TextView>
+
+                <TextView
+                    android:id="@+id/pickingOrderUser"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:layout_margin="@dimen/text_margin"
                     android:background="@drawable/edittext_bg">
                 </TextView>
             </LinearLayout>

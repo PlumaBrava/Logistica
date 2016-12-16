@@ -23,12 +23,27 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.firebase.auth.FirebaseAuth;
-import com.nextnut.logistica.util.ProductSectionActivity;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
+import com.nextnut.logistica.modelos.CabeceraOrden;
+import com.nextnut.logistica.modelos.Producto;
+import com.nextnut.logistica.modelos.Totales;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
+import static com.nextnut.logistica.util.Constantes.ESTADO_ORDEN_INICIAL;
+import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
+import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
+import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.REQUEST_CUSTOMER;
 import static com.nextnut.logistica.util.Constantes.REQUEST_EMPRESA;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
@@ -222,6 +237,61 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
                 Log.e(LOG_TAG, "mClienteKey: NO NULO " );
 
+//1a.-
+                mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child("cabecera").runTransaction(new Transaction.Handler() {
+                    @Override
+                    public Transaction.Result doTransaction(MutableData mutableData) {
+                        Totales cabecera_ordenes = mutableData.getValue(Totales.class);
+                        if (cabecera_ordenes == null) {
+                            Log.d(LOG_TAG, "orden: cabecera Null");
+                            cabecera_ordenes = new Totales();
+                            cabecera_ordenes.setCantidadDeOrdenesClientes(1);
+                        } else {
+                            Log.d(LOG_TAG, "orden: cabecera ID"+cabecera_ordenes.getCantidadDeOrdenesClientes());
+                        cabecera_ordenes.setCantidadDeOrdenesClientes(cabecera_ordenes.getCantidadDeOrdenesClientes()+1);                            // Unstar the post and remove self from stars
+                        }
+
+                        // Set value and report transaction success
+                        mutableData.setValue(cabecera_ordenes);
+                        return Transaction.success(mutableData);
+                    }
+
+                    @Override
+                    public void onComplete(DatabaseError databaseError, boolean commited,
+                                           DataSnapshot dataSnapshot) {
+                        // Transaction completed
+                        Log.d(LOG_TAG, "orden:onComplete:  databaseError" + databaseError);
+                        Log.d(LOG_TAG, "orden:onComplete: boolean b" + commited);
+                        Totales ordenes1a = dataSnapshot.getValue(Totales.class);
+                        long numeroOrden =ordenes1a.getCantidadDeOrdenesClientes();
+                        Log.d(LOG_TAG, "orden:onComplete: ID " + numeroOrden);
+
+                        if (commited){
+                            // preparo la cabecera de orden del cliente
+
+                            //Totales en cero
+                            Totales totales=new Totales(0,0,0,0.0,0.0,0.0,0.0,0.0,0.0);
+                            CabeceraOrden cabeceraOrden= new CabeceraOrden(mClienteKey,mCliente,ESTADO_ORDEN_INICIAL,totales,mUserKey, numeroOrden);
+                            cabeceraOrden.setUsuarioCreador(mUsuario.getUsername());
+                            Map<String, Object> cabeceraOrdenValues =  cabeceraOrden.toMap();
+                            Map<String, Object> childUpdates = new HashMap<>();
+//1b
+                            childUpdates.put(NODO_ORDENES + mEmpresaKey +"/"+ numeroOrden+"/cabecera", cabeceraOrdenValues);
+//2
+                            childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey +"/"+ESTADO_ORDEN_INICIAL+"/"+ numeroOrden, cabeceraOrdenValues);
+                            mDatabase.updateChildren(childUpdates);
+
+                            Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
+                            putExtraFirebase(intent);
+                            intent.putExtra(EXTRA_CABECERA_ORDEN , cabeceraOrden);
+                            intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+
+                            startActivity(intent);
+                        }
+
+                    }
+                });
+
 //                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
 //                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrders.CONTENT_URI);
 //                builder.withValue(CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER, customRef);
@@ -240,12 +310,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
             }
 
-            CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
-            Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
-            putExtraFirebase(intent);
-            intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
 
-            startActivity(intent);
 
 
         }
@@ -281,10 +346,9 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
 
             if (fragmentCustomOrder != null) {
-                fragmentCustomOrder.saveCustomOrderProduct(data.getExtras().getLong(ProductSectionActivity.KEY_RefPRODUCTO),
-                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_NAME),
-                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICES_ESPECIAL),
-                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICE)
+                Producto p= (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
+                fragmentCustomOrder.agregarProductoAlaOrden(p.getCantidadDefault()*1.0,data.getExtras().getString(EXTRA_PRODUCT_KEY),p
+
                 );
 
             }
@@ -421,6 +485,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     // to assign custom orders and manage the fab visibility in the picking segment
     @Override
     public void onPickingOrderSelected(long pickingOrderID) {
+        Log.i(LOG_TAG, "onPickingOrderSelected: " + pickingOrderID);
         mPickingOrderSelected = pickingOrderID;
         if (mPickingOrderSelected > 0) {
             mFab.setVisibility(View.GONE);

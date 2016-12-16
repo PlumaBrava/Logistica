@@ -46,10 +46,7 @@ import static com.nextnut.logistica.util.UtilFirebase.getDatabase;
 
 public class ActivityBasic extends AppCompatActivity {
 
-    //    private FirebaseAuth mAuth;
-
     public DatabaseReference mDatabase;
-
     public String mFirebaseUrl;
     public String mUserKey;
     public Usuario mUsuario;

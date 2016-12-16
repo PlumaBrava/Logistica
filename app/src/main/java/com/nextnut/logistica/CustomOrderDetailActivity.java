@@ -5,10 +5,15 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
-import com.nextnut.logistica.util.ProductSectionActivity;
+import com.nextnut.logistica.modelos.CabeceraOrden;
+import com.nextnut.logistica.modelos.Producto;
 
+import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
 
@@ -48,8 +53,14 @@ public class CustomOrderDetailActivity extends ActivityBasic {
                     getIntent().getLongExtra(CustomOrderDetailFragment.ARG_ITEM_ID,0));
             int mAction = getIntent().getIntExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
             arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, mAction);
-            arguments=putBundleFirebase();
+            CabeceraOrden cabeceraOrden= getIntent().getParcelableExtra(EXTRA_CABECERA_ORDEN);
+            Log.d(LOG_TAG, "orden:onComplete: getClienteKey " + cabeceraOrden.getClienteKey());
+            Log.d(LOG_TAG, "orden:onComplete: getCliente().getNombre() " + cabeceraOrden.getCliente().getNombre());
+            Log.d(LOG_TAG, "orden:onComplete: cabeceraOrden.getTotales().getCantidadDeOrdenesClientes() " + cabeceraOrden.getTotales().getCantidadDeOrdenesClientes());
 
+
+            arguments=putBundleFirebase();
+            arguments.putParcelable(EXTRA_CABECERA_ORDEN , cabeceraOrden);
             CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
 
             fragment.setArguments(arguments);
@@ -101,15 +112,14 @@ public class CustomOrderDetailActivity extends ActivityBasic {
         if (requestCode ==REQUEST_PRODUCT && resultCode == RESULT_OK) {
             String res = data.getExtras().getString(RESULTADO);
             CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+
             if (fragmentCustomOrder != null) {
-                fragmentCustomOrder.saveCustomOrderProduct(data.getExtras().getLong(ProductSectionActivity.KEY_RefPRODUCTO),
-                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_NAME),
-                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICES_ESPECIAL),
-                        data.getExtras().getString(ProductSectionActivity.KEY_PRODUCTO_PRICE)
+                Producto p=(Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
+                fragmentCustomOrder.agregarProductoAlaOrden(
+                        p.getCantidadDefault()*1.0,
+                        data.getExtras().getString(EXTRA_PRODUCT_KEY),
+                        p);
 
-                );
-
-            }else {
             }
 
 

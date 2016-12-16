@@ -196,6 +196,16 @@ public class CustomListActivity extends ActivityBasic {
 
                 );
             }
+
+            @Override
+            protected void onItemDismissHolder(Cliente model, int position) {
+
+            }
+
+            @Override
+            protected void onItemAcceptedHolder(Cliente model, int position) {
+
+            }
         }
 
         ;
@@ -230,8 +240,8 @@ public class CustomListActivity extends ActivityBasic {
 //        mManager.setReverseLayout(true);
 //        mManager.setStackFromEnd(true);
 //
-//        mRecyclerView.setLayoutManager(mManager);
-//        mRecyclerView.setHasFixedSize(true);
+//        mDetalleRecyclerView.setLayoutManager(mManager);
+//        mDetalleRecyclerView.setHasFixedSize(true);
 //        Query customQuery =getQuery(mDatabase);
 ////                mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey);
 //        mAdapter = new FirebaseRecyclerAdapter<Cliente, Cliente1ViewHolder>(Cliente.class, R.layout.custom_list_item,
@@ -297,7 +307,7 @@ public class CustomListActivity extends ActivityBasic {
 //                        });
 //            }
 //        } ;
-//        mRecyclerView.setAdapter(mAdapter);
+//        mDetalleRecyclerView.setAdapter(mAdapter);
 //    }
 
     @Override

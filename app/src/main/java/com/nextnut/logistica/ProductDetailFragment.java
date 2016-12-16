@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import com.nextnut.logistica.util.CurrencyToDouble;
 import com.nextnut.logistica.util.DialogAlerta;
 import com.nextnut.logistica.util.NumberTextWatcher;
 import com.rey.material.widget.ProgressView;
+import com.rey.material.widget.Spinner;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
@@ -73,10 +75,16 @@ public class ProductDetailFragment extends FragmentBasic
     private EditText mProductName;
     private EditText mProductPrice;
     private EditText mProductPriceSpecial;
+    private com.rey.material.widget.Spinner mRubro;
+    private com.rey.material.widget.Spinner mTipoUnidad;
+    private EditText mCantidadMinima;
+    private EditText mCantidadMaxima;
+    private EditText mCantidadDefault;
     private EditText mProductDescription;
     private ImageButton mImageProducto;
     public ProgressView spinner;
-
+    public ArrayAdapter<CharSequence> mAdapterTipoUnidad;
+    public ArrayAdapter<CharSequence> mAdapterRubro;
 
 
 
@@ -219,12 +227,48 @@ public class ProductDetailFragment extends FragmentBasic
 
         });
 
+        mRubro = (Spinner) rootView.findViewById(R.id.productRubro);
+        mAdapterRubro = ArrayAdapter.createFromResource(getContext(),
+                R.array.productRubro_array, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        mAdapterRubro.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        mRubro.setAdapter(mAdapterRubro);
+        mRubro.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(Spinner parent, View view, int position, long id) {
+                Log.i("producto", "parent: " + parent.toString());
+                Log.i("producto", "view: " + view.toString());
+                Log.i("producto", "position: " + position);
+                Log.i("producto", "id: " + id);
+                Log.i("producto", "parent.getSelectedItem(): " + parent.getSelectedItem());
+                parent.getSelectedItem();
+            }
+        });
+
+
+        mTipoUnidad = (Spinner) rootView.findViewById(R.id.product_TipoUnidad);
+        mAdapterTipoUnidad = ArrayAdapter.createFromResource(getContext(),
+                R.array.productTipoUnidad_array, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        mAdapterTipoUnidad.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        mTipoUnidad.setAdapter(mAdapterTipoUnidad);
+        mTipoUnidad.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(Spinner parent, View view, int position, long id) {
+
+            }
+        });
+
+
+        mCantidadMinima = (EditText) rootView.findViewById(R.id.productMinCantidad);
+        mCantidadMaxima = (EditText) rootView.findViewById(R.id.productMaxCantidad);
+        mCantidadDefault = (EditText) rootView.findViewById(R.id.productCantidadDefault);
 
 
         spinner = (ProgressView) rootView.findViewById(R.id.progressBarProducto);
         spinner.setVisibility(View.GONE);
-
-
 
 
         if (mAction == PRODUCT_NEW) {
@@ -277,6 +321,16 @@ public class ProductDetailFragment extends FragmentBasic
                             .placeholder(R.drawable.ic_action_action_redeem)
                             .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                             .into(mImageProducto);
+
+                    int spinnerPositionRubro = mAdapterRubro.getPosition(producto.getRubro());
+                    mRubro.setSelection(spinnerPositionRubro);
+
+                    int spinnerPositionTipoUnidad = mAdapterTipoUnidad.getPosition(producto.getTipoUnidad());
+                    mTipoUnidad.setSelection(spinnerPositionTipoUnidad);
+
+                    mCantidadMinima.setText(String.valueOf(producto.getCantidadMinima()));
+                    mCantidadMaxima.setText(String.valueOf(producto.getCantidadMaxima()));
+                    mCantidadDefault.setText(String.valueOf(producto.getCantidadDefault()));
 
                     if (appBarLayout != null) {
                         {
@@ -355,7 +409,9 @@ public class ProductDetailFragment extends FragmentBasic
     public boolean verifyName(String name) {
         if (!isNameMaxLengthCorrect(name)) {
             return false;
-        } else {return true;}
+        } else {
+            return true;
+        }
 
     }
 
@@ -369,30 +425,32 @@ public class ProductDetailFragment extends FragmentBasic
 
             dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
-            return ;
+            return;
         }
 
 
         // Verifica que si existe ese usuario en NewUser
-        Query myNewUsers= mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).orderByChild("nombreProducto");
+        Query myNewUsers = mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).orderByChild("nombreProducto");
         myNewUsers
                 .startAt(mProductName.getText().toString())
                 .endAt(mProductName.getText().toString())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d(LOG_TAG, "mProductName count"+ dataSnapshot.getChildrenCount());
-                        Log.d(LOG_TAG, "mProductName-KEY1: "+ dataSnapshot.getKey());
-                        if (dataSnapshot.getChildrenCount()==0){ fireBaseSaveProducto();}//El producto no exisite en el listado
+                        Log.d(LOG_TAG, "mProductName count" + dataSnapshot.getChildrenCount());
+                        Log.d(LOG_TAG, "mProductName-KEY1: " + dataSnapshot.getKey());
+                        if (dataSnapshot.getChildrenCount() == 0) {
+                            fireBaseSaveProducto();
+                        }//El producto no exisite en el listado
 
-                        else if(dataSnapshot.getChildrenCount()>0){//El producto existe
+                        else if (dataSnapshot.getChildrenCount() > 0) {//El producto existe
 
-                            Log.d(LOG_TAG, "mProductName- count"+ dataSnapshot.getChildrenCount());
-                            Log.d(LOG_TAG, "mProductName-KEY2: "+ dataSnapshot.getKey());
-                            for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {
-                                Log.d(LOG_TAG, "mmProductName-KEY3:"+ messageSnapshot.getKey());
-                                if (messageSnapshot.getKey().equals(mProductKey)){
-                                    Log.d(LOG_TAG, "mmProductName-Es una modificacio de ProductKey:"+ mProductKey);
+                            Log.d(LOG_TAG, "mProductName- count" + dataSnapshot.getChildrenCount());
+                            Log.d(LOG_TAG, "mProductName-KEY2: " + dataSnapshot.getKey());
+                            for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                                Log.d(LOG_TAG, "mmProductName-KEY3:" + messageSnapshot.getKey());
+                                if (messageSnapshot.getKey().equals(mProductKey)) {
+                                    Log.d(LOG_TAG, "mmProductName-Es una modificacio de ProductKey:" + mProductKey);
                                     fireBaseSaveProducto();
                                     return;
                                 }
@@ -410,12 +468,10 @@ public class ProductDetailFragment extends FragmentBasic
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.d(LOG_TAG, "Producto Cancelled "+ databaseError.toString());
+                        Log.d(LOG_TAG, "Producto Cancelled " + databaseError.toString());
 
                     }
                 });
-
-
 
 
     }
@@ -545,13 +601,27 @@ public class ProductDetailFragment extends FragmentBasic
                 priceEspecial.convert(),
                 mProductDescription.getText().toString(),
                 mCurrentPhotoPath,
-                mUserKey
+                mUserKey,
+                mRubro.getSelectedItem().toString(),
+                mTipoUnidad.getSelectedItem().toString(),
+//                mRubro.getText().toString(),
+//                mTipoUnidad.getText().toString(),
+                Integer.parseInt(mCantidadMinima.getText().toString()),
+                Integer.parseInt(mCantidadMaxima.getText().toString()),
+                Integer.parseInt(mCantidadDefault.getText().toString())
         );
     }
 
 
     // [START basic_write]
-    private void writeNewProducto(String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto, String uid) {
+    private void writeNewProducto(String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto, String uid,
+                                  String rubro,
+                                  String tipoUnidad,
+                                  int cantidadMinima,
+                                  int cantidadMaxima,
+                                  int cantidadDefault
+
+    ) {
         if (true) {//validar formulario
             Log.i("producto", "writeNewProducto: nombre " + nombreProducto);
             Log.i("producto", "writeNewProducto: precio " + precio);
@@ -561,7 +631,13 @@ public class ProductDetailFragment extends FragmentBasic
             Log.i("producto", "writeNewProducto: uid " + uid);
             Log.i("producto", "writeNewProducto: mProductKey " + mProductKey);
 
-            Producto producto = new Producto(uid, nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto);
+            Producto producto = new Producto(uid, nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto,
+                    rubro,
+                    tipoUnidad,
+                    cantidadMinima,
+                    cantidadMaxima,
+                    cantidadDefault);
+
             Map<String, Object> productoValues = producto.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
 

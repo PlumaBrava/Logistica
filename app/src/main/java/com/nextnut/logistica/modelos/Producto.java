@@ -23,23 +23,41 @@ public class Producto implements Parcelable {
     private String descripcionProducto;
     private String fotoProducto;
     private long fechaModificacion;
+
+    private String rubro;
+    private String tipoUnidad;
+    private int cantidadMinima;
+    private int cantidadMaxima;
+    private int cantidadDefault;
+
     private String uid;
-
-
-
 
 
     public Producto() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Producto(String uid,String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto ) {
+    public Producto(String uid, String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto,
+                    String rubro,
+                    String tipoUnidad,
+                    int cantidadMinima,
+                    int cantidadMaxima,
+                    int cantidadDefault
+    ) {
         this.nombreProducto = nombreProducto;
         this.precio = precio;
         this.precioEspcecial = precioEspcecial;
         this.descripcionProducto = descripcionProducto;
         this.fotoProducto = fotoProducto;
-         this.uid = uid;
+
+        this.rubro = rubro;
+        this.tipoUnidad = tipoUnidad;
+        this.cantidadMinima = cantidadMinima;
+        this.cantidadMaxima = cantidadMaxima;
+        this.cantidadDefault = cantidadDefault;
+
+
+        this.uid = uid;
     }
 
     // [START post_to_map]
@@ -52,12 +70,59 @@ public class Producto implements Parcelable {
         result.put("precioEspcecial", precioEspcecial);
         result.put("descripcionProducto", descripcionProducto);
         result.put("fotoProducto", fotoProducto);
+
+        result.put("rubro", rubro);
+        result.put("tipoUnidad", tipoUnidad);
+        result.put("cantidadMinima", cantidadMinima);
+        result.put("cantidadMaxima", cantidadMaxima);
+        result.put("cantidadDefault", cantidadDefault);
+
         result.put("fechaModificacion", ServerValue.TIMESTAMP);
         result.put("uid", uid);
         return result;
     }
     // [END post_to_map]
 
+
+    public int getCantidadDefault() {
+        return cantidadDefault;
+    }
+
+    public void setCantidadDefault(int cantidadDefault) {
+        this.cantidadDefault = cantidadDefault;
+    }
+
+    public int getCantidadMaxima() {
+        return cantidadMaxima;
+    }
+
+    public void setCantidadMaxima(int cantidadMaxima) {
+        this.cantidadMaxima = cantidadMaxima;
+    }
+
+    public int getCantidadMinima() {
+        return cantidadMinima;
+    }
+
+    public void setCantidadMinima(int cantidadMinima) {
+        this.cantidadMinima = cantidadMinima;
+    }
+
+    public String getRubro() {
+        return rubro;
+    }
+
+    public void setRubro(String rubro) {
+        this.rubro = rubro;
+    }
+
+    public String getTipoUnidad() {
+        return tipoUnidad;
+    }
+
+    public void setTipoUnidad(String tipoUnidad) {
+        this.tipoUnidad = tipoUnidad;
+    }
 
     public String getNombreProducto() {
         return nombreProducto;
@@ -127,6 +192,15 @@ public class Producto implements Parcelable {
         parcel.writeDouble(precioEspcecial);
         parcel.writeString(descripcionProducto);
         parcel.writeString(fotoProducto);
+
+
+        parcel.writeString(rubro);
+        parcel.writeString(tipoUnidad);
+        parcel.writeInt(cantidadMinima);
+        parcel.writeInt(cantidadMaxima);
+        parcel.writeInt(cantidadDefault);
+
+
         parcel.writeLong(fechaModificacion);
         parcel.writeString(uid);
     }
@@ -144,13 +218,21 @@ public class Producto implements Parcelable {
 
     // example constructor that takes a Parcel and gives you an object populated with it's values
     private Producto(Parcel in) {
-        nombreProducto=in.readString();
-        precio=in.readDouble();
-        precioEspcecial=in.readDouble();
-        descripcionProducto=in.readString();
-        fotoProducto=in.readString();
-        fechaModificacion=in.readLong();
-        uid=in.readString();
+        nombreProducto = in.readString();
+        precio = in.readDouble();
+        precioEspcecial = in.readDouble();
+        descripcionProducto = in.readString();
+        fotoProducto = in.readString();
+
+        rubro=in.readString();
+        tipoUnidad=in.readString();
+        cantidadMinima= in.readInt();
+        cantidadMaxima= in.readInt();
+        cantidadDefault= in.readInt();
+
+
+        fechaModificacion = in.readLong();
+        uid = in.readString();
 
     }
 }

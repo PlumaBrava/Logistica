@@ -226,6 +226,16 @@ public class UsuarioListActivity extends ActivityBasic{
                     }
                 });
             }
+
+            @Override
+            protected void onItemDismissHolder(UsuarioPerfil model, int position) {
+
+            }
+
+            @Override
+            protected void onItemAcceptedHolder(UsuarioPerfil model, int position) {
+
+            }
         };
         mRecycler.setAdapter(mAdapter);
     }

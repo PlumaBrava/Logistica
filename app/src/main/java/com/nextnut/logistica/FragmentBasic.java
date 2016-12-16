@@ -21,6 +21,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.nextnut.logistica.modelos.Cliente;
+import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.modelos.Empresa;
 import com.nextnut.logistica.modelos.Perfil;
 import com.nextnut.logistica.modelos.Producto;
@@ -66,6 +67,7 @@ public abstract class FragmentBasic extends Fragment {
     public String mProductKey;
     public Cliente mCliente;
     public Producto mProducto;
+
     public static final String LOG_TAG = "FragmentBasic";
 
     @Override
@@ -97,7 +99,7 @@ public abstract class FragmentBasic extends Fragment {
         Log.d(LOG_TAG, "onCreate-mProductKeyl:" + mProductKey);
 
         mDatabase = getDatabase().getReference();
-        ;
+
 
     }
 
@@ -119,6 +121,10 @@ public abstract class FragmentBasic extends Fragment {
         Log.d(LOG_TAG, "putExtraFirebase-mEmpresaKey:" + mEmpresaKey);
         Log.d(LOG_TAG, "putExtraFirebase-mEmpresa,nombre:" + mEmpresa.getNombre());
         Log.d(LOG_TAG, "putExtraFirebase-Perfil,Cliente:" + mPerfil.getClientes());
+        Log.d(LOG_TAG, "putExtraFirebase-mClienteKey:" + mClienteKey);
+        Log.d(LOG_TAG, "putExtraFirebase-mProductKey" + mProductKey);
+//        Log.d(LOG_TAG, "putExtraFirebase-mProducto:" + mProducto.getNombreProducto());
+//        Log.d(LOG_TAG, "putExtraFirebase-mCliente,nombre:" + mCliente.getNombre());
     }
 
     public Bundle putBundleFirebase_Fragment()  // Se usa para enviar información desde una Actividad a un fragment

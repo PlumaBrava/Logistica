@@ -12,15 +12,17 @@ import android.view.View;
 import com.nextnut.logistica.R;
 
 import static com.nextnut.logistica.R.drawable.ic_action_action_redeem;
+import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
+import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN;
+import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_PICKING;
+import static com.nextnut.logistica.util.Constantes.ADAPTER_DETALLE_DELIVEY;
+import static com.nextnut.logistica.util.Constantes.ADAPTER_DETALLE_ORDEN;
 
 /**
  * Created by sam_chordas on 8/14/15.
  */
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     private final ItemTouchHelperAdapter mAdapter;
-    public static final int   ORDER_INICIAL=1;
-    public static final int   PICKING=2;
-    public static final int   DELIVERY=3;
 
     private int mStep;
     public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter,int step){
@@ -55,13 +57,13 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
 
                 switch (mStep) {
 
-                    case ORDER_INICIAL:
+                    case ADAPTER_CABECERA_ORDEN:
                     icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
                     break;
-                    case PICKING:
+                    case ADAPTER_CABECERA_PICKING:
                     icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_lory);
                     break;
-                    case DELIVERY:
+                    case ADAPTER_CABECERA_DELIVEY:
                         icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_candado);
                         break;
                 }
@@ -76,13 +78,16 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
 
                 switch (mStep) {
 
-                    case ORDER_INICIAL:
+                    case ADAPTER_DETALLE_ORDEN:
                         icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_delete);
                         break;
-                    case PICKING:
+                    case ADAPTER_CABECERA_ORDEN:
+                        icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_delete);
+                        break;
+                    case ADAPTER_CABECERA_PICKING:
                         icon = BitmapFactory.decodeResource(recyclerView.getResources(),ic_action_action_redeem);
                         break;
-                    case DELIVERY:
+                    case ADAPTER_CABECERA_DELIVEY:
                         icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
                         break;
                 }
@@ -107,8 +112,25 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         final int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        final int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        switch ( mStep   ){
+            case ADAPTER_CABECERA_ORDEN:
+
+            case ADAPTER_CABECERA_PICKING:
+                swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END; //Swipe para ambos lados.
+                break;
+
+            case ADAPTER_CABECERA_DELIVEY:          // Swipe a la derecha
+                swipeFlags =  ItemTouchHelper.END;
+                break;
+            case ADAPTER_DETALLE_ORDEN:
+            case ADAPTER_DETALLE_DELIVEY:
+                swipeFlags =  ItemTouchHelper.START; //Swipe a la izquierda
+                break;
+        }
         return makeMovementFlags(dragFlags, swipeFlags);
+
+
     }
 
     @Override
@@ -136,18 +158,18 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
 
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-            itemViewHolder.onItemSelected();
-        }
+//        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+//            ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
+//            itemViewHolder.onItemSelected();
+//        }
 
         super.onSelectedChanged(viewHolder, actionState);
     }
 
     @Override
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        super.clearView(recyclerView, viewHolder);
-        ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-        itemViewHolder.onItemClear();
+//        super.clearView(recyclerView, viewHolder);
+//        ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
+//        itemViewHolder.onItemClear();
     }
 }

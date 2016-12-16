@@ -2,7 +2,6 @@ package com.nextnut.logistica;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -21,8 +20,7 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
 
 public class CustomSelectionActivity extends ActivityBasic  {
     private FirebaseRecyclerAdapter<Cliente, ClienteViewHolder> mAdapter;
-    private RecyclerView mRecycler;
-    private LinearLayoutManager mManager;
+
 
 //    Adapter mAdapter;
     public static String RESULTADO = "resultado";
@@ -44,7 +42,7 @@ public class CustomSelectionActivity extends ActivityBasic  {
 
 
         StaggeredGridLayoutManager sglm =
-                new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+                new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(sglm);
 
 //        mAdapter = new Adapter(null);
@@ -73,12 +71,12 @@ public class CustomSelectionActivity extends ActivityBasic  {
 //                                                                   // when rotate the screen the selecction of the second Screen is conserved.
 ////                    arguments.putLong(ProductDetailFragment.ARG_ITEM_ID, id);
 ////
-//                                                                   arguments.putString(EXTRA_PRODUCT_KEY, customKey);
 //                                                                   arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, ProductDetailFragment.PRODUCT_SELECTION);
 //
 //                                                                   ProductDetailFragment fragment = new ProductDetailFragment();
 //                                                                   fragment.setArguments(arguments);
-//                                                                   getSupportFragmentManager().beginTransaction()
+//                                                                  arguments.putString(EXTRA_PRODUCT_KEY, customKey);
+//                                                                    getSupportFragmentManager().beginTransaction()
 //                                                                           .addToBackStack(null)
 //                                                                           .replace(R.id.product_detail_container, fragment)
 //                                                                           .commit();
@@ -123,6 +121,16 @@ public class CustomSelectionActivity extends ActivityBasic  {
                         }
 
                 );
+            }
+
+            @Override
+            protected void onItemDismissHolder(Cliente model, int position) {
+
+            }
+
+            @Override
+            protected void onItemAcceptedHolder(Cliente model, int position) {
+
             }
         }
 

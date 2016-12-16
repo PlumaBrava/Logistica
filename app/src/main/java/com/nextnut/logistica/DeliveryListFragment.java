@@ -52,6 +52,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
+import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_DELIVERED;
+import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_PICKING;
+import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_CERRADA;
+import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
+import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
 import static com.nextnut.logistica.util.MakeCall.makeTheCall;
 import static com.nextnut.logistica.util.SharePickingOrder.sharePickingOrder;
 import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
@@ -212,7 +218,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                         mIDPickingOrderSelected = cursorID;
                         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
                         ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
-                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PickingListFragment.PICKING_STATUS_INICIAL);
+                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PICKING_STATUS_INICIAL);
                         batchOperations.add(builder.build());
 
 
@@ -232,7 +238,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                         mIDPickingOrderSelected = cursorID;
                         ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
                         ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
-                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PickingListFragment.PICKING_STATUS_CERRADA);
+                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PICKING_STATUS_CERRADA);
                         batchOperations.add(builder.build());
                         try {
                             getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
@@ -260,7 +266,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
 
         recyclerView.setAdapter(mPickinOrdersAdapter);
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mPickinOrdersAdapter, SimpleItemTouchHelperCallback.DELIVERY);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mPickinOrdersAdapter, ADAPTER_CABECERA_DELIVEY);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
 
@@ -364,7 +370,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                 mCustomOrderIdSelected = cursorID;
                 ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
                 ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
-                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, CustomOrderListFragment.ORDER_STATUS_DELIVERED);
+                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_DELIVERED);
                 batchOperations.add(builder.build());
                 try {
                     getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
@@ -492,8 +498,8 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                         getActivity(),
                         LogisticaProvider.ShowJoin.CONTENT_URI,
                         proyection,
-                        " ( " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " + CustomOrderListFragment.ORDER_STATUS_PICKING
-                                + " or " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " + CustomOrderListFragment.ORDER_STATUS_DELIVERED + " ) "
+                        " ( " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " +ORDER_STATUS_PICKING
+                                + " or " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " + ORDER_STATUS_DELIVERED + " ) "
                                 + " and " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + mIDPickingOrderSelected,
                         null,
                         null);
@@ -505,9 +511,9 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                         getActivity(),
                         LogisticaProvider.PickingOrders.CONTENT_URI,
                         null,
-                        LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PickingListFragment.PICKING_STATUS_DELIVERY +
+                        LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PICKING_STATUS_DELIVERY +
                                 " OR " +
-                                LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PickingListFragment.PICKING_STATUS_CERRADA,
+                                LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PICKING_STATUS_CERRADA,
                         null,
                         null);
 

@@ -5,9 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:id="@+id/picking_list_fragment_Layout1"
     tools:context=".MainActivity">
-
 
 
     <FrameLayout
@@ -20,6 +18,31 @@
 
     </FrameLayout>
 
-
-
 </FrameLayout>
+
+
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<FrameLayout xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:fitsSystemWindows="true"-->
+    <!--tools:context=".MainActivity">-->
+
+
+
+    <!--<FrameLayout-->
+        <!--android:id="@+id/picking_list_fragment_Layout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
+
+        <!--<include layout="@layout/picking_order_list" />-->
+
+    <!--</FrameLayout>-->
+
+
+
+<!--</FrameLayout>-->

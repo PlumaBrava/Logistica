@@ -263,12 +263,7 @@ public class CustomDetailFragment extends FragmentBasic  {
         // use a linear layout manager
         mListadeTelefonos.setHasFixedSize(true);
         mListadeTelefonos.setLayoutManager(new LinearLayoutManager(getContext()));
-        telefonos.put("home10","123i456");
-        telefonos.put("home11","1273456");
-        telefonos.put("home12","1423456");
-        telefonos.put("work9","111199999");
-        telefonos.put("work1","22299999");
-        telefonos.put("work9","2222299999");
+
         mAdapterTelefonos = new MyAdapter(telefonos);
 
 

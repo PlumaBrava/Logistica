@@ -13,9 +13,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.nextnut.logistica.CustomOrderListFragment;
 import com.nextnut.logistica.R;
-import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperViewHolder;
 
@@ -125,16 +123,18 @@ implements ItemTouchHelperAdapter{
                 DatabaseUtils.dumpCursor(cursor);
 
 
+// Este if se anulo TODO: REvisar....si sirve
 
-                if(cursor.getInt(cursor.getColumnIndex(CustomOrdersColumns.STATUS_CUSTOM_ORDER))==
-                        CustomOrderListFragment.ORDER_STATUS_DELIVERED){
-                    ((View )(viewHolder.mOrderNumber.getParent().getParent())).setBackgroundColor(Color.RED);
-                    viewHolder.mOrderNumber.setTextColor(Color.GREEN);
-                }else {
-                    ((View )(viewHolder.mOrderNumber.getParent().getParent())).setBackgroundColor(
-                            mContext.getResources().getColor(R.color.CustomOrderCard_background));
 
-                }
+//                if(cursor.getInt(cursor.getColumnIndex(CustomOrdersColumns.STATUS_CUSTOM_ORDER))==
+//                        CustomOrderListFragment.ORDER_STATUS_DELIVERED){
+//                    ((View )(viewHolder.mOrderNumber.getParent().getParent())).setBackgroundColor(Color.RED);
+//                    viewHolder.mOrderNumber.setTextColor(Color.GREEN);
+//                }else {
+//                    ((View )(viewHolder.mOrderNumber.getParent().getParent())).setBackgroundColor(
+//                            mContext.getResources().getColor(R.color.CustomOrderCard_background));
+//
+//                }
 
 
                 viewHolder.mcursorId=cursor.getLong(0);

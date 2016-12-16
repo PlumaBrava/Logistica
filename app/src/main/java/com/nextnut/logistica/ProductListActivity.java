@@ -191,6 +191,16 @@ public class ProductListActivity extends ActivityBasic {
 
                 );
             }
+
+            @Override
+            protected void onItemDismissHolder(Producto model, int position) {
+
+            }
+
+            @Override
+            protected void onItemAcceptedHolder(Producto model, int position) {
+
+            }
         }
 
         ;

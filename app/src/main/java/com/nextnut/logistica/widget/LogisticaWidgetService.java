@@ -8,7 +8,6 @@ import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.nextnut.logistica.PickingListFragment;
 import com.nextnut.logistica.R;
 import com.nextnut.logistica.data.CustomOrdersDetailColumns;
 import com.nextnut.logistica.data.LogisticaDataBase;
@@ -16,6 +15,8 @@ import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.PickingOrdersColumns;
 import com.nextnut.logistica.data.PickingOrdersDetailColumns;
 import com.nextnut.logistica.data.ProductsColumns;
+
+import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -61,7 +62,7 @@ public class LogisticaWidgetService extends RemoteViewsService {
 
 
                 String where =
-                        LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PickingListFragment.PICKING_STATUS_DELIVERY;
+                        LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PICKING_STATUS_DELIVERY;
 
 
                 data = getContentResolver().query(

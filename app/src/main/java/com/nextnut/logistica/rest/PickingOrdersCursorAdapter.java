@@ -13,7 +13,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.nextnut.logistica.PickingListFragment;
 import com.nextnut.logistica.R;
 import com.nextnut.logistica.data.PickingOrdersColumns;
 import com.nextnut.logistica.swipe_helper.ItemTouchHelperAdapter;
@@ -105,7 +104,7 @@ public class PickingOrdersCursorAdapter extends CursorRecyclerViewAdapter<Pickin
     public void onBindViewHolder(final ViewHolder viewHolder, Cursor cursor) {
         DatabaseUtils.dumpCursor(cursor);
         if (cursor.getInt(cursor.getColumnIndex(PickingOrdersColumns.STATUS_PICKING_ORDERS)) ==
-                PickingListFragment.PICKING_STATUS_CERRADA) {
+               3) {
             ((View) (viewHolder.mPickingOrderNumber.getParent().getParent())).setBackgroundColor(Color.RED);
 
         } else {

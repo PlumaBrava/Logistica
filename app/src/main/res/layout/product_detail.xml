@@ -172,6 +172,95 @@
             </LinearLayout>
         </LinearLayout>
 
+        /////
+
+        <com.rey.material.widget.Spinner
+            style="@style/Material.Widget.Spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:rd_style="@style/Material.Drawable.Ripple.Wave"
+            android:id="@+id/productRubro"
+            android:contentDescription="@string/productRubro"
+            android:hint="@string/productRubro"
+            android:inputType="text"
+            android:padding="8dp"
+            />
+
+            <com.rey.material.widget.Spinner
+                style="@style/Material.Widget.Spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:rd_style="@style/Material.Drawable.Ripple.Wave"
+                android:id="@+id/product_TipoUnidad"
+                android:contentDescription="@string/productTipoUnidad"
+                android:hint="@string/productTipoUnidad"
+                android:inputType="text"
+                android:padding="8dp"
+                />
+
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <!--app:counterEnabled="true"-->
+            <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+
+            <EditText
+                android:id="@+id/productCantidadDefault"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/productDefaultCantidadUnitaria"
+                android:hint="@string/productDefaultCantidadUnitaria"
+                android:inputType="number"
+                android:padding="8dp"
+                />
+
+        </android.support.design.widget.TextInputLayout>
+
+        /////
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <!--app:counterEnabled="true"-->
+                <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+                <EditText
+                    android:id="@+id/productMinCantidad"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/productMinCantidadUnitaria"
+                    android:hint="@string/productMinCantidadUnitaria"
+                    android:inputType="number"
+                    android:padding="8dp"
+                  />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <!--app:counterEnabled="true"-->
+                <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+
+                <EditText
+                    android:id="@+id/productMaxCantidad"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/productMaxCantidadUnitaria"
+                    android:hint="@string/productMaxCantidadUnitaria"
+                    android:inputType="number"
+                    android:padding="8dp"
+                    />
+
+            </android.support.design.widget.TextInputLayout>
+
+
+        </LinearLayout>
 
     </LinearLayout>
 
