@@ -1,0 +1,365 @@
+<resources>
+    <string name="app_name">Logistica</string>
+
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!--Main Activity-->
+    <string name="device1">A086DD273532AA15DD4D5A83D2A6880E</string>
+    <string name="device2">4A2790CC2F2F210B9805A86F1289FEAF</string>
+
+    <!--Loging Activity-->
+    <string name="Required">requerido</string>
+    <string name="sign_in">ingresar</string>
+    <string name="sign_up">registrarse</string>
+    <string name="error_usuario">Error al buscar datos del usuario</string>
+    <string name="error_perfil">Error al buscar datos del perfil- Contacte al administrador</string>
+    <string name="error_empresa">Error al buscar datos de la empresa - Contacte al administrador</string>
+
+
+    <!--Perfiles de Usuarios-->
+    <string name="usuario_email">Email</string>
+    <string name="usuario_emailConfirmacion">Conrfirmar Email</string>
+    <string name="usuario_emailConfirmacionError">Email tiene que ser igual a su comfirmación</string>
+    <string name="usuario_emailyaExisite">Ese Email ya Existe !</string>
+    <string name="perfil_productos">Productos</string>
+    <string name="perfil_clientes">Clientes</string>
+    <string name="perfil_reportes">Reportes</string>
+    <string name="perfil_ordenes">Ordenes</string>
+    <string name="perfil_preparar">Preparar</string>
+    <string name="perfil_entregar">Entregar</string>
+    <string name="perfil_pagos">Pagos</string>
+    <string name="perfil_stock">Stock</string>
+
+
+
+    <!--Toast in Main activity for Menu Actions-->
+    <string name="productToast">Productos</string>
+    <string name="CustomToast">Clientes</string>
+    <string name="AddInternalError">Error Interno</string>
+    <string name="AddInvalidReques">Requerimiento Invalido</string>
+    <string name="AddNetworkError">Error en la RED</string>
+    <string name="AddNoFill">sin Lugar</string>
+    <string name="AddonFailedToLoad">Error al cargar Publicidad(%S)</string>
+
+    <!--Make a Call-->
+    <string name="MakeCall_Choose">Choose a number</string>
+    <string name="NomberTypeOtro">Otro</string>
+    <string name="NomberTypeMain">MAIN</string>
+    <string name="NomberTypeFaxWork">FAX WORK</string>
+    <string name="NomberTypeWork">WORK</string>
+    <string name="NomberTypeMovile">MOVILE</string>
+    <string name="NomberTypeHome">HOME</string>
+    <string name="MakeCall_Tel">tel:</string>
+
+
+    <!--Menu Options-->
+    <string name="products">Productos</string>
+    <string name="customs">Clientes</string>
+    <string name="reportesXcliente">Reporte x Cliente</string>
+    <string name="reportesXMes">Reporte x Mes</string>
+    <string name="menu_grupoConfiguracion">Configuracion</string>
+    <string name="menu_grupoReportes">Reportes</string>
+    <string name="menu_logout">Salir</string>
+    <string name="menu_empresa">Empresas</string>
+    <string name="menu_empresaList">Lista de Empresas</string>
+    <string name="menu_usuariosList">Lista de Usuarios</string>
+    <string name="menu_usuarios">Usuarios</string>
+    <string name="title_product_list">Productos</string>
+    <string name="title_product_detail">Detalle de Productos</string>
+
+    <!--Section Process Titles-->
+    <string name="title_custom_orders">Ordenes</string>
+    <string name="title_picking">Preparar</string>
+    <string name="title_delivery">Entregar</string>
+    <string name="title_pagos">Pagos</string>
+    <string name="title_stock">Stock</string>
+
+
+    <!--Products List Activity List-->
+    <!--<string name="empty_product_list">No Products to Show</string>-->
+    <string name="empty_product_list">Sin Productos para mostrar</string>
+    <string name="empty_pickingOrder_list">Sin Ordenes de preparacion para mostrar</string>
+    <string name="empty_custom_Order_list">Sin Ordens de clietes para Mostrar</string>
+
+    <!--Products Detail Activity-->
+
+    <!--<string name="product_Id_text">Product Number:</string>-->
+    <string name="product_name_text">Nombre:</string>
+    <string name="product_name_error_tooLong">Muy Largo:</string>
+    <string name="product_name_error_yaexiste">Ya Existe</string>
+    <string name="product_name_error_cantBeNull">No puede estar en blanco</string>
+
+    <string name="product_price_text">Precio:</string>
+    <string name="enter_price_message">Ingrese el preio</string>
+    <string name="price_error_cantBeNull">No puede estar en blanco</string>
+    <string name="price_error_mustBegraterthan0">Debe ser mayor que cero</string>
+    <string name="price_error_cantBeCero">No puede ser cero</string>
+
+    <string name="product_priceSpecal_text">Precio Especial:</string>
+    <string name="enter_priceSpecia_message">Ingrese precio especial</string>
+    <string name="product_photo_text">Imagen</string>
+    <string name="product_description_text">Descripcion:</string>
+
+    <string name="product_description_hint_text">Descripcion del Producto</string>
+    <string name="detail_icon_transition_name" translatable="false">TN_DetailName</string>
+    <string name="detail_icon_transition_price" translatable="false">TN_DetailPrice</string>
+    <string name="detail_icon_transition_imagen" translatable="false">TN_DetailIcon</string>
+    <string name="pruductDetailBar_NEW_PRODUCT" translatable="false">Nuevo Producto</string>
+
+    <string-array name="productTipoUnidad_array">
+        <item>Unidad</item>
+        <item>Kg</item>
+        <item>Metro</item>
+    </string-array>
+
+    <string-array name="productRubro_array">
+        <item>Rubro 1</item>
+        <item>Rubro 2</item>
+        <item>Rubro 3</item>
+    </string-array>
+
+    <string name="productRubro" >Rubro</string>
+    <string name="productTipoUnidad" >Unidad</string>
+    <string name="productMinCantidadUnitaria" >Cantidad Minima: </string>
+    <string name="productMaxCantidadUnitaria" >Cantidad Máxima: </string>
+    <string name="productDefaultCantidadUnitaria" >Cantidad Default: </string>
+
+
+    <!--Verifications Message In Product-->
+    <string name="theproducNametExist" translatable="true">El producto ya existe</string>
+    <string name="theproducNametcantbenull" translatable="true">El producto no puede ser nulo</string>
+    <string name="theproductNameToLong" translatable="true">El nombre es muy largo</string>
+
+    <string name="theproductdesccantbenull" translatable="true">La descripcion No puede ser nula</string>
+    <string name="theproductdescToLong" translatable="true">Descripcion muy larga</string>
+
+    <string name="priceError" translatable="true">El precio debe ser > 0 </string>
+    <string name="title_custom_list">Clientes</string>
+    <string name="title_custom_detail">Detalle de clientes</string>
+
+
+    <!--Custom Detail Activity-->
+
+    <string name="custom_Id_text">Cliente</string>
+    <string name="custom_new">Nuevo Cliente </string>
+    <string name="custom_name_text">Nombre:</string>
+    <string name="custom_name_text_hint_text">Nombre </string>
+    <string name="custom_last_text">Apellido: </string>
+    <string name="custom_last_hint_text">Apellido </string>
+
+    <string name="custom_agenda_text">Agendada</string>
+    <string name="custom_photo">Foto del Cliente</string>
+    <string name="custom_delivery_address_text">Dirección de entrega:</string>
+    <string name="custom_delivery_address_hint_text">Dirección de entrega:</string>
+    <string name="custom_city_text">Ciudad:</string>
+    <string name="custom_city_hint_text">Ciudad</string>
+    <string name="custom_Special_text">Especial</string>
+    <!--<string name="custom_city_hint_text">City</string>-->
+    <string name="custom_Cuit_text">Cuit:</string>
+    <string name="custom_Cuit_hint_text">Cuit:</string>
+
+    <string name="custom_TipoTelefono_text">Tipo:</string>
+    <string name="custom_NumeroTelefono_text">Numero:</string>
+    <string name="custom_AgregarTelefono_text">Agregar</string>
+    <string name="custom_IVA_text">Iva:</string>
+    <string name="custom_IVA_hint_text">% del impuesto</string>
+
+    <string name="custom_icon_transition_name" translatable="false">TN_CustomName</string>
+    <string name="custom_icon_transition_surname" translatable="false">TN_CustomSurname</string>
+    <string name="custom_icon_transition_imagen" translatable="false">TN_CustomIcon</string>
+
+    <!--Verificar si se usa-->
+    <string name="custom_DetailBar_NEW_PRODUCT" translatable="false">Nuevo Producto</string>
+
+    <!--Products List Activity List-->
+    <string name="empty_custom_list">Sin Clientes para mostrar</string>
+    <string name="empty_picking_list">Sin ordenes para Preparar</string>
+    <string name="empty_delivery_list">Sin ordenes para Entregar</string>
+    <string name="title_customorder_list">Ordenes </string>
+    <string name="title_customorder_detail">Detalle de Ordenes</string>
+
+    <!--Custom Order List Fragment-->
+    <string name="selectPickingOrderToAssing">Seleccione una Orden para Preparar</string>
+    <string name="doYouWantDelete">Quiere Borrar?</string>
+    <string name="CANCEL">Cancelar</string>
+    <string name="OK">OK</string>
+
+
+    <!--Custom Order Detail Activity-->
+    <string name="title_New_Order">Nueva Orden </string>
+    <string name="title_Order_Number">Orden: </string>
+    <string name="favoriteAlreadyExisist">Ya existe como favorito </string>
+    <string name="doYouWantToChange">Quiere cambiarlo? </string>
+    <string name="quantityPicker">Seleccione Cantidad</string>
+    <string name="TotalCantidad">cantidad: </string>
+    <string name="MontoTotal">Monto Total:</string>
+    <string name="MontoTotalDelivey">Monto Total Entrega:</string>
+    <string name="InformeErrorApplyingBatchInsert">Informe Error applying batch insert</string>
+    <string name="InformeError">Error: </string>
+    <string name="customOrder_Id_text">Numero de Orden:</string>
+    <string name="customOrder_new">Nueva Orden </string>
+    <string name="customOrder_text">Nombre:</string>
+    <string name="customOrder_text_hint_text">Nombre</string>
+    <string name="customOrder_last_text">Apellido:</string>
+    <string name="customOrder_last_hint_text">Apellido</string>
+    <string name="BotonSeleccionCliente">Cliente</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="contentDescription_customPhoto">Foto de Cliente</string>
+    <string name="contentDescription_butonMakeAcall">Boton para llamadas</string>
+    <string name="contentDescription_butonShare">Boton Compartir</string>
+    <string name="contentDescription_PhotoProduct">Foto de Producto</string>
+
+
+    <string name="file">file:</string>
+    <string name="Product_">Product_</string>
+    <string name="yyyyMMdd_HHmmss">yyyyMMdd_HHmmss</string>
+    <string name="data">data</string>
+
+
+    <!--Share Picking Order-->
+    <string name="PickingOrderNumber"> Compartir Orden: </string>
+
+
+    <!--dialog number picker-->
+    <string name="dialogNumebrPickerCancel">Cancelar</string>
+    <string name="dialogNumebrPickerSet">OK</string>
+    <string name="NumberPicker">Seleccionar Cantidad</string>
+
+    <!-- Date Format -->
+    <string name="dateFormat">yyyy-MM-dd</string>
+
+    <!-- Customer Activity for selection Tite-->
+    <string name="title_activity_custom_selection">Seleccionar Cliente</string>
+    <!-- Custome Order Detail  -->
+    <string name="boton_select_customer">Seleccionar Cliente</string>
+    <string name="boton_select_product">Seleccionar Producto</string>
+    <string name="boton_conectPrinter">Conectar Impresora</string>
+    <string name="boton_Print">Imprimir</string>
+
+    <!--delivery list fragment-->
+    <string name="NewOrder">New Order</string>
+
+    <!--Custom ORDER CARD (customorder_list_contet.xml-->
+    <string name="custom_card_order_number">ORDEN: </string>
+    <string name="custom_card_empty_custom_list">Sin Ordenes para mostrar </string>
+
+
+    <!--Picking ORDER CARD (customorder_list_contet.xml-->
+    <string name="pickng_card_order_number">Orden de Preparación </string>
+    <string name="picking_card_empty_custom_list">Sin nada para Prepar </string>
+    <string name="picking_card_Text_Coment">Ingrese su Comentario </string>
+    <string name="picking_card_saveButton_contentDescription">Boton Grabar</string>
+
+
+    <!--Custom ORDER DETAIL ITEM (order_detail_item.xml-->
+    <string name="favorito">Favorito</string>
+
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Clave</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">Email Incorrecto</string>
+    <string name="error_invalid_password">El password es muy corto</string>
+    <string name="error_incorrect_password">El password no es correcto</string>
+    <string name="error_field_required">Requerido</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+
+    <!-- Picking Orders -->
+    <string name="detete_picking_order">Do you want delete this Picking Order?</string>
+    <string name="detete_picking_order_cancel">Cancel</string>
+    <string name="detete_picking_order_ok">OK</string>
+    <string name="detete_picking_order_Existen_CustomOrders_Asigned">There are Custom Orders Asigned</string>
+    <string name="detete_picking_order_NO_Existen_CustomOrders_Asigned">There are NO Custom Orders Asigned</string>
+
+    <!-- Order_detail_item -->
+    <string name="product">Porduct:   </string>
+    <string name="price">Price</string>
+    <string name="quantity">Quantity</string>
+    <string name="total">Total</string>
+    <string name="description">Product Descrition:   </string>
+    <string name="photo">Product Picture</string>
+    <string name="productTitle">Product header</string>
+    <string name="priceTitle">Price header</string>
+    <string name="quantityTitle">quantity header</string>
+    <string name="totalTitle">total header</string>
+    <string name="deliverPrice">price</string>
+    <string name="deliverqantity">quantiny for deliver</string>
+    <string name="deliverPricetotalTitle">total Price</string>
+    <string name="specialPriceTitle">Special Price header</string>
+
+    <!-- product_list_item -->
+    <string name="productListItem">Producto</string>
+    <string name="priceListItem">Precio</string>
+    <string name="SpecialpriceListItem">Precio Especial</string>
+    <string name="photoListItem">Imagen de Prodcuto</string>
+    <!--<string name="productTitleListItem">Product header</string>-->
+    <!--<string name="priceTitleListItem">Price header</string>-->
+    <!--<string name="specialPriceTitleListItem">Special Price header</string>-->
+
+    <!-- picking_product_item -->
+    <string name="Orders">Orders</string>
+    <string name="Picking">Picking</string>
+    <string name="Delivery">Delivery"</string>
+    <string name="quantityOrders">Cantidad en Ordenes"</string>
+    <string name="quantityPicking">Cantidad en Preparacion"</string>
+    <string name="quantityDelivered">Cantidad en Entrega"</string>
+
+    <!-- Imagenes -->
+    <string name="TakePhoto">Sacar una Foto</string>
+    <string name="ChoosefromLibrary">Elegir de la Libreria</string>
+    <string name="Cancel">Cancelar</string>
+    <string name="AddPhoto">Agregar una Foto!</string>
+
+
+    <string name="title_activity_product_section">Seleccione un Producto</string>
+    <string name="title_activity_productos_en_ordenes">Productos en Ordenes</string>
+    <string name="title_activity_reporte_mensualx_cliente">ReporteMensualxCliete</string>
+    <string name="title_activity_reporte_x_Mes">Reporte por Mes </string>
+
+    <!--Reporte Mensual x Cliente-->
+    <string name="title_activity_reporte_mensualx_cliente_Title">Reporte</string>
+    <string name="title_activity_reporte_mensualx_cliente_SubTitle">Por Cliente</string>
+
+    <!--Reporte Mensual x Month-->
+    <string name="title_activity_reporte_mensualx_month_Title">Reporte</string>
+    <string name="title_activity_reporte_mensualx_month_SubTitle">Por Mes</string>
+
+    // Widget
+    <string name="appwidget_text">LOGISTICA - Productos en Entrega</string>
+    <string name="appwidget_picking">Preparar: </string>
+    <string name="appwidget_product"> - Producto: </string>
+    <string name="add_widget">Agregar widget</string>
+
+
+    //com.nexnut.logistica (free)
+    <!--<string name="server_client_id">378485183737-cj1pcnet2t14ifrrcc1e9fmvunkqd206.apps.googleusercontent.com</string>-->
+    <string name="server_client_id">378485183737-0rknnj5dulrkqnb8khbjbks0a3k2iecf.apps.googleusercontent.com</string>
+    <string name="fb_app_id">1187995437955506</string>
+
+    <string name="web_client_id">378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com</string>
+
+    // Empresas List Activity
+    <string name="Texto_EmpresasList">Seleccione la empresa con la que trabajará o cree una nueva.</string>
+
+
+    // Empresas Activity
+    <string name="title_activity_empresas">Empresa</string>
+    <string name="hint_empresaNombre">Empresas</string>
+    <string name="hint_empresaCuit">Cuit</string>
+    <string name="hint_empresaCiudad">Ciudad</string>
+    <string name="hint_empresaDireccion">Direccion</string>
+    <string name="hint_empresaCodigoPostal">Código Postal</string>
+    <string name="hint_empresaTelefono">Teléfono</string>
+    <string name="hint_empresaLogo">Logo</string>
+    <string name="title_activity_empesas_list">EmpesasListActivity</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="olvidaste_tu_constrase_a">¿Olvidaste tu constraseña?</string>
+    <string name="logo">Logo</string>
+
+</resources>
