@@ -48,7 +48,7 @@ public class Constantes {
 
     // Listado de Favoritos
     public static String ESQUEMA_FAVORITOS = "favoritos";
-    public static String NODO_ESQUEMA_FAVORITOS ="/" + ESQUEMA_FAVORITOS+ "/";
+    public static String NODO_FAVORITOS ="/" + ESQUEMA_FAVORITOS+ "/";
 
     // Listado Completo de Ordenes de una empresa
     // --  1  ---
@@ -93,7 +93,7 @@ public class Constantes {
     // Listado productos de en estado inicial totales de candantidades de cada producto en por orden
     // --  5  ---
     public static String ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL = "productos_en_ordenes_inicial";
-    public static String NODO_PRODUCTOS_X_ORDEN_INICIAL ="/" + ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL+ "/";
+    public static String NODO_PRODUCTOS_EN_ORDENES_INICIAL ="/" + ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL+ "/";
 
     // Listado de Picking
     // --  6  ---
@@ -164,5 +164,14 @@ public class Constantes {
     public static final int   ADAPTER_TOTALES_DELIVEY=7;
     public static final int   ADAPTER_CABECERA_DELIVEY=8;
     public static final int   ADAPTER_DETALLE_DELIVEY=9;
+    public static final int   ADAPTER_CABECERA_ORDEN_EN_PICKING=10;
 
+    public static  String detalleOrdenRef_1C(String mEmpresaKey,long numeroDeOrdena,String productoKey){
+        String numeroDeOrden =String.valueOf(numeroDeOrdena);
+        return NODO_ORDENES + mEmpresaKey + "/" + numeroDeOrden + "/" + productoKey;
+    }
+    public static  String detalleOrdenRef_4(String mEmpresaKey,long numeroDeOrdena,String productoKey){
+        String numeroDeOrden =String.valueOf(numeroDeOrdena);
+        return NODO_ORDENES_DETALLE + mEmpresaKey + "/" + numeroDeOrden + "/" + productoKey;
+    }
 }

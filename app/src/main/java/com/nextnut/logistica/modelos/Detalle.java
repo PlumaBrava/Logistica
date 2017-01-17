@@ -48,9 +48,17 @@ public class Detalle {
                 return detalleCppy;
     }
 
-    public Detalle(Double cantidadOrden, Producto producto) {
+    public Detalle(Double cantidadOrden, Producto producto, Cliente cliente) {
         this.cantidadOrden = cantidadOrden;
         this.producto = producto;
+        if (cliente!=null){
+            if(cliente.getEspecial()){
+                this.precio=producto.getPrecioEspcecial();
+            }else {
+                this.precio=producto.getPrecio();
+            }
+            this.montoItemOrden=cantidadOrden*this.precio;
+        }
     }
 
     public Double getCantidadEntrega() {
@@ -165,6 +173,14 @@ public class Detalle {
             Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
             this.montoItemOrden = cantidadOrden * producto.getPrecio();
         }
+
+    }
+    public void modificarCantidadEnTotalInicial(Detalle detalleOrdenNuevo,  Detalle detalleOrdenAnterior) {
+        Log.d("EnTotalInicial", "this.montoItemOrden) " + this.montoItemOrden);
+        Log.d("EnTotalInicial", "detalleOrdenNuevo.getMontoItemOrden() " + detalleOrdenNuevo.getMontoItemOrden());
+        Log.d("EnTotalInicial", "detalleOrdenAnterior.getMontoItemOrden() " + detalleOrdenAnterior.getMontoItemOrden());
+        this.cantidadOrden = this.cantidadOrden+detalleOrdenNuevo.getCantidadOrden()-detalleOrdenAnterior.getCantidadOrden();
+        this.montoItemOrden = this.montoItemOrden+detalleOrdenNuevo.getMontoItemOrden()-detalleOrdenAnterior.getMontoItemOrden();
 
     }
 

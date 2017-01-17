@@ -139,10 +139,16 @@ public class CabeceraOrden  implements Parcelable {
         this.usuarioPicking = usuarioPicking;
     }
 
-    public void ingresaProductoEnOrden(Double cantidadOrden, String productKey, Producto producto, Boolean clienteEspecial) {
+    public void ingresaProductoEnOrden(Double cantidadOrden,  Producto producto, Boolean clienteEspecial) {
         this.totales.ingresaProductoEnOrden(cantidadOrden,  producto, clienteEspecial);
 
     }
+
+    public void modificarCantidadProductoEnOrden(Double cantidadOrden,  Detalle detalleAnterior) {
+        this.totales.modificarCantidadProductoDeOrden(cantidadOrden,  detalleAnterior);
+
+    }
+
     public Boolean getSemaforo() {
         return semaforo;
     }

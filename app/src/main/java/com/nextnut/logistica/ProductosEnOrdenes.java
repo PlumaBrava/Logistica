@@ -21,7 +21,7 @@ public class ProductosEnOrdenes extends ActivityBasic {
     private long mItem;
     private static final int CUSTOM_LOADER_LIST = 0;
     private TextView modenesXProducto;
-
+    private ValueEventListener mListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,17 +42,19 @@ public class ProductosEnOrdenes extends ActivityBasic {
 
 
         modenesXProducto = (TextView) findViewById(R.id.productosEnOrdenes);
-        mDatabase.child(ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL).child(mEmpresaKey).child(mProductKey).addListenerForSingleValueEvent(new ValueEventListener() {
+       mListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(LOG_TAG, "onAuthSuccess:getChildrenCount: " + dataSnapshot.getChildrenCount());
-                String text = " nulo";
+
+
+                Log.d(LOG_TAG, "onAuthSuccess:onDataChange getChildrenCount: " + dataSnapshot.getChildrenCount());
+                String text = "no hay datos";
                 if (dataSnapshot.getChildrenCount() <= 0) {
                     Log.d(LOG_TAG, "NO hay datos ");
 
                 } else {
-
-                    Log.d(LOG_TAG, "onAuthSuccess:getChildrenCount: - hay empresa Asignada ");
+                    text = "";
+                    Log.d(LOG_TAG, "onAuthSuccess:getChildrenCount: - dataSnapshot.getChildren()"+dataSnapshot.getChildren());
                     for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
                         Log.d(LOG_TAG, "onAuthSuccess-KEY" + messageSnapshot.getKey());
                         PrductosxOrden data = messageSnapshot.getValue(PrductosxOrden.class);
@@ -60,7 +62,7 @@ public class ProductosEnOrdenes extends ActivityBasic {
                         text = text + " " + messageSnapshot.getKey();
                         text = text + " " + data.getDetalle().getProducto().getNombreProducto();
                         text = text + " " + data.getDetalle().getCantidadOrden() + "\n";
-
+                        Log.d(LOG_TAG, "onAuthSuccess-TEXT" + text);
 
                     }
                     modenesXProducto.setText(text);
@@ -69,14 +71,22 @@ public class ProductosEnOrdenes extends ActivityBasic {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.d(LOG_TAG, "onAuthSuccess " + databaseError.toString());
+                Log.d(LOG_TAG, "onAuthSuccess onDataChange" + databaseError.toString());
 
             }
-        });
+        };
+        mDatabase.child(ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL).child(mEmpresaKey).child(mProductKey).addValueEventListener(mListener);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mDatabase.child(ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL).child(mEmpresaKey).child(mProductKey).removeEventListener(mListener);
+        Log.d(LOG_TAG, "onAuthSuccess:onStop: ");
 
-//    @Override
+    }
+
+    //    @Override
 //    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 //
 //        String select[] = {

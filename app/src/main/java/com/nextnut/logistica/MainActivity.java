@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.nextnut.logistica.modelos.CabeceraOrden;
+import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.modelos.Totales;
 
@@ -347,7 +348,8 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
             if (fragmentCustomOrder != null) {
                 Producto p= (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
-                fragmentCustomOrder.agregarProductoAlaOrden(p.getCantidadDefault()*1.0,data.getExtras().getString(EXTRA_PRODUCT_KEY),p
+                Detalle detalle = new Detalle(0.0,p,mCliente);
+                fragmentCustomOrder.abmDetalleDeOrden(p.getCantidadDefault()*1.0,data.getExtras().getString(EXTRA_PRODUCT_KEY),detalle
 
                 );
 

@@ -1,29 +1,42 @@
 package com.nextnut.logistica;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.nextnut.logistica.modelos.CabeceraOrden;
+import com.nextnut.logistica.modelos.CabeceraPicking;
 import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.modelos.Empresa;
 import com.nextnut.logistica.modelos.Perfil;
+import com.nextnut.logistica.modelos.PrductosxOrden;
 import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.modelos.Usuario;
 import com.nextnut.logistica.util.Constantes;
@@ -33,8 +46,17 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static android.content.Intent.EXTRA_USER;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_FAVORITOS;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_CABECERA;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_DETALLE;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_TOTAL_INICIAL;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_PICKING;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_PICKING_TOTAL;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
@@ -44,6 +66,15 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_PERFIL;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_USER_KEY;
+import static com.nextnut.logistica.util.Constantes.NODO_FAVORITOS;
+import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
+import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
+import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_DETALLE;
+import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_TOTAL_INICIAL;
+import static com.nextnut.logistica.util.Constantes.NODO_PICKING;
+import static com.nextnut.logistica.util.Constantes.NODO_PICKING_TOTAL;
+import static com.nextnut.logistica.util.Constantes.NODO_PRODUCTOS_EN_ORDENES_INICIAL;
+import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.UtilFirebase.getDatabase;
 
@@ -67,6 +98,56 @@ public abstract class FragmentBasic extends Fragment {
     public String mProductKey;
     public Cliente mCliente;
     public Producto mProducto;
+
+    // Total Inicial de Ordenes. 3
+    public ArrayList<String> mTotalInicialIndex = new ArrayList<String>();
+    public ArrayList<String> mTotalInicialIndexLiberar = new ArrayList<String>();
+    public ArrayList<Task> mTotalInicialTask = new ArrayList<Task>();
+    public ArrayList<TaskCompletionSource<Object>> mTotalInicialCompletionTask = new ArrayList<TaskCompletionSource<Object>>();
+//    public ArrayList<TaskCompletionSource<DataSnapshot>> mTotalInicialCompletionTask;
+
+    public Boolean mLiberarSemaforoTotalInicial = false; // se pone en true cuando tengo que liberar por accion de este proceso
+    public ArrayList<Task> mLiberarTotalInicialTask = new ArrayList<Task>();
+    public ArrayList<TaskCompletionSource<Object>> mLiberarTotalInicialCompetionTask = new ArrayList<TaskCompletionSource<Object>>();
+
+    // Cabecera Orden 1B
+    public Boolean mLiberarSemaforoCabeceraOrden = false;
+    public TaskCompletionSource<DataSnapshot> mCabeceraOrdenCompletionTask;
+    public Task mCabeceraOrdenTask;
+    public Task mLiberarCabeceraOrdenTask;
+    public TaskCompletionSource<DataSnapshot> mLiberarcabeceraOrdenCompletionTask;
+
+
+    // Productos En Ordenes 5
+    public Boolean mLiberarSemaforoProductosEnOrdenes = false;
+    public TaskCompletionSource<DataSnapshot> mProductosEnOrdenesCompletionTask;
+    public Task mProductosEnOrdenesTask;
+    public Task mLiberarProductosEnOrdenesTask;
+    public TaskCompletionSource<DataSnapshot> mLiberarProductosEnOrdenesCompletionTask;
+
+
+    // Cabecera Picking 6
+    public Boolean mLiberarSemaforoPicking = false;
+    public TaskCompletionSource<DataSnapshot> mPickingCompletionTask;
+    public Task mPickingTask;
+    public Task mLiberarPickingTask;
+    public TaskCompletionSource<DataSnapshot> mLiberarPickingCompletionTask;
+
+
+    // Picking Total 7
+    public Boolean mLiberarSemaforoPickingTotal = false;
+    public ArrayList<String> mPickingTotalIndex = new ArrayList<String>();
+    public ArrayList<String> mPickingTotalIndexLiberar = new ArrayList<String>();
+    public ArrayList<Task> mPickingTotalTask = new ArrayList<Task>();
+    public ArrayList<TaskCompletionSource<Object>> mPickingTotalCompletionTask = new ArrayList<TaskCompletionSource<Object>>();
+
+
+    //    public TaskCompletionSource<DataSnapshot> mPickingTotalCompletionTask;
+//    public Task mPickingTotalTask;
+    public ArrayList<Task> mLiberarPickingTotalTask = new ArrayList<Task>();
+    ;
+    public ArrayList<TaskCompletionSource<Object>> mLiberarPickingTotalCompletionTask = new ArrayList<TaskCompletionSource<Object>>();
+
 
     public static final String LOG_TAG = "FragmentBasic";
 
@@ -173,8 +254,10 @@ public abstract class FragmentBasic extends Fragment {
         }
     }
 
-    public abstract void  savePhoto(Bitmap bitmap);
-   public String mCurrentPhotoPath;
+    public abstract void savePhoto(Bitmap bitmap);
+
+    public String mCurrentPhotoPath;
+
     public void uploadImagen(Bitmap bitmap, StorageReference ImagenRef, final ImageView imageView, final ProgressView spinner) {
 
         if (bitmap != null) {
@@ -186,7 +269,7 @@ public abstract class FragmentBasic extends Fragment {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             byte[] datosFoto = baos.toByteArray();
-            if (spinner!=null){
+            if (spinner != null) {
                 spinner.setVisibility(View.VISIBLE);
                 imageView.setVisibility(View.GONE);
             }
@@ -195,12 +278,13 @@ public abstract class FragmentBasic extends Fragment {
                                                 @Override
                                                 public void onFailure(@NonNull Exception exception) {
                                                     // Handle unsuccessful uploads
-                                                    if (spinner!=null){
-                                                    spinner.setVisibility(View.GONE);
-                                                    imageView.setVisibility(View.VISIBLE);
-                                                    Log.i("subirFotoReturnUri", "onFailure: -spinner off " + exception.toString());
+                                                    if (spinner != null) {
+                                                        spinner.setVisibility(View.GONE);
+                                                        imageView.setVisibility(View.VISIBLE);
+                                                        Log.i("subirFotoReturnUri", "onFailure: -spinner off " + exception.toString());
 
-                                                }}
+                                                    }
+                                                }
                                             }
 
             ).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -212,13 +296,13 @@ public abstract class FragmentBasic extends Fragment {
 
                                            Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_action_redeem);
                                            mCurrentPhotoPath = downloadUrl.toString();
-                                           Log.i("subirFotoReturnUri", "onSuccess: mCurrentPhotoPath-listener"+mCurrentPhotoPath);
+                                           Log.i("subirFotoReturnUri", "onSuccess: mCurrentPhotoPath-listener" + mCurrentPhotoPath);
                                            Picasso.with(getContext())
                                                    .load(mCurrentPhotoPath)
 //                                                       .placeholder(drawable)
                                                    .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
                                                    .into(imageView);
-                                           if (spinner!=null) {
+                                           if (spinner != null) {
                                                spinner.setVisibility(View.GONE);
                                                imageView.setVisibility(View.VISIBLE);
                                            }
@@ -230,18 +314,927 @@ public abstract class FragmentBasic extends Fragment {
                 @Override
                 public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                     double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                    if (spinner!=null){
-                    spinner.setProgress((float) progress);
+                    if (spinner != null) {
+                        spinner.setProgress((float) progress);
                     }
                     Log.i("subirFotoReturnUri", "spinner progress" + progress);
 
                 }
             });
         }
-        Log.i("subirFotoReturnUri", "onSuccess: mCurrentPhotoPath-return"+mCurrentPhotoPath);
+        Log.i("subirFotoReturnUri", "onSuccess: mCurrentPhotoPath-return" + mCurrentPhotoPath);
 
 
     }
+
+
+    public void readBlockTotalInicial(String productoKey) {
+
+//        Lee y bloquea el total Inicial para un pruducto de una empresa
+//        Si el producto esta bloqueda Retorna error
+//
+        mTotalInicialIndex.add(productoKey);// /agrego las Key de los productos bloqueados
+
+        mTotalInicialCompletionTask.add(new TaskCompletionSource<>());
+        mTotalInicialTask.add(mTotalInicialCompletionTask.get(mTotalInicialCompletionTask.size() - 1).getTask());
+        mTotalInicialTask.get(mTotalInicialTask.size() - 1).addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                Log.i(LOG_TAG, "readBlockTotalInicial onComplete mTotalInicialTask " + task.toString());
+                Log.i(LOG_TAG, "readBlockTotalInicial onComplete  task.isSuccessful() " + task.isSuccessful());
+                if (task.isSuccessful()) {
+                    mTotalInicialIndexLiberar.add(((DataSnapshot) task.getResult()).getKey());// /agrego las Key de los productos bloqueados
+
+                    mLiberarSemaforoTotalInicial = true;
+                }
+
+            }
+        });
+        mTotalInicialTask.get(mTotalInicialTask.size() - 1).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(LOG_TAG, "readBlockTotalInicial onFailure mTotalInicialTask " + e.toString());
+//                mLiberarSemaforoTotalInicial=true;
+            }
+        });
+
+
+/*3*/
+        mDatabase.child(ESQUEMA_ORDENES_TOTAL_INICIAL).child(mEmpresaKey).child(productoKey).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+
+                // Bloqueo la orden para modificaciones,
+                // Actualizo  el esquema y luego lo libero.
+
+                Detalle detalle = mutableData.getValue(Detalle.class);
+
+
+                if (detalle == null) {
+                    Log.i(LOG_TAG, "readBlockTotalInicial CabeceraOrden = NuLL- ");
+                } else {
+                    Log.i(LOG_TAG, "readBlockTotalInicial CabeceraOrden = not NuLL- ");
+
+                    if (detalle.sepuedeModificar()) {
+                        Log.i(LOG_TAG, "readBlockTotalInicial Si, se puede Modificar y bloqueo");
+                        detalle.bloquear();
+                    } else {
+                        Log.i(LOG_TAG, "readBlockTotalInicial No se puede Modificar ");
+                        Log.i(LOG_TAG,"readBlockTotalInicial Bloqueado "+detalle.getProducto().getNombreProducto() );
+
+//                        mTotalInicialCompletionTask.setException(new Exception("Bloqueado"));
+                        return Transaction.abort();
+                    }
+
+                }
+
+                // Set value and report transaction success
+                mutableData.setValue(detalle);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean commited,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(LOG_TAG, "readBlockTotalInicial: boolean b" + commited);
+                int index = mTotalInicialIndex.indexOf(dataSnapshot.getKey());
+                Log.d(LOG_TAG, "readBlockTotalInicial: commited," + commited+" key:"+ "-index "+index);
+
+                if (commited) {
+
+                    mTotalInicialCompletionTask.get(index).setResult(dataSnapshot);
+                    Log.i(LOG_TAG, "readBlockTotalInicial onComplete True ");
+                    Detalle detalle = dataSnapshot.getValue(Detalle.class);
+                    if (detalle == null) {
+                        Log.d(LOG_TAG, "readBlockTotalInicial:onComplete: detalle.getCantidadOrden() NULL");
+                    } else {
+                        Log.d(LOG_TAG, "readBlockTotalInicial:onComplete: detalle.Semaforo " + detalle.getSemaforo()
+                                + "-" + detalle.getCantidadOrden());
+                    }
+                } else {
+
+
+                    if (databaseError == null) {
+                        Log.i(LOG_TAG, "readBlockTotalInicial onComplete False " + "error nulo");
+                        mTotalInicialCompletionTask.get(index).setException(new Exception("Error Nulo"));
+                    } else {
+                        Log.i(LOG_TAG, "readBlockTotalInicial onComplete False " + databaseError.toString());
+                        mTotalInicialCompletionTask.get(index).setException(new Exception(databaseError.getMessage()));
+                    }
+                }
+
+
+            }
+        });
+    }
+
+    public void liberarTotalInicial() {
+
+        for (int a = 0; a < mTotalInicialIndexLiberar.size(); a++) {
+
+            mLiberarTotalInicialCompetionTask.add(new TaskCompletionSource<>());
+            mLiberarTotalInicialTask.add(mLiberarTotalInicialCompetionTask.get(mLiberarTotalInicialCompetionTask.size() - 1).getTask());
+            mLiberarTotalInicialTask.get(mLiberarTotalInicialTask.size() - 1).addOnCompleteListener(new OnCompleteListener() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+                    Log.i(LOG_TAG, "liberarTotalInicial onComplete liberarTotalInicial" + task.toString());
+                    if (task.isSuccessful()) {
+                        ((DataSnapshot) task.getResult()).getKey();
+                        int index=mTotalInicialIndexLiberar.indexOf(((DataSnapshot) task.getResult()).getKey());
+                        if(index >-1) {
+                            Log.i("liberarTotalInicial", "Liberacion de la key" + ((DataSnapshot) task.getResult()).getKey() + " - index: " + index);
+                            mTotalInicialIndexLiberar.remove(index);
+                            mLiberarTotalInicialCompetionTask.remove(index);
+                            mLiberarTotalInicialTask.remove(index);
+                        }
+                        if (mTotalInicialIndexLiberar.size() == 0) {
+                            Log.i("liberarTotalInicial", "Liberacion Completa");
+                            mLiberarSemaforoTotalInicial = false;
+                            Log.i(LOG_TAG, "liberarTotalInicial onComplete mLiberarSemaforoTotalInicial" + mLiberarSemaforoTotalInicial);
+
+                        }
+                    }
+
+                }
+            });
+            mLiberarTotalInicialTask.get(mLiberarTotalInicialTask.size() - 1).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.i(LOG_TAG, "liberarTotalInicial onFailure liberarTotalInicial " + e.toString());
+//                TOdo: ver que hacer cuando falla el relase. cuanto se insiste;
+//                liberarTotalInicial(productoKey);
+                }
+            });
+
+            mDatabase.child(ESQUEMA_ORDENES_TOTAL_INICIAL).child(mEmpresaKey).child(mTotalInicialIndexLiberar.get(a)).runTransaction(new Transaction.Handler() {
+                @Override
+                public Transaction.Result doTransaction(MutableData mutableData) {
+
+                    // Bloqueo la orden para modificaciones,
+                    // Actualizo  el esquema y luego lo libero.
+
+                    Detalle detalle = mutableData.getValue(Detalle.class);
+
+
+                    if (detalle == null) {
+                        Log.i(LOG_TAG, "liberarTotalInicial CabeceraOrden = NuLL- ");
+                    } else {
+                        Log.i(LOG_TAG, "liberarTotalInicial CabeceraOrden = not NuLL-detalle.sepuedeModificar() " + detalle.sepuedeModificar());
+
+                        if (!detalle.sepuedeModificar()) {
+                            Log.i(LOG_TAG, "liberarTotalInicial NO, se puede Modificar y liberar");
+                            detalle.liberar();
+                        } else {
+                            Log.i(LOG_TAG, "liberarTotalInicial No se puede Modificar ");
+                            return Transaction.abort();
+                        }
+
+                    }
+
+                    // Set value and report transaction success
+                    mutableData.setValue(detalle);
+                    return Transaction.success(mutableData);
+                }
+
+                @Override
+                public void onComplete(DatabaseError databaseError, boolean commited,
+                                       DataSnapshot dataSnapshot) {
+                    int index = mTotalInicialIndexLiberar.indexOf(dataSnapshot.getKey());
+                    // Transaction completed
+                    Log.d(LOG_TAG, "liberarTotalInicial: boolean b" + commited);
+                    if (commited) {
+//                    mLiberarSemaforoTotalInicial=false;
+                        mLiberarTotalInicialCompetionTask.get(index).setResult(dataSnapshot);
+//                    mTotalInicialCompletionTask.setResult(dataSnapshot);
+                        Log.i(LOG_TAG, "liberarTotalInicial onComplete True ");
+                        Detalle detalle = dataSnapshot.getValue(Detalle.class);
+                        if (detalle == null) {
+                            Log.d(LOG_TAG, "liberarTotalInicial:onComplete: detalle.getCantidadOrden() NULL");
+                        } else {
+                            Log.d(LOG_TAG, "liberarTotalInicial:onComplete: detalle.semaforo" + detalle.getSemaforo()
+                                    + "-" + detalle.getCantidadOrden());
+                        }
+                    } else {
+                        if (databaseError == null) {
+                            mLiberarTotalInicialCompetionTask.get(index).setException(new Exception("Error Nulo"));
+                            Log.i(LOG_TAG, "liberarTotalInicial onComplete False " + "error nulo");
+                        } else {
+                            mLiberarTotalInicialCompetionTask.get(index).setException(new Exception(databaseError.toString()));
+                            Log.i(LOG_TAG, "liberarTotalInicial onComplete False " + databaseError.toString());
+                        }
+                    }
+
+
+                }
+            });
+
+        }
+    }
+
+    public void readBlockCabeceraOrden(long numeroOrdena) {
+        String numeroOrden = String.valueOf(numeroOrdena);
+
+//        Lee y bloquea el total Inicial para un pruducto de una empresa
+//        Si el producto esta bloqueda Retorna error
+//
+        Log.i(LOG_TAG, "readBlockCabeceraOrden Numero de orden:" + numeroOrden);
+
+
+        mCabeceraOrdenCompletionTask = new TaskCompletionSource<>();
+        mCabeceraOrdenTask = mCabeceraOrdenCompletionTask.getTask();
+        mCabeceraOrdenTask.addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                Log.i(LOG_TAG, "readBlockCabeceraOrden onComplete mCabeceraOrdenTask " + task.toString());
+                Log.i(LOG_TAG, "readBlockCabeceraOrden onComplete is succesfull " + task.isSuccessful());
+                if (task.isSuccessful()) {
+                    mLiberarSemaforoCabeceraOrden = true;
+                }
+            }
+        });
+        mCabeceraOrdenTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(LOG_TAG, "readBlockCabeceraOrden onFailure mCabeceraOrdenTask " + e.toString());
+//                mLiberarSemaforoCabeceraOrden=true;
+
+            }
+        });
+
+/*1-B*/
+        mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child(numeroOrden).child("cabecera").runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+
+                // Bloqueo la orden para modificaciones,
+                // Actualizo  el esquema y luego lo libero.
+
+                CabeceraOrden cabeceraOrden = mutableData.getValue(CabeceraOrden.class);
+
+                if (cabeceraOrden == null) {
+                    Log.i(LOG_TAG, "readBlockCabeceraOrden CabeceraOrden = NuLL- ");
+                } else {
+                    Log.i(LOG_TAG, "readBlockCabeceraOrden CabeceraOrden = not NuLL- cabeceraOrden.sepuedeModificar()" + cabeceraOrden.sepuedeModificar());
+
+                    if (cabeceraOrden.sepuedeModificar()) {
+                        Log.i(LOG_TAG, "readBlockCabeceraOrden Si, se puede Modificar y bloqueo");
+                        cabeceraOrden.bloquear();
+                    } else {
+                        Log.i(LOG_TAG, "readBlockCabeceraOrden  blqueado No se puede Modificar Orden "+cabeceraOrden.getNumeroDeOrden());
+//                        mCabeceraOrdenCompletionTask.setException(new Exception("Bloqueado"));
+                        return Transaction.abort();
+                    }
+
+                }
+
+                // Set value and report transaction success
+                mutableData.setValue(cabeceraOrden);
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean commited,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: boolean b" + commited);
+
+                if (commited) {
+
+                    mCabeceraOrdenCompletionTask.setResult(dataSnapshot);
+                    Log.i(LOG_TAG, "readBlockCabeceraOrden onComplete True ");
+                    CabeceraOrden cabeceraOrden = dataSnapshot.getValue(CabeceraOrden.class);
+                    if (cabeceraOrden == null) {
+                        Log.d(LOG_TAG, "readAndBlockCabeceraOrden Inicial cabecera NULL Task completa");
+                    } else {
+                        Log.d(LOG_TAG, "readBlockCabeceraOrden Inicial semaforo Task completa" + cabeceraOrden.getSemaforo());
+                    }
+                } else {
+
+
+                    if (databaseError == null) {
+                        mCabeceraOrdenCompletionTask.setException(new Exception("error nulo"));
+                        Log.i(LOG_TAG, "readBlockCabeceraOrden Task incompleta error " + "error nulo");
+                    } else {
+                        mCabeceraOrdenCompletionTask.setException(new Exception(databaseError.toString()));
+                        Log.i(LOG_TAG, "readBlockCabeceraOrden Task incompleta " + databaseError.toString());
+                    }
+
+                }
+
+
+            }
+        });
+    }
+
+    public void liberarCabeceraOrden(String numeroOrden) {
+
+        mLiberarcabeceraOrdenCompletionTask = new TaskCompletionSource<>();
+        mLiberarCabeceraOrdenTask = mLiberarcabeceraOrdenCompletionTask.getTask();
+        mLiberarCabeceraOrdenTask.addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                Log.i(LOG_TAG, "liberarCabeceraOrden onComplete liberarTotalInicial" + task.toString());
+                if (task.isSuccessful()) {
+                    mLiberarSemaforoCabeceraOrden = false;
+                    Log.i(LOG_TAG, "liberarCabeceraOrden onComplete mLiberarSemaforoCabeceraOrden " + mLiberarSemaforoCabeceraOrden);
+                }
+
+            }
+        });
+        mLiberarCabeceraOrdenTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(LOG_TAG, "liberarCabeceraOrden onFailure liberarTotalInicial " + e.toString());
+//                TOdo: ver que hacer cuando falla el relase. cuanto se insiste;
+//                liberarTotalInicial(productoKey);
+            }
+        });
+
+
+//        *1-B*/
+        mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child(numeroOrden).child("cabecera").runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+
+                // Bloqueo la orden para modificaciones,
+                // Actualizo  el esquema y luego lo libero.
+
+                CabeceraOrden cabeceraOrden = mutableData.getValue(CabeceraOrden.class);
+
+                if (cabeceraOrden == null) {
+                    Log.i(LOG_TAG, "liberarCabeceraOrden CabeceraOrden = NuLL- ");
+                } else {
+                    Log.i(LOG_TAG, "liberarCabeceraOrden CabeceraOrden = not NuLL- cabeceraOrden.sepuedeModificar()" + cabeceraOrden.sepuedeModificar());
+                    if (!cabeceraOrden.sepuedeModificar()) {
+                        Log.i(LOG_TAG, "liberarCabeceraOrden Si, se puede Modificar y bloqueo");
+                        cabeceraOrden.liberar();
+                    } else {
+                        Log.i(LOG_TAG, "liberarCabeceraOrden No se puede Lberar ");
+//                        mCabeceraOrdenCompletionTask.setException(new Exception("Bloqueado"));
+                        return Transaction.abort();
+                    }
+
+                }
+
+                // Set value and report transaction success
+                mutableData.setValue(cabeceraOrden);
+
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean commited,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(LOG_TAG, "liberarCabeceraOrden: boolean b" + commited);
+
+                if (commited) {
+
+                    mLiberarcabeceraOrdenCompletionTask.setResult(dataSnapshot);
+                    Log.i(LOG_TAG, "liberarCabeceraOrden onComplete True ");
+                    CabeceraOrden cabeceraOrden = dataSnapshot.getValue(CabeceraOrden.class);
+                    if (cabeceraOrden == null) {
+                        Log.d(LOG_TAG, "liberarCabeceraOrden cabecera NULL Task completa");
+                    } else {
+                        Log.d(LOG_TAG, "liberarCabeceraOrden semaforo Task completa" + String.valueOf(cabeceraOrden.getSemaforo()));
+                    }
+                } else {
+//                    mCabeceraOrdenCompletionTask.setException(new Exception("Bloqueado"));
+
+
+                    if (databaseError == null) {
+                        mLiberarcabeceraOrdenCompletionTask.setException(new Exception("Error Nulo"));
+                        Log.i(LOG_TAG, "liberarCabeceraOrden Task incompleta " + "error nulo");
+                    } else {
+                        mLiberarcabeceraOrdenCompletionTask.setException(new Exception(databaseError.toString()));
+                        Log.i(LOG_TAG, "liberarCabeceraOrden Task incompleta " + databaseError.toString());
+                    }
+
+                }
+
+
+            }
+        });
+    }
+
+
+    public void readBlockProductosEnOrdenes(String productKey, long numeroDeOrdena) {
+
+//        Lee y bloquea prodcutos en Ordenes 5
+
+        String numeroDeOrden = String.valueOf(numeroDeOrdena);
+        mProductosEnOrdenesCompletionTask = new TaskCompletionSource<>();
+        mProductosEnOrdenesTask = mProductosEnOrdenesCompletionTask.getTask();
+        mProductosEnOrdenesTask.addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if (task.isSuccessful()) {
+                    mLiberarSemaforoProductosEnOrdenes = true;
+                }
+            }
+        });
+
+/*5*/
+        mDatabase.child(ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL).child(mEmpresaKey).child(productKey).child(numeroDeOrden).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                PrductosxOrden productosEnOrdenes = mutableData.getValue(PrductosxOrden.class);
+                if (productosEnOrdenes == null) {
+                } else {
+                    if (productosEnOrdenes.sepuedeModificar()) {
+                        productosEnOrdenes.bloquear();
+                    } else {
+                        return Transaction.abort();
+                    }
+
+                }
+                mutableData.setValue(productosEnOrdenes);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean commited,
+                                   DataSnapshot dataSnapshot) {
+                if (commited) {
+                    mProductosEnOrdenesCompletionTask.setResult(dataSnapshot);
+                    Log.i(LOG_TAG, "readBlockCabeceraOrden Task completa " );
+
+                } else {
+                    if (databaseError == null) {
+                        mProductosEnOrdenesCompletionTask.setException(new Exception("error nulo"));
+                        Log.i(LOG_TAG, "readBlockCabeceraOrden Task incompleta " + databaseError.toString());
+
+                    } else {
+                        mProductosEnOrdenesCompletionTask.setException(new Exception(databaseError.toString()));
+                        Log.i(LOG_TAG, "readBlockCabeceraOrden Task incompleta " + databaseError.toString());
+                    }
+                }
+            }
+        });
+    }
+
+    public void liberarProductosEnOrdenes(String productKey, String numeroDeOrden) {
+
+        mLiberarProductosEnOrdenesCompletionTask = new TaskCompletionSource<>();
+        mLiberarProductosEnOrdenesTask = mLiberarProductosEnOrdenesCompletionTask.getTask();
+        //noinspection unchecked
+        mLiberarProductosEnOrdenesTask.addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if (task.isSuccessful()) {
+                    mLiberarSemaforoProductosEnOrdenes = false;
+                }
+            }
+        });
+        mLiberarProductosEnOrdenesTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+            }
+        });
+
+
+
+/*5*/
+        mDatabase.child(ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL).child(mEmpresaKey).child(productKey).child(numeroDeOrden).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                PrductosxOrden productosxOrden = mutableData.getValue(PrductosxOrden.class);
+                if (productosxOrden == null) {
+                } else {
+                    if (!productosxOrden.sepuedeModificar()) {
+                        productosxOrden.liberar();
+                    } else {
+                        return Transaction.abort();
+                    }
+                }
+                mutableData.setValue(productosxOrden);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean commited, DataSnapshot dataSnapshot) {
+                if (commited) {
+                    mLiberarProductosEnOrdenesCompletionTask.setResult(dataSnapshot);
+                } else {
+                    if (databaseError == null) {
+                        mLiberarProductosEnOrdenesCompletionTask.setException(new Exception("Error Nulo"));
+                    } else {
+
+                        mLiberarProductosEnOrdenesCompletionTask.setException(new Exception(databaseError.toString()));
+                    }
+                }
+            }
+        });
+    }
+
+    public void limpiarTodosLosSemaforosLiberar() {
+        mLiberarSemaforoTotalInicial = false;
+        mLiberarSemaforoCabeceraOrden = false;
+        mLiberarSemaforoProductosEnOrdenes = false;
+        mLiberarSemaforoPicking = false;
+        mLiberarSemaforoPickingTotal = false;
+    }
+
+
+    public void readBlockPicking(int estado, Long numeroPicking) {
+
+//        Lee y bloquea  Ordenes ce Picking 6
+
+
+        mPickingCompletionTask = new TaskCompletionSource<>();
+        mPickingTask = mPickingCompletionTask.getTask();
+        mPickingTask.addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if (task.isSuccessful()) {
+                    mLiberarSemaforoPicking = true;
+                }
+            }
+        });
+
+/*6*/
+        mDatabase.child(ESQUEMA_PICKING).child(mEmpresaKey).child(String.valueOf(estado)).child(String.valueOf(numeroPicking)).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                CabeceraPicking cabeceraPicking = mutableData.getValue(CabeceraPicking.class);
+                if (cabeceraPicking == null) {
+                } else {
+                    if (cabeceraPicking.sepuedeModificar()) {
+                        cabeceraPicking.bloquear();
+                    } else {
+                        return Transaction.abort();
+                    }
+
+                }
+                mutableData.setValue(cabeceraPicking);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean commited,
+                                   DataSnapshot dataSnapshot) {
+                if (commited) {
+                    Log.i(LOG_TAG, "readBlockPicking Task completa " );
+                    mPickingCompletionTask.setResult(dataSnapshot);
+                } else {
+                    if (databaseError == null) {
+                        Log.i(LOG_TAG, "readBlockPicking Task incompleta " + "error nulo");
+                        mPickingCompletionTask.setException(new Exception("error nulo"));
+                    } else {
+                        Log.i(LOG_TAG, "readBlockPicking Task incompleta " + databaseError.toString());
+                        mPickingCompletionTask.setException(new Exception(databaseError.toString()));
+                    }
+                }
+            }
+        });
+    }
+
+    public void liberarPicking(int estado, long numeroPicking) {
+
+        mLiberarPickingCompletionTask = new TaskCompletionSource<>();
+        mLiberarPickingTask = mLiberarPickingCompletionTask.getTask();
+        //noinspection unchecked
+        mLiberarPickingTask.addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if (task.isSuccessful()) {
+                    mLiberarSemaforoPicking = false;
+                }
+            }
+        });
+        mLiberarPickingTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+            }
+        });
+
+/*6*/
+        mDatabase.child(ESQUEMA_PICKING).child(mEmpresaKey).child(String.valueOf(estado)).child(String.valueOf(numeroPicking)).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                CabeceraPicking cabeceraPicking = mutableData.getValue(CabeceraPicking.class);
+                if (cabeceraPicking == null) {
+                } else {
+                    if (!cabeceraPicking.sepuedeModificar()) {
+                        cabeceraPicking.liberar();
+                    } else {
+                        return Transaction.abort();
+                    }
+                }
+                mutableData.setValue(cabeceraPicking);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean commited, DataSnapshot dataSnapshot) {
+                if (commited) {
+                    mLiberarPickingCompletionTask.setResult(dataSnapshot);
+                } else {
+                    if (databaseError == null) {
+                        mLiberarPickingCompletionTask.setException(new Exception("Error Nulo"));
+                    } else {
+                        mLiberarPickingCompletionTask.setException(new Exception(databaseError.toString()));
+                    }
+                }
+            }
+        });
+    }
+
+    public void readBlockPickingTotal(int estado, long numeroPicking, String productKey) {
+
+//        Lee y bloquea  Ordenes ce Picking 6
+        mPickingTotalIndex.add(productKey);
+
+
+        mPickingTotalCompletionTask.add(new TaskCompletionSource<>());
+        mPickingTotalTask.add(mPickingTotalCompletionTask.get(mPickingTotalCompletionTask.size() - 1).getTask());
+        mPickingTotalTask.get(mPickingTotalTask.size() - 1).addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if (task.isSuccessful()) {
+                    Log.i("readBlockPickingTotal", "task.isSuccessful()" + task.isSuccessful());
+                    mPickingTotalIndexLiberar.add(((DataSnapshot) task.getResult()).getKey());// /agrego las Key de los productos bloqueados
+                    mLiberarSemaforoPickingTotal = true;
+                }
+            }
+        });
+
+/*7*/
+        mDatabase.child(ESQUEMA_PICKING_TOTAL).child(mEmpresaKey).child(String.valueOf(estado)).child(String.valueOf(numeroPicking)).child(productKey).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Detalle detalle = mutableData.getValue(Detalle.class);
+                if (detalle == null) {
+                    Log.i("readBlockPickingTotal", " tdetalle == null" );
+                } else {
+                    if (detalle.sepuedeModificar()) {
+                        Log.i("readBlockPickingTotal", "detalle.sepuedeModificar() "+detalle.sepuedeModificar() );
+                        detalle.bloquear();
+                    } else {
+                        Log.i("readBlockPickingTotal", "Bloqueado "+detalle.getProducto().getNombreProducto() );
+                        return Transaction.abort();
+                    }
+
+                }
+                mutableData.setValue(detalle);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean commited,
+                                   DataSnapshot dataSnapshot) {
+                int index = mPickingTotalIndex.indexOf(dataSnapshot.getKey());
+                Log.i("readBlockPickingTotal", "onComplete index"+index );
+                if (commited) {
+                    Log.i("readBlockPickingTotal", "Task completa commited "+commited);
+                    mPickingTotalCompletionTask.get(index).setResult(dataSnapshot);
+                } else {
+                    if (databaseError == null) {
+                        Log.i("readBlockPickingTotal", "Task incompletadatabaseError == null");
+                        mPickingTotalCompletionTask.get(index).setException(new Exception("error nulo"));
+                    } else {
+                        Log.i("readBlockPickingTotal", "Task incompleta databaseError == "+databaseError.toString());
+                        mPickingTotalCompletionTask.get(index).setException(new Exception(databaseError.toString()));
+                    }
+                }
+            }
+        });
+    }
+
+    public void liberarPickingTotal(int estado, long numeroPicking) {
+
+        for (int a = 0; a < mPickingTotalIndexLiberar.size(); a++) {
+
+            mLiberarPickingTotalCompletionTask.add(new TaskCompletionSource<>());
+            mLiberarPickingTotalTask.add(mLiberarPickingTotalCompletionTask.get(mLiberarPickingTotalCompletionTask.size() - 1).getTask());
+            //noinspection unchecked
+            mLiberarPickingTotalTask.get(mLiberarPickingTotalTask.size() - 1).addOnCompleteListener(new OnCompleteListener() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+                    if (task.isSuccessful()) {
+                        Log.i("LiberarPicking", "task.isSuccessful()" + task.isSuccessful());
+                        int index=mPickingTotalIndexLiberar.indexOf(((DataSnapshot) task.getResult()).getKey());
+                        Log.i("LiberarPicking", "getKey: " +  ((DataSnapshot) task.getResult()).getKey()+" index: "+index);
+                        if(index >-1) {
+                            Log.i("LiberarPicking", "Liberacion de la key" + ((DataSnapshot) task.getResult()).getKey() + " - index: " + index);
+                            mPickingTotalIndexLiberar.remove(index);
+                            mLiberarPickingTotalCompletionTask.remove(index);
+                            mLiberarPickingTotalTask.remove(index);
+                        }
+                        if (mPickingTotalIndexLiberar.size() == 0) {
+                            Log.i("LiberarPicking", "Liberacion Completa");
+                            mLiberarSemaforoPicking = false;
+                        }
+                    }
+                }
+            });
+            mLiberarPickingTotalTask.get(mLiberarPickingTotalTask.size() - 1).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                }
+            });
+
+/*7*/
+            mDatabase.child(ESQUEMA_PICKING_TOTAL).child(mEmpresaKey).child(String.valueOf(estado)).child(String.valueOf(numeroPicking)).child(mPickingTotalIndexLiberar.get(a)).runTransaction(new Transaction.Handler() {
+
+                @Override
+                public Transaction.Result doTransaction(MutableData mutableData) {
+                    Detalle cetalle = mutableData.getValue(Detalle.class);
+                    if (cetalle == null) {
+                    } else {
+                        if (!cetalle.sepuedeModificar()) {
+                            cetalle.liberar();
+                        } else {
+                            return Transaction.abort();
+                        }
+                    }
+                    mutableData.setValue(cetalle);
+                    return Transaction.success(mutableData);
+                }
+
+                @Override
+                public void onComplete(DatabaseError databaseError, boolean commited, DataSnapshot dataSnapshot) {
+                    int index = mPickingTotalIndexLiberar.indexOf(dataSnapshot.getKey());
+
+                    if (commited) {
+                        mLiberarPickingTotalCompletionTask.get(index).setResult(dataSnapshot);
+                    } else {
+                        if (databaseError == null) {
+                            mLiberarPickingTotalCompletionTask.get(index).setException(new Exception("Error Nulo"));
+                        } else {
+                            mLiberarPickingTotalCompletionTask.get(index).setException(new Exception(databaseError.toString()));
+                        }
+                    }
+                }
+            });
+        }
+    }
+    public void onDialogAlert(String mensaje) {
+        AlertDialog.Builder alert;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            alert = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
+        } else {
+            alert = new AlertDialog.Builder(getContext());
+        }
+        alert.setMessage(mensaje);
+        alert.create().show();
+        alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+    }
+    public void liberarRecusosTomados(long numeroOrdena, String mProductKey) {
+        String nomeroDeOrden = String.valueOf(numeroOrdena);
+        Log.i(LOG_TAG, "liberarRecusosTomados-mLiberarSemaforoTotalInicial " + mLiberarSemaforoTotalInicial);
+        Log.i(LOG_TAG, "liberarRecusosTomados-mLiberarSemaforoCabeceraOrden " + mLiberarSemaforoCabeceraOrden);
+        Log.i(LOG_TAG, "liberarRecusosTomados-mLiberarSemaforoProductosEnOrdenes " + mLiberarSemaforoProductosEnOrdenes);
+        Log.i(LOG_TAG, "liberarRecusosTomados-mLiberarSemaforoPicking " + mLiberarSemaforoPicking);
+        Log.i(LOG_TAG, "liberarRecusosTomados-mLiberarSemaforoPickingTotal " + mLiberarSemaforoPickingTotal);
+
+        if (mLiberarSemaforoTotalInicial) {
+            liberarTotalInicial();
+        }
+        if (mLiberarSemaforoCabeceraOrden) {
+            liberarCabeceraOrden(nomeroDeOrden);
+        }
+        if (mLiberarSemaforoProductosEnOrdenes) {
+            liberarProductosEnOrdenes(nomeroDeOrden, mProductKey);
+        }
+        if (mLiberarSemaforoPicking) {
+            liberarPicking(PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+        }
+        if (mLiberarSemaforoPickingTotal) {
+            liberarPickingTotal(PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+        }
+
+    }
+
+    public DatabaseReference refCabeceraOrden_1B(long nuemeroOrden) {
+        return mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child(String.valueOf(nuemeroOrden)).child("cabecera");
+    }
+
+    public String nodoCabeceraOrden_1B(long nuemeroOrden) {
+        return NODO_ORDENES + mEmpresaKey + "/" + String.valueOf(nuemeroOrden) + "/" + "cabecera";
+
+    }
+
+    public DatabaseReference refDetalleOrden_1C(long nuemeroOrden, String productKey) {
+        return mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child(String.valueOf(nuemeroOrden)).child(productKey);
+    }
+
+    public String nodoDetalleOrden_1C(long nuemeroOrden, String productKey) {
+        return NODO_ORDENES + mEmpresaKey + "/" + String.valueOf(nuemeroOrden) + "/" + productKey;
+
+    }
+
+    public DatabaseReference refDetalleOrden_4(long nuemeroOrden, String productKey) {
+        return mDatabase.child(ESQUEMA_ORDENES_DETALLE).child(mEmpresaKey).child(String.valueOf(nuemeroOrden)).child(productKey);
+    }
+
+    public String nodoDetalleOrden_4(long nuemeroOrden, String productKey) {
+        return NODO_ORDENES_DETALLE + "/" + mEmpresaKey + "/" + nuemeroOrden + "/" + productKey;
+    }
+
+    public DatabaseReference refDetalleOrden_4_ListaXOrden(long nuemeroOrden) {//trae todos los Productos de una Orden
+        return mDatabase.child(ESQUEMA_ORDENES_DETALLE).child(mEmpresaKey).child(String.valueOf(nuemeroOrden));
+    }
+
+    public String nodoDetalleOrden_4_ListaXOrden(long nuemeroOrden) {//trae todos los Productos de una Orden
+        return NODO_ORDENES_DETALLE + "/" + mEmpresaKey + "/" + nuemeroOrden;
+    }
+
+    public DatabaseReference refCabeceraOrden_2(long nuemeroOrdena, int statusOrden) {
+        String statusString = String.valueOf(statusOrden);
+        return mDatabase.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(statusString).child(String.valueOf(nuemeroOrdena));
+    }
+
+    public String nodoCabeceraOrden_2(long nuemeroOrdena, int statusOrden) {
+        String statusString = String.valueOf(statusOrden);
+        return NODO_ORDENES_CABECERA + "/" + mEmpresaKey + "/" + statusString + "/" + nuemeroOrdena;
+    }
+    public DatabaseReference refCabeceraOrden_2_List( int statusOrden) {
+        String statusString = String.valueOf(statusOrden);
+        return mDatabase.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(String.valueOf(statusString));
+    }
+
+
+    public DatabaseReference refProductosXOrdenInicial_5(String productKey, long nuemeroOrden) {
+        return mDatabase.child(ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL).child(mEmpresaKey).child(productKey).child(String.valueOf(nuemeroOrden));
+    }
+
+    public String nodoProductosXOrdenInicial_5(String productKey, long nuemeroOrden) {
+        return NODO_PRODUCTOS_EN_ORDENES_INICIAL + "/" + mEmpresaKey + "/" + productKey + "/" + nuemeroOrden;
+    }
+
+    public DatabaseReference refPicking_6(int statusPicking, long numeroPicking) {
+        return mDatabase.child(ESQUEMA_PICKING).child(mEmpresaKey).child(String.valueOf(statusPicking)).child(String.valueOf(numeroPicking));
+
+    }
+
+    public String nodoPicking_6(int statusPicking, String numeroPicking) {
+        return NODO_PICKING + mEmpresaKey + "/" + statusPicking + "/" + numeroPicking;
+    }
+
+    public DatabaseReference refPicking_6_List(int statusPicking) {
+        return mDatabase.child(ESQUEMA_PICKING).child(mEmpresaKey).child(String.valueOf(statusPicking));
+//        return mDatabase.child(NODO_PICKING).child(mEmpresaKey).child(String.valueOf(statusPicking)).child(String.valueOf(numeroPicking));
+
+    }
+
+    public String nodoPicking_6_List(int statusPicking) {
+        return NODO_PICKING + mEmpresaKey + "/" + statusPicking;
+    }
+
+
+    public DatabaseReference refPickingTotal_7_List(int statusPicking,long nroPicking) {
+        return mDatabase.child(ESQUEMA_PICKING_TOTAL).child(mEmpresaKey).child(String.valueOf(statusPicking)).child(String.valueOf(nroPicking));
+//        return mDatabase.child(NODO_PICKING).child(mEmpresaKey).child(String.valueOf(statusPicking)).child(String.valueOf(numeroPicking));
+
+    }
+
+    public String nodoPickingTotal_7_List(int statusPicking) {
+        return NODO_PICKING_TOTAL + mEmpresaKey + "/" + statusPicking;
+    }
+
+    public DatabaseReference refPickingTotal_7(int statusPicking, String productKey) {
+        return mDatabase.child(ESQUEMA_PICKING_TOTAL).child(mEmpresaKey).child(String.valueOf(statusPicking)).child(productKey);
+//        return mDatabase.child(NODO_PICKING).child(mEmpresaKey).child(String.valueOf(statusPicking)).child(String.valueOf(numeroPicking));
+
+    }
+
+    public String nodoPickingTotal_7(int statusPicking, long nroPicking , String productKey) {
+        return NODO_PICKING_TOTAL + mEmpresaKey + "/" + statusPicking + "/" + nroPicking+ "/" + productKey;
+    }
+
+
+    public DatabaseReference refTotalInicial_3(String productoKey) {
+        return mDatabase.child(ESQUEMA_ORDENES_TOTAL_INICIAL).child(mEmpresaKey).child(productoKey);
+    }
+
+    public String nodoTotalInicial_3(String productoKey) {
+        return NODO_ORDENES_TOTAL_INICIAL + mEmpresaKey + "/" + (productoKey);
+    }
+
+    public DatabaseReference refProductoFavoritoDeCliente(String clienteKey, String productKey) {
+        return mDatabase.child(ESQUEMA_FAVORITOS).child(mEmpresaKey).child(clienteKey).child(productKey);
+    }
+
+    public String nodoProductoFavoritoDeCliente(String clienteKey, String productKey) {
+        return NODO_FAVORITOS + mEmpresaKey + "/" + clienteKey + "/" + productKey;
+    }
+
+    public DatabaseReference refListaFavoritosXCliente(String clienteKey) {
+        return mDatabase.child(ESQUEMA_FAVORITOS).child(mEmpresaKey).child(clienteKey);
+    }
+
+    public String nodoListaFavoritosXCliente(String clienteKey) {
+        return NODO_FAVORITOS + mEmpresaKey + "/" + clienteKey;
+    }
+
 }
 
 

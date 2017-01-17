@@ -31,6 +31,11 @@ import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,7 +73,6 @@ import static com.nextnut.logistica.util.Constantes.ADAPTER_DETALLE_ORDEN;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_FAVORITOS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_DETALLE;
-import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_TOTAL_INICIAL;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_KEYLIST;
@@ -78,6 +82,8 @@ import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_DETALLE;
 import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
+import static com.nextnut.logistica.util.Constantes.detalleOrdenRef_1C;
+import static com.nextnut.logistica.util.Constantes.detalleOrdenRef_4;
 
 /**
  * A fragment representing a single CustomOrder detail screen.
@@ -103,7 +109,12 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     private CheckBox mCheckBox_for_favorite;
     private Cursor c_favorite;
 
-private Detalle mDetalleAnterior;
+    private Detalle mDetalleAnterior;
+    private Detalle mDetalleDato;//Tiene los datos a ser cargados en una operacion
+    private Double mCantidadDato;//Tiene los datos a ser cargados en una operacion
+    private String mproductKeyDato;
+    private DataSnapshot mDataSanpshotFavoritosDato;//Tiene los datos a ser cargados en una operacion
+    private DataSnapshot mDataSanpshotDetalleDeOrdenDato;//Tiene los datos a ser cargados en una operacion
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -111,7 +122,6 @@ private Detalle mDetalleAnterior;
 
     public static final String ARG_ITEM_ID = "item_id";
     public static final String CUSTOM_ORDER_ACTION = "custom_order_action";
-
 
 
     private TextView mOrderNumber;
@@ -134,6 +144,7 @@ private Detalle mDetalleAnterior;
 
 
     private Button mBotonSeleccionCliente;
+    private Button mBotonSeleccionProduto;
 
     private int mAction;
 
@@ -207,29 +218,7 @@ private Detalle mDetalleAnterior;
     }
 
 
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        switch (mAction) {
-//            case CUSTOM_ORDER_NEW: // Go to the last order
-//                getLoaderManager().initLoader(CUSTOM_LOADER_NEW, null, this);
-//                break;
-//
-//            case CUSTOM_ORDER_SELECTION: // Go to the mItem order.
-//                getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
-//                getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-//                break;
-//            case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
-//                getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
-//                getLoaderManager().initLoader(PRODUCTS_LOADER, null, this);
-////                openButton.setVisibility(View.VISIBLE);
-////                sendButton.setVisibility(View.VISIBLE);
-//                break;
-//            default:
-//                break;
-//        }
-//        super.onActivityCreated(savedInstanceState);
-//
-//    }
+
 
     @Override
     public void onResume() {
@@ -307,7 +296,7 @@ private Detalle mDetalleAnterior;
         mBotonSeleccionCliente = (Button) mRootView.findViewById(R.id.botonSelecionCliente);
         mBotonSeleccionCliente.setVisibility(View.VISIBLE);
 
-        final Button mBotonSeleccionProduto = (Button) mRootView.findViewById(R.id.botonSelecionProdcuto);
+        mBotonSeleccionProduto = (Button) mRootView.findViewById(R.id.botonSelecionProdcuto);
 //        mBotonSeleccionProduto.setVisibility(View.VISIBLE);
 
         mCustomName = (TextView) mRootView.findViewById(R.id.custom_name_text);
@@ -350,48 +339,72 @@ private Detalle mDetalleAnterior;
             }
 
         });
+        mBotonSeleccionProduto.setVisibility(View.GONE);
 
         final View emptyView = mRootView.findViewById(R.id.recyclerview_product_empty);
         mDetalleRecyclerView = (RecyclerView) mRootView.findViewById(R.id.product_list_customOrder);
-        mBotonSeleccionProduto.setVisibility(View.GONE);
+
         Query productosAsignados = getQuery(mDatabase);
         mKeyList = new ArrayList<String>();
-        mDatabase.child(ESQUEMA_ORDENES_DETALLE).child(mEmpresaKey).child(String.valueOf(mCabeceraOrden.getNumeroDeOrden()))
-        .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(LOG_TAG, "favorito Cantidad de getChildrenCount: " + dataSnapshot.getChildrenCount());
-                Log.d(LOG_TAG, "favorito Cantidad de getRef(): " + dataSnapshot.getRef());
-                Log.d(LOG_TAG, "favorito Cantidad de getKey(): " + dataSnapshot.getKey());
-                Log.d(LOG_TAG, "favorito Cantidad de exists(): " + dataSnapshot.exists());
-                Log.d(LOG_TAG, "favorito Cantidad de hasChildren(): " + dataSnapshot.hasChildren());
+        // me fijo si hay productos cargados. si No hay busco en favoritos y los agrego. Luego muestro el boton para agregar productos.
+        refDetalleOrden_4_ListaXOrden(mCabeceraOrden.getNumeroDeOrden())
+//        mDatabase.child(ESQUEMA_ORDENES_DETALLE).child(mEmpresaKey).child(String.valueOf(mCabeceraOrden.getNumeroDeOrden()))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(LOG_TAG, "favorito Cantidad de getChildrenCount: " + dataSnapshot.getChildrenCount());
+                        Log.d(LOG_TAG, "favorito Cantidad de getRef(): " + dataSnapshot.getRef());
+                        Log.d(LOG_TAG, "favorito Cantidad de getKey(): " + dataSnapshot.getKey());
+                        Log.d(LOG_TAG, "favorito Cantidad de exists(): " + dataSnapshot.exists());
+                        Log.d(LOG_TAG, "favorito Cantidad de hasChildren(): " + dataSnapshot.hasChildren());
 
-                if (!dataSnapshot.exists()) {
-                    Log.d(LOG_TAG, "favorito Sin Productos Asignados ");
-                    addFavorite();
+                        if (!dataSnapshot.exists()) {
+                            Log.d(LOG_TAG, "favorito Sin Productos Asignados ");
+                            refListaFavoritosXCliente(mCabeceraOrden.getClienteKey())
+//                            mDatabase.child(ESQUEMA_FAVORITOS).child(mEmpresaKey).child(mCabeceraOrden.getClienteKey())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        //Existen favoritos para agregar.
+                                        mDataSanpshotFavoritosDato = dataSnapshot;
+                                        addFavorite();
+                                    } else {
+                                        // no existen favoritos para agregar
+                                        mBotonSeleccionProduto.setVisibility(View.VISIBLE);
+                                        mKeyList.add(null);
+
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    mBotonSeleccionProduto.setVisibility(View.VISIBLE);
+                                }
+                            });
 
 
-                } else {
-                    Log.d(LOG_TAG, "favorito Con Productos Asignados. ");
-                    for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
-                        mKeyList.add(messageSnapshot.getKey());
-//                                String category = (String) messageSnapshot.child("category").getValue();
-                        Log.d(LOG_TAG, "favoritos asignados onAuthSuccess-KEY" + messageSnapshot.getKey());
-                        mDatabase.child("copy").setValue(dataSnapshot.getValue());
+                        } else {
 
+                            // ya existen productos asignados a esta orden. Leo las claves para sacarlas del listado propuesto.
+                            Log.d(LOG_TAG, "favorito Con Productos Asignados. ");
+                            for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
+                                mKeyList.add(messageSnapshot.getKey());
+                                Log.d(LOG_TAG, "favoritos asignados onAuthSuccess-KEY" + messageSnapshot.getKey());
+                                mDatabase.child("copy").setValue(dataSnapshot.getValue());
+                                mBotonSeleccionProduto.setVisibility(View.VISIBLE);
+                            }
+
+                        }
 
                     }
 
-                }
-                mBotonSeleccionProduto.setVisibility(View.VISIBLE);
-            }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(LOG_TAG, "favorito error " + databaseError.toString());
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(LOG_TAG, "favorito error " + databaseError.toString());
-
-            }
-        });
+                    }
+                });
         mDetalleAdapter = new FirebaseRecyclerAdapter<Detalle, DetalleViewHolder>(Detalle.class, R.layout.order_detail_item,
                 DetalleViewHolder.class, productosAsignados) {
             @Override
@@ -407,10 +420,10 @@ private Detalle mDetalleAnterior;
                                                             @Override
                                                             public void onClick(View v) {
 //                                                                viewHolder.mfavorito.setChecked(!viewHolder.mfavorito.isChecked());
-                                                                Log.d(LOG_TAG, "favorito viewHolder nombre: "+viewHolder.mTextViewNombre);
-                                                                Log.d(LOG_TAG, "favorito model-Producto: "+model.getProducto().getNombreProducto());
-                                                                Log.d(LOG_TAG, "favorito  productkey: "+productKey);
-                                                                onFavorite(viewHolder, model,productKey);
+                                                                Log.d(LOG_TAG, "favorito viewHolder nombre: " + viewHolder.mTextViewNombre);
+                                                                Log.d(LOG_TAG, "favorito model-Producto: " + model.getProducto().getNombreProducto());
+                                                                Log.d(LOG_TAG, "favorito  productkey: " + productKey);
+                                                                onFavorite(viewHolder, model, productKey);
 
                                                             }
                                                         }
@@ -422,7 +435,7 @@ private Detalle mDetalleAnterior;
                             @Override
                             public void onClick(View view) {
                                 Log.d(LOG_TAG, "adapter:onClick model: " + model.getProducto().getNombreProducto());
-                                mDetalleAnterior=model;
+                                mDetalleAnterior = model;
                                 showDialogNumberPicker(productKey);
                             }
                         }
@@ -433,8 +446,9 @@ private Detalle mDetalleAnterior;
             @Override
             protected void onItemDismissHolder(Detalle model, int position) {
                 // TODO: ACTUALIZAR TOTALES !!!
-                mDetalleAnterior=model;
-                borrarProductoDeOrden(getRef(position).getKey(),model);
+                mDetalleAnterior = model;
+                abmDetalleDeOrden(0.0,getRef(position).getKey(), model);
+//                borrarProductoDeOrden(getRef(position).getKey(), model);
                 Log.d(LOG_TAG, " onItemDismissHolder: " + model.getProducto().getNombreProducto() + " pos: " + position);
                 Log.d(LOG_TAG, " onItemDismissHolder: " + " key: " + getRef(position).getKey());
 
@@ -445,7 +459,6 @@ private Detalle mDetalleAnterior;
                 Log.d(LOG_TAG, "onItemAcceptedHolder: " + model.getProducto().getNombreProducto() + " pos: " + position);
             }
         };
-
 
 
         if (mAction == CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY) {
@@ -464,12 +477,12 @@ private Detalle mDetalleAnterior;
     }
 
     public void onFavorite(final DetalleViewHolder viewHolder, final Detalle model, final String productKey) {
-        Log.d(LOG_TAG, "favorito viewHolder nombre: "+viewHolder.mTextViewNombre);
-        Log.d(LOG_TAG, "favorito model-Producto: "+model.getProducto().getNombreProducto());
-        Log.d(LOG_TAG, "favorito  productkey: "+productKey);
-        Log.d(LOG_TAG, "favorito  mEmpresaKey: "+mEmpresaKey);
-        Log.d(LOG_TAG, "favorito  mClienteKey: "+mCabeceraOrden.getClienteKey());
-        mDatabase.child(ESQUEMA_FAVORITOS).child(mEmpresaKey).child(mCabeceraOrden.getClienteKey()).child(productKey).addListenerForSingleValueEvent(new ValueEventListener() {
+        Log.d(LOG_TAG, "favorito viewHolder nombre: " + viewHolder.mTextViewNombre);
+        Log.d(LOG_TAG, "favorito model-Producto: " + model.getProducto().getNombreProducto());
+        Log.d(LOG_TAG, "favorito  productkey: " + productKey);
+        Log.d(LOG_TAG, "favorito  mEmpresaKey: " + mEmpresaKey);
+        Log.d(LOG_TAG, "favorito  mClienteKey: " + mCabeceraOrden.getClienteKey());
+        refProductoFavoritoDeCliente(mCabeceraOrden.getClienteKey(), (productKey)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getChildrenCount() > 0)// Eviste el favorito, preguntar si se quiere modificar
@@ -488,9 +501,9 @@ private Detalle mDetalleAnterior;
                     alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            if(viewHolder.mfavorito.isChecked()) {
+                            if (viewHolder.mfavorito.isChecked()) {
                                 mDatabase.child(ESQUEMA_FAVORITOS).child(mEmpresaKey).child(mCabeceraOrden.getClienteKey()).child(productKey).setValue(model);
-                            }else{
+                            } else {
                                 mDatabase.child(ESQUEMA_FAVORITOS).child(mEmpresaKey).child(mCabeceraOrden.getClienteKey()).child(productKey).removeValue();
 
                             }
@@ -514,115 +527,99 @@ private Detalle mDetalleAnterior;
 
     public void addFavorite() {
 
-        Log.d(LOG_TAG, "favorito  mEmpresaKey: "+mEmpresaKey);
-        Log.d(LOG_TAG, "favorito  mClienteKey: "+mCabeceraOrden.getClienteKey());
-        mDatabase.child(ESQUEMA_FAVORITOS).child(mEmpresaKey).child(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getChildrenCount() > 0)// Existen Favoritos
-                {
+        Log.d(LOG_TAG, "favorito  mEmpresaKey: " + mEmpresaKey);
+        Log.d(LOG_TAG, "favorito  mClienteKey: " + mCabeceraOrden.getClienteKey());
 //   1b -Bloqueo toda la orden y puedo modificar toda sus dependencias.  Pues modifico mientra tengo tomada la orden.
-                    mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child(String.valueOf(mCabeceraOrden.getNumeroDeOrden())).child("cabecera").runTransaction(new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        // Bloqueo la orden para modificaciones,
-                        // Actualizo  el esquema y luego lo libero.
+        refCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                // Bloqueo la orden para modificaciones,
+                // Actualizo  el esquema y luego lo libero.
 
-                        CabeceraOrden cabeceraOrden1b = mutableData.getValue(CabeceraOrden.class);
-                        if (cabeceraOrden1b == null) { // seria un error puesto que la cabecera se genera al conseguir el Nuevo Nro.
-                            Log.d(LOG_TAG, "orden:agregarProductoAlaOrden cabeceraOrden1b-null, es un error");
-                            return Transaction.success(mutableData);
-                        } else {
+                CabeceraOrden cabeceraOrden1b = mutableData.getValue(CabeceraOrden.class);
+                if (cabeceraOrden1b == null) { // seria un error puesto que la cabecera se genera al conseguir el Nuevo Nro.
+                    Log.d(LOG_TAG, "orden:abmDetalleDeOrden cabeceraOrden1b-null, es un error");
+                    return Transaction.success(mutableData);
+                } else {
 
-                            Map<String, Object> childUpdates = new HashMap<>();
-                            for (DataSnapshot data:dataSnapshot.getChildren()) {
-
-
-                                String productoKey = data.getKey();
-                                Detalle d = data.getValue(Detalle.class);
-                                Double cantidad = d.getCantidadOrden();
-                                Producto producto = d.getProducto();
-                                Log.d(LOG_TAG, "favorito  keyProducto: " + productoKey);
-                                Log.d(LOG_TAG, "favorito  d : " + d.getProducto().getNombreProducto() + " - " + d.getCantidadOrden());
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    for (DataSnapshot data : mDataSanpshotFavoritosDato.getChildren()) {
 
 
-                                Log.d(LOG_TAG, "orden:agregarProductoAlaOrden 1c-NOT null");
-                                Detalle detalle = new Detalle();
-                                detalle.ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
-                                mCabeceraOrden.getTotales().ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
+                        String productoKey = data.getKey();
+                        Detalle d = data.getValue(Detalle.class);
+                        Double cantidad = d.getCantidadOrden();
+                        Producto producto = d.getProducto();
+                        Log.d(LOG_TAG, "favorito  keyProducto: " + productoKey);
+                        Log.d(LOG_TAG, "favorito  d : " + d.getProducto().getNombreProducto() + " - " + d.getCantidadOrden());
 
-                                Map<String, Object> detalleOrdenValues = detalle.toMap();
+                        Log.d(LOG_TAG, "orden:abmDetalleDeOrden 1c-NOT null");
+                        Detalle detalle = new Detalle();
+                        detalle.ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
+                        mCabeceraOrden.getTotales().ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
+
+                        Map<String, Object> detalleOrdenValues = detalle.toMap();
 /*1c*/
-                                childUpdates.put(NODO_ORDENES + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
+                        childUpdates.put(detalleOrdenRef_1C(mEmpresaKey, mCabeceraOrden.getNumeroDeOrden(), productoKey), detalleOrdenValues);
+//                        childUpdates.put(NODO_ORDENES + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
 /*4 */
-                                childUpdates.put(NODO_ORDENES_DETALLE + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
+                        childUpdates.put(detalleOrdenRef_4(mEmpresaKey, mCabeceraOrden.getNumeroDeOrden(), productoKey), detalleOrdenValues);
+//                        childUpdates.put(NODO_ORDENES_DETALLE + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
 
-                            Log.i("ClienteViewHolder", "saveCustomOrderProductproductoKey" + productoKey);
-                            Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Nombre" + producto.getNombreProducto());
-                            Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Precio" + producto.getPrecio());
+                        Log.i("ClienteViewHolder", "saveCustomOrderProductproductoKey" + productoKey);
+                        Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Nombre" + producto.getNombreProducto());
+                        Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Precio" + producto.getPrecio());
 
-/*3*/               Detalle detalleInicial=detalle;
-                            detalleInicial.setCantidadOrden(0.0);
-                            detalleInicial.setMontoItemOrden(0.0);
-                            mDetalleAnterior=detalleInicial;
-                            saveDetalleInicialTotales( cantidad, productoKey); // cantidad es el valor nuevo y detalle tiene el anterior en este caso esta en cero
+/*3*/
+                        Detalle detalleInicial = detalle;
+                        detalleInicial.setCantidadOrden(0.0);
+                        detalleInicial.setMontoItemOrden(0.0);
+                        mDetalleAnterior = detalleInicial;
+                        saveDetalleInicialTotales(cantidad, productoKey); // cantidad es el valor nuevo y detalle tiene el anterior en este caso esta en cero
 /*5*/
-                            saveOrdenProductoXCliente(productoKey, detalle); // tiene el valor final que se graba en la orden
-                            mKeyList.add(productoKey); // Agrega productkey para que no se repita.
+                        saveOrdenProductoXCliente(productoKey, detalle); // tiene el valor final que se graba en la orden
+                        mKeyList.add(productoKey); // Agrega productkey para que no se repita.
 
-                            }
-                            Map<String, Object> cabeceraOrdenValues = mCabeceraOrden.toMap();
+                    }
+                    Map<String, Object> cabeceraOrdenValues = mCabeceraOrden.toMap();
 
 /*2 */
 
-                            childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" +ORDER_STATUS_INICIAL+ "/"+ mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
+                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDER_STATUS_INICIAL + "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
 
-                            mDatabase.updateChildren(childUpdates);
+                    mDatabase.updateChildren(childUpdates);
 
-                        }
-
-                        NumberFormat format = NumberFormat.getCurrencyInstance();
-                        // Set value and report transaction success
-                        mutableData.setValue(mCabeceraOrden);
-                        return Transaction.success(mutableData);
-                    }
-
-                    @Override
-                    public void onComplete(DatabaseError databaseError, boolean commited,
-                                           DataSnapshot dataSnapshot) {
-                        // Transaction completed
-                        Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete:  databaseError" + databaseError);
-                        Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: boolean b" + commited);
-                        CabeceraOrden cabecera_orden = dataSnapshot.getValue(CabeceraOrden.class);
-
-                        long numeroOrden = cabecera_orden.getNumeroDeOrden();
-                        Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: ID " + numeroOrden);
-                        Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: Monto Orden " + cabecera_orden.getTotales().getMontoEnOrdenes());
-
-                        mCantidadTotal.setText("Items: " + String.valueOf(cabecera_orden.getTotales().getCantidadDeProductosDiferentes()));
-                        NumberFormat format = NumberFormat.getCurrencyInstance();
-                        mMontoTotal.setText("Monto Orden" + format.format(cabecera_orden.getTotales().getMontoEnOrdenes()));
-                        mMontoTotalDelivey.setText("Monto Entregado" + format.format(cabecera_orden.getTotales().getMontoEntregado()));
-                        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-
-                    }
-                });
-
-
-
-                } else {
-                        mKeyList=null;
-//                    mDatabase.child(ESQUEMA_FAVORITOS).child(mEmpresaKey).child(mCabeceraOrden.getClienteKey()).child(productKey).setValue(model);
                 }
+
+
+                // Set value and report transaction success
+                mutableData.setValue(mCabeceraOrden);
+                return Transaction.success(mutableData);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onComplete(DatabaseError databaseError, boolean commited,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete:  databaseError" + databaseError);
+                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: boolean b" + commited);
+                CabeceraOrden cabecera_orden = dataSnapshot.getValue(CabeceraOrden.class);
+
+                long numeroOrden = cabecera_orden.getNumeroDeOrden();
+                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: ID " + numeroOrden);
+                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: Monto Orden " + cabecera_orden.getTotales().getMontoEnOrdenes());
+
+                mCantidadTotal.setText("Items: " + String.valueOf(cabecera_orden.getTotales().getCantidadDeProductosDiferentes()));
+                NumberFormat format = NumberFormat.getCurrencyInstance();
+                mMontoTotal.setText("Monto Orden" + format.format(cabecera_orden.getTotales().getMontoEnOrdenes()));
+                mMontoTotalDelivey.setText("Monto Entregado" + format.format(cabecera_orden.getTotales().getMontoEntregado()));
+                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+                mBotonSeleccionProduto.setVisibility(View.VISIBLE);
 
             }
         });
-
     }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -661,9 +658,9 @@ private Detalle mDetalleAnterior;
             Log.d("Picker", "ordenCantidad: " + mDetalleAnterior.getCantidadOrden());
 
             np.setMaxValue(mDetalleAnterior.getProducto().getCantidadMaxima());
-            if(mDetalleAnterior.getCantidadOrden()==null){
+            if (mDetalleAnterior.getCantidadOrden() == null) {
                 np.setValue(mDetalleAnterior.getProducto().getCantidadDefault());
-            }else{
+            } else {
                 np.setValue(mDetalleAnterior.getCantidadOrden().intValue());
             }
             np.setMinValue(mDetalleAnterior.getProducto().getCantidadMinima());
@@ -691,8 +688,8 @@ private Detalle mDetalleAnterior;
                     } else {
                         Log.d("detalle1", "showDialogNumberPicker-detalle) " + mDetalleAnterior.getCantidadOrden());
                         Log.d("detalle1", "showDialogNumberPicker-np.getValue() " + np.getValue());
-
-                        modificarCantidadDeProductoEnOrden(np.getValue(), productKey);
+                        abmDetalleDeOrden((double) np.getValue(),productKey,mDetalleAnterior);
+//                        modificarCantidadDeProductoEnOrden(np.getValue(), productKey);
 //                        vh.mTextcantidad.setText(String.valueOf(np.getValue()));
 //                        CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecio.getText().toString());
 //                        double total = np.getValue() * price.convert();
@@ -726,8 +723,6 @@ private Detalle mDetalleAnterior;
 
         recyclerView.setAdapter(mDetalleAdapter);
     }
-
-
 
 
     public void saveTotalPrice(double totalPrice) {
@@ -827,81 +822,305 @@ private Detalle mDetalleAnterior;
 
     }
 
-    public void agregarProductoAlaOrden(final Double cantidad, final String productoKey, final Producto producto) {
+    // abmDetalleDeOrden
+    // si Detalle viene con cantidad =0 se entiende que es un producto Nuevo.
+    // Si cantidad es cero se entiende que se saca de la orden
+    public void abmDetalleDeOrden(final Double cantidad, String productoKey, Detalle detalle) {
 
-//1b -Bloqueo toda la orden y puedo modificar toda sus dependencias.  Pues modifico mientra tengo tomada la orden.
-        mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child(String.valueOf(mCabeceraOrden.getNumeroDeOrden())).child("cabecera").runTransaction(new Transaction.Handler() {
+        mCantidadDato = cantidad; // Es la nueva cantidad que queremos tener
+        mproductKeyDato = productoKey;
+        mDetalleDato = detalle; // tiene los valores del detalle que se quiere modificar
+
+
+        Log.i(LOG_TAG, "abmDetalleDeOrden cantidad " + cantidad + " productokey " + productoKey + " Producto " + detalle.getProducto().getNombreProducto());
+        limpiarTodosLosSemaforosLiberar();
+
+        // todo: ver donde pongo la limpeza de estos vectores para que funcione en rotaciones o sin red. Tengo que asegurar que libere.
+
+        mTotalInicialTask.clear();
+        mTotalInicialCompletionTask.clear();
+        mTotalInicialIndex.clear();
+
+        readBlockCabeceraOrden(mCabeceraOrden.getNumeroDeOrden());
+        readBlockTotalInicial(productoKey);
+        readBlockProductosEnOrdenes(productoKey, mCabeceraOrden.getNumeroDeOrden());
+
+        Task<Void> allTask;
+        allTask = Tasks.whenAll(mCabeceraOrdenTask, mTotalInicialTask.get(0), mProductosEnOrdenesTask);
+        allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                // Bloqueo la orden para modificaciones,
-                // Actualizo  el esquema y luego lo libero.
+            public void onSuccess(Void aVoid) {
 
-                CabeceraOrden cabeceraOrden1b = mutableData.getValue(CabeceraOrden.class);
-                if (cabeceraOrden1b == null) { // seria un error puesto que la cabecera se genera al conseguir el Nuevo Nro.
-                    Log.d(LOG_TAG, "orden:agregarProductoAlaOrden cabeceraOrden1b-null, es un error");
-                    return Transaction.success(mutableData);
+                CabeceraOrden cabeceraOrden;
+                Detalle totalInicialDetalle;
+                PrductosxOrden prductosxOrden;
+                Detalle nuevoDetalleOrden = mDetalleDato.copy();
+
+                DataSnapshot dataCabecera = (DataSnapshot) mCabeceraOrdenTask.getResult();
+
+                // do something with db data?
+                if (dataCabecera.exists()) {
+                    dataCabecera.getKey();
+                    cabeceraOrden = dataCabecera.getValue(CabeceraOrden.class);
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mProductosEnOrdenesTask =" + dataCabecera.getKey() + "- monto cab" + dataCabecera.getValue(CabeceraOrden.class).getTotales().getMontoEnOrdenes());
+
                 } else {
-                    Log.d(LOG_TAG, "orden:agregarProductoAlaOrden 1c-NOT null");
-                    Detalle detalle = new Detalle();
-                    detalle.ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
-                    mCabeceraOrden.getTotales().ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
-
-                    Map<String, Object> cabeceraOrdenValues = mCabeceraOrden.toMap();
-                    Map<String, Object> detalleOrdenValues = detalle.toMap();
-                    Map<String, Object> childUpdates = new HashMap<>();
-/*1c*/
-                    childUpdates.put(NODO_ORDENES + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
-/*4 */
-                    childUpdates.put(NODO_ORDENES_DETALLE + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
-/*2 */
-                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" +ORDER_STATUS_INICIAL+ "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
-
-                    mDatabase.updateChildren(childUpdates);
-
-                    Log.i("ClienteViewHolder", "saveCustomOrderProductproductoKey" + productoKey);
-                    Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Nombre" + producto.getNombreProducto());
-                    Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Precio" + producto.getPrecio());
-
-/*3*/               Detalle detalleInicial=detalle;
-                    detalleInicial.setCantidadOrden(0.0);
-                    detalleInicial.setMontoItemOrden(0.0);
-                    mDetalleAnterior=detalleInicial;
-                    saveDetalleInicialTotales( cantidad, productoKey); // cantidad es el valor nuevo y detalle tiene el anterior en este caso esta en cero
-/*5*/
-                    saveOrdenProductoXCliente(productoKey, detalle); // tiene el valor final que se graba en la orden
-                    mKeyList.add(productoKey); // Agrega productkey para que no se repita.
+                    //Debe existir, de lo contrario es un error.
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mProductosEnOrdenesTask = NuLL- ");
+                    return;
                 }
 
 
-                // Set value and report transaction success
-                mutableData.setValue(mCabeceraOrden);
-                return Transaction.success(mutableData);
-            }
+                DataSnapshot dataDetalleTotalInicial = (DataSnapshot) mTotalInicialTask.get(0).getResult();
 
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean commited,
-                                   DataSnapshot dataSnapshot) {
-                // Transaction completed
-                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete:  databaseError" + databaseError);
-                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: boolean b" + commited);
-                CabeceraOrden cabecera_orden = dataSnapshot.getValue(CabeceraOrden.class);
+                // do something with db data?
+                if (dataDetalleTotalInicial.exists()) {
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mTotalInicialTask key =" + dataDetalleTotalInicial.getKey());
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mTotalInicialTask data.hasChildren() =" + dataDetalleTotalInicial.hasChildren());
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mTotalInicialTask data.hasChildren() =" + dataDetalleTotalInicial.getChildrenCount());
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mTotalInicialTask data.exists() =" + dataDetalleTotalInicial.exists());
 
-                long numeroOrden = cabecera_orden.getNumeroDeOrden();
-                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: ID " + numeroOrden);
-                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: Monto Orden " + cabecera_orden.getTotales().getMontoEnOrdenes());
+                    dataDetalleTotalInicial.getKey();
+                    totalInicialDetalle = dataDetalleTotalInicial.getValue(Detalle.class);
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mTotalInicialTask =" + dataDetalleTotalInicial.getKey() + "- nombre Producto" + dataDetalleTotalInicial.getValue(Detalle.class).getProducto().getNombreProducto()
+                            + "- cantidad Orden" + dataDetalleTotalInicial.getValue(Detalle.class).getCantidadOrden());
 
-                mCantidadTotal.setText("Items: " + String.valueOf(cabecera_orden.getTotales().getCantidadDeProductosDiferentes()));
-                NumberFormat format = NumberFormat.getCurrencyInstance();
-                mMontoTotal.setText("Monto Orden" + format.format(cabecera_orden.getTotales().getMontoEnOrdenes()));
-                mMontoTotalDelivey.setText("Monto Entregado" + format.format(cabecera_orden.getTotales().getMontoEntregado()));
+                } else {
+                    // si no existe el producto en el listado se crea.
+                    totalInicialDetalle = new Detalle(0.0, mDetalleDato.getProducto(),null);
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mTotalInicialTask = NuLL- ");
+
+                }
+
+
+                DataSnapshot dataProductosEnOrdenes = (DataSnapshot) mProductosEnOrdenesTask.getResult();
+
+
+                if (dataProductosEnOrdenes.exists()) {
+                    dataProductosEnOrdenes.getKey();
+                    prductosxOrden = dataProductosEnOrdenes.getValue(PrductosxOrden.class);
+//                    data.getValue(Detalle.class);
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mProductosEnOrdenesTask key =" + dataProductosEnOrdenes.getKey());
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mProductosEnOrdenesTask data.hasChildren() =" + dataProductosEnOrdenes.hasChildren());
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mProductosEnOrdenesTask data.hasChildren() =" + dataProductosEnOrdenes.getChildrenCount());
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mProductosEnOrdenesTask data.exists() =" + dataProductosEnOrdenes.exists());
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mProductosEnOrdenesTask NombreProd =" + dataProductosEnOrdenes.getValue(PrductosxOrden.class).getDetalle().getProducto().getNombreProducto());
+
+
+                } else {
+                    prductosxOrden = new PrductosxOrden(mCabeceraOrden.getCliente(), new Detalle(0.0, mDetalleDato.getProducto(), null));
+                    Log.i(LOG_TAG, "abmDetalleDeOrden mProductosEnOrdenesTask = NuLL- ");
+                }
+
+                // Todo: procesar los datos
+                // liberar los semaforos para grabar
+                cabeceraOrden.liberar();
+                nuevoDetalleOrden.liberar();
+                totalInicialDetalle.liberar();
+                prductosxOrden.liberar();
+                if (mDetalleDato.getCantidadOrden() == 0 && mCantidadDato != 0.0)//ingresa un nuevo producto
+                {
+                    Log.i(LOG_TAG, "abmDetalleDeOrden ingresa un nuevo producto ");
+                    //Actualizo cabecera de Orden 1B ( Ingresa producto en orden suma 1 a la cantidad de Items y ajusta el monto total
+                    // Se ajusta Totales
+                    cabeceraOrden.ingresaProductoEnOrden(mCantidadDato, mDetalleDato.getProducto(), mCabeceraOrden.getCliente().getEspecial());
+
+                    //Actualizo productos por Orden 5. Es necesario bloquear este esquema? o se puede planchar directamente???
+                    prductosxOrden.getDetalle().ingresaProductoEnOrden(mCantidadDato, mDetalleDato.getProducto(), mCabeceraOrden.getCliente().getEspecial());
+
+                    //Actualizo Detalle de Orden para 1C y 4
+                    nuevoDetalleOrden.modificarCantidadProductoDeOrden(mCantidadDato);
+
+                    //Actualizo Total Inicial (3).
+                    totalInicialDetalle.modificarCantidadEnTotalInicial(nuevoDetalleOrden, mDetalleDato);
+
+                } else if (mDetalleDato.getCantidadOrden() > 0 && mCantidadDato > 0)// Se modifica una cantidad
+                {
+                    Log.i(LOG_TAG, "abmDetalleDeOrden Se modifica una cantidad ");
+
+                    //Actualizo cabecera de Orden 1B ( Ingresa producto en orden suma 1 a la cantidad de Items y ajusta el monto total
+                    // Se ajusta Totales
+                    cabeceraOrden.modificarCantidadProductoEnOrden(mCantidadDato, mDetalleDato);
+
+                    //Actualizo productos por Orden 5. Es necesario bloquear este esquema? o se puede planchar directamente???
+                    //Idem al anterior, se plantacha
+                    prductosxOrden.getDetalle().ingresaProductoEnOrden(mCantidadDato, mDetalleDato.getProducto(), mCabeceraOrden.getCliente().getEspecial());
+
+                    //Actualizo Detalle de Orden para 1C y 4
+                    nuevoDetalleOrden.modificarCantidadProductoDeOrden(mCantidadDato);
+
+                    //Actualizo Total Inicial (3).
+                    totalInicialDetalle.modificarCantidadEnTotalInicial(nuevoDetalleOrden, mDetalleDato);
+                } else if (mCantidadDato == 0.0)// se borra un producto
+                {
+                    Log.i(LOG_TAG, "abmDetalleDeOrden se borra un producto ");
+
+                    // modifico el detalle nuevo para impactar totalInicialDetalle.
+                    nuevoDetalleOrden.modificarCantidadProductoDeOrden(mCantidadDato);
+                    // Actualizo Cabecera
+                    cabeceraOrden.getTotales().sacarProductoDeOrden(mDetalleDato);
+                    //Actualizo Total Inicial (3).
+                    if (mDetalleDato.getCantidadOrden().equals(totalInicialDetalle.getCantidadOrden()))
+                        totalInicialDetalle = null;
+                    else {
+                        totalInicialDetalle.modificarCantidadEnTotalInicial(nuevoDetalleOrden, mDetalleDato);
+                    }
+                    //Actualizo Detalle de Orden para 1C y 4
+                    nuevoDetalleOrden = null;
+                    //Actualizo productos por Orden 5
+                    prductosxOrden = null;
+                }
+
+                // Todo: Escribir en la Firebase simultaneament.
+
+                mCabeceraOrden.getTotales().setCantidadDeProductosDiferentes(cabeceraOrden.getTotales().getCantidadDeProductosDiferentes());;
+                mCabeceraOrden.getTotales().setMontoEnOrdenes(cabeceraOrden.getTotales().getMontoEnOrdenes());;
+
+                Map<String, Object> cabeceraOrdenValues=null;
+                Map<String, Object> detalleOrdenValues=null;
+                Map<String, Object> totalInicialDetalleValues=null;
+                Map<String, Object> prductosxOrdenValues=null;
+
+                if(cabeceraOrden!=null) {cabeceraOrdenValues = cabeceraOrden.toMap();}
+                if(nuevoDetalleOrden!=null) {detalleOrdenValues = nuevoDetalleOrden.toMap();}
+                if (totalInicialDetalle!=null) {totalInicialDetalleValues = totalInicialDetalle.toMap();}
+                if(prductosxOrden!=null){ prductosxOrdenValues = prductosxOrden.toMap();}
+
+                Map<String, Object> childUpdates = new HashMap<>();
+
+
+                Log.i(LOG_TAG, "abmDetalleDeOrden refCabeceraOrden_1B "+refCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()).toString());
+                Log.i(LOG_TAG, "abmDetalleDeOrden refCabeceraOrden_2 "+refCabeceraOrden_2(mCabeceraOrden.getNumeroDeOrden(), ORDER_STATUS_INICIAL).toString());
+                Log.i(LOG_TAG, "abmDetalleDeOrden refDetalleOrden_1C "+refDetalleOrden_1C(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato).toString());
+                Log.i(LOG_TAG, "abmDetalleDeOrden refDetalleOrden_4 "+refDetalleOrden_4(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato).toString());
+                Log.i(LOG_TAG, "abmDetalleDeOrden refProductosXOrdenInicial_5 "+refProductosXOrdenInicial_5(mproductKeyDato,mCabeceraOrden.getNumeroDeOrden()).toString());
+                Log.i(LOG_TAG, "abmDetalleDeOrden refTotalInicial_3 "+refTotalInicial_3(mproductKeyDato).toString());
+
+
+
+/*1B*/
+                childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()), cabeceraOrdenValues);
+/*2 */
+                childUpdates.put(nodoCabeceraOrden_2(mCabeceraOrden.getNumeroDeOrden(), ORDER_STATUS_INICIAL), cabeceraOrdenValues);
+/*1c*/
+                childUpdates.put(nodoDetalleOrden_1C(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
+/*4 */
+                childUpdates.put(nodoDetalleOrden_4(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
+/*5 */
+                childUpdates.put(nodoProductosXOrdenInicial_5(mproductKeyDato,mCabeceraOrden.getNumeroDeOrden()), prductosxOrdenValues);
+/*3 */
+                childUpdates.put(nodoTotalInicial_3(mproductKeyDato), totalInicialDetalleValues);
+
+
+                mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        Log.i(LOG_TAG, "abmDetalleDeOrden updateChildren-onFailure "+e.toString());
+                        liberarRecusosTomados(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato);
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        mMontoTotal.setText(mCabeceraOrden.getTotales().getMontoEnOrdenes().toString());
+                        mCantidadTotal.setText(String.valueOf( mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
+                        mKeyList.add(mproductKeyDato);
+                        Log.i(LOG_TAG, "abmDetalleDeOrden updateChildren - OnCompleteListener task.isSuccessful():"+task.isSuccessful());
+
+                    }
+                });
+//
 
             }
         });
+        allTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(LOG_TAG, "abmDetalleDeOrden addOnFailureListener= allTask" + e.toString());
+                liberarRecusosTomados(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato);
+
+            }
+        });
+
+
+////1b -Bloqueo toda la orden y puedo modificar toda sus dependencias.  Pues modifico mientra tengo tomada la orden.
+//        mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child(String.valueOf(mCabeceraOrden.getNumeroDeOrden())).child("cabecera").runTransaction(new Transaction.Handler() {
+//            @Override
+//            public Transaction.Result doTransaction(MutableData mutableData) {
+//                // Bloqueo la orden para modificaciones,
+//                // Actualizo  el esquema y luego lo libero.
+//
+//                CabeceraOrden cabeceraOrden1b = mutableData.getValue(CabeceraOrden.class);
+//                if (cabeceraOrden1b == null) { // seria un error puesto que la cabecera se genera al conseguir el Nuevo Nro.
+//                    Log.d(LOG_TAG, "orden:abmDetalleDeOrden cabeceraOrden1b-null, es un error");
+//                    return Transaction.success(mutableData);
+//                } else {
+//
+//
+//
+//
+//
+//                    Log.d(LOG_TAG, "orden:abmDetalleDeOrden 1c-NOT null");
+//                    Detalle detalle = new Detalle();
+//                    detalle.ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
+//                    mCabeceraOrden.getTotales().ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
+//
+//                    Map<String, Object> cabeceraOrdenValues = mCabeceraOrden.toMap();
+//                    Map<String, Object> detalleOrdenValues = detalle.toMap();
+//                    Map<String, Object> childUpdates = new HashMap<>();
+///*1c*/
+//                    childUpdates.put(NODO_ORDENES + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
+///*4 */
+//                    childUpdates.put(NODO_ORDENES_DETALLE + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
+///*2 */
+//                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" +ORDER_STATUS_INICIAL+ "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
+//
+//                    mDatabase.updateChildren(childUpdates);
+//
+//                    Log.i("ClienteViewHolder", "saveCustomOrderProductproductoKey" + productoKey);
+//                    Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Nombre" + producto.getNombreProducto());
+//                    Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Precio" + producto.getPrecio());
+//
+///*3*/               Detalle detalleInicial=detalle;
+//                    detalleInicial.setCantidadOrden(0.0);
+//                    detalleInicial.setMontoItemOrden(0.0);
+//                    mDetalleAnterior=detalleInicial;
+//                    saveDetalleInicialTotales( cantidad, productoKey); // cantidad es el valor nuevo y detalle tiene el anterior en este caso esta en cero
+///*5*/
+//                    saveOrdenProductoXCliente(productoKey, detalle); // tiene el valor final que se graba en la orden
+//                    mKeyList.add(productoKey); // Agrega productkey para que no se repita.
+//                }
+//
+//
+//                // Set value and report transaction success
+//                mutableData.setValue(mCabeceraOrden);
+//                return Transaction.success(mutableData);
+//            }
+//
+//            @Override
+//            public void onComplete(DatabaseError databaseError, boolean commited,
+//                                   DataSnapshot dataSnapshot) {
+//                // Transaction completed
+//                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete:  databaseError" + databaseError);
+//                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: boolean b" + commited);
+//                CabeceraOrden cabecera_orden = dataSnapshot.getValue(CabeceraOrden.class);
+//
+//                long numeroOrden = cabecera_orden.getNumeroDeOrden();
+//                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: ID " + numeroOrden);
+//                Log.d(LOG_TAG, "orden:saveCustomOrderProductonComplete: Monto Orden " + cabecera_orden.getTotales().getMontoEnOrdenes());
+//
+//                mCantidadTotal.setText("Items: " + String.valueOf(cabecera_orden.getTotales().getCantidadDeProductosDiferentes()));
+//                NumberFormat format = NumberFormat.getCurrencyInstance();
+//                mMontoTotal.setText("Monto Orden" + format.format(cabecera_orden.getTotales().getMontoEnOrdenes()));
+//                mMontoTotalDelivey.setText("Monto Entregado" + format.format(cabecera_orden.getTotales().getMontoEntregado()));
+//
+//            }
+//        });
     }
 
     public void modificarCantidadDeProductoEnOrden(final int cantidadNueva, final String productoKey) {
 
-        Log.d("detalle1", "modificarCantidadDeProductoEnOrden-cantidadNueva) " +cantidadNueva);
+        Log.d("detalle1", "modificarCantidadDeProductoEnOrden-cantidadNueva) " + cantidadNueva);
         Log.d("detalle1", "modificarCantidadDeProductoEnOrden -detalleanterior) " + mDetalleAnterior.getCantidadOrden());
 //1b -Bloqueo toda la orden y puedo modificar toda sus dependencias.  Pues modifico mientra tengo tomada la orden.
         mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child(String.valueOf(mCabeceraOrden.getNumeroDeOrden())).child("cabecera").runTransaction(new Transaction.Handler() {
@@ -912,23 +1131,22 @@ private Detalle mDetalleAnterior;
 
                 CabeceraOrden cabeceraOrden1b = mutableData.getValue(CabeceraOrden.class);
                 if (cabeceraOrden1b == null) { // seria un error puesto que la cabecera se genera al conseguir el Nuevo Nro.
-                    Log.d(LOG_TAG, "orden:agregarProductoAlaOrden cabeceraOrden1b-null, es un error");
+                    Log.d(LOG_TAG, "orden:abmDetalleDeOrden cabeceraOrden1b-null, es un error");
                     return Transaction.success(mutableData);
                 } else {
-                    Log.d(LOG_TAG, "orden:agregarProductoAlaOrden 1c-NOT null");
+                    Log.d(LOG_TAG, "orden:abmDetalleDeOrden 1c-NOT null");
                     Log.d("detalle1", "antes saveDetalle-detalleAnterior) " + mDetalleAnterior.getCantidadOrden());
                     Log.d("detalle1", "antes saveDetalle-cantidadNUeva) " + cantidadNueva);
 /*3*/               //Se copia para evitar el traslado que produce pasar final
 
-                    saveDetalleInicialTotales( cantidadNueva * 1.0, productoKey);// en este caso se pasa detalle anterior que tiene los valore de cantidades antes de la modificacion
-
+                    saveDetalleInicialTotales(cantidadNueva * 1.0, productoKey);// en este caso se pasa detalle anterior que tiene los valore de cantidades antes de la modificacion
 
 
 //                    detalle.ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
-                    mCabeceraOrden.getTotales().modificarCantidadProductoDeOrden( 1.0 * cantidadNueva,
+                    mCabeceraOrden.getTotales().modificarCantidadProductoDeOrden(1.0 * cantidadNueva,
                             mDetalleAnterior);
-                    Detalle detalle =new Detalle();
-                    detalle=mDetalleAnterior.copy();
+                    Detalle detalle = new Detalle();
+                    detalle = mDetalleAnterior.copy();
                     detalle.modificarCantidadProductoDeOrden(cantidadNueva * 1.0);
 //                    mMontoTotal.setText(mCabeceraOrden.getTotales().getMontoEnOrdenes().toString());
 
@@ -943,7 +1161,7 @@ private Detalle mDetalleAnterior;
 /*4 */
                     childUpdates.put(NODO_ORDENES_DETALLE + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
 /*2 */
-                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDER_STATUS_INICIAL+ "/" +mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
+                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDER_STATUS_INICIAL + "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
 
                     mDatabase.updateChildren(childUpdates);
 
@@ -980,7 +1198,7 @@ private Detalle mDetalleAnterior;
         });
     }
 
-    public void borrarProductoDeOrden( final String productoKey, final Detalle detalle) {
+    public void borrarProductoDeOrden(final String productoKey, final Detalle detalle) {
 
 //        final int cantidadNueva=0;
         Log.d("detalle1", "modificarCantidadDeProductoEnOrden-detalle) " + detalle.getCantidadOrden());
@@ -994,14 +1212,14 @@ private Detalle mDetalleAnterior;
 
                 CabeceraOrden cabeceraOrden1b = mutableData.getValue(CabeceraOrden.class);
                 if (cabeceraOrden1b == null) { // seria un error puesto que la cabecera se genera al conseguir el Nuevo Nro.
-                    Log.d(LOG_TAG, "orden:agregarProductoAlaOrden cabeceraOrden1b-null, es un error");
+                    Log.d(LOG_TAG, "orden:abmDetalleDeOrden cabeceraOrden1b-null, es un error");
                     return Transaction.success(mutableData);
                 } else {
-                    Log.d(LOG_TAG, "orden:agregarProductoAlaOrden 1c-NOT null");
+                    Log.d(LOG_TAG, "orden:abmDetalleDeOrden 1c-NOT null");
                     Log.d("detalle1", "antes saveDetalle-detalleAnterior) " + detalle.getCantidadOrden());
 //                    Log.d("detalle1", "antes saveDetalle-cantidadNUeva) " + cantidadNueva);
 /*3*/
-                    saveDetalleInicialTotales( 0 * 1.0, productoKey);// en este caso se pasa detalle anterior que tiene los valore de cantidades antes de la modificacion
+                    saveDetalleInicialTotales(0 * 1.0, productoKey);// en este caso se pasa detalle anterior que tiene los valore de cantidades antes de la modificacion
 /*5*/
 //                    saveOrdenProductoXCliente(productoKey, detalle);
                     // borrar de este esquema el dato para esta orden.
@@ -1020,7 +1238,7 @@ private Detalle mDetalleAnterior;
 /*4 */
                     childUpdates.put(NODO_ORDENES_DETALLE + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, null);
 /*2 */
-                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" +ORDER_STATUS_INICIAL+ "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
+                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDER_STATUS_INICIAL + "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
 
                     mDatabase.updateChildren(childUpdates);
 
@@ -1059,7 +1277,7 @@ private Detalle mDetalleAnterior;
         });
     }
 
-    public void saveDetalleInicialTotales( final Double cantidadNueva, final String productoKey) {
+    public void saveDetalleInicialTotales(final Double cantidadNueva, final String productoKey) {
 
 //        final Double cantidadAnterior = detalle.getCantidadOrden();
 //        final Producto producto=detalle.getProducto();
@@ -1067,7 +1285,7 @@ private Detalle mDetalleAnterior;
 //        Log.d("detalle1", "saveDetalleInicialTotales-detalleAnterior) " + cantidadAnterior);
 //        Log.d("detalle1", "saveDetalleInicialTotales-cantidadNUeva) " + cantidadNueva);
 /*3*/
-        mDatabase.child(ESQUEMA_ORDENES_TOTAL_INICIAL).child(mEmpresaKey).child(productoKey).runTransaction(new Transaction.Handler() {
+        refTotalInicial_3(productoKey).runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
                 // Bloqueo la orden para modificaciones,
@@ -1076,7 +1294,7 @@ private Detalle mDetalleAnterior;
                 Detalle detalle3 = mutableData.getValue(Detalle.class);
 
                 if (detalle3 == null) {
-                    detalle3 = new Detalle(0.0, mDetalleAnterior.getProducto());
+                    detalle3 = new Detalle(0.0, mDetalleAnterior.getProducto(),null);
                     detalle3.modificarCantidadTotalDeOrden(cantidadNueva, mDetalleAnterior);
                     Log.d("detalle1", "saveDetalleInicialTotales NULL -detalleAnteriorvar) " + mDetalleAnterior.getCantidadOrden());
                     Log.d("detalle1", "saveDetalleInicialTotales NULL -cantidadNUeva) " + cantidadNueva);
@@ -1086,7 +1304,9 @@ private Detalle mDetalleAnterior;
                     Log.d("detalle1", "saveDetalleInicialTotales Not NULL -cantidadNUeva) " + cantidadNueva);
                     // update de totales con cantidades anteriores.
                     detalle3.modificarCantidadTotalDeOrden(cantidadNueva, mDetalleAnterior);
-                    if (detalle3.getCantidadOrden()==0){detalle3=null;}
+                    if (detalle3.getCantidadOrden() == 0) {
+                        detalle3 = null;
+                    }
 
                 }
 

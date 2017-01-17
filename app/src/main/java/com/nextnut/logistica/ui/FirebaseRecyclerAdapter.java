@@ -223,7 +223,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
     public void onItemDismiss(int position) {
         T model = getItem(position);
         onItemDismissHolder(model, position);
-        Log.w("Firebase-", mModelClass.getSimpleName()+"onItemDismiss: "+ position);
+        Log.w("Firebase-", mModelClass.getSimpleName()+"-onItemDismiss: "+ position);
         notifyItemChanged(position);
     }
 
@@ -231,7 +231,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
     public void onItemAcepted(int position) {
         T model = getItem(position);
         onItemAcceptedHolder(model, position);
-        Log.w("Firebase-", mModelClass.getSimpleName()+ "onItemAcepted: "+ position);
+        Log.w("Firebase-", mModelClass.getSimpleName()+ "-onItemAcepted: "+ position);
         notifyItemChanged(position);
     }
 

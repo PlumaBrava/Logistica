@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.nextnut.logistica.modelos.CabeceraOrden;
+import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.modelos.Producto;
 
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
@@ -114,11 +115,16 @@ public class CustomOrderDetailActivity extends ActivityBasic {
             CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
 
             if (fragmentCustomOrder != null) {
-                Producto p=(Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
-                fragmentCustomOrder.agregarProductoAlaOrden(
-                        p.getCantidadDefault()*1.0,
-                        data.getExtras().getString(EXTRA_PRODUCT_KEY),
-                        p);
+
+                Producto p= (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
+                Detalle detalle = new Detalle(0.0,p,mCliente);
+                fragmentCustomOrder.abmDetalleDeOrden(p.getCantidadDefault()*1.0,data.getExtras().getString(EXTRA_PRODUCT_KEY),detalle);
+
+//                        Producto p=(Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
+//                fragmentCustomOrder.abmDetalleDeOrden(
+//                        p.getCantidadDefault()*1.0,
+//                        data.getExtras().getString(EXTRA_PRODUCT_KEY),
+//                        p);
 
             }
 
