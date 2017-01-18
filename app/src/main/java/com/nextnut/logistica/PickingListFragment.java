@@ -467,18 +467,18 @@ public class PickingListFragment extends FragmentBasic {
                             public void onClick(View starView) {
                                 Log.d(LOG_TAG, "adapter:onClick model: " + model.getProducto().getNombreProducto());
                                 Log.d(LOG_TAG, "adapter:onClick");
-                                Intent intent = new Intent(getContext(), ProductosEnOrdenes.class);
-//                                mCliente=model.getCliente();
-                                mProducto = model.getProducto();
-                                mProductKey = productKey;
-                                mDetalleAnterior=model;
-                                putExtraFirebase_Fragment(intent);
-
-//                                intent.putExtra(EXTRA_PRODUCT_KEY, productKey);
-//                                intent.putExtra(EXTRA_PRODUCT, model.getProducto());
-                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
-
-                                startActivity(intent);
+//                                Intent intent = new Intent(getContext(), ProductosEnOrdenes.class);
+////                                mCliente=model.getCliente();
+//                                mProducto = model.getProducto();
+//                                mProductKey = productKey;
+//                                mDetalleAnterior=model;
+//                                putExtraFirebase_Fragment(intent);
+//
+////                                intent.putExtra(EXTRA_PRODUCT_KEY, productKey);
+////                                intent.putExtra(EXTRA_PRODUCT, model.getProducto());
+//                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//
+//                                startActivity(intent);
 
                                 showDialogNumberPicker(mProductKey);
                             }
@@ -947,14 +947,14 @@ public class PickingListFragment extends FragmentBasic {
                 // Todo: procesar los datos
                 // liberar los semaforos para grabar
 
-                nuevoDetalleOrden.liberar();
+
                 totalPickingDetalle.liberar();
 
                     //Actualizo Detalle de Picking 7
                 totalPickingDetalle.modificarCantidadProductoDePicking(mCantidadDato);
 
 
-                Map<String, Object> totalPickingValues=null;
+                Map<String, Object> totalPickingValues=totalPickingDetalle.toMap();
 
 
                 Map<String, Object> childUpdates = new HashMap<>();
