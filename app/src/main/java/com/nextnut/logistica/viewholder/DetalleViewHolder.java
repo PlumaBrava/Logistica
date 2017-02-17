@@ -39,7 +39,7 @@ public class DetalleViewHolder extends RecyclerView.ViewHolder  implements ItemT
     public TextView mTextcantidadDelivery;
     public TextView mTextToalDelivery;
 
-    public TextView mTextViewDescition;
+//    public TextView mTextViewDescition;
     public CheckBox mfavorito;
 
     public void setDeliveryState() {this.mDeliveryState=true;}
@@ -50,7 +50,7 @@ public class DetalleViewHolder extends RecyclerView.ViewHolder  implements ItemT
         mContext=view.getContext();
         mphotoProducto = (ImageView) view.findViewById(R.id.photoProducto);
         mTextViewNombre = (TextView) view.findViewById(R.id.nombreProducto);
-        mTextViewDescition = (TextView) view.findViewById(R.id.descriptionProducto);
+//        mTextViewDescition = (TextView) view.findViewById(R.id.descriptionProducto);
         mTextViewPrecio = (TextView) view.findViewById(R.id.precioProducto);
         mTextcantidad = (TextView) view.findViewById(R.id.cantidad);
         mTextToal = (TextView) view.findViewById(R.id.total);
@@ -100,22 +100,23 @@ public class DetalleViewHolder extends RecyclerView.ViewHolder  implements ItemT
         mTextViewPrecio.setText(format.format(detalle.getPrecio()));
         mTextcantidad.setText(String.valueOf(detalle.getCantidadOrden()));
         mTextToal.setText(format.format(detalle.getMontoItemOrden()));
-        Log.d("detalle2", "antes saveDetalle-detalle.getPrecio()) " + detalle.getPrecio());
+        Log.d("detalle2", "Delivery " + mDeliveryState);
+        Log.d("detalle2", "Cantidad Picking " + detalle.getCantidadPicking());
         Log.d("detalle2", "antes saveDetalle-detalle.getMontoItemOrden()) " + detalle.getMontoItemOrden());
 
-        if(detalle.getCantidadEntrega() > 0) {
+        if(detalle.getCantidadPicking() > -1) {
            mTextViewPrecioDelivery.setText(format.format(detalle.getPrecio()));
            mTextcantidadDelivery.setText(Double.toString( detalle.getCantidadEntrega()));
            mTextToalDelivery.setText(format.format(detalle.getMontoItemEntrega()));
 
         }
 
-        mTextViewDescition.setText(detalle.getProducto().getDescripcionProducto());
+//        mTextViewDescition.setText(detalle.getProducto().getDescripcionProducto());
 //        mfavorito.setChecked(detalle.getProducto().get);
 //        mRefProduct =cursor.getLong(1) ;
 //        mRefCustomer =cursor.getLong(9) ;
 
-        ((View)mTextViewDescition.getParent()).setOnClickListener(detalleClickListener);
+        ((View) mTextcantidad.getParent()).setOnClickListener(detalleClickListener);
 
     }
 

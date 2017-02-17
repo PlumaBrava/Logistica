@@ -44,6 +44,26 @@ public class CabeceraPicking implements Parcelable {
         // Default constructor required for calls to DataSnapshot.getValue(CabeceraOrden.class)
     }
 
+    public CabeceraPicking Copy() {
+        CabeceraPicking cabeceraPickingCopy=new CabeceraPicking();
+        cabeceraPickingCopy.fechaDeCreacion=getFechaDeCreacion();
+        cabeceraPickingCopy.usuarioCreador=getUsuarioCreador();
+
+        cabeceraPickingCopy.totales=getTotales();
+        cabeceraPickingCopy.numeroDePickingOrden=getNumeroDePickingOrden();
+        cabeceraPickingCopy.fechaPicking=getFechaPicking();
+        cabeceraPickingCopy.usuarioPicking=getUsuarioPicking();
+
+        cabeceraPickingCopy.fechaEntrega=getFechaEntrega();
+        cabeceraPickingCopy.usuarioEntrega=getUsuarioEntrega();
+        cabeceraPickingCopy.comentario=getComentario();
+        cabeceraPickingCopy.estado=getEstado();
+        cabeceraPickingCopy.semaforo=getSemaforo();
+        return cabeceraPickingCopy;
+
+
+    }
+
 
     public CabeceraPicking( String mUserKey, long numeroOrden,int estado){
         this.usuarioCreador=mUserKey;

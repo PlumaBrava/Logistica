@@ -10,7 +10,11 @@
     <dimen name="text_margin">8dp</dimen>
 
     <!--Product Dimens-->
+    <dimen name="foto_margin">0dp</dimen>
+    <dimen name="picking_total_CardMarginTop">2dp</dimen>
+    <dimen name="picking_total_CardMarginBottom">2dp</dimen>
 
+    <!--Product Dimens-->
     <dimen name="product_detail_view_padding_vertical">
         @dimen/abc_list_item_padding_horizontal_material
     </dimen>

@@ -122,6 +122,7 @@ public class Constantes {
     public static final String EXTRA_CLIENTE= "cliente";
     public static final String EXTRA_CABECERA_ORDEN = "cabeceraOrden";
     public static final String EXTRA_KEYLIST = "keyList"; //listado de key de una orden
+    public static final String EXTRA_NRO_PICKIG = "NroPicking"; //listado de key de una orden
 
 
     // Activity For Result
@@ -142,8 +143,9 @@ public class Constantes {
 
     public static final int ORDER_STATUS_INICIAL = 0;
     public static final int ORDER_STATUS_PICKING = 1;
-    public static final int ORDER_STATUS_DELIVERED = 2;
-    public static final int ORDER_STATUS_DELETED = 3;
+    public static final int ORDER_STATUS_EN_DELIVERING = 2;
+    public static final int ORDER_STATUS_DELIVERED = 3;
+    public static final int ORDER_STATUS_DELETED = 4;
 
     // Estado de De Picking
     public static final int PICKING_STATUS_INICIAL = 0;
@@ -165,6 +167,7 @@ public class Constantes {
     public static final int   ADAPTER_CABECERA_DELIVEY=8;
     public static final int   ADAPTER_DETALLE_DELIVEY=9;
     public static final int   ADAPTER_CABECERA_ORDEN_EN_PICKING=10;
+    public static final int   ADAPTER_CABECERA_ORDEN_EN_DELIVEY=10;
 
     public static  String detalleOrdenRef_1C(String mEmpresaKey,long numeroDeOrdena,String productoKey){
         String numeroDeOrden =String.valueOf(numeroDeOrdena);

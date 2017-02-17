@@ -184,9 +184,25 @@ public class Detalle {
 
     }
 
+    public void modificarCantidadEnTotalDelivey(Detalle detalleOrdenNuevo,  Detalle detalleOrdenAnterior) {
+        Log.d("EnTotalInicial", "this.montoItemOrden) " + this.montoItemOrden);
+        Log.d("EnTotalInicial", "detalleOrdenNuevo.getMontoItemOrden() " + detalleOrdenNuevo.getMontoItemOrden());
+        Log.d("EnTotalInicial", "detalleOrdenAnterior.getMontoItemOrden() " + detalleOrdenAnterior.getMontoItemOrden());
+        this.cantidadEntrega = this.cantidadEntrega+detalleOrdenNuevo.getCantidadEntrega()-detalleOrdenAnterior.getCantidadEntrega();
+        this.montoItemEntrega = this.montoItemEntrega+detalleOrdenNuevo.getMontoItemEntrega()-detalleOrdenAnterior.getMontoItemEntrega();
+
+    }
+
+
     public void modificarCantidadProductoDeOrden(Double cantidadOrdenNueva){
         this.cantidadOrden = cantidadOrdenNueva;
         this.montoItemOrden = cantidadOrdenNueva * this.precio;
+
+    }
+
+    public void modificarCantidadProductoDeEntrega(Double cantidadOrdenNueva){
+        this.cantidadEntrega = cantidadOrdenNueva;
+        this.montoItemEntrega = cantidadOrdenNueva * this.precio;
 
     }
 
@@ -222,11 +238,7 @@ public class Detalle {
 
     }
 
-    public void modificarCantidadProductoDeEntrega(Double cantidadOrdenNueva){
-        this.cantidadEntrega = cantidadOrdenNueva;
-        this.montoItemEntrega = cantidadOrdenNueva * this.precio;
 
-    }
 
 
     // Metodos para modificar en detalle en Cabeceras

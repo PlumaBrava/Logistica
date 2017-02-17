@@ -13,6 +13,7 @@ import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.modelos.Producto;
 
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
+import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
@@ -55,6 +56,8 @@ public class CustomOrderDetailActivity extends ActivityBasic {
             int mAction = getIntent().getIntExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
             arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, mAction);
             CabeceraOrden cabeceraOrden= getIntent().getParcelableExtra(EXTRA_CABECERA_ORDEN);
+
+            Long nroPicking=getIntent().getLongExtra(EXTRA_NRO_PICKIG,0);
             Log.d(LOG_TAG, "orden:onComplete: getClienteKey " + cabeceraOrden.getClienteKey());
             Log.d(LOG_TAG, "orden:onComplete: getCliente().getNombre() " + cabeceraOrden.getCliente().getNombre());
             Log.d(LOG_TAG, "orden:onComplete: cabeceraOrden.getTotales().getCantidadDeOrdenesClientes() " + cabeceraOrden.getTotales().getCantidadDeOrdenesClientes());
@@ -62,6 +65,7 @@ public class CustomOrderDetailActivity extends ActivityBasic {
 
             arguments=putBundleFirebase();
             arguments.putParcelable(EXTRA_CABECERA_ORDEN , cabeceraOrden);
+            arguments.putLong(EXTRA_NRO_PICKIG,nroPicking);
             CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
 
             fragment.setArguments(arguments);

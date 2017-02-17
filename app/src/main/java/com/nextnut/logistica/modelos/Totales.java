@@ -161,7 +161,18 @@ public class Totales implements Parcelable {
 
     }
 
+    public void modificarCantidadProductoDeEntrega(Double cantidadEntregaNueva,Detalle detalle){
+        //
+        // El producto y tipo de cliente. Detalle ya tiene todos los datos.
+        // Se actualiza el monto Entregado de la orden.
+        // Si cambia el precio, o algo del producto. lo puedo sacar de la orden y cargar el nuevo con el cambio.
 
+        Log.d("Totales", "this.montoEneNTREGA " +this.montoEntregado);
+        Log.d("Totales", "cantidadOrdenAnteriorEntrega " +detalle.getCantidadEntrega());
+        Log.d("Totales", "cantidadEntregaNueva " +cantidadEntregaNueva);
+        this.montoEntregado = this.montoEntregado+cantidadEntregaNueva * detalle.getPrecio()-detalle.getCantidadEntrega() * detalle.getPrecio();
+
+    }
 
     // [START post_to_map]
     @Exclude

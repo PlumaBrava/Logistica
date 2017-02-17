@@ -22,13 +22,12 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content"
    >
-    <!--android:divider="#FFCC00-->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_weight="1"
-        android:layout_margin="4dp"
+        android:layout_margin="@dimen/foto_margin"
         >
 
     <ImageView
@@ -38,7 +37,7 @@
         android:contentDescription="@string/photo"
         android:maxHeight="@dimen/product_cardPhotoheigth"
         android:maxWidth="@dimen/product_cardPhotowidth"
-
+        android:layout_marginLeft="2dp"
         android:transitionName="@string/detail_icon_transition_name"
         android:layout_gravity="center"
      />
@@ -52,22 +51,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_weight="3"
-
+        android:layout_margin="@dimen/text_margin"
         >
-        <!--android:layout_margin="@dimen/text_margin"-->
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
            >
-            <!--<TextView-->
-                <!--android:text="@string/product"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="start"-->
-                <!--android:gravity="start"-->
-                <!--android:textStyle="bold"/>-->
+
 
     <TextView
         android:id="@+id/nombreProducto"
@@ -79,16 +72,6 @@
         android:layout_weight="1"/>
 
 
-            <!--android:layout_margin="@dimen/text_margin"-->
-
-            <CheckBox
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/favorito"
-                android:contentDescription="@string/favorito"
-                android:id="@+id/favorito"
-                android:layout_weight="1"/>
 
 
         </LinearLayout>
@@ -100,37 +83,37 @@
             >
 
             <TextView
-                android:text="@string/price"
+                android:id="@+id/blanco"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
                 android:layout_gravity="center_vertical"
                 android:gravity="start"
-                android:contentDescription="@string/priceTitle"
                 android:layout_weight="1"/>
-            <!--android:layout_margin="@dimen/text_margin"-->
+
+
             <TextView
-                android:text="@string/quantity"
+                android:text="@string/EnOrdenes"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="start"
                 android:textStyle="bold"
-                android:contentDescription="@string/quantityTitle"
+                android:contentDescription="@string/EnOrdenes"
+
                 android:layout_marginStart="@dimen/text_margin"
                 android:layout_weight="1"
-                />
+                android:layout_marginLeft="@dimen/text_margin" />
 
 
             <TextView
-                android:text="@string/total"
+                android:text="@string/EnPicking"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="start"
                 android:textStyle="bold"
                 android:layout_weight="1"
-                android:contentDescription="@string/totalTitle"
+                android:contentDescription="@string/EnPicking"
                 />
             <!--android:layout_margin="@dimen/text_margin"-->
         </LinearLayout>
@@ -142,17 +125,19 @@
             android:orientation="horizontal"
             >
 
+            <TextView
+                android:text="@string/cantidad"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="center_vertical"
+                android:gravity="start"
+                android:contentDescription="@string/cantidad"
+                android:layout_weight="1"/>
+
+
         <TextView
-            android:id="@+id/precioProducto"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="start"
-            android:contentDescription="@string/product"
-            android:layout_weight="1"/>
-            <!--android:layout_margin="@dimen/text_margin"-->
-        <TextView
-            android:id="@+id/cantidad"
+            android:id="@+id/cantidadEnOrdenes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -160,89 +145,23 @@
             android:contentDescription="@string/quantity"
             android:layout_marginStart="@dimen/text_margin"
             android:layout_weight="1"
-            />
+            android:layout_marginLeft="@dimen/text_margin" />
 
 
         <TextView
-            android:id="@+id/total"
+            android:id="@+id/cantidadPicking"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="start"
-
+            android:background="@drawable/edittext_bg"
             android:layout_weight="1"
             />
             <!--android:layout_margin="@dimen/text_margin"-->
     </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-            <TextView
-                android:id="@+id/precioProductoDelivery"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/deliverPrice"
-
-                android:layout_gravity="center_vertical"
-                android:gravity="start"
-
-                android:layout_weight="1"/>
-            <!--android:layout_margin="@dimen/text_margin"-->
-            <TextView
-                android:id="@+id/cantidadDelivery"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="start"
-                android:textStyle="bold"
-                android:background="@drawable/edittext_bg"
-                android:layout_marginLeft="@dimen/text_margin"
-                android:layout_marginRight="@dimen/text_margin"
-                android:layout_weight="1"
-                android:contentDescription="@string/deliverqantity"
-                />
 
 
-            <TextView
-                android:id="@+id/totalDelivery"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="start"
-                android:contentDescription="@string/deliverPricetotalTitle"
-                android:layout_weight="1"
-                />
-            <!--android:layout_margin="@dimen/text_margin"-->
-        </LinearLayout>
-
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal"-->
-            <!--&gt;-->
-
-        <!--<TextView-->
-            <!--android:text="@string/description"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="start"-->
-            <!--android:gravity="start"-->
-            <!--android:textStyle="bold"-->
-            <!--android:contentDescription="@string/description"-->
-            <!--/>-->
-        <!--<TextView-->
-            <!--android:id="@+id/descriptionProducto"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="start"-->
-            <!--android:gravity="start"-->
-
-
-            <!--/>-->
         <!--android:layout_margin="@dimen/text_margin"-->
 
         <!--</LinearLayout>-->

@@ -43,6 +43,8 @@ class FirebaseArrayDistinct implements ChildEventListener {
         mSnapshots = new ArrayList<DataSnapshot>();
         mQuery.addChildEventListener(this);
         this.keys=keys;
+        Log.i("ArrayDistinct", "abmDetalleDeOrden mproductKeyDato "+keys.toString());
+
         Log.i("ArrayDistinct", "constructor");
 
     }

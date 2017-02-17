@@ -1,66 +1,63 @@
 package com.nextnut.logistica;
 
-import android.app.Dialog;
-import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.os.Build;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import com.nextnut.logistica.data.CustomColumns;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.nextnut.logistica.data.CustomOrdersColumns;
-import com.nextnut.logistica.data.CustomOrdersDetailColumns;
-import com.nextnut.logistica.data.LogisticaDataBase;
 import com.nextnut.logistica.data.LogisticaProvider;
-import com.nextnut.logistica.data.PickingOrdersColumns;
-import com.nextnut.logistica.data.PickingOrdersDetailColumns;
-import com.nextnut.logistica.data.ProductsColumns;
-import com.nextnut.logistica.rest.CustomsOrdersCursorAdapter;
-import com.nextnut.logistica.rest.PickingOrderProductsAdapter;
-import com.nextnut.logistica.rest.PickingOrdersCursorAdapter;
+import com.nextnut.logistica.modelos.CabeceraOrden;
+import com.nextnut.logistica.modelos.CabeceraPicking;
+import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallbackDeleveyCustomOrder;
-import com.nextnut.logistica.util.CurrencyToDouble;
-import com.nextnut.logistica.util.DialogAlerta;
+import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
+import com.nextnut.logistica.viewholder.CabeceraPickingViewHolder;
+import com.nextnut.logistica.viewholder.CabeceraViewHolder;
+import com.nextnut.logistica.viewholder.DetalleDeliveryTotalProdutctosViewHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
-import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_DELIVERED;
+import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
+import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
+import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
+import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_EN_DELIVERING;
 import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_PICKING;
-import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_CERRADA;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
-import static com.nextnut.logistica.util.MakeCall.makeTheCall;
-import static com.nextnut.logistica.util.SharePickingOrder.sharePickingOrder;
-import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
 
 /**
  * An activity representing a list of CustomOrders. This activity
@@ -70,17 +67,25 @@ import static com.nextnut.logistica.widget.LogisticaWidget.upDateWitget;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class DeliveryListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DeliveryListFragment  extends FragmentBasic
+//        Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+{
 
     public static final String ARG_ITEM_ID = "item_id";
 
     private long mCustomOrderIdSelected;
 
     private long mIDPickingOrderSelected;
-
-    private PickingOrdersCursorAdapter mPickinOrdersAdapter;
-    private PickingOrderProductsAdapter mCursorAdapterTotalProductos;
-    private CustomsOrdersCursorAdapter mCustomsOrdersCursorAdapter;
+    View emptyViewTotalProducts;
+    private Query totalProductos;
+//    private PickingOrdersCursorAdapter mPickinOrdersAdapter;
+//    private PickingOrderProductsAdapter mCursorAdapterTotalProductos;
+//    private CustomsOrdersCursorAdapter mCustomsOrdersCursorAdapter;
+    View emptyViewCustomOrder;
+    private FirebaseRecyclerAdapter<CabeceraPicking, CabeceraPickingViewHolder> mPickinOrdersAdapter;
+    private FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder> mCustomsOrdersCursorAdapter;
+    private FirebaseRecyclerAdapter<Detalle, DetalleDeliveryTotalProdutctosViewHolder> mCursorAdapterTotalProductos;
+//
 
     private RecyclerView recyclerView;
     private RecyclerView recyclerViewTotalProductos;
@@ -90,7 +95,13 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
     private EditText mTilePickingComent;
     private TextView mCreationDate;
 
+    private   ArrayList<Task> taskList = new ArrayList<Task>();
+    private   Task<Void> allTask;
 
+    private DataSnapshot mProductosEnOrdenDatos;
+    private DataSnapshot mOrdenesEnPickingDatos;
+
+private CabeceraPicking datosCabeceraPickingSeleccionada;
 
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_delete;
@@ -139,12 +150,12 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
-    public void onResume() {
-        getLoaderManager().restartLoader(PICKING_ORDER_LOADER, null, this);
-        getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, this);
-        getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
-        super.onResume();
+    public void savePhoto(Bitmap bitmap) {
+
     }
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -181,88 +192,142 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         recyclerView = (RecyclerView) rootView.findViewById(R.id.pickingOrder_list);
         recyclerView.setLayoutManager(layoutManager);
 
-        mPickinOrdersAdapter = new PickingOrdersCursorAdapter(
-                getContext(),
-                null,
-                emptyViewPicking,
-                new PickingOrdersCursorAdapter.PinckingOrdersCursorAdapterOnClickHandler() {
+        final View emptyViewPickingOrders = rootView.findViewById(R.id.recyclerview_pickingOrders_empty);
+        Query pickingOrderQuery = refPicking_6_List(PICKING_STATUS_DELIVERY);
+//         = mDatabase.child(ESQUEMA_PICKING).child(mEmpresaKey).child(String.valueOf(PICKING_STATUS_INICIAL));
+        mPickinOrdersAdapter = new FirebaseRecyclerAdapter<CabeceraPicking, CabeceraPickingViewHolder>(CabeceraPicking.class, R.layout.picking_orders_list_content,
+                CabeceraPickingViewHolder.class, pickingOrderQuery) {
+            @Override
+            protected void populateViewHolder(CabeceraPickingViewHolder viewHolder, final CabeceraPicking model, int position) {
+                viewHolder.bindToPost(model, new View.OnClickListener() {
                     @Override
-                    public void onClick(long id, PickingOrdersCursorAdapter.ViewHolder vh) {
-                        mTilePickingComent.setText(vh.mpickingOrderComents.getText());
-                        mTilePickingOrderNumber.setText(vh.mPickingOrderNumber.getText());
+                    public void onClick(View view) {
+
+                        datosCabeceraPickingSeleccionada=model.Copy();
+                        mTilePickingComent.setText(model.getComentario());
+                        mTilePickingOrderNumber.setText(String.valueOf( model.getNumeroDePickingOrden()));
                         mTilePickingComent.setVisibility(View.VISIBLE);
-                        mCreationDate.setText(vh.mCreationDate.getText());
-                        mIDPickingOrderSelected = id;
+                        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+                        mCreationDate.setText(sfd.format(new Date(model.getFechaDeCreacion())));
+
+
+
+
+
+
                         mPickinOrdersAdapter.notifyDataSetChanged();
-                        getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, DeliveryListFragment.this);
-                        getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, DeliveryListFragment.this);
+
+                        muestraTotalesProductosDelivery();
+                        muestraOrdenesEnDelivey();
+
                         mCursorAdapterTotalProductos.notifyDataSetChanged();
+                        recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.VISIBLE);
+                        recyclerViewTotalProductos.setVisibility(View.VISIBLE);
+
+
+
+
                         recyclerView.setVisibility(View.GONE);
                         mLinearOrders.setVisibility(View.VISIBLE);
                         mLinearProductos.setVisibility(View.VISIBLE);
                         mDeliveryOrderTile.setVisibility(View.VISIBLE);
+
                     }
 
-                    @Override
-                    public void onDataChange() {
-                        getLoaderManager().restartLoader(PICKING_ORDER_LOADER, null, DeliveryListFragment.this);
-                        getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, DeliveryListFragment.this);
-                        getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, DeliveryListFragment.this);
-                        mCursorAdapterTotalProductos.notifyDataSetChanged();
-                        mPickinOrdersAdapter.notifyDataSetChanged();
-                        mCursorAdapterTotalProductos.notifyDataSetChanged();
-                    }
+                });
+            }
 
-                    @Override
-                    public void onItemDismissCall(long cursorID) {
-                        mIDPickingOrderSelected = cursorID;
-                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-                        ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
-                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PICKING_STATUS_INICIAL);
-                        batchOperations.add(builder.build());
+            @Override
+            protected void onItemDismissHolder(CabeceraPicking model, int position) {
+                pasarPickingAInicial( model);
+            }
 
+            @Override
+            protected void onItemAcceptedHolder(CabeceraPicking model, int position) {
 
-                        try {
-                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-                            onDataChange();
-                        } catch (RemoteException | OperationApplicationException e) {
-                        } finally {
-                            onDataChange();
-                            upDateWitget(getContext());
-                        }
-                    }
+            }
+        };
 
-                    @Override
-                    public void onItemAceptedCall(long cursorID) {
-
-                        mIDPickingOrderSelected = cursorID;
-                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-                        ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
-                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PICKING_STATUS_CERRADA);
-                        batchOperations.add(builder.build());
-                        try {
-                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-                            onDataChange();
-                        } catch (RemoteException | OperationApplicationException e) {
-
-                        } finally {
-                            onDataChange();
-                            upDateWitget(getContext());
-                        }
-                    }
-
-                    @Override
-                    public void onDialogAlert(String message) {
-                        DialogAlerta dFragment = DialogAlerta.newInstance(message);
-                        dFragment.show(getFragmentManager(), "Dialog Fragment");
-                    }
-
-                    @Override
-                    public void sharePickingorder(PickingOrdersCursorAdapter.ViewHolder vh) {
-                        sharePickingOrder(getContext(), vh.mPickingOrderNumber.getText().toString(), mTilePickingComent.getText().toString());
-                    }
-                }
-        );
+//        mPickinOrdersAdapter = new PickingOrdersCursorAdapter(
+//                getContext(),
+//                null,
+//                emptyViewPicking,
+//                new PickingOrdersCursorAdapter.PinckingOrdersCursorAdapterOnClickHandler() {
+//                    @Override
+//                    public void onClick(long id, PickingOrdersCursorAdapter.ViewHolder vh) {
+//                        mTilePickingComent.setText(vh.mpickingOrderComents.getText());
+//                        mTilePickingOrderNumber.setText(vh.mPickingOrderNumber.getText());
+//                        mTilePickingComent.setVisibility(View.VISIBLE);
+//                        mCreationDate.setText(vh.mCreationDate.getText());
+//                        mIDPickingOrderSelected = id;
+//                        mPickinOrdersAdapter.notifyDataSetChanged();
+//
+//                        mCursorAdapterTotalProductos.notifyDataSetChanged();
+//                        recyclerView.setVisibility(View.GONE);
+//                        mLinearOrders.setVisibility(View.VISIBLE);
+//                        mLinearProductos.setVisibility(View.VISIBLE);
+//                        mDeliveryOrderTile.setVisibility(View.VISIBLE);
+//                    }
+//
+//                    @Override
+//                    public void onDataChange() {
+//
+//                        mCursorAdapterTotalProductos.notifyDataSetChanged();
+//                        mPickinOrdersAdapter.notifyDataSetChanged();
+//                        mCursorAdapterTotalProductos.notifyDataSetChanged();
+//                    }
+//
+//                    @Override
+//                    public void onItemDismissCall(long cursorID) {
+//                        mIDPickingOrderSelected = cursorID;
+//                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+//                        ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
+//                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PICKING_STATUS_INICIAL);
+//                        batchOperations.add(builder.build());
+//
+//
+//                        try {
+//                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//                            onDataChange();
+//                        } catch (RemoteException | OperationApplicationException e) {
+//                        } finally {
+//                            onDataChange();
+//                            upDateWitget(getContext());
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onItemAceptedCall(long cursorID) {
+//
+//                        mIDPickingOrderSelected = cursorID;
+//                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+//                        ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
+//                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PICKING_STATUS_CERRADA);
+//                        batchOperations.add(builder.build());
+//                        try {
+//                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//                            onDataChange();
+//                        } catch (RemoteException | OperationApplicationException e) {
+//
+//                        } finally {
+//                            onDataChange();
+//                            upDateWitget(getContext());
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onDialogAlert(String message) {
+//                        DialogAlerta dFragment = DialogAlerta.newInstance(message);
+//                        dFragment.show(getFragmentManager(), "Dialog Fragment");
+//                    }
+//
+//                    @Override
+//                    public void sharePickingorder(PickingOrdersCursorAdapter.ViewHolder vh) {
+//                        sharePickingOrder(getContext(), vh.mPickingOrderNumber.getText().toString(), mTilePickingComent.getText().toString());
+//                    }
+//                }
+//        );
 
 
         recyclerView.setAdapter(mPickinOrdersAdapter);
@@ -280,8 +345,8 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
                 mDeliveryOrderTile.setVisibility(View.GONE);
                 mLinearProductos.setVisibility(View.GONE);
                 mLinearOrders.setVisibility(View.GONE);
-//                recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
-//                recyclerViewTotalProductos.setVisibility(View.GONE);
+                recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
+                recyclerViewTotalProductos.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
 
             }
@@ -289,21 +354,21 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
         // Productos
 
-        View emptyViewTotalProducts = rootView.findViewById(R.id.recyclerview_totalproduct_empty);
+        emptyViewTotalProducts = rootView.findViewById(R.id.recyclerview_totalproduct_empty);
         recyclerViewTotalProductos = (RecyclerView) rootView.findViewById(R.id.total_products_pickingOrder);
 
         recyclerViewTotalProductos.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-        mCursorAdapterTotalProductos = new PickingOrderProductsAdapter(getContext(), null,
-                emptyViewTotalProducts,
-                new PickingOrderProductsAdapter.ProductCursorAdapterOnClickHandler() {
-                    @Override
-                    public void onClick(long id, PickingOrderProductsAdapter.ViewHolder vh) {
-
-                    }
-                }
-        );
+//        mCursorAdapterTotalProductos = new PickingOrderProductsAdapter(getContext(), null,
+//                emptyViewTotalProducts,
+//                new PickingOrderProductsAdapter.ProductCursorAdapterOnClickHandler() {
+//                    @Override
+//                    public void onClick(long id, PickingOrderProductsAdapter.ViewHolder vh) {
+//
+//                    }
+//                }
+//        );
 
 
         recyclerViewTotalProductos.setAdapter(mCursorAdapterTotalProductos);
@@ -313,90 +378,88 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
 
         // Custom Orders
-        View emptyView = rootView.findViewById(R.id.recyclerview_custom_empty);
-        mCustomsOrdersCursorAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyView, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
-            @Override
-            public void onClick(long id, CustomsOrdersCursorAdapter.ViewHolder vh) {
-
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-
-//                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
-                    arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-                    CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
-                    fragment.setArguments(arguments);
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .addToBackStack(null)
-                            .replace(R.id.customorder_detail_container, fragment)
-                            .commit();
-                } else {
-                    Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
-                    intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY);
-//                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
-
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
-                        ActivityOptionsCompat activityOptions =
-                                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p2);
-                        startActivity(intent, activityOptions.toBundle());
-
-                    } else {
-                        startActivity(intent);
-                    }
-
-                }
-
-
-            }
-
-            @Override
-            public void onMakeACall(String ContactID) {
-                makeTheCall(getActivity(), ContactID);
-            }
-
-            @Override
-            public void onDialogAlert(String message) {
-
-            }
-
-            @Override
-            public void onItemDismissCall(long cursorID) {
-                mCustomOrderIdSelected = cursorID;
-            }
-
-            @Override
-            public void onItemAceptedCall(long cursorID) {
-                mCustomOrderIdSelected = cursorID;
-                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
-                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_DELIVERED);
-                batchOperations.add(builder.build());
-                try {
-                    getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-                } catch (RemoteException | OperationApplicationException e) {
-
-                } finally {
-                    onDataChange();
-                }
-
-
-            }
-
-            @Override
-            public void onDataChange() {
-                getLoaderManager().restartLoader(PICKING_ORDER_LOADER, null, DeliveryListFragment.this);
-                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, DeliveryListFragment.this);
-                getLoaderManager().restartLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, DeliveryListFragment.this);
-                mCursorAdapterTotalProductos.notifyDataSetChanged();
-                mPickinOrdersAdapter.notifyDataSetChanged();
-                mCursorAdapterTotalProductos.notifyDataSetChanged();
-            }
-        }
-
-        );
-
-        recyclerViewCustomOrderInDeliveyOrder.setAdapter(mCustomsOrdersCursorAdapter);
+       emptyViewCustomOrder = rootView.findViewById(R.id.recyclerview_custom_empty);
+//        mCustomsOrdersCursorAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyView, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
+//            @Override
+//            public void onClick(long id, CustomsOrdersCursorAdapter.ViewHolder vh) {
+//
+//                if (mTwoPane) {
+//                    Bundle arguments = new Bundle();
+//
+////                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
+//                    arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
+//                    CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
+//                    fragment.setArguments(arguments);
+//                    getActivity().getSupportFragmentManager().beginTransaction()
+//                            .addToBackStack(null)
+//                            .replace(R.id.customorder_detail_container, fragment)
+//                            .commit();
+//                } else {
+//                    Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
+//                    intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY);
+////                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
+//
+//
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
+//                        ActivityOptionsCompat activityOptions =
+//                                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p2);
+//                        startActivity(intent, activityOptions.toBundle());
+//
+//                    } else {
+//                        startActivity(intent);
+//                    }
+//
+//                }
+//
+//
+//            }
+//
+//            @Override
+//            public void onMakeACall(String ContactID) {
+//                makeTheCall(getActivity(), ContactID);
+//            }
+//
+//            @Override
+//            public void onDialogAlert(String message) {
+//
+//            }
+//
+//            @Override
+//            public void onItemDismissCall(long cursorID) {
+//                mCustomOrderIdSelected = cursorID;
+//            }
+//
+//            @Override
+//            public void onItemAceptedCall(long cursorID) {
+//                mCustomOrderIdSelected = cursorID;
+//                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
+//                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
+//                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_DELIVERED);
+//                batchOperations.add(builder.build());
+//                try {
+//                    getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
+//                } catch (RemoteException | OperationApplicationException e) {
+//
+//                } finally {
+//                    onDataChange();
+//                }
+//
+//
+//            }
+//
+//            @Override
+//            public void onDataChange() {
+//
+//                mCursorAdapterTotalProductos.notifyDataSetChanged();
+//                mPickinOrdersAdapter.notifyDataSetChanged();
+//                mCursorAdapterTotalProductos.notifyDataSetChanged();
+//            }
+//        }
+//
+//        );
+//
+//        recyclerViewCustomOrderInDeliveyOrder.setAdapter(mCustomsOrdersCursorAdapter);
 
         ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallbackDeleveyCustomOrder(mCustomsOrdersCursorAdapter);
         ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
@@ -415,6 +478,164 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         }
         return rootView;
     }
+
+
+
+    public void muestraOrdenesEnDelivey() {
+        Query listadoOrdenesEnPickingQuery = refCabeceraOrden_2_List(ORDER_STATUS_EN_DELIVERING, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
+        Log.i(LOG_TAG, "muestraOrdenesEnPicking:MainActivity.getmPickingOrderSelected(): " + datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
+        Log.i(LOG_TAG, "muestraOrdenesEnPicking:Query: " + listadoOrdenesEnPickingQuery.getRef().toString());
+
+        mCustomsOrdersCursorAdapter = new FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder>(CabeceraOrden.class, R.layout.customorder_list_content,
+                CabeceraViewHolder.class, listadoOrdenesEnPickingQuery) {
+            @Override
+            protected void populateViewHolder(final CabeceraViewHolder viewHolder, final CabeceraOrden model, final int position) {
+                final DatabaseReference CabeceraRef = getRef(position);
+                emptyViewCustomOrder.setVisibility(View.GONE);
+                Log.i(LOG_TAG, "muestraOrdenesEnPicking:CabeceraRef: " + CabeceraRef.toString());
+
+                // Set click listener for the whole post view
+                final String orderKey = CabeceraRef.getKey();
+                Log.i(LOG_TAG, "muestraOrdenesEnPicking:orderKey: " + orderKey);
+
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                                                           @Override
+                                                           public void onClick(View v) {
+
+
+                                                           }
+                                                       }
+                );
+
+                viewHolder.bindToPost(model, new View.OnClickListener()
+
+                        {
+                            @Override
+                            public void onClick(View starView) {
+                                Log.d(LOG_TAG, "muestraOrdenesEnPicking:onClick model: " + model.getCliente().getNombre());
+                                Log.d(LOG_TAG, "muestraOrdenesEnPicking:onClick");
+                                Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
+                                mCliente = model.getCliente();
+                                putExtraFirebase_Fragment(intent);
+                                intent.putExtra(EXTRA_CABECERA_ORDEN, model);
+                                Log.d(LOG_TAG, "muestraOrdenesEnPickin CabeceraPicking Nro: "+datosCabeceraPickingSeleccionada.getNumeroDePickingOrden() );
+                                intent.putExtra(EXTRA_NRO_PICKIG, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
+                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+                                startActivity(intent);
+                            }
+                        }
+
+                );
+            }
+
+            @Override
+            protected void onItemDismissHolder(CabeceraOrden model, int position) {
+                Log.i(LOG_TAG, "muestraOrdenesEnPicking Modelo: Numero de orden- " + model.getNumeroDeOrden());
+                if (MainActivity.mPickingOrderSelected == 0) {
+
+                    onDialogAlert(getResources().getString(R.string.selectPickingOrderToAssing));
+//                    onDataChange();
+                } else {
+
+                    Log.i(LOG_TAG, "muestraOrdenesEnPicking Modelo: Numero de orden- " + model.getNumeroDeOrden());
+  //                  pasarOrdenAInicial(model);
+
+                }
+            }
+
+            @Override
+            protected void onItemAcceptedHolder(CabeceraOrden model, int position) {
+
+
+                if (MainActivity.mPickingOrderSelected == 0) {
+
+                    onDialogAlert(getResources().getString(R.string.selectPickingOrderToAssing));
+//                    onDataChange();
+                } else {
+
+                    Log.i(LOG_TAG, "muestraOrdenesEnPicking Modelo: Numero de orden- " + model.getNumeroDeOrden());
+//                    pasarOrdenAInicial(model);
+
+
+                }
+            }
+        };
+
+
+
+
+        ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallback(mCustomsOrdersCursorAdapter, ADAPTER_CABECERA_ORDEN_EN_DELIVEY);
+        ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
+        mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderInDeliveyOrder);
+
+        recyclerViewCustomOrderInDeliveyOrder.setAdapter(mCustomsOrdersCursorAdapter);
+    }
+
+    public void muestraTotalesProductosDelivery() {
+        totalProductos = refPickingTotal_7_List(PICKING_STATUS_DELIVERY, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
+        mCursorAdapterTotalProductos = new FirebaseRecyclerAdapter<Detalle, DetalleDeliveryTotalProdutctosViewHolder>(Detalle.class, R.layout.picking_product_item,
+                DetalleDeliveryTotalProdutctosViewHolder.class, totalProductos) {
+            @Override
+            protected void populateViewHolder(final DetalleDeliveryTotalProdutctosViewHolder viewHolder, final Detalle model, final int position) {
+                final DatabaseReference CabeceraRef = getRef(position);
+
+                emptyViewTotalProducts.setVisibility(View.GONE);
+                Log.i(LOG_TAG, "adapter:CabeceraRef: " + CabeceraRef.toString());
+
+                // Set click listener for the whole post view
+                final String productKey = CabeceraRef.getKey();
+                Log.i(LOG_TAG, "adapter:orderKey: " + productKey);
+
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                                                           @Override
+                                                           public void onClick(View v) {
+
+                                                           }
+                                                       }
+                );
+
+                viewHolder.bindToPost(model, new View.OnClickListener()
+
+                        {
+                            @Override
+                            public void onClick(View starView) {
+                                Log.d(LOG_TAG, "adapter:onClick model: " + model.getProducto().getNombreProducto());
+                                Log.d(LOG_TAG, "adapter:onClick");
+//                                Intent intent = new Intent(getContext(), ProductosEnOrdenes.class);
+//                                mCliente=model.getCliente();
+                                mProducto = model.getProducto();
+                                mProductKey = productKey;
+//                                mDetalleAnterior = model;
+//                                putExtraFirebase_Fragment(intent);
+//
+////                                intent.putExtra(EXTRA_PRODUCT_KEY, productKey);
+////                                intent.putExtra(EXTRA_PRODUCT, model.getProducto());
+//                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//
+//                                startActivity(intent);
+
+//                                showDialogNumberPicker(mProductKey);
+                            }
+                        }
+
+                );
+            }
+
+            @Override
+            protected void onItemDismissHolder(Detalle model, int position) {
+                Log.d(LOG_TAG, "onItemDismissHolder");
+            }
+
+            @Override
+            protected void onItemAcceptedHolder(Detalle model, int position) {
+                Log.d(LOG_TAG, "onItemAcceptedHolder");
+
+            }
+        };
+        recyclerViewTotalProductos.setAdapter(mCursorAdapterTotalProductos);
+    }
+
+
 
     public boolean exitenCUasignedtoPickingOrder() {
         String select = "((" + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " NOTNULL) AND ("
@@ -441,9 +662,7 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(PICKING_ORDER_LOADER, null, this);
-        getLoaderManager().initLoader(PICKING_LOADER_TOTAL_PRODUCTOS, null, this);
-        getLoaderManager().initLoader(CUSTOM_ORDER_LOADER, null, this);
+
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -476,168 +695,189 @@ public class DeliveryListFragment extends Fragment implements LoaderManager.Load
         return super.onOptionsItemSelected(item);
     }
 
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        switch (id) {
-
-            case CUSTOM_ORDER_LOADER:
-
-                String proyection[] = {LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.ID_CUSTOM_ORDER,
-                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER,
-                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER,
-                        LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
-                        LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
-                        LogisticaDataBase.CUSTOMS + "." + CustomColumns.REFERENCE_CUSTOM,
-                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER
-                };
-
-
-                return new CursorLoader(
-                        getActivity(),
-                        LogisticaProvider.ShowJoin.CONTENT_URI,
-                        proyection,
-                        " ( " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " +ORDER_STATUS_PICKING
-                                + " or " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.STATUS_CUSTOM_ORDER + " = " + ORDER_STATUS_DELIVERED + " ) "
-                                + " and " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + mIDPickingOrderSelected,
-                        null,
-                        null);
-
-            case PICKING_ORDER_LOADER:
-
-
-                return new CursorLoader(
-                        getActivity(),
-                        LogisticaProvider.PickingOrders.CONTENT_URI,
-                        null,
-                        LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PICKING_STATUS_DELIVERY +
-                                " OR " +
-                                LogisticaDataBase.PICKING_ORDERS + "." + PickingOrdersColumns.STATUS_PICKING_ORDERS + " = " + PICKING_STATUS_CERRADA,
-                        null,
-                        null);
-
-            case PICKING_LOADER_TOTAL_PRODUCTOS:
-
-
-                String select[] = {
-/* 0 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns._ID_PRODUCTO,
-/* 1 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
-/* 2 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.IMAGEN_PRODUCTO,
-/* 3 */             LogisticaDataBase.PRODUCTS + "." + ProductsColumns.DESCRIPCION_PRODUCTO,
-/* 4 */            "sum ( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " )",
-/* 5 */            LogisticaDataBase.PICKING_ORDERS_DETAIL + "." + PickingOrdersDetailColumns.ID_PICKING_ORDERS_DETAIL,
-/* 6 */           "max ( " + LogisticaDataBase.PICKING_ORDERS_DETAIL + "." + PickingOrdersDetailColumns.QUANTITY_PICKING_ORDERS_DETAIL + " )",
-/* 7 */           "sum ( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL + " )",
-/* 8 */            "max ( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.ID_CUSTOM_ORDER_DETAIL + " )"};
-
-
-                String where =
-
-                        LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER + " = " + mIDPickingOrderSelected;
-
-
-                return new CursorLoader(
-                        getActivity(),
-                        LogisticaProvider.join_customorderDetail_Product_Customer_picking.CONTENT_URI,
-                        select,
-                        where,
-                        null,
-                        null);
-
-
-            default:
-                return null;
-
+    private void pasarPickingAInicial(final CabeceraPicking cabeceraPicking) {
+        Log.i(LOG_TAG, "pasarPickingAEntrega Numero de picking- " + cabeceraPicking.getNumeroDePickingOrden());
+        if (hayTareaEnProceso()) {
+            return;
         }
+
+
+        // leo y bloqueo picking
+        readBlockPicking(PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden());
+
+
+        mPickingTask.addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if (task.isSuccessful()) {
+                    CabeceraPicking cabeceraPicking1 = ((DataSnapshot) mPickingTask.getResult()).getValue(CabeceraPicking.class);
+
+
+                    Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key lee cabeceras");
+                    //leo las ordenes asociadas al picking y las bloqueo
+                    refCabeceraOrden_2_List(ORDER_STATUS_EN_DELIVERING, cabeceraPicking.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden lee cabeceras Llegaron los datos");
+                            Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key " + dataSnapshot.getKey());
+                            Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden Ref " + dataSnapshot.getRef());
+                            Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden ChildrenCount" + dataSnapshot.getChildrenCount());
+                            mOrdenesEnPickingDatos = dataSnapshot;
+                            int i = 0;
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                String nroOrden = snapshot.getKey();
+                                Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key " + nroOrden);
+
+//                        CabeceraOrden cabeceraOrden= (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
+                                readBlockCabeceraOrden(Long.parseLong(nroOrden));
+                                taskList.add(mCabeceraOrdenTask.get(i));
+                                i++;
+                            }
+
+                            //leo los totales de productos asociadas al picking y las bloqueo
+                            refPickingTotal_7_List(PICKING_STATUS_INICIAL, cabeceraPicking.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    int i = 0;
+                                    mProductosEnOrdenDatos = dataSnapshot;
+                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                        String productkey = snapshot.getKey();
+                                        Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Picking Total key " + productkey);
+
+                                        readBlockPickingTotal(PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden(), productkey);
+                                        taskList.add(mPickingTotalTask.get(i));
+                                        i++;}
+
+                                    allTask = Tasks.whenAll(taskList.toArray(new Task[taskList.size()]));
+                                    allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.i(LOG_TAG, "pasarPickingAEntrega Completo el bloqueo- ");
+
+                                            Map<String, Object> childUpdates = new HashMap<>();
+                                            Map<String, Object> totalInicialDetalleValues = null;
+                                            Map<String, Object> pickingTotalValues = null;
+                                            int i = 0;
+                                            //Recorro el total de Productos en Picking (7)
+
+                                            for (DataSnapshot productoEnOrden : mProductosEnOrdenDatos.getChildren()) {
+                                                // busca el producto dentro de la orden
+                                                String productKey = productoEnOrden.getKey();
+                                                Detalle pickingTotal = productoEnOrden.getValue(Detalle.class);
+                                                pickingTotal.liberar();
+                                                // cambio de estado el total de picking 7
+                                                childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden(), productKey), null);
+                                                childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_INICIAL, cabeceraPicking.getNumeroDePickingOrden(), productKey), pickingTotal.toMap());
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega Product key- " + productKey + " " + pickingTotal.getProducto().getNombreProducto());
+
+                                            }
+
+                                            // Actualizacion de Cabecera de Picking (6)
+                                            final CabeceraPicking cabeceraPicking = ((DataSnapshot) mPickingTask.getResult()).getValue(CabeceraPicking.class);
+                                            Log.i(LOG_TAG, "pasarPickingAEntrega mPickingTask-isSuccessful(): " + mPickingTask.isSuccessful());
+                                            Log.i(LOG_TAG, "pasarPickingAEntrega mPickingTask-getKey(): " + ((DataSnapshot) mPickingTask.getResult()).getKey());
+                                            Log.i(LOG_TAG, "pasarPickingAEntrega mPickingTask-getREF(): " + ((DataSnapshot) mPickingTask.getResult()).getRef());
+
+                                            if (cabeceraPicking == null) {
+                                                // si es nulo se trataria de un error puesto que existe
+
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega TotalInicial Detalle = NuLL- ");
+                                            } else {
+                                                cabeceraPicking.liberar();
+
+                                            }
+
+                                            /*6 */
+                                            childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY, String.valueOf(cabeceraPicking.getNumeroDePickingOrden())), null);
+                                            childUpdates.put(nodoPicking_6(PICKING_STATUS_INICIAL, String.valueOf(cabeceraPicking.getNumeroDePickingOrden())), cabeceraPicking.toMap());
+
+                                            for (int a = 0; a < mCabeceraOrdenTask.size(); a++) {
+                                                DataSnapshot cabeceraOrdenes = ((DataSnapshot) mCabeceraOrdenTask.get(a).getResult());
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega cabeceraOrdenes key = " + cabeceraOrdenes.getKey());
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega cabeceraOrdenes ref = " + cabeceraOrdenes.getRef());
+
+                                                String nroDeOrden = cabeceraOrdenes.getKey();
+                                                CabeceraOrden cabeceraOrden = cabeceraOrdenes.getValue(CabeceraOrden.class);
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega nroDeOrden = " + nroDeOrden);
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega nroDeOrden = " + cabeceraOrden.getNumeroDeOrden());
+
+                                    /*2 */
+                                                cabeceraOrden.setEstado(ORDER_STATUS_PICKING);
+                                                cabeceraOrden.liberar();
+                                                childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_EN_DELIVERING , cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), null);
+                                                // todo: verificar si esta linea funciona bien!!!
+                                                childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_PICKING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), cabeceraOrden.toMap());
+//                                        childUpdates.put(nodoCabeceraOrden_2(ORDER_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+                                                childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+
+                                            }
+
+                                            mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+
+                                                    Log.i(LOG_TAG, "pasarPickingAEntrega updateChildren-onFailure " + e.toString());
+                                                    liberarRecusosTomados( "", PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden());
+                                                    liberarArrayTaskConBloqueos();
+                                                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+
+                                                }
+                                            }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                         @Override
+                                                                         public void onComplete(@NonNull Task<Void> task) {
+                                                                             liberarArrayTaskCasoExitoso();
+                                                                             Log.i(LOG_TAG, "pasarPickingAEntrega - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
+
+                                                                         }
+                                                                     }
+
+                                            );
+                                        }
+                                    });
+                                    allTask.addOnFailureListener(new OnFailureListener() {
+                                                                     @Override
+                                                                     public void onFailure(@NonNull Exception e) {
+                                                                         liberarRecusosTomados( "", PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden());
+                                                                         liberarArrayTaskConBloqueos();
+                                                                         onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                                                     }
+                                                                 }
+
+                                    );
+
+                                }
+
+
+                                @Override // Listado de Picking... Listen for single value
+                                public void onCancelled(DatabaseError databaseError) {
+                                    liberarRecusosTomados( "", PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden());
+                                    liberarArrayTaskConBloqueos();
+                                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                }
+                            });
+                        }
+
+                        @Override // Listado de cabceras... Listen for single value
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key lee cabeceras onCancelled");
+                            liberarRecusosTomados( "", PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden());
+                            liberarArrayTaskConBloqueos();
+                            onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                        }
+                    });
+
+
+                }
+
+            }
+        }).addOnFailureListener(new OnFailureListener() { // bloqueo de la orden de Picking.
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                liberarRecusosTomados( "", PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden());
+                liberarArrayTaskConBloqueos();
+                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
+            }
+        });
     }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        switch (loader.getId()) {
-
-            case CUSTOM_ORDER_LOADER:
-                if (data != null && data.moveToFirst()) {
-                    mCustomsOrdersCursorAdapter.swapCursor(data);
-
-                }
-                break;
-            case PICKING_ORDER_LOADER:
-                if (data != null && data.moveToFirst()) {
-                    mPickinOrdersAdapter.swapCursor(data);
-                }
-                break;
-
-
-            case PICKING_LOADER_TOTAL_PRODUCTOS:
-                if (data != null && data.moveToFirst()) {
-                    mCursorAdapterTotalProductos.swapCursor(data);
-                }
-                break;
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mPickinOrdersAdapter.swapCursor(null);
-        mCursorAdapterTotalProductos.swapCursor(null);
-        mCustomsOrdersCursorAdapter.swapCursor(null);
-
-    }
-
-
-    public void saveNewPickingOrder() {
-        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-        ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.PickingOrders.CONTENT_URI);
-        SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
-        String formattedDate = df.format(new Date());
-        builder.withValue(PickingOrdersColumns.CREATION_DATE_PICKING_ORDERS, formattedDate);
-        builder.withValue(PickingOrdersColumns.COMMENTS_PICKING_ORDERS, getString(R.string.NewOrder));
-        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, CustomOrderDetailFragment.STATUS_ORDER_INICIAL);
-        batchOperations.add(builder.build());
-        try {
-
-            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-        } catch (RemoteException | OperationApplicationException e) {
-        }
-    }
-
-    public void showDialogNumberPicker(final PickingOrderProductsAdapter.ViewHolder vh) {
-
-        {
-
-            final Dialog d = new Dialog(getContext());
-            d.setTitle(getString(R.string.NumberPicker));
-            d.setContentView(R.layout.dialog_number_picker);
-            Button b1 = (Button) d.findViewById(R.id.button1);
-            Button b2 = (Button) d.findViewById(R.id.button2);
-            final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
-            np.setMaxValue(getResources().getInteger(R.integer.MaxPickerNumber));
-            np.setMinValue(getResources().getInteger(R.integer.MinPickerNumber));
-            np.setWrapSelectorWheel(true);
-            np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-                @Override
-                public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                }
-            });
-            b1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    vh.mTextcantidadPicking.setText(String.valueOf(np.getValue()));
-                    CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecio.getText().toString());
-                    d.dismiss();
-                }
-            });
-            b2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    d.dismiss();
-                }
-            });
-            d.show();
-
-
-        }
-    }
 }
