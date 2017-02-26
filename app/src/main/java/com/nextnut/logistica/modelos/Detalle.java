@@ -185,9 +185,11 @@ public class Detalle {
     }
 
     public void modificarCantidadEnTotalDelivey(Detalle detalleOrdenNuevo,  Detalle detalleOrdenAnterior) {
-        Log.d("EnTotalInicial", "this.montoItemOrden) " + this.montoItemOrden);
-        Log.d("EnTotalInicial", "detalleOrdenNuevo.getMontoItemOrden() " + detalleOrdenNuevo.getMontoItemOrden());
-        Log.d("EnTotalInicial", "detalleOrdenAnterior.getMontoItemOrden() " + detalleOrdenAnterior.getMontoItemOrden());
+        Log.d("EnTotalDelivey", "this.montoItemOrden) " + this.montoItemOrden);
+        Log.d("EnTotalDelivey", "detalleOrdenNuevo.getCantidadEntrega()" + detalleOrdenNuevo.getCantidadEntrega());
+        Log.d("EnTotalDelivey", "detalleOrdenNuevo.getMontoItemEntrega()" + detalleOrdenNuevo.getMontoItemEntrega());
+        Log.d("EnTotalDelivey", "detalleOrdenAnterior.getMontoItemOrden() " + detalleOrdenAnterior.getMontoItemOrden());
+        Log.d("EnTotalDelivey", "detalleOrdenAnterior.getMontoItemEntrega() " + detalleOrdenAnterior.getMontoItemEntrega());
         this.cantidadEntrega = this.cantidadEntrega+detalleOrdenNuevo.getCantidadEntrega()-detalleOrdenAnterior.getCantidadEntrega();
         this.montoItemEntrega = this.montoItemEntrega+detalleOrdenNuevo.getMontoItemEntrega()-detalleOrdenAnterior.getMontoItemEntrega();
 

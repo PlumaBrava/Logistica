@@ -549,7 +549,10 @@ public class CustomOrderListFragment extends FragmentBasic {
                                 /*2 */
                                     mCabeceraOrdenDato.setEstado(ORDER_STATUS_PICKING);
                                     mCabeceraOrdenDato.liberar();
+                                    Log.i(LOG_TAG, "pasarOrdenAPickingl MainActivity.getmPickingOrderSelected() "+ MainActivity.getmPickingOrderSelected());
+                                    Log.i(LOG_TAG, "pasarOrdenAPickingl mCabeceraOrdenDato "+ mCabeceraOrdenDato.getNumeroDePickingOrden());
                                     mCabeceraOrdenDato.setNumeroDePickingOrden(MainActivity.getmPickingOrderSelected());
+                                    Log.i(LOG_TAG, "pasarOrdenAPickingl mCabeceraOrdenDato "+ mCabeceraOrdenDato.getNumeroDePickingOrden());
                                     Log.i(LOG_TAG, "pasarOrdenAPickingl getNumeroDeOrden() "+ mCabeceraOrdenDato.getNumeroDeOrden());
                                     Log.i(LOG_TAG, "pasarOrdenAPickingl getNumeroDePickingOrden() "+ mCabeceraOrdenDato.getNumeroDePickingOrden());
 

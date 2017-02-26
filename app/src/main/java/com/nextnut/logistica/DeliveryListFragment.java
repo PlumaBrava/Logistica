@@ -37,8 +37,8 @@ import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.modelos.CabeceraOrden;
 import com.nextnut.logistica.modelos.CabeceraPicking;
 import com.nextnut.logistica.modelos.Detalle;
+import com.nextnut.logistica.modelos.Totales;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
-import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallbackDeleveyCustomOrder;
 import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
 import com.nextnut.logistica.viewholder.CabeceraPickingViewHolder;
 import com.nextnut.logistica.viewholder.CabeceraViewHolder;
@@ -52,8 +52,10 @@ import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
+import static com.nextnut.logistica.util.Constantes.ESTADO_ORDEN_INICIAL;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
+import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_DELIVERED_PARA_COMPENSAR;
 import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_EN_DELIVERING;
 import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_PICKING;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
@@ -461,9 +463,9 @@ private CabeceraPicking datosCabeceraPickingSeleccionada;
 //
 //        recyclerViewCustomOrderInDeliveyOrder.setAdapter(mCustomsOrdersCursorAdapter);
 
-        ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallbackDeleveyCustomOrder(mCustomsOrdersCursorAdapter);
-        ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
-        mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderInDeliveyOrder);
+//        ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallbackDeleveyCustomOrder(mCustomsOrdersCursorAdapter);
+//        ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
+//        mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderInDeliveyOrder);
 
 
         mLinearOrders.setVisibility(View.GONE);
@@ -547,18 +549,13 @@ private CabeceraPicking datosCabeceraPickingSeleccionada;
             protected void onItemAcceptedHolder(CabeceraOrden model, int position) {
 
 
-                if (MainActivity.mPickingOrderSelected == 0) {
 
-                    onDialogAlert(getResources().getString(R.string.selectPickingOrderToAssing));
-//                    onDataChange();
-                } else {
 
-                    Log.i(LOG_TAG, "muestraOrdenesEnPicking Modelo: Numero de orden- " + model.getNumeroDeOrden());
-//                    pasarOrdenAInicial(model);
+                    Log.i(LOG_TAG, "muestraOrdenesEndelivery Modelo: Numero de orden- " + model.getNumeroDeOrden());
+                pasarOrdenAEntregadaParaCompensar(model);
 
 
                 }
-            }
         };
 
 
@@ -567,6 +564,7 @@ private CabeceraPicking datosCabeceraPickingSeleccionada;
         ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallback(mCustomsOrdersCursorAdapter, ADAPTER_CABECERA_ORDEN_EN_DELIVEY);
         ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
         mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderInDeliveyOrder);
+
 
         recyclerViewCustomOrderInDeliveyOrder.setAdapter(mCustomsOrdersCursorAdapter);
     }
@@ -695,6 +693,280 @@ private CabeceraPicking datosCabeceraPickingSeleccionada;
         return super.onOptionsItemSelected(item);
     }
 
+
+    private void pasarOrdenAEntregadaParaCompensar(final CabeceraOrden cabeceraOrden) {
+
+        if(hayTareaEnProceso()){
+            return;
+        }
+
+        taskList.clear();
+
+//        mCabeceraOrdenDato = cabeceraOrden;
+
+        readBlockCabeceraOrden(cabeceraOrden.getNumeroDeOrden());
+        mCabeceraOrdenTask.get(0).addOnCompleteListener(new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if (task.isSuccessful()) {
+                    final CabeceraOrden dataCabecera = ((DataSnapshot) mCabeceraOrdenTask.get(0).getResult()).getValue(CabeceraOrden.class);
+                    refDetalleOrden_4_ListaXOrden(dataCabecera.getNumeroDeOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            mProductosEnOrdenDatos = dataSnapshot;
+                            readBlockSaldosTotal(cabeceraOrden.getClienteKey());
+                            taskList.add(mSaldosTotalTask.get(0));
+                            Log.i(LOG_TAG, "pasarOrdenEntrega-  status picking " + PICKING_STATUS_DELIVERY+" cabeceraOrden.getNumeroDePickingOrden() "+cabeceraOrden.getNumeroDePickingOrden());
+                            readBlockPicking(PICKING_STATUS_DELIVERY, cabeceraOrden.getNumeroDePickingOrden());
+                            taskList.add(mPickingTask);
+                            int i = 0;
+                            for (DataSnapshot snapshot : mProductosEnOrdenDatos.getChildren()) {
+                                Log.i(LOG_TAG, "pasarOrdenEntrega- " + snapshot.getKey());
+                                String productKey = snapshot.getKey();
+
+
+                                readBlockPickingTotal(PICKING_STATUS_DELIVERY, cabeceraOrden.getNumeroDePickingOrden(), productKey);/*7*/
+                                taskList.add(mPickingTotalTask.get(i));
+
+
+                                SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
+
+                                Log.i(LOG_TAG, "pasarOrdenEntrega TIMESTAMP- " + aamm.format(new Date(System.currentTimeMillis())));
+
+
+                                Log.i(LOG_TAG, "pasarOrdenEntrega TIMESTAMP- " + aamm.toString());
+                                readBlockReporteVentasCliente(dataCabecera.getClienteKey(),productKey,aamm.format(new Date(System.currentTimeMillis())) );
+                                taskList.add(mReporteVentasClienteTask.get(i));
+                                readBlockReporteVentasProducto(productKey,aamm.format(new Date(System.currentTimeMillis())));
+                                        taskList.add(mReporteVentasProductoTask.get(i));
+
+
+                                i++;
+                            }
+
+                            allTask = Tasks.whenAll(taskList.toArray(new Task[taskList.size()]));
+
+                            allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.i(LOG_TAG, "pasarOrdenEntrega Completo el bloqueo- ");
+
+                                    Map<String, Object> childUpdates = new HashMap<>();
+                                    Map<String, Object> totalInicialDetalleValues = null;
+                                    int i = 0;
+                                    //            SimpleDateFormat aamm = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                                    SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
+                                    for (DataSnapshot productoEnOrden : mProductosEnOrdenDatos.getChildren()) {
+                                        // busca el producto dentro de la orden
+                                        String productKey = productoEnOrden.getKey();
+                                        Detalle detalleOrden = productoEnOrden.getValue(Detalle.class);
+
+                                        // creamos una copia con cantidad cero para usar en otras estructuras.
+                                        Detalle detalleOrdenAux = detalleOrden.copy();
+                                        detalleOrdenAux.modificarCantidadProductoDeOrden(0.0); // modificamos la cantidad a Cero para usarla para el calculo de Total
+                                        detalleOrdenAux.modificarCantidadProductoDeEntrega(0.0); // modificamos la cantidad a Cero para usarla para el calculo de Total
+
+
+
+
+
+
+                                        Detalle detallePickingTotal = ((DataSnapshot) mPickingTotalTask.get(i).getResult()).getValue(Detalle.class);
+
+
+                                        if (detallePickingTotal == null) {
+                                            // di no existe esta estructura, se crea una en cero.
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega TotalPicking= NULL" );
+                                            detallePickingTotal = new Detalle(0.0, detalleOrden.getProducto(), null);
+                                            detallePickingTotal.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+                                        } else {
+//                                            Log.i(LOG_TAG, "pasarOrdenEntrega TotalPicking=" + ((DataSnapshot) mTotalInicialTask.get(i).getResult()).getKey() );
+                                            Log.i(LOG_TAG,  "pasarOrdenEntrega- PickingTotal nombre Producto" + detallePickingTotal.getProducto().getNombreProducto());
+                                            detallePickingTotal.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+                                        }
+
+                                            /*7 */
+                                        detallePickingTotal.liberar();
+                                        childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY,cabeceraOrden.getNumeroDePickingOrden(), productKey),detallePickingTotal.toMap());
+
+
+                                            /*5*/
+//                                        childUpdates.put(nodoProductosXOrdenInicial_5(productKey, mCabeceraOrdenDato.getNumeroDeOrden()), null);
+
+                                            /*4 */ //No se modifica, queda igual
+//                                            childUpdates.put(nodoDetalleOrden_4(mCabeceraOrdenDato.getNumeroDeOrden(), productKey), null);
+
+
+
+                                        // Reporte de Ventas de Productos /8/
+
+
+                                        Detalle ventasProducto = ((DataSnapshot) mReporteVentasProductoTask.get(i).getResult()).getValue(Detalle.class);
+// todo: Revisar
+                                        if (ventasProducto == null) {
+                                            // di no existe esta estructura, se crea una en cero.
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasProducto= NULL" );
+                                            ventasProducto = new Detalle(0.0, detalleOrden.getProducto(), null);
+                                            ventasProducto.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+                                        } else {
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasProducto=" + ((DataSnapshot) mReporteVentasProductoTask.get(i).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mReporteVentasProductoTask.get(i).getResult()).getValue(Detalle.class).getProducto().getNombreProducto());
+
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" +ventasProducto.getMontoItemEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" +ventasProducto.getCantidadEntrega());
+
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrden getMontoItemEntrega=" +detalleOrden.getMontoItemEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenget CantidadEntrega=" +detalleOrden.getCantidadEntrega());
+
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux getMontoItemEntrega=" +detalleOrdenAux.getMontoItemEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux CantidadEntrega=" +detalleOrdenAux.getCantidadEntrega());
+                                            ventasProducto.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" +ventasProducto.getMontoItemEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" +ventasProducto.getCantidadEntrega());
+
+                                        }
+                                        ventasProducto.liberar();
+                                        childUpdates.put(nodoReporteVentasProducto_8(productKey,aamm.format(new Date(System.currentTimeMillis()))),ventasProducto.toMap());
+
+
+                                        // Reporte de Ventas Por Cliente /9/
+
+
+                                        Detalle ventasCliente = ((DataSnapshot) mReporteVentasClienteTask.get(i).getResult()).getValue(Detalle.class);
+// todo: Revisar
+                                        if (ventasCliente == null) {
+                                            // di no existe esta estructura, se crea una en cero.
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente = NULL" );
+                                            ventasCliente = new Detalle(0.0, detalleOrden.getProducto(), null);
+                                            ventasCliente.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+                                        } else {
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente =" + ((DataSnapshot) mReporteVentasClienteTask.get(i).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mReporteVentasClienteTask.get(i).getResult()).getValue(Detalle.class).getProducto().getNombreProducto());
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" +ventasCliente.getMontoItemEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" +ventasCliente.getCantidadEntrega());
+
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrden getMontoItemEntrega=" +detalleOrden.getMontoItemEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenget CantidadEntrega=" +detalleOrden.getCantidadEntrega());
+
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux getMontoItemEntrega=" +detalleOrdenAux.getMontoItemEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux CantidadEntrega=" +detalleOrdenAux.getCantidadEntrega());
+
+
+                                            ventasCliente.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" +ventasCliente.getMontoItemEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" +ventasCliente.getCantidadEntrega());
+
+                                        }
+                                        ventasCliente.liberar();
+                                        childUpdates.put(nodoReporteVentasClientes_9(cabeceraOrden.getClienteKey(),productKey,aamm.format(new Date(System.currentTimeMillis()))),ventasCliente.toMap());
+
+                                        i++;
+                                    }
+
+                                    // Actualizacion de totales en Picking (6)
+
+
+                                    DataSnapshot d= ((DataSnapshot) mPickingTask.getResult());
+                                    Log.i(LOG_TAG, "pasarOrdenEntrega d.getRef() "+ d.getRef());
+                                    Log.i(LOG_TAG, "pasarOrdenEntrega d.getRef() "+ d.getKey());
+
+                                    CabeceraPicking cabeceraPicking = d.getValue(CabeceraPicking.class);
+                                    Log.i(LOG_TAG, "pasarOrdenEntrega getMontoEntregado "+ cabeceraPicking.getTotales().getMontoEntregado());
+                                    Log.i(LOG_TAG, "pasarOrdenEntrega cabeceraOrden.getTotales().getMontoEntregado( "+ cabeceraOrden.getTotales().getMontoEntregado());
+                                    cabeceraPicking.getTotales().setSumaMontoEntregado(cabeceraOrden.getTotales().getMontoEntregado());
+                                    cabeceraPicking.liberar();
+                                    childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY,((DataSnapshot) mPickingTask.getResult()).getKey()),cabeceraPicking.toMap());
+
+
+                                /*2 */
+                                    cabeceraOrden.setEstado(ORDER_STATUS_DELIVERED_PARA_COMPENSAR);
+                                    cabeceraOrden.liberar();
+                                    cabeceraOrden.setNumeroDePickingOrden( cabeceraOrden.getNumeroDePickingOrden());
+                                    Log.i(LOG_TAG, "pasarOrdenEntrega getNumeroDeOrden() "+ cabeceraOrden.getNumeroDeOrden());
+                                    Log.i(LOG_TAG, "pasarOrdenEntrega getNumeroDePickingOrden() "+ cabeceraOrden.getNumeroDePickingOrden());
+
+                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_EN_DELIVERING,cabeceraOrden.getNumeroDeOrden(),cabeceraOrden.getNumeroDePickingOrden() ),null);
+                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_DELIVERED_PARA_COMPENSAR,cabeceraOrden.getNumeroDeOrden(),cabeceraOrden.getNumeroDePickingOrden()),cabeceraOrden.toMap());
+                                    childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()),cabeceraOrden.toMap());
+
+
+                                    CabeceraOrden saldosTotal = ((DataSnapshot) mSaldosTotalTask.get(0).getResult()).getValue(CabeceraOrden.class);
+
+                                    if (saldosTotal == null) {
+                                        // di no existe esta estructura, se crea una en cero.
+                                        Log.i(LOG_TAG, "pasarOrdenEntrega saldosTotal= NULL" );
+
+                                        Totales totales=new Totales(0,0,0,0.0,0.0,0.0,0.0,0.0,0.0);
+                                        saldosTotal= new CabeceraOrden(cabeceraOrden.getClienteKey(),cabeceraOrden.getCliente(),ESTADO_ORDEN_INICIAL,totales,"Sistema", 00);
+                                        cabeceraOrden.setUsuarioCreador("Sistema");
+
+                                        saldosTotal.getTotales().setMontoEntregado(saldosTotal.getTotales().getMontoEntregado()+cabeceraOrden.getTotales().getMontoEntregado());
+                                    } else {
+//                                        Log.i(LOG_TAG, "pasarOrdenEntrega saldosTotal=" + ((DataSnapshot) mSaldosTotalTask.get(0).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mSaldosTotalTask.get(0).getResult()).getValue(CabeceraOrden.class).getCliente().getNombre());
+//                                        Log.i(LOG_TAG, "pasarOrdenEntrega saldosTotal=" + saldosTotal.getTotales().getMontoEntregado() + "- cabeceraOrden.getTotales().getMontoEntregado()" + cabeceraOrden.getTotales().getMontoEntregado());
+                                        saldosTotal.getTotales().setMontoEntregado(saldosTotal.getTotales().getMontoEntregado()+cabeceraOrden.getTotales().getMontoEntregado());
+
+                                    }
+                                    saldosTotal.liberar();
+                                    childUpdates.put(nodoSaldoTotalClientes_10(cabeceraOrden.getClienteKey()),saldosTotal.toMap());
+
+
+                                    mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega updateChildren-onFailure "+e.toString());
+                                            liberarRecusosTomados( "",PICKING_STATUS_DELIVERY,cabeceraOrden.getNumeroDePickingOrden());
+                                            liberarArrayTaskConBloqueos();
+                                            onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+
+                                        }
+                                    }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            liberarArrayTaskCasoExitoso();
+//                                            mMontoTotal.setText(mCabeceraOrden.getTotales().getMontoEnOrdenes().toString());
+//                                            mCantidadTotal.setText(String.valueOf( mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
+//                                            mKeyList.add(mproductKeyDato);
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega - OnCompleteListener task.isSuccessful():"+task.isSuccessful());
+
+                                        }
+                                    });
+                                }
+
+
+                            });
+                            allTask.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.i(LOG_TAG, "pasarOrdenEntrega - OnFailureListener:"+e.toString());
+                                    Log.i(LOG_TAG, "pasarOrdenEntrega - OnFailureListener:"+e.getMessage());
+
+                                    liberarRecusosTomados( "",PICKING_STATUS_DELIVERY,cabeceraOrden.getNumeroDePickingOrden());
+                                    liberarArrayTaskConBloqueos();
+                                    onDialogAlert(getResources().getString( R.string.ERROR_NO_SE_PUDO_BLOQUEAR)+e.getMessage().toString());
+
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                } else {
+                    Log.i(LOG_TAG, "pasarOrdenAPickingl Operacion fallo- " + task.getException().toString());
+                    Log.i(LOG_TAG, "pasarOrdenAPickingl Operacion fallo- " + task.getException().getMessage());
+                    liberarRecusosTomados( "",PICKING_STATUS_DELIVERY,cabeceraOrden.getNumeroDePickingOrden());
+                    liberarArrayTaskConBloqueos();
+                    onDialogAlert(getResources().getString( R.string.ERROR_NO_SE_PUDO_BLOQUEAR )+ task.getException().getMessage().toString());
+                }
+            }
+        });
+    }
+
+
     private void pasarPickingAInicial(final CabeceraPicking cabeceraPicking) {
         Log.i(LOG_TAG, "pasarPickingAEntrega Numero de picking- " + cabeceraPicking.getNumeroDePickingOrden());
         if (hayTareaEnProceso()) {
@@ -805,7 +1077,7 @@ private CabeceraPicking datosCabeceraPickingSeleccionada;
                                                 cabeceraOrden.setEstado(ORDER_STATUS_PICKING);
                                                 cabeceraOrden.liberar();
                                                 childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_EN_DELIVERING , cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), null);
-                                                // todo: verificar si esta linea funciona bien!!!
+
                                                 childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_PICKING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), cabeceraOrden.toMap());
 //                                        childUpdates.put(nodoCabeceraOrden_2(ORDER_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
                                                 childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());

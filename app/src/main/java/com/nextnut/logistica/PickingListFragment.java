@@ -807,6 +807,7 @@ public class PickingListFragment extends FragmentBasic {
                     //Totales en cero
                     Totales totales = new Totales(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                     CabeceraPicking cabeceraPicking = new CabeceraPicking(mUserKey, numeroOrdenPicking, PICKING_STATUS_INICIAL);
+                    cabeceraPicking.setTotales(totales);
                     cabeceraPicking.setUsuarioCreador(mUsuario.getUsername());
                     Map<String, Object> cabeceraOrdenValues = cabeceraPicking.toMap();
                     Map<String, Object> childUpdates = new HashMap<>();
@@ -1336,7 +1337,7 @@ public class PickingListFragment extends FragmentBasic {
                                                     cabeceraOrden.setEstado(ORDER_STATUS_EN_DELIVERING);
                                                     cabeceraOrden.liberar();
                                                     childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_PICKING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), null);
-                                                    // todo: verificar si esta linea funciona bien!!!
+
                                                     childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), cabeceraOrden.toMap());
 //                                        childUpdates.put(nodoCabeceraOrden_2(ORDER_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
                                                     childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());

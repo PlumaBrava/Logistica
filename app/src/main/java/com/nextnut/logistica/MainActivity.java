@@ -64,6 +64,8 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     public static final int CUSTOM_ORDER_FRAGMENT = 0;
     public static final int PICKING_FRAGMENT = 1;
     public static final int DELIVERY_FRAGMENT = 2;
+    public static final int PAGOS_FRAGMENT = 3;
+    public static final int STOCK_FRAGMENT = 4;
     public static final String USER_DISPLAY_NAME = "userDisplayName";
     public static final String USER_ID = "userId";
 
@@ -526,6 +528,10 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                     DeliveryListFragment c = new DeliveryListFragment();
                     c.setArguments(putBundleFirebase());
                     return c;
+                case PAGOS_FRAGMENT:
+                    SaldosListFragment d = new SaldosListFragment();
+                    d.setArguments(putBundleFirebase());
+                    return d;
 
                 default:
 
@@ -787,11 +793,11 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         }
 
         if (mPerfil.getPagos()) {
-            mSeccionesDisponibles.add(DELIVERY_FRAGMENT);
+            mSeccionesDisponibles.add(PAGOS_FRAGMENT);
             mTitulosSeccionesDisponibles.add(getResources().getString(R.string.title_pagos));
         }
         if (mPerfil.getStock()) {
-            mSeccionesDisponibles.add(DELIVERY_FRAGMENT);
+            mSeccionesDisponibles.add(STOCK_FRAGMENT);
             mTitulosSeccionesDisponibles.add(getResources().getString(R.string.title_stock));
         }
 

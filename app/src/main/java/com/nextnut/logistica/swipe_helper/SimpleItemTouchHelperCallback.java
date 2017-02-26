@@ -14,6 +14,7 @@ import com.nextnut.logistica.R;
 import static com.nextnut.logistica.R.drawable.ic_action_action_redeem;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN;
+import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_PICKING;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_PICKING;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_DETALLE_DELIVEY;
@@ -70,6 +71,9 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
                     case ADAPTER_CABECERA_ORDEN_EN_PICKING:
                         icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
                         break;
+                    case ADAPTER_CABECERA_ORDEN_EN_DELIVEY:
+                        icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
+                        break;
 
                 }
 
@@ -98,6 +102,10 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
                     case ADAPTER_CABECERA_ORDEN_EN_PICKING:
                         icon = BitmapFactory.decodeResource(recyclerView.getResources(), ic_action_action_redeem);
                         break;
+                    case ADAPTER_CABECERA_ORDEN_EN_DELIVEY:
+                        icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
+                        break;
+
 
                 }
 
@@ -129,7 +137,9 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
                 swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END; //Swipe para ambos lados.
                 break;
 
-            case ADAPTER_CABECERA_DELIVEY:          // Swipe a la derecha
+
+            case ADAPTER_CABECERA_ORDEN_EN_DELIVEY:          // Swipe a la derecha
+            case ADAPTER_CABECERA_DELIVEY:
                 swipeFlags =  ItemTouchHelper.END;
                 break;
             case ADAPTER_DETALLE_ORDEN:

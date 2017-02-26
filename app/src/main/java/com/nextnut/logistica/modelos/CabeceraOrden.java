@@ -180,6 +180,7 @@ public class CabeceraOrden  implements Parcelable {
         result.put("usuarioCreador", usuarioCreador);
         result.put("numeroDeOrden", numeroDeOrden);
         result.put("totales", totales);
+        result.put("numeroDePickingOrden", numeroDePickingOrden);
         result.put("fechaPicking", fechaPicking);
         result.put("usuarioPicking", usuarioPicking);
         result.put("fechaEntrega", fechaEntrega);

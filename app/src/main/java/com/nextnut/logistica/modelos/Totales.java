@@ -174,6 +174,11 @@ public class Totales implements Parcelable {
 
     }
 
+    public void setSumaMontoEntregado(Double monto){
+        this.montoEntregado=this.montoEntregado+monto;
+    }
+
+
     // [START post_to_map]
     @Exclude
     public Map<String, Object> toMap() {

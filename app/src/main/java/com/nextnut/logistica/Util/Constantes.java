@@ -108,6 +108,39 @@ public class Constantes {
     public static String ESQUEMA_PICKING_TOTAL = "picking_total";
     public static String NODO_PICKING_TOTAL ="/" + ESQUEMA_PICKING_TOTAL+ "/";
 
+// Reporte de ventas x Producto
+// --  8  ---
+
+    public static String ESQUEMA_REPORTE_VENTAS_PRODUCTO = "reporte_ventas_producto";
+    public static String NODO_REPORTE_VENTAS_PRODUCTO ="/" + ESQUEMA_REPORTE_VENTAS_PRODUCTO+ "/";
+
+    // Reporte de ventas x Cliente
+// --  9  ---
+
+    public static String ESQUEMA_REPORTE_VENTAS_CLIENTE = "reporte_ventas_cliente";
+    public static String NODO_REPORTE_VENTAS_CLIENTE ="/" + ESQUEMA_REPORTE_VENTAS_CLIENTE+ "/";
+
+
+    // Saldo Total por cliente
+// --  10  ---
+
+    public static String ESQUEMA_SALDO_TOTAL = "saldo_total";
+    public static String NODO_SALDO_TOTAL ="/" + ESQUEMA_SALDO_TOTAL+ "/";
+
+
+    // Pagos
+// --  11  ---
+
+    public static String ESQUEMA_PAGOS = "pagos";
+    public static String NODO_PAGOS ="/" + ESQUEMA_PAGOS+ "/";
+
+
+    // HISTORIAL DE Saldos
+// --  12  ---
+
+    public static String ESQUEMA_SALDOS_HISTORIAL = "saldos_historial";
+    public static String NODO_SALDOS_HISTORIAL ="/" + ESQUEMA_SALDOS_HISTORIAL+ "/";
+
 
 
     // Constantes para pasar datos entre actividades.
@@ -144,7 +177,7 @@ public class Constantes {
     public static final int ORDER_STATUS_INICIAL = 0;
     public static final int ORDER_STATUS_PICKING = 1;
     public static final int ORDER_STATUS_EN_DELIVERING = 2;
-    public static final int ORDER_STATUS_DELIVERED = 3;
+    public static final int ORDER_STATUS_DELIVERED_PARA_COMPENSAR = 3;
     public static final int ORDER_STATUS_DELETED = 4;
 
     // Estado de De Picking
@@ -167,7 +200,7 @@ public class Constantes {
     public static final int   ADAPTER_CABECERA_DELIVEY=8;
     public static final int   ADAPTER_DETALLE_DELIVEY=9;
     public static final int   ADAPTER_CABECERA_ORDEN_EN_PICKING=10;
-    public static final int   ADAPTER_CABECERA_ORDEN_EN_DELIVEY=10;
+    public static final int   ADAPTER_CABECERA_ORDEN_EN_DELIVEY=11;
 
     public static  String detalleOrdenRef_1C(String mEmpresaKey,long numeroDeOrdena,String productoKey){
         String numeroDeOrden =String.valueOf(numeroDeOrdena);
