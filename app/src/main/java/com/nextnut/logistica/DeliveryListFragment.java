@@ -50,6 +50,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ESTADO_ORDEN_INICIAL;
@@ -927,8 +928,13 @@ private CabeceraPicking datosCabeceraPickingSeleccionada;
 //                                            mMontoTotal.setText(mCabeceraOrden.getTotales().getMontoEnOrdenes().toString());
 //                                            mCantidadTotal.setText(String.valueOf( mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
 //                                            mKeyList.add(mproductKeyDato);
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega - OnCompleteListener task.isSuccessful():"+task.isSuccessful());
+                                            mClienteKey=cabeceraOrden.getClienteKey();
+                                            mCliente=cabeceraOrden.getCliente();
 
+                                            Log.i(LOG_TAG, "pasarOrdenEntrega - OnCompleteListener task.isSuccessful():"+task.isSuccessful());
+                                            Intent intent = new Intent(getApplicationContext(), PagosActivity.class);
+                                            putExtraFirebase_Fragment(intent);
+                                            startActivity(intent);
                                         }
                                     });
                                 }

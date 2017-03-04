@@ -2126,8 +2126,7 @@ public abstract class FragmentBasic extends Fragment {
 
     // Pagos 11-Retoran un puntero a las claves de pago (listado)
     public DatabaseReference refPagosListado_11(String cliente) {
-        return mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).child(cliente);
-    }
+        return mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).child(cliente);    }
 
     public String nodoPagosListado_11(String cliente) {
         return NODO_PAGOS + mEmpresaKey + "/" +cliente ;

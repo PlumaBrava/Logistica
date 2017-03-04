@@ -672,6 +672,6 @@ public class ProductDetailFragment extends FragmentBasic
 
     }
 
-    ;
+
 
 }

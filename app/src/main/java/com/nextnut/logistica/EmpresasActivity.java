@@ -10,7 +10,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -178,9 +177,9 @@ public class EmpresasActivity extends AppCompatActivity {
 
                     writeNewEmpresa(mUser, mEmpresaNombre.getText().toString(), mEmpresaCuit.getText().toString(), mEmpresaCiudad.getText().toString(), mEmpresaDireccion.getText().toString(), mEmpresaCodigoPostal.getText().toString(), mEmpresaTelefono.getText().toString(), mEmpresaLogoURL);
 
-
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+//
+//                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                            .setAction("Action", null).show();
                 }
             });
             spinner = (ProgressView) findViewById(R.id.progressBarEmpresa);
@@ -346,7 +345,7 @@ public class EmpresasActivity extends AppCompatActivity {
                     mEmpresaKey = mDatabase.child("empresa").push().getKey();
                 }
                 // Crear una referencia a la foto. (directorio Imagenes/mProductoKey
-                StorageReference ImagenRef = mStorageRef.child("images/" + mEmpresaKey);
+                StorageReference ImagenRef = mStorageRef.child("imagenes/empresas/" + mEmpresaKey);
                 Log.i("subirFotoReturnUri", "onFailure: -spinner ON 11" + mEmpresaKey);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();

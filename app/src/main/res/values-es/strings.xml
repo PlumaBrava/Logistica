@@ -81,6 +81,14 @@
     <string name="empty_pickingOrder_list">Sin Ordenes de preparacion para mostrar</string>
     <string name="empty_custom_Order_list">Sin Ordens de clietes para Mostrar</string>
 
+
+    <!--Saldos List Fragment-->
+    <string name="empty_ordenes_saldos_list">Sin Ordenes para mostrar</string>
+    <string name="empty_saldos_list">Sin Saldos Para Mostrar</string>
+    <string name="empty_custom_ssOrder_list">Sisss</string>
+
+
+
     <!--Products Detail Activity-->
 
     <!--<string name="product_Id_text">Product Number:</string>-->
@@ -136,6 +144,35 @@
     <string name="priceError" translatable="true">El precio debe ser > 0 </string>
     <string name="title_custom_list">Clientes</string>
     <string name="title_custom_detail">Detalle de clientes</string>
+
+    <!--Custom Detail Activity-->
+    <string name="title_pagos_activity">Pagos</string>
+
+
+    <!--Pagos Fragment-->
+    <string name="title_pagos_fragment">Pagos</string>
+    <string name="fecha_pagos_fragment">Fecha de Pago: </string>
+    <string name="Monto_pagos_fragment">Monto</string>
+    <string name="TipoPago_pagos_fragment">Monto</string>
+    <string name="Banco_pagos_fragment">Banco</string>
+    <string name="FechaDeCheque_pagos_fragment">Fecha Cheque</string>
+    <string name="NumeroDeCheque_pagos_fragment">Numero Cheque</string>
+    <string name="EmisorDeCheque_pagos_fragment">Emisor del Cheque</string>
+    <string name="FotoDeCheque_pagos_fragment">Foto del Cheque</string>
+    <string-array name="tipoDePago_array">
+        <item>Efectivo</item>
+        <item>Cheque</item>
+        <item>Nota de Credito</item>
+    </string-array>
+    <string name="NuevoPago_pagos_fragment">Nuevo Pago</string>
+    <string name="dayFormat">dd-MM-yyyy</string>
+
+    <string name="validacionMonto_pagos_fragment">El Monto debe ser > 0 </string>
+    <string name="validacionBanco_pagos_fragment">Requerido </string>
+    <string name="validacionFecha_pagos_fragment">Verifique la Fecha </string>
+    <string name="validacionEmisor_pagos_fragment">Emisor del cheque </string>
+    <string name="validacionNumeroCheque_pagos_fragment">Ingrese Nro de cheque </string>
+    <string name="validacionNumeroFoto_pagos_fragment">Foto del cheque </string>
 
 
     <!--Custom Detail Activity-->

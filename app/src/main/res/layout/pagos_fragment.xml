@@ -1,0 +1,311 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/custom_cardViewMarginBottom"
+    android:layout_marginEnd="@dimen/custom_cardViewMarginRight"
+    android:layout_marginLeft="@dimen/custom_cardViewMarginLeft"
+    android:layout_marginRight="@dimen/custom_cardViewMarginRight"
+    android:layout_marginStart="@dimen/custom_cardViewMarginLeft"
+    android:layout_marginTop="@dimen/custom_cardViewtMarginTop"
+    android:elevation="@dimen/custom_cardViewElevation"
+
+    android:focusable="true"
+    android:foreground="?selectableItemBackground">
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/custom_cardViewMarginRight"
+        android:orientation="vertical"
+        tools:context="com.nextnut.logistica.ProductDetailFragment">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:orientation="horizontal">
+
+
+            <!--Custom Photo-->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="16dp"
+                android:orientation="horizontal"
+
+                >
+
+
+                <ImageView
+                    android:id="@+id/custom_imagen"
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/custom_photo"
+                    android:maxHeight="104dp"
+                    android:maxWidth="104dp"
+                    android:src="@drawable/com_facebook_profile_picture_blank_square"
+                    android:transitionName="@string/custom_icon_transition_imagen" />
+
+                <!--<com.rey.material.widget.ProgressView-->
+                    <!--android:id="@+id/progressBarCliente"-->
+                    <!--android:layout_width="104dp"-->
+                    <!--android:layout_height="104dp"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--app:pv_autostart="true"-->
+                    <!--app:pv_circular="true"-->
+                    <!--app:pv_progressMode="indeterminate"-->
+                    <!--app:pv_progressStyle="@style/Material.Drawable.CircularProgress" />-->
+
+            </LinearLayout>
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <!--app:counterEnabled="true"-->
+                    <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+                    <EditText
+                        android:id="@+id/custom_name_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/custom_name_text"
+                        android:hint="@string/custom_name_text"
+                        android:inputType="text"
+                        android:maxLength="@integer/customNameMaxLength"
+                        android:padding="8dp"
+                        android:transitionName="@string/detail_icon_transition_name" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <!--app:counterEnabled="true"-->
+                    <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+
+                    <EditText
+                        android:id="@+id/product_Lastname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/custom_last_text"
+                        android:hint="@string/custom_last_text"
+                        android:inputType="text"
+                        android:maxLength="@integer/customNameMaxLength"
+                        android:transitionName="@string/custom_icon_transition_surname" />
+
+                </android.support.design.widget.TextInputLayout>
+
+
+            </LinearLayout>
+        </LinearLayout>
+        <!--Fecha-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <android.support.design.widget.TextInputLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="150dp"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/fechaDePago"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/fecha_pagos_fragment"
+                    android:hint="@string/fecha_pagos_fragment"
+
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <!--monto-->
+        <LinearLayout
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/monto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/Monto_pagos_fragment"
+                    android:hint="@string/Monto_pagos_fragment"
+                    android:inputType="number|numberDecimal"
+                    android:maxLength="@integer/customAddressMaxLength"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+        <!--Tipo del Pago (efectivo, cheque, Nota de Credito -->
+        <com.rey.material.widget.Spinner
+            android:id="@+id/tipoPago"
+            style="@style/Material.Widget.Spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/TipoPago_pagos_fragment"
+            android:hint="@string/TipoPago_pagos_fragment"
+            android:inputType="text"
+            android:padding="8dp"
+            app:rd_style="@style/Material.Drawable.Ripple.Wave" />
+
+        <!--Datos Bancarios-->
+        <LinearLayout
+            android:id="@+id/datosBancariosLinear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:orientation="vertical">
+
+
+            <!--Banco-->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_weight="3">
+
+                <EditText
+                    android:id="@+id/banco"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/Banco_pagos_fragment"
+                    android:hint="@string/Banco_pagos_fragment"
+                    android:inputType="text"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <!--Fecha del Cheque-->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/fechadeCheque"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/FechaDeCheque_pagos_fragment"
+                    android:hint="@string/FechaDeCheque_pagos_fragment"
+                    android:inputType="none"
+
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+            </android.support.design.widget.TextInputLayout>
+
+
+            <!--Numero de Cheque-->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/numeroDeCheque"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/NumeroDeCheque_pagos_fragment"
+                    android:hint="@string/NumeroDeCheque_pagos_fragment"
+                    android:inputType="text"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <!--Numero de Cheque-->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/emisorDeCheque"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/EmisorDeCheque_pagos_fragment"
+                    android:hint="@string/EmisorDeCheque_pagos_fragment"
+                    android:inputType="text"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+
+
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/foto_cheque"
+
+
+                    android:contentDescription="@string/FotoDeCheque_pagos_fragment"
+
+
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:maxHeight="104dp"
+                    android:maxWidth="104dp"
+                    android:src="@drawable/com_facebook_profile_picture_blank_square"
+                    />
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+
+                <com.rey.material.widget.ProgressView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:id="@+id/progressBarCheque"
+                    app:pv_autostart="true"
+                    app:pv_circular="true"
+                    app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
+                    app:pv_progressMode="indeterminate"/>
+            </LinearLayout>
+
+
+    </LinearLayout>
+    </LinearLayout>
+
+
+
+
+</android.support.v7.widget.CardView>

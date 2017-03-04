@@ -40,19 +40,9 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
 import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_DELIVERED_PARA_COMPENSAR;
 
-/**
- * An activity representing a list of CustomOrders. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link CustomOrderDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- */
 public class SaldosListFragment extends FragmentBasic
-//        Fragment implements LoaderManager.LoaderCallbacks<Cursor>
 {
 
-    public static final String ARG_ITEM_ID = "item_id";
 
     private long mCustomOrderIdSelected;
 
@@ -63,13 +53,11 @@ public class SaldosListFragment extends FragmentBasic
     View emptyViewCustomOrder;
     private FirebaseRecyclerAdapter<CabeceraOrden, SaldosViewHolder> mSaldosAdapter;
     private FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder> mCustomsOrdersCursorAdapter;
-//    private FirebaseRecyclerAdapter<Detalle, DetalleDeliveryTotalProdutctosViewHolder> mCursorAdapterTotalProductos;
-//
 
-    private RecyclerView recyclerView;
-    private RecyclerView recyclerViewTotalProductos;
-    private RecyclerView recyclerViewCustomOrderInDeliveyOrder;
-    private CardView mDeliveryOrderTile;
+    private RecyclerView recyclerViewSaldos;
+    private RecyclerView recyclerViewCustomOrderEnSaldos;
+
+    private CardView mSaldosTile;
     private TextView mTilePickingOrderNumber;
     private EditText mTilePickingComent;
     private TextView mCreationDate;
@@ -84,12 +72,9 @@ public class SaldosListFragment extends FragmentBasic
 
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_delete;
-    private static final int CUSTOM_ORDER_LOADER = 0;
-    private static final int PICKING_ORDER_LOADER = 1;
-    private static final int PICKING_LOADER_TOTAL_PRODUCTOS = 2;
-    private int mItem = 0;
 
-    private LinearLayout mLinearProductos;
+
+
     private LinearLayout mLinearOrders;
 
 
@@ -139,39 +124,38 @@ public class SaldosListFragment extends FragmentBasic
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View rootView = inflater.inflate(R.layout.delivery_list_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.saldos_list_fragment, container, false);
 
         Log.i(LOG_TAG, "  monCreateView" );
-        mDeliveryOrderTile = (CardView) rootView.findViewById(R.id.deliveryOrderNumbertitleID);
-        mDeliveryOrderTile.setOnClickListener(new View.OnClickListener() {
+        mSaldosTile = (CardView) rootView.findViewById(R.id.saldosTitleID);
+        mSaldosTile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 mIDPickingOrderSelected = 0;
-                mDeliveryOrderTile.setVisibility(View.GONE);
-                recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
-                recyclerViewTotalProductos.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                mSaldosTile.setVisibility(View.GONE);
+                recyclerViewCustomOrderEnSaldos.setVisibility(View.GONE);
+                recyclerViewSaldos.setVisibility(View.VISIBLE);
             }
         });
-        mDeliveryOrderTile.setVisibility(View.GONE);
-        mTilePickingOrderNumber = (TextView) mDeliveryOrderTile.findViewById(R.id.titlepickingNumberOrderCard);
-        mTilePickingComent = (EditText) mDeliveryOrderTile.findViewById(R.id.TitlepickingOrderComents);
-        mCreationDate = (TextView) mDeliveryOrderTile.findViewById(R.id.titlePicckinOder_creationdate);
+        mSaldosTile.setVisibility(View.GONE);
+        mTilePickingOrderNumber = (TextView) mSaldosTile.findViewById(R.id.titlepickingNumberOrderCard);
+        mTilePickingComent = (EditText) mSaldosTile.findViewById(R.id.TitlepickingOrderComents);
+        mCreationDate = (TextView) mSaldosTile.findViewById(R.id.titlePicckinOder_creationdate);
 
-        mLinearProductos =(LinearLayout)rootView.findViewById(R.id.linearProductos);
+
         mLinearOrders =(LinearLayout)rootView.findViewById(R.id.linearOrders);
 
 
-        View emptyViewPicking = rootView.findViewById(R.id.recyclerview_pickingOrders_empty);
+
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        // Picking Orders
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.pickingOrder_list);
-        recyclerView.setLayoutManager(layoutManager);
+        // Lista de saldos
+        recyclerViewSaldos = (RecyclerView) rootView.findViewById(R.id.saldos_listRV );
+        recyclerViewSaldos.setLayoutManager(layoutManager);
 
-        final View emptyViewPickingOrders = rootView.findViewById(R.id.recyclerview_pickingOrders_empty);
+        final View saldosEmpty = rootView.findViewById(R.id.recyclerview_saldos_empty);
         Query saldosQuery = refSaldoTotalClientes_10List();
 //         = mDatabase.child(ESQUEMA_PICKING).child(mEmpresaKey).child(String.valueOf(PICKING_STATUS_INICIAL));
         mSaldosAdapter = new FirebaseRecyclerAdapter<CabeceraOrden, SaldosViewHolder>(CabeceraOrden.class, R.layout.saldos_list_content,
@@ -182,7 +166,7 @@ public class SaldosListFragment extends FragmentBasic
                     @Override
                     public void onClick(View view) {
 
-
+                        saldosEmpty.setVisibility(View.GONE);
                         mTilePickingOrderNumber.setText(String.valueOf( model.getNumeroDePickingOrden()));
                         mTilePickingComent.setVisibility(View.VISIBLE);
                         SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -200,16 +184,14 @@ public class SaldosListFragment extends FragmentBasic
                         muestraOrdenesSinCompensar();
 
 //                        mCursorAdapterTotalProductos.notifyDataSetChanged();
-                        recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.VISIBLE);
-                        recyclerViewTotalProductos.setVisibility(View.VISIBLE);
+                        recyclerViewCustomOrderEnSaldos.setVisibility(View.VISIBLE);
 
 
 
 
-                        recyclerView.setVisibility(View.GONE);
+                        recyclerViewSaldos.setVisibility(View.GONE);
                         mLinearOrders.setVisibility(View.VISIBLE);
-                        mLinearProductos.setVisibility(View.VISIBLE);
-                        mDeliveryOrderTile.setVisibility(View.VISIBLE);
+                        mSaldosTile.setVisibility(View.VISIBLE);
 
                     }
 
@@ -231,50 +213,41 @@ public class SaldosListFragment extends FragmentBasic
 
 
 
-        recyclerView.setAdapter(mSaldosAdapter);
+        recyclerViewSaldos.setAdapter(mSaldosAdapter);
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mSaldosAdapter, ADAPTER_CABECERA_DELIVEY);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+        mItemTouchHelper.attachToRecyclerView(recyclerViewSaldos);
 
 
-        ImageButton fab_save = (ImageButton) mDeliveryOrderTile.findViewById(R.id.save_picking_Button);
+        ImageButton fab_save = (ImageButton) mSaldosTile.findViewById(R.id.save_picking_Button);
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 mIDPickingOrderSelected = 0;
-                mDeliveryOrderTile.setVisibility(View.GONE);
-                mLinearProductos.setVisibility(View.GONE);
+                mSaldosTile.setVisibility(View.GONE);
                 mLinearOrders.setVisibility(View.GONE);
-                recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
-                recyclerViewTotalProductos.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                recyclerViewCustomOrderEnSaldos.setVisibility(View.GONE);
+                recyclerViewSaldos.setVisibility(View.VISIBLE);
 
             }
         });
 
-        // Productos
-
-        emptyViewTotalProducts = rootView.findViewById(R.id.recyclerview_totalproduct_empty);
-        recyclerViewTotalProductos = (RecyclerView) rootView.findViewById(R.id.total_products_pickingOrder);
-
-        recyclerViewTotalProductos.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-//        recyclerViewTotalProductos.setAdapter(mCursorAdapterTotalProductos);
-        recyclerViewCustomOrderInDeliveyOrder = (RecyclerView) rootView.findViewById(R.id.customOrderInpickingOrder_list);
-        recyclerViewCustomOrderInDeliveyOrder.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewCustomOrderEnSaldos = (RecyclerView) rootView.findViewById(R.id.customOrderEnSaldos_list);
+        recyclerViewCustomOrderEnSaldos.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
 
         // Custom Orders
-       emptyViewCustomOrder = rootView.findViewById(R.id.recyclerview_custom_empty);
+       emptyViewCustomOrder = rootView.findViewById(R.id.recyclerview_orden_empty);
 
 
 
         mLinearOrders.setVisibility(View.GONE);
-        mLinearProductos.setVisibility(View.GONE);
 
+        //Todo: revisar para el caso de tablets
         if (rootView.findViewById(R.id.customorder_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -359,10 +332,10 @@ public class SaldosListFragment extends FragmentBasic
 
         ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallback(mCustomsOrdersCursorAdapter, ADAPTER_CABECERA_ORDEN_EN_DELIVEY);
         ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
-        mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderInDeliveyOrder);
+        mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderEnSaldos);
 
 
-        recyclerViewCustomOrderInDeliveyOrder.setAdapter(mCustomsOrdersCursorAdapter);
+        recyclerViewCustomOrderEnSaldos.setAdapter(mCustomsOrdersCursorAdapter);
     }
 
 

@@ -13,18 +13,19 @@
     android:layout_marginTop="@dimen/custom_cardViewtMarginTop"
     android:layout_marginBottom="@dimen/custom_cardViewMarginBottom"
     android:elevation="@dimen/custom_cardViewElevation"
-    card_view:cardBackgroundColor ="@color/CustomOrderCard_background"
+    card_view:cardBackgroundColor ="@color/SaldosCard_background"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?selectableItemBackground">
 
     <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
 
-            android:layout_weight="3"
+
            >
+        <!--android:layout_weight="3"-->
             <!--android:background="@android:color/holo_blue_bright"-->
 
             <LinearLayout
@@ -44,10 +45,9 @@
 
 
                     android:textStyle="bold"
-                    android:transitionName="@string/custom_icon_transition_name"
+
                     />
-                <!--android:layout_weight="1"-->
-                <!--android:layout_margin="@dimen/text_margin"-->
+
                 <TextView
                     android:id="@+id/latNameOrderCard"
                     android:layout_width="0dp"
@@ -56,9 +56,9 @@
                     android:layout_gravity="start"
                     android:gravity="start"
                     android:textStyle="bold"
-                    android:transitionName="@string/custom_icon_transition_surname"
+
                     />
-                <!--android:layout_margin="@dimen/text_margin"-->
+
                 <ImageButton
                     android:layout_width="0dp"
                     android:layout_weight="1"

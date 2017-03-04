@@ -1,6 +1,9 @@
 package com.nextnut.logistica;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -57,6 +60,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private int mViewPagerFabItem;
     private ArrayList<Integer> mSeccionesDisponibles = new ArrayList<Integer>();
     private ArrayList<String> mTitulosSeccionesDisponibles = new ArrayList<String>();
 
@@ -176,6 +180,15 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                         mFab.setVisibility(View.GONE);
                         break;
                     }
+                    case PAGOS_FRAGMENT: {
+                        mFab.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    case STOCK_FRAGMENT: {
+                        mFab.setVisibility(View.VISIBLE);
+                        break;
+                    }
+
                     default:
                 }
             }
@@ -190,7 +203,8 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (getResources().getBoolean(R.bool.is_app_free)) {
+                Log.i("main", "Fab click");
+                if (getResources().getBoolean(R.bool.is_app_free) && isNetworkAvailable()) {
                     showInsterstitial();
                 } else {
                     fabActions();
@@ -238,82 +252,73 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
             if (mClienteKey != null) {
 
-                Log.e(LOG_TAG, "mClienteKey: NO NULO " );
+                if (mViewPagerFabItem == CUSTOM_ORDER_FRAGMENT) {
+
+                    Log.e(LOG_TAG, "mClienteKey: NO NULO ");
 
 //1a.-
-                mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child("cabecera").runTransaction(new Transaction.Handler() {
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        Totales cabecera_ordenes = mutableData.getValue(Totales.class);
-                        if (cabecera_ordenes == null) {
-                            Log.d(LOG_TAG, "orden: cabecera Null");
-                            cabecera_ordenes = new Totales();
-                            cabecera_ordenes.setCantidadDeOrdenesClientes(1);
-                        } else {
-                            Log.d(LOG_TAG, "orden: cabecera ID"+cabecera_ordenes.getCantidadDeOrdenesClientes());
-                        cabecera_ordenes.setCantidadDeOrdenesClientes(cabecera_ordenes.getCantidadDeOrdenesClientes()+1);                            // Unstar the post and remove self from stars
+                    mDatabase.child(ESQUEMA_ORDENES).child(mEmpresaKey).child("cabecera").runTransaction(new Transaction.Handler() {
+                        @Override
+                        public Transaction.Result doTransaction(MutableData mutableData) {
+                            Totales cabecera_ordenes = mutableData.getValue(Totales.class);
+                            if (cabecera_ordenes == null) {
+                                Log.d(LOG_TAG, "orden: cabecera Null");
+                                cabecera_ordenes = new Totales();
+                                cabecera_ordenes.setCantidadDeOrdenesClientes(1);
+                            } else {
+                                Log.d(LOG_TAG, "orden: cabecera ID" + cabecera_ordenes.getCantidadDeOrdenesClientes());
+                                cabecera_ordenes.setCantidadDeOrdenesClientes(cabecera_ordenes.getCantidadDeOrdenesClientes() + 1);                            // Unstar the post and remove self from stars
+                            }
+
+                            // Set value and report transaction success
+                            mutableData.setValue(cabecera_ordenes);
+                            return Transaction.success(mutableData);
                         }
 
-                        // Set value and report transaction success
-                        mutableData.setValue(cabecera_ordenes);
-                        return Transaction.success(mutableData);
-                    }
+                        @Override
+                        public void onComplete(DatabaseError databaseError, boolean commited,
+                                               DataSnapshot dataSnapshot) {
+                            // Transaction completed
+                            Log.d(LOG_TAG, "orden:onComplete:  databaseError" + databaseError);
+                            Log.d(LOG_TAG, "orden:onComplete: boolean b" + commited);
+                            Totales ordenes1a = dataSnapshot.getValue(Totales.class);
+                            long numeroOrden = ordenes1a.getCantidadDeOrdenesClientes();
+                            Log.d(LOG_TAG, "orden:onComplete: ID " + numeroOrden);
 
-                    @Override
-                    public void onComplete(DatabaseError databaseError, boolean commited,
-                                           DataSnapshot dataSnapshot) {
-                        // Transaction completed
-                        Log.d(LOG_TAG, "orden:onComplete:  databaseError" + databaseError);
-                        Log.d(LOG_TAG, "orden:onComplete: boolean b" + commited);
-                        Totales ordenes1a = dataSnapshot.getValue(Totales.class);
-                        long numeroOrden =ordenes1a.getCantidadDeOrdenesClientes();
-                        Log.d(LOG_TAG, "orden:onComplete: ID " + numeroOrden);
+                            if (commited) {
+                                // preparo la cabecera de orden del cliente
 
-                        if (commited){
-                            // preparo la cabecera de orden del cliente
-
-                            //Totales en cero
-                            Totales totales=new Totales(0,0,0,0.0,0.0,0.0,0.0,0.0,0.0);
-                            CabeceraOrden cabeceraOrden= new CabeceraOrden(mClienteKey,mCliente,ESTADO_ORDEN_INICIAL,totales,mUserKey, numeroOrden);
-                            cabeceraOrden.setUsuarioCreador(mUsuario.getUsername());
-                            Map<String, Object> cabeceraOrdenValues =  cabeceraOrden.toMap();
-                            Map<String, Object> childUpdates = new HashMap<>();
+                                //Totales en cero
+                                Totales totales = new Totales(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                                CabeceraOrden cabeceraOrden = new CabeceraOrden(mClienteKey, mCliente, ESTADO_ORDEN_INICIAL, totales, mUserKey, numeroOrden);
+                                cabeceraOrden.setUsuarioCreador(mUsuario.getUsername());
+                                Map<String, Object> cabeceraOrdenValues = cabeceraOrden.toMap();
+                                Map<String, Object> childUpdates = new HashMap<>();
 //1b
-                            childUpdates.put(NODO_ORDENES + mEmpresaKey +"/"+ numeroOrden+"/cabecera", cabeceraOrdenValues);
+                                childUpdates.put(NODO_ORDENES + mEmpresaKey + "/" + numeroOrden + "/cabecera", cabeceraOrdenValues);
 //2
-                            childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey +"/"+ESTADO_ORDEN_INICIAL+"/"+ numeroOrden, cabeceraOrdenValues);
-                            mDatabase.updateChildren(childUpdates);
+                                childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ESTADO_ORDEN_INICIAL + "/" + numeroOrden, cabeceraOrdenValues);
+                                mDatabase.updateChildren(childUpdates);
 
-                            Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
-                            putExtraFirebase(intent);
-                            intent.putExtra(EXTRA_CABECERA_ORDEN , cabeceraOrden);
-                            intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+                                Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
+                                putExtraFirebase(intent);
+                                intent.putExtra(EXTRA_CABECERA_ORDEN, cabeceraOrden);
+                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
 
-                            startActivity(intent);
+                                startActivity(intent);
+                            }
+
                         }
+                    });
 
-                    }
-                });
+                }else if(mViewPagerFabItem==PAGOS_FRAGMENT){
 
-//                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-//                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(LogisticaProvider.CustomOrders.CONTENT_URI);
-//                builder.withValue(CustomOrdersColumns.REF_CUSTOM_CUSTOM_ORDER, customRef);
-//                SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
-//                String formattedDate = df.format(new Date());
-//                builder.withValue(CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER, formattedDate);
-//                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, CustomOrderDetailFragment.STATUS_ORDER_INICIAL);
-//
-//                batchOperations.add(builder.build());
-//                try {
-//
-//                    getApplicationContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-//                } catch (RemoteException | OperationApplicationException e) {
-//                    Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
-//                }
+                    Intent intent = new Intent(getApplicationContext(), PagosActivity.class);
+                    putExtraFirebase(intent);
+                    startActivity(intent);
+                }
 
             }
-
-
 
 
         }
@@ -533,6 +538,11 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                     d.setArguments(putBundleFirebase());
                     return d;
 
+                case STOCK_FRAGMENT:
+                    SaldosListFragment e = new SaldosListFragment();
+                    e.setArguments(putBundleFirebase());
+                    return e;
+
                 default:
 
                     return null;
@@ -664,13 +674,21 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
     }
 
-    public void fabActions() {
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
-        switch (mViewPager.getCurrentItem()) {
+    public void fabActions() {
+        mViewPagerFabItem = mViewPager.getCurrentItem();
+        switch ( mViewPagerFabItem) {
             case CUSTOM_ORDER_FRAGMENT: {
                 Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
                 putExtraFirebase(intent);
                 startActivityForResult(intent, REQUEST_CUSTOMER);
+
                 break;
             }
             case PICKING_FRAGMENT: {
@@ -687,6 +705,18 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             case DELIVERY_FRAGMENT: {
                 break;
             }
+
+            case PAGOS_FRAGMENT: {
+
+                Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
+                putExtraFirebase(intent);
+                startActivityForResult(intent, REQUEST_CUSTOMER);
+
+
+                break;
+            }
+
+
             default:
         }
     }

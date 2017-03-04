@@ -8,6 +8,7 @@ public class Constantes {
     public static String STORAGE_REFERENCE = "gs://logistica-144918.appspot.com";
     public static String IMAGENES_PRODUCTOS = "/imagenes/productos";
     public static String IMAGENES_CLIENTES = "/imagenes/clientes";
+    public static String IMAGENES_PAGOS = "/imagenes/pagos";
 
 
     //usuarios
