@@ -79,7 +79,7 @@ public class CustomDetailFragment extends FragmentBasic  {
     private EditText mTelefono;
     private com.rey.material.widget.Button mBotonAgregarTelefono;
     private RecyclerView mListadeTelefonos;
-    private Map<String, String> telefonos= new HashMap<>();
+    private Map<String, String> mTelefonos = new HashMap<>();
     private MyAdapter mAdapterTelefonos;
 
 
@@ -253,10 +253,10 @@ public class CustomDetailFragment extends FragmentBasic  {
         mBotonAgregarTelefono.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                telefonos.put(mTipoTelefono.getText().toString(),mTelefono.getText().toString());
+                mTelefonos.put(mTipoTelefono.getText().toString(),mTelefono.getText().toString());
                 mTipoTelefono.setText("");
                 mTelefono.setText("");
-                mAdapterTelefonos.swap(telefonos);
+                mAdapterTelefonos.swap(mTelefonos);
             }
         });
         mListadeTelefonos=(RecyclerView) rootView.findViewById(R.id.listaTelefonos);
@@ -264,13 +264,13 @@ public class CustomDetailFragment extends FragmentBasic  {
         mListadeTelefonos.setHasFixedSize(true);
         mListadeTelefonos.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mAdapterTelefonos = new MyAdapter(telefonos);
+        mAdapterTelefonos = new MyAdapter(mTelefonos);
 
 
 
         mListadeTelefonos.setAdapter(mAdapterTelefonos);
 
-        Log.i("TelefonosArrayAdapter", "telefonos .size() on create" + telefonos.entrySet().size());
+        Log.i("TelefonosArrayAdapter", "mTelefonos .size() on create" + mTelefonos.entrySet().size());
         return rootView;
     }
 
@@ -409,23 +409,23 @@ public class CustomDetailFragment extends FragmentBasic  {
                         mDeliveyAddress.setText(cliente.getDireccionDeEntrega());
                         mCity.setText(cliente.getCiudad());
                         mCurrentPhotoPath =cliente.getFotoCliente();
-                        // todo: reemplazar por un listado de telefonos.
+                        // todo: reemplazar por un listado de mTelefonos.
                         mIdContact=null;// aqui deber ir la referencia al Id Android de contacto.
 
                         mCuit.setText(cliente.getCuit());
                         mIva.setText(Double.toString(cliente.getIva()));
                         mSpecial.setChecked(cliente.getEspecial());
-                        Log.i("TelefonosArrayAdapter", "telefonos .size()antes" + telefonos.entrySet().size());
+                        Log.i("TelefonosArrayAdapter", "mTelefonos .size()antes" + mTelefonos.entrySet().size());
 
-                        telefonos=cliente.getTelefonos();
-                        Log.i("TelefonosArrayAdapter", "telefonos .size()" + telefonos.entrySet().size());
-//                        telefonos.clear();
+                        mTelefonos =cliente.getTelefonos();
+                        Log.i("TelefonosArrayAdapter", "mTelefonos .size()" + mTelefonos.entrySet().size());
+//                        mTelefonos.clear();
                         for(Map.Entry<String,String> entry : cliente.getTelefonos().entrySet()) {
-                            telefonos.put(entry.getKey(),entry.getValue());
-                            Log.i("TelefonosArrayAdapter", "telefonos .key" + entry.getKey());
-                            Log.i("TelefonosArrayAdapter", "telefonos .value" + entry.getValue());
+                            mTelefonos.put(entry.getKey(),entry.getValue());
+                            Log.i("TelefonosArrayAdapter", "mTelefonos .key" + entry.getKey());
+                            Log.i("TelefonosArrayAdapter", "mTelefonos .value" + entry.getValue());
                         }
-                        mAdapterTelefonos.swap(telefonos);
+                        mAdapterTelefonos.swap(mTelefonos);
 //                        mListadeTelefonos.invalidate();
 //                        mAdapterTelefonos.notifyDataSetChanged();
 //                        mAdapterTelefonos.notifyAll();
@@ -535,21 +535,19 @@ public class CustomDetailFragment extends FragmentBasic  {
     public void fireBaseSaveCliente() {
         Log.i("producto", "fireBaseSaveProducto");
 
-        Map<String,String>telefonosMap= new HashMap<>();
-        telefonosMap.put("home","123456");
-        telefonosMap.put("work","99999");
+
 
         writeNewCliente(mUserKey,
                 mCustomName.getText().toString(),
                 mLastName.getText().toString(),
-                mIdContact,//todo ver este tema para pasar lo Nros de telefonos
+                mIdContact,//todo ver este tema para pasar lo Nros de mTelefonos
                 mCurrentPhotoPath,
                 mDeliveyAddress.getText().toString(),
                 mCity.getText().toString(),
                 Double.parseDouble(mIva.getText().toString()),
                 mCuit.getText().toString(),
                 mSpecial.isChecked(),
-                telefonosMap);
+                mTelefonos);
     }
 
     // [START basic_write]

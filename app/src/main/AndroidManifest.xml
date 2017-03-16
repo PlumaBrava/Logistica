@@ -102,6 +102,25 @@
                 android:value="com.nextnut.logistica.CustomListActivity" />
         </activity>
         <activity
+            android:name=".AlmacenesListActivity"
+            android:label="@string/title_almacenes_list"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nextnut.logistica.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".AlmacenesDetailActivity"
+            android:label="@string/title_almacenes_detail"
+            android:parentActivityName=".CustomListActivity"
+            android:theme="@style/AppTheme.Dialog_NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nextnut.logistica.AlmacenesListActivity" />
+        </activity>
+        <activity
             android:name=".CustomOrderDetailActivity"
             android:label="@string/title_customorder_detail"
             android:parentActivityName=".MainActivity"

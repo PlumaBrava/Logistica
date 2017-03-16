@@ -1,9 +1,6 @@
 package com.nextnut.logistica;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -13,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -40,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
-import static com.nextnut.logistica.util.Constantes.ESTADO_ORDEN_INICIAL;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
@@ -48,10 +45,12 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.REQUEST_CUSTOMER;
 import static com.nextnut.logistica.util.Constantes.REQUEST_EMPRESA;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
+import static com.nextnut.logistica.util.Network.isNetworkAvailable;
 
 
 public class MainActivity extends ActivityBasic implements PickingListFragment.PickingOrdersHandler {
@@ -77,6 +76,10 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     public static long mPickingOrderSelected = 0;
     public FloatingActionButton mFab;
 
+    private static AppCompatActivity mContext;
+    public static AppCompatActivity getMainActicity() {
+        return mContext;
+    }
     public static long getmPickingOrderSelected() {
         return mPickingOrderSelected;
     }
@@ -95,7 +98,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mContext= this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 //        mAuth = FirebaseAuth.getInstance();
@@ -204,7 +207,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             @Override
             public void onClick(View view) {
                 Log.i("main", "Fab click");
-                if (getResources().getBoolean(R.bool.is_app_free) && isNetworkAvailable()) {
+                if (getResources().getBoolean(R.bool.is_app_free) && isNetworkAvailable(getApplicationContext())) {
                     showInsterstitial();
                 } else {
                     fabActions();
@@ -290,14 +293,14 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
                                 //Totales en cero
                                 Totales totales = new Totales(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-                                CabeceraOrden cabeceraOrden = new CabeceraOrden(mClienteKey, mCliente, ESTADO_ORDEN_INICIAL, totales, mUserKey, numeroOrden);
+                                CabeceraOrden cabeceraOrden = new CabeceraOrden(mClienteKey, mCliente, ORDEN_STATUS_INICIAL, totales, mUserKey, numeroOrden);
                                 cabeceraOrden.setUsuarioCreador(mUsuario.getUsername());
                                 Map<String, Object> cabeceraOrdenValues = cabeceraOrden.toMap();
                                 Map<String, Object> childUpdates = new HashMap<>();
 //1b
                                 childUpdates.put(NODO_ORDENES + mEmpresaKey + "/" + numeroOrden + "/cabecera", cabeceraOrdenValues);
 //2
-                                childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ESTADO_ORDEN_INICIAL + "/" + numeroOrden, cabeceraOrdenValues);
+                                childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDEN_STATUS_INICIAL + "/" + numeroOrden, cabeceraOrdenValues);
                                 mDatabase.updateChildren(childUpdates);
 
                                 Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
@@ -391,6 +394,8 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         menu.setGroupVisible(R.id.productos_, mPerfil.getProductos());
         menu.setGroupEnabled(R.id.customs_, mPerfil.getClientes());
         menu.setGroupVisible(R.id.customs_, mPerfil.getClientes());
+         menu.setGroupEnabled(R.id.almacenes_, mPerfil.getClientes());
+        menu.setGroupVisible(R.id.almacenes_, mPerfil.getClientes());
         menu.setGroupEnabled(R.id.action_usuarios_, mPerfil.getUsuarios());
 
         menu.setGroupEnabled(R.id.grupo_reportes, mPerfil.getReportes());
@@ -435,6 +440,14 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 //            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
             return true;
         }
+
+        if (id == R.id.almacenes) {
+            Intent intent = new Intent(this, AlmacenesListActivity.class);
+            putExtraFirebase(intent);
+            startActivity(intent);
+            return true;
+        }
+
         if (id == R.id.reportexCliente) {
 
             Intent intent1 = new Intent(this, ReporteMensualxCliente.class);
@@ -502,6 +515,8 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             mFab.setVisibility(View.VISIBLE);
         }
     }
+
+
 
 
     /**
@@ -674,12 +689,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
     }
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
+
 
     public void fabActions() {
         mViewPagerFabItem = mViewPager.getCurrentItem();

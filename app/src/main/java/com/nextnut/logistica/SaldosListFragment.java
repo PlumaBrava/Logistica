@@ -38,7 +38,7 @@ import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
-import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_DELIVERED_PARA_COMPENSAR;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_DELIVERED_PARA_COMPENSAR;
 
 public class SaldosListFragment extends FragmentBasic
 {
@@ -261,7 +261,7 @@ public class SaldosListFragment extends FragmentBasic
 
 
     public void muestraOrdenesSinCompensar() {
-        Query listadoOrdenesEnPickingQuery = refCabeceraOrden_2_List(ORDER_STATUS_DELIVERED_PARA_COMPENSAR, 4);
+        Query listadoOrdenesEnPickingQuery = refCabeceraOrden_2_List(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, 4);
         Log.i(LOG_TAG, "muestraOrdenesSinCompensar:Query: " + listadoOrdenesEnPickingQuery.getRef().toString());
 
         mCustomsOrdersCursorAdapter = new FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder>(CabeceraOrden.class, R.layout.customorder_list_content,

@@ -62,9 +62,9 @@ import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_PI
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_PICKING;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PICKING;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
-import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_EN_DELIVERING;
-import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_INICIAL;
-import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_PICKING;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERING;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_PICKING;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
 import static com.nextnut.logistica.util.SharePickingOrder.sharePickingOrder;
@@ -479,7 +479,7 @@ public class PickingListFragment extends FragmentBasic {
 
 
     public void muestraOrdenesEnPicking() {
-        Query listadoOrdenesEnPickingQuery = refCabeceraOrden_2_List(ORDER_STATUS_PICKING, MainActivity.getmPickingOrderSelected());
+        Query listadoOrdenesEnPickingQuery = refCabeceraOrden_2_List(ORDEN_STATUS_PICKING, MainActivity.getmPickingOrderSelected());
         Log.i(LOG_TAG, "muestraOrdenesEnPicking:MainActivity.getmPickingOrderSelected(): " + MainActivity.getmPickingOrderSelected());
         Log.i(LOG_TAG, "muestraOrdenesEnPicking:Query: " + listadoOrdenesEnPickingQuery.getRef().toString());
 
@@ -618,7 +618,7 @@ public class PickingListFragment extends FragmentBasic {
 //
 //                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
 //                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
-//                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_INICIAL);
+//                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDEN_STATUS_INICIAL);
 //                builder.withValue(CustomOrdersColumns.REF_PICKING_ORDER_CUSTOM_ORDER, null);
 //                batchOperations.add(builder.build());
 //
@@ -981,7 +981,7 @@ public class PickingListFragment extends FragmentBasic {
                     public void onFailure(@NonNull Exception e) {
 
                         Log.i(LOG_TAG, "abmDetalleDeOrden updateChildren-onFailure " + e.toString());
-                        liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.mPickingOrderSelected);
+                        liberarRecusosTomados();
                         liberarArrayTaskConBloqueos();
 
 //                        liberarRecusosTomados(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato);
@@ -1006,10 +1006,9 @@ public class PickingListFragment extends FragmentBasic {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.i(LOG_TAG, "abmDetalleDeOrden addOnFailureListener= allTask" + e.toString());
-                liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.mPickingOrderSelected);
+                liberarRecusosTomados();
                 liberarArrayTaskConBloqueos();
 
-//                liberarRecusosTomados(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato);
 
             }
         });
@@ -1166,11 +1165,11 @@ public class PickingListFragment extends FragmentBasic {
 
 
                                 /*2 */
-                                    mCabeceraOrdenDato.setEstado(ORDER_STATUS_INICIAL);
+                                    mCabeceraOrdenDato.setEstado(ORDEN_STATUS_INICIAL);
                                     mCabeceraOrdenDato.setNumeroDePickingOrden(0);
                                     mCabeceraOrdenDato.liberar();
-                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_PICKING, mCabeceraOrdenDato.getNumeroDeOrden(), MainActivity.getmPickingOrderSelected()), null);
-                                    childUpdates.put(nodoCabeceraOrden_2(ORDER_STATUS_INICIAL, mCabeceraOrdenDato.getNumeroDeOrden()), mCabeceraOrdenDato.toMap());
+                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_PICKING, mCabeceraOrdenDato.getNumeroDeOrden(), MainActivity.getmPickingOrderSelected()), null);
+                                    childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_INICIAL, mCabeceraOrdenDato.getNumeroDeOrden()), mCabeceraOrdenDato.toMap());
                                     childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrdenDato.getNumeroDeOrden()), mCabeceraOrdenDato.toMap());
 
                                     mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
@@ -1195,7 +1194,7 @@ public class PickingListFragment extends FragmentBasic {
                             allTask.addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                                    liberarRecusosTomados();
                                     liberarArrayTaskConBloqueos();
                                     onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + "allTask");
 
@@ -1212,7 +1211,7 @@ public class PickingListFragment extends FragmentBasic {
 
                 } else {
                     Log.i(LOG_TAG, "pasarOrdenAInicial Operacion fallo- " + task.getException().toString());
-                    liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                    liberarRecusosTomados();
                     liberarArrayTaskConBloqueos();
                     onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
                 }
@@ -1220,7 +1219,7 @@ public class PickingListFragment extends FragmentBasic {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                liberarRecusosTomados( );
                 liberarArrayTaskConBloqueos();
                 onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
             }
@@ -1247,7 +1246,7 @@ public class PickingListFragment extends FragmentBasic {
 
                     Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key lee cabeceras");
                     //leo las ordenes asociadas al picking y las bloqueo
-                    refCabeceraOrden_2_List(ORDER_STATUS_PICKING, cabeceraPicking.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    refCabeceraOrden_2_List(ORDEN_STATUS_PICKING, cabeceraPicking.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden lee cabeceras Llegaron los datos");
@@ -1334,12 +1333,12 @@ public class PickingListFragment extends FragmentBasic {
                                                     Log.i(LOG_TAG, "pasarPickingAEntrega nroDeOrden = " + cabeceraOrden.getNumeroDeOrden());
 
                                     /*2 */
-                                                    cabeceraOrden.setEstado(ORDER_STATUS_EN_DELIVERING);
+                                                    cabeceraOrden.setEstado(ORDEN_STATUS_EN_DELIVERING);
                                                     cabeceraOrden.liberar();
-                                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_PICKING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), null);
+                                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_PICKING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), null);
 
-                                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), cabeceraOrden.toMap());
-//                                        childUpdates.put(nodoCabeceraOrden_2(ORDER_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+                                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), cabeceraOrden.toMap());
+//                                        childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
                                                     childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
 
                                                 }
@@ -1349,7 +1348,7 @@ public class PickingListFragment extends FragmentBasic {
                                                     public void onFailure(@NonNull Exception e) {
 
                                                         Log.i(LOG_TAG, "pasarPickingAEntrega updateChildren-onFailure " + e.toString());
-                                                        liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                                                        liberarRecusosTomados();
                                                         liberarArrayTaskConBloqueos();
                                                         onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
 
@@ -1369,7 +1368,7 @@ public class PickingListFragment extends FragmentBasic {
                                         allTask.addOnFailureListener(new OnFailureListener() {
                                                                          @Override
                                                                          public void onFailure(@NonNull Exception e) {
-                                                                             liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                                                                             liberarRecusosTomados();
                                                                              liberarArrayTaskConBloqueos();
                                                                              onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                                                                          }
@@ -1382,7 +1381,7 @@ public class PickingListFragment extends FragmentBasic {
 
                                 @Override // Listado de Picking... Listen for single value
                                 public void onCancelled(DatabaseError databaseError) {
-                                    liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                                    liberarRecusosTomados( );
                                     liberarArrayTaskConBloqueos();
                                     onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                                 }
@@ -1392,7 +1391,7 @@ public class PickingListFragment extends FragmentBasic {
                         @Override // Listado de cabceras... Listen for single value
                         public void onCancelled(DatabaseError databaseError) {
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key lee cabeceras onCancelled");
-                            liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                            liberarRecusosTomados();
                             liberarArrayTaskConBloqueos();
                             onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                         }
@@ -1405,7 +1404,7 @@ public class PickingListFragment extends FragmentBasic {
         }).addOnFailureListener(new OnFailureListener() { // bloqueo de la orden de Picking.
             @Override
             public void onFailure(@NonNull Exception e) {
-                liberarRecusosTomados( "", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                liberarRecusosTomados( );
                 liberarArrayTaskConBloqueos();
                 onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
             }

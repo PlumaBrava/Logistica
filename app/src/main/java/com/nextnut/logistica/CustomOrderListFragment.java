@@ -42,8 +42,8 @@ import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_TOTAL_INICIAL;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
-import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_INICIAL;
-import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_PICKING;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_PICKING;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
 
 /**
@@ -119,6 +119,7 @@ public class CustomOrderListFragment extends FragmentBasic {
             protected void populateViewHolder(final DetalleViewHolder viewHolder, final Detalle model, final int position) {
                 final DatabaseReference CabeceraRef = getRef(position);
                 emptyViewTotalProducts.setVisibility(View.GONE);
+                viewHolder.mfavorito.setVisibility(View.GONE);
                 Log.i(LOG_TAG, "adapter:CabeceraRef: " + CabeceraRef.toString());
 
                 // Set click listener for the whole post view
@@ -266,7 +267,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 
 //                    ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
 //                    ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
-//                    builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_PICKING);
+//                    builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDEN_STATUS_PICKING);
 //                    SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
 //                    String formattedDate = df.format(new Date());
 //                    builder.withValue(CustomOrdersColumns.DATE_OF_PICKING_ASIGNATION_CUSTOM_ORDER, formattedDate);
@@ -392,7 +393,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 //                } else {
 //                    ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
 //                    ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
-//                    builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_PICKING);
+//                    builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDEN_STATUS_PICKING);
 //                    SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
 //                    String formattedDate = df.format(new Date());
 //                    builder.withValue(CustomOrdersColumns.DATE_OF_PICKING_ASIGNATION_CUSTOM_ORDER, formattedDate);
@@ -547,7 +548,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 
 
                                 /*2 */
-                                    mCabeceraOrdenDato.setEstado(ORDER_STATUS_PICKING);
+                                    mCabeceraOrdenDato.setEstado(ORDEN_STATUS_PICKING);
                                     mCabeceraOrdenDato.liberar();
                                     Log.i(LOG_TAG, "pasarOrdenAPickingl MainActivity.getmPickingOrderSelected() "+ MainActivity.getmPickingOrderSelected());
                                     Log.i(LOG_TAG, "pasarOrdenAPickingl mCabeceraOrdenDato "+ mCabeceraOrdenDato.getNumeroDePickingOrden());
@@ -556,8 +557,8 @@ public class CustomOrderListFragment extends FragmentBasic {
                                     Log.i(LOG_TAG, "pasarOrdenAPickingl getNumeroDeOrden() "+ mCabeceraOrdenDato.getNumeroDeOrden());
                                     Log.i(LOG_TAG, "pasarOrdenAPickingl getNumeroDePickingOrden() "+ mCabeceraOrdenDato.getNumeroDePickingOrden());
 
-                                    childUpdates.put(nodoCabeceraOrden_2(ORDER_STATUS_INICIAL,mCabeceraOrdenDato.getNumeroDeOrden()), null);
-                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_PICKING,mCabeceraOrdenDato.getNumeroDeOrden(),MainActivity.getmPickingOrderSelected() ),mCabeceraOrdenDato.toMap());
+                                    childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_INICIAL,mCabeceraOrdenDato.getNumeroDeOrden()), null);
+                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_PICKING,mCabeceraOrdenDato.getNumeroDeOrden(),MainActivity.getmPickingOrderSelected() ),mCabeceraOrdenDato.toMap());
                                     childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrdenDato.getNumeroDeOrden()),mCabeceraOrdenDato.toMap());
 
                                     mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
@@ -565,7 +566,7 @@ public class CustomOrderListFragment extends FragmentBasic {
                                         public void onFailure(@NonNull Exception e) {
 
                                             Log.i(LOG_TAG, "pasarOrdenAPickingl updateChildren-onFailure "+e.toString());
-                                            liberarRecusosTomados( "",PICKING_STATUS_INICIAL,MainActivity.getmPickingOrderSelected());
+                                            liberarRecusosTomados();
                                             liberarArrayTaskConBloqueos();
                                             onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
 
@@ -589,7 +590,7 @@ public class CustomOrderListFragment extends FragmentBasic {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
 
-                                    liberarRecusosTomados( "",PICKING_STATUS_INICIAL,MainActivity.getmPickingOrderSelected());
+                                    liberarRecusosTomados();
                                     liberarArrayTaskConBloqueos();
                                     onDialogAlert(getResources().getString( R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
 
@@ -605,7 +606,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 
                 } else {
                     Log.i(LOG_TAG, "pasarOrdenAPickingl Operacion fallo- " + task.getException().toString());
-                    liberarRecusosTomados( "",PICKING_STATUS_INICIAL,MainActivity.getmPickingOrderSelected());
+                    liberarRecusosTomados();
                     liberarArrayTaskConBloqueos();
                     onDialogAlert(getResources().getString( R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
                 }
@@ -828,7 +829,7 @@ public class CustomOrderListFragment extends FragmentBasic {
     }
 
     public Query getQuery(DatabaseReference databaseReference) {
-        return databaseReference.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(String.valueOf(ORDER_STATUS_INICIAL));
+        return databaseReference.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(String.valueOf(ORDEN_STATUS_INICIAL));
     }
 
 

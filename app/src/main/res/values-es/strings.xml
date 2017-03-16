@@ -55,6 +55,7 @@
     <!--Menu Options-->
     <string name="products">Productos</string>
     <string name="customs">Clientes</string>
+    <string name="almacenes">Almacenes</string>
     <string name="reportesXcliente">Reporte x Cliente</string>
     <string name="reportesXMes">Reporte x Mes</string>
     <string name="menu_grupoConfiguracion">Configuracion</string>
@@ -205,6 +206,28 @@
     <string name="custom_icon_transition_surname" translatable="false">TN_CustomSurname</string>
     <string name="custom_icon_transition_imagen" translatable="false">TN_CustomIcon</string>
 
+    <!--Almacen ViewHolder- Almacenes_list_item.xml-->
+    <string name="title_almacenes_list">Almacenes</string>
+    <string name="title_almacenes_detail">Almacenes Detalle</string>
+    <string name="almacen_foto_text">Foto Almacen</string>
+    <string name="almacen_nombre">Nombre</string>
+    <string name="almacen_ciudad">Ciudad</string>
+    <string name="almacen_direccion">Direccion</string>
+    <string name="almacen_tipo">Tipo de Almacen</string>
+    <string name="almacen_responsable">Responsable del Almacen</string>
+    <string name="almacen_telefono">Telefono del Almacen</string>
+    <string name="almacen_nuevo">Nuevo Almacen</string>
+    <string name="almacen_titulo">Almacen:</string>
+
+    <!--Almacen List Activity - almacenes_list.xml -->
+
+
+    <!--Almacen Detail Fragmen - almacenes_list.xml -->
+
+
+
+    <string name="almacen_sinAlmacenesParaMostrar">Sin Almacenes para Mostrar</string>
+
     <!--Verificar si se usa-->
     <string name="custom_DetailBar_NEW_PRODUCT" translatable="false">Nuevo Producto</string>
 
@@ -255,6 +278,9 @@
 
     <!--Share Picking Order-->
     <string name="PickingOrderNumber"> Compartir Orden: </string>
+    <string name="PickingOrderSeleccionada">NroPickingOrdenSeleccionada</string>
+    <string name="PickingOrderCommentSeleccionada">ComentarioPickingOrdenSeleccionada</string>
+    <string name="PickingOrderFechaSeleccionada">FechaPickingOrdenSeleccionada</string>
 
 
     <!--dialog number picker-->
@@ -400,7 +426,6 @@
     <string name="hint_empresaTelefono">Teléfono</string>
     <string name="hint_empresaLogo">Logo</string>
     <string name="title_activity_empesas_list">EmpesasListActivity</string>
-
     <string name="action_settings">Settings</string>
     <string name="olvidaste_tu_constrase_a">¿Olvidaste tu constraseña?</string>
     <string name="logo">Logo</string>

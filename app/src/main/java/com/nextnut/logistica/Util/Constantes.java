@@ -8,6 +8,7 @@ public class Constantes {
     public static String STORAGE_REFERENCE = "gs://logistica-144918.appspot.com";
     public static String IMAGENES_PRODUCTOS = "/imagenes/productos";
     public static String IMAGENES_CLIENTES = "/imagenes/clientes";
+    public static String IMAGENES_ALMACENES = "/imagenes/almacenes";
     public static String IMAGENES_PAGOS = "/imagenes/pagos";
 
 
@@ -144,6 +145,14 @@ public class Constantes {
 
 
 
+    // Almacenes
+// --  14  ---
+
+    public static String ESQUEMA_ALMACENES = "almacenes";
+    public static String NODO_ALMACENES ="/" + ESQUEMA_ALMACENES+ "/";
+
+
+
     // Constantes para pasar datos entre actividades.
     public static  final String EXTRA_FIREBASE_URL ="FIREBASE_URL";
     public static  final String EXTRA_USER_KEY ="user_key";
@@ -157,6 +166,7 @@ public class Constantes {
     public static final String EXTRA_CABECERA_ORDEN = "cabeceraOrden";
     public static final String EXTRA_KEYLIST = "keyList"; //listado de key de una orden
     public static final String EXTRA_NRO_PICKIG = "NroPicking"; //listado de key de una orden
+    public static final String EXTRA_ALMACEN_KEY = "almacen_key"; //key de un almacen
 
 
     // Activity For Result
@@ -167,25 +177,29 @@ public class Constantes {
 
 
     // Estado de Ordenes
-    public static final int ESTADO_ORDEN_INICIAL = 0;       // Estado de Inicial de una orden
-    public static final int ESTADO_ORDEN_EN_PICKING = 1;    // Estado En Picking de una orden
-    public static final int ESTADO_ORDEN_EN_ENTREGA = 2;    // Estado  EN ENTREGA de una orden
-    public static final int ESTADO_ORDEN_ENTREGADA = 3;     // Estado ENTREGADO de una orden
-    public static final int ESTADO_ORDEN_PAGO_PARCIAL = 4;  // Estado REGISTRA PAGO PARCIAL de una orden
-    public static final int ESTADO_ORDEN_COMPENSADA = 5;    // Estado TOTALMENTE PAGADA
-    public static final int ESTADO_ORDEN_ACTUALIZANDO_DATOS = 6;    // Estado actualizando datos. Se pasa a este estado para actualizar todo el esquema, al finalizar se retorna al estado que corresponda.
 
-    public static final int ORDER_STATUS_INICIAL = 0;
-    public static final int ORDER_STATUS_PICKING = 1;
-    public static final int ORDER_STATUS_EN_DELIVERING = 2;
-    public static final int ORDER_STATUS_DELIVERED_PARA_COMPENSAR = 3;
-    public static final int ORDER_STATUS_DELETED = 4;
+    public static final int ORDEN_STATUS_INICIAL = 0;                   // Estado de Inicial de una orden
+    public static final int ORDEN_STATUS_PICKING = 1;                   // Estado En Picking de una orden
+    public static final int ORDEN_STATUS_EN_DELIVERING = 2;             // Estado  EN ENTREGA de una orden
+    public static final int ORDEN_STATUS_DELIVERED_PARA_COMPENSAR = 3;  // Estado Orden entregada.
+    public static final int ORDEN_STATUS_DELIVERED_COMPENSADA_PARCIALMENTE = 4;  // Estado entregada, pagada parcialmente
+    public static final int ORDEN_STATUS_COMPENSADA = 5;            // Estado TOTALMENTE PAGAD
+    public static final int ORDEN_STATUS_DELETED = 99;                   // Orden Borrada-
 
     // Estado de De Picking
-    public static final int PICKING_STATUS_INICIAL = 0;
-    public static final int PICKING_STATUS_DELIVERY = 1;
-    public static final int PICKING_STATUS_CERRADA = 2;
-    public static final int PICKING_STATUS_DELETED = 3;
+    public static final int PICKING_STATUS_INICIAL = 0;         //Picking Borrado
+    public static final int PICKING_STATUS_DELIVERY = 1;        //Picking Pasado a Entregar.
+    public static final int PICKING_STATUS_EN_ENTREGA = 2;      //Picking Entrega Seleccionada.
+    public static final int PICKING_STATUS_CERRADA = 3;         //Picking Borrado
+    public static final int PICKING_STATUS_DELETED = 4;         //Picking Borrado
+
+
+    // Estado de De UN PAGO
+    public static final int PAGO_STATUS_INICIAL_SIN_COMPENSAR = 0;
+    public static final int PAGO_STATUS_COMPENSADO_PARCIALMENTE = 1;
+    public static final int PAGO_STATUS_COMPENSADO= 2;
+    public static final int PAGO_STATUS_XXX = 3;
+
 
     // Adaptadores.
 

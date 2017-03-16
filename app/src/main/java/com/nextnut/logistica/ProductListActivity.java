@@ -29,8 +29,7 @@ public class ProductListActivity extends ActivityBasic {
 //    private static final String LOG_TAG = ProductDetailFragment.class.getSimpleName();
     private FirebaseRecyclerAdapter<Producto, ProductViewHolder> mAdapter;
     private static final String LOG_TAG = ProductListActivity.class.getSimpleName();
-    private static final int CURSOR_LOADER_ID = 0;
-    private long mItem = 0;
+
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.

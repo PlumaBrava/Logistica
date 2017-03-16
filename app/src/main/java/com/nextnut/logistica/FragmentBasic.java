@@ -145,11 +145,15 @@ public abstract class FragmentBasic extends Fragment {
     public Task mPickingTask;
     public Task mLiberarPickingTask;
     public TaskCompletionSource<DataSnapshot> mLiberarPickingCompletionTask;
+    public int mPickingEstado=0;
+    public long mPickingNumero=0;
 
 
     // Picking Total 7
     public Boolean mLiberarSemaforoPickingTotal = false;
     public ArrayList<String> mPickingTotalIndex = new ArrayList<String>();
+    public int mPickingTotalEstado=0;
+    public long mPickingTotalNumero=0;
     public ArrayList<String> mPickingTotalIndexLiberar = new ArrayList<String>();
     public ArrayList<Task> mPickingTotalTask = new ArrayList<Task>();
     public ArrayList<TaskCompletionSource<Object>> mPickingTotalCompletionTask = new ArrayList<TaskCompletionSource<Object>>();
@@ -657,8 +661,8 @@ public abstract class FragmentBasic extends Fragment {
                 // Transaction completed
                 Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: commited: " + commited);
                 Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: size: " + mCabeceraOrdenIndex.size());
-                Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: size: " + mCabeceraOrdenIndex.get(0));
-                Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: mCabeceraOrdenIndex.indexOf(dataSnapshot.getKey()" + mCabeceraOrdenIndex.indexOf(dataSnapshot.getRef().toString()));
+//                Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: size: " + mCabeceraOrdenIndex.get(0));
+//                Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: mCabeceraOrdenIndex.indexOf(dataSnapshot.getKey()" + mCabeceraOrdenIndex.indexOf(dataSnapshot.getRef().toString()));
                 Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: mCabeceraOrdenIndex.parent " + dataSnapshot.getRef().getParent().getKey());
                 Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: ref: " + dataSnapshot.getRef());
                 Log.i(LOG_TAG, "readBlockCabeceraOrden Inicial: key: " + dataSnapshot.getKey());
@@ -737,6 +741,7 @@ public abstract class FragmentBasic extends Fragment {
                             Log.i("liberarCabeceraOrden", "Liberacion Completa index" + index);
                             mLiberarSemaforoCabeceraOrden = false;
                             mCabeceraOrdenLiberar.clear();
+                            mCabeceraOrdenIndex.clear();
                             mLiberarcabeceraOrdenCompletionTask.clear();
                             mLiberarCabeceraOrdenTask.clear();
                             Log.i(LOG_TAG, "liberarCabeceraOrdenonComplete mLiberarSemaforoCabeceraOrden" + mLiberarSemaforoCabeceraOrden);
@@ -954,7 +959,8 @@ public abstract class FragmentBasic extends Fragment {
 
 //        Lee y bloquea  Ordenes de Picking 6
 
-
+        mPickingEstado=estado;
+        mPickingNumero=numeroPicking;
         mPickingCompletionTask = new TaskCompletionSource<>();
         mPickingTask = mPickingCompletionTask.getTask();
         mPickingTask.addOnCompleteListener(new OnCompleteListener() {
@@ -1022,6 +1028,8 @@ public abstract class FragmentBasic extends Fragment {
                     mLiberarSemaforoPicking = false;
                     mLiberarPickingCompletionTask=null;
                     mLiberarPickingTask=null;
+                    mPickingEstado=0;
+                    mPickingNumero=0;
                 }
             }
         });
@@ -1067,7 +1075,8 @@ public abstract class FragmentBasic extends Fragment {
 
 //        Lee y bloquea  Ordenes ce Picking 6
         mPickingTotalIndex.add(productKey);
-
+        mPickingTotalEstado=estado;
+        mPickingTotalNumero=numeroPicking;
         Log.i("readBlockPickingTotal", "estado " + estado + " numeroPicking " + numeroPicking + " productKey " + productKey);
 
         mPickingTotalCompletionTask.add(new TaskCompletionSource<>());
@@ -1126,9 +1135,12 @@ public abstract class FragmentBasic extends Fragment {
     }
 
     public void liberarPickingTotal(int estado, long numeroPicking) {
+        Log.i("LiberarPicking", "estado" +  estado);
+        Log.i("LiberarPicking", "numeroPicking" +String.valueOf(numeroPicking));
+
         ArrayList<String> pickingTotalIndexLiberarAux = (ArrayList<String>) mPickingTotalIndexLiberar.clone();
         for (int a = 0; a < mPickingTotalIndexLiberar.size(); a++) {
-
+            Log.i("LiberarPicking", "mPickingTotalIndexLiberar.get(a)" + mPickingTotalIndexLiberar.get(a));
             mLiberarPickingTotalCompletionTask.add(new TaskCompletionSource<>());
             mLiberarPickingTotalTask.add(mLiberarPickingTotalCompletionTask.get(mLiberarPickingTotalCompletionTask.size() - 1).getTask());
             //noinspection unchecked
@@ -1150,6 +1162,9 @@ public abstract class FragmentBasic extends Fragment {
                             mLiberarPickingTotalCompletionTask.clear();
                             mLiberarPickingTotalTask.clear();
                             mPickingTotalIndexLiberar.clear();
+                            mPickingTotalIndex.clear();
+                            mPickingTotalNumero=0;
+                            mPickingTotalEstado=0;
                         }
                     }
                 }
@@ -1591,18 +1606,22 @@ public abstract class FragmentBasic extends Fragment {
 
                         }
                         if (sonTodosCeros(mSaldosTotalIndexLiberar)) {
-                            Log.i("Liberar Cliente", "Liberacion Completa");
+                            Log.i("SaldosTotal", "Liberacion Completa");
                             mLiberarSemaforoSaldoTotal = false;
                             mLiberarSaldosTotalCompletionTask.clear();
                             mLiberarSaldosTotalTask.clear();
+                            mSaldosTotalIndex.clear();
                             mSaldosTotalIndexLiberar.clear();
                         }
+                    }else{
+                        Log.i("SaldosTotal", "mLiberarSaldosTotalTask-task.isNOT Successful()" );
                     }
                 }
             });
-            mSaldosTotalTask.get(mLiberarSaldosTotalTask.size() - 1).addOnFailureListener(new OnFailureListener() {
+            mLiberarSaldosTotalTask.get(mLiberarSaldosTotalTask.size() - 1).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
+                    Log.i("SaldosTotal", "mLiberarSaldosTotalTask-onFailure"+e.toString());
                 }
             });
 
@@ -1920,7 +1939,8 @@ public abstract class FragmentBasic extends Fragment {
     }
 
 
-    public void liberarRecusosTomados(String productKey, int statusPicking, long nroPicking) {
+//    public void liberarRecusosTomados(String productKey, int statusPicking, long nroPicking) {
+    public void liberarRecusosTomados() {
         Log.i(LOG_TAG, "liberarRecusosTomados-mLiberarSemaforoTotalInicial " + mLiberarSemaforoTotalInicial);
         Log.i(LOG_TAG, "liberarRecusosTomados-mLiberarSemaforoCabeceraOrden " + mLiberarSemaforoCabeceraOrden);
         Log.i(LOG_TAG, "liberarRecusosTomados-mLiberarSemaforoProductosEnOrdenes " + mLiberarSemaforoProductosEnOrdenes);
@@ -1945,11 +1965,11 @@ public abstract class FragmentBasic extends Fragment {
 //        }
         if (mLiberarSemaforoPicking) {
             //6
-            liberarPicking(statusPicking, nroPicking);
+            liberarPicking(mPickingEstado, mPickingNumero);
         }
         if (mLiberarSemaforoPickingTotal) {
             //7-multiples productos
-            liberarPickingTotal(statusPicking, nroPicking);
+            liberarPickingTotal(mPickingTotalEstado, mPickingTotalNumero);
         }
 
         if (mLiberarSemaforoReporteVentasProducto) {

@@ -80,10 +80,9 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_DETALLE;
-import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_EN_DELIVERING;
-import static com.nextnut.logistica.util.Constantes.ORDER_STATUS_INICIAL;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERING;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
-import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
 import static com.nextnut.logistica.util.Constantes.detalleOrdenRef_1C;
@@ -325,10 +324,10 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
         mOrderNumber = (TextView) mRootView.findViewById(R.id.orderNumber);
         mBotonSeleccionCliente = (Button) mRootView.findViewById(R.id.botonSelecionCliente);
-        mBotonSeleccionCliente.setVisibility(mCabeceraOrden.getEstado() == ORDER_STATUS_INICIAL ? View.VISIBLE : View.GONE);
+        mBotonSeleccionCliente.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
 
         mBotonSeleccionProduto = (Button) mRootView.findViewById(R.id.botonSelecionProdcuto);
-        mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDER_STATUS_INICIAL ? View.VISIBLE : View.GONE);
+        mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
 
         mCustomName = (TextView) mRootView.findViewById(R.id.custom_name_text);
         mLastName = (TextView) mRootView.findViewById(R.id.product_Lastname);
@@ -403,7 +402,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                                 addFavorite();
                                             } else {
                                                 // no existen favoritos para agregar
-                                                mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDER_STATUS_INICIAL ? View.VISIBLE : View.GONE);
+                                                mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
                                                 mKeyList.add(null);
 
                                             }
@@ -411,7 +410,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                                         @Override
                                         public void onCancelled(DatabaseError databaseError) {
-                                            mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDER_STATUS_INICIAL ? View.VISIBLE : View.GONE);
+                                            mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
 
                                         }
                                     });
@@ -425,7 +424,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                 mKeyList.add(messageSnapshot.getKey());
                                 Log.d(LOG_TAG, "mKeyList added" + messageSnapshot.getKey());
                                 mDatabase.child("copy").setValue(dataSnapshot.getValue());
-                                mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDER_STATUS_INICIAL ? View.VISIBLE : View.GONE);
+                                mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
 
                             }
 
@@ -444,15 +443,15 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             @Override
             protected void populateViewHolder(final DetalleViewHolder viewHolder, final Detalle model, final int position) {
                 final DatabaseReference detalleRef = getRef(position);
-                if (mCabeceraOrden.getEstado() == ORDER_STATUS_EN_DELIVERING) {
-                    Log.i(LOG_TAG, "adapter:detalleRef:ORDER_STATUS_EN_DELIVERING " + mCabeceraOrden.getEstado());
+                if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERING) {
+                    Log.i(LOG_TAG, "adapter:detalleRef:ORDEN_STATUS_EN_DELIVERING " + mCabeceraOrden.getEstado());
                     viewHolder.setDeliveryState();
                     viewHolder.mTextViewPrecioDelivery.setVisibility(View.VISIBLE);
                     viewHolder.mTextcantidadDelivery.setVisibility(View.VISIBLE);
                     viewHolder.mTextToalDelivery.setVisibility(View.VISIBLE);
                     viewHolder.mfavorito.setVisibility(View.GONE);
                 } else {
-                    Log.i(LOG_TAG, "adapter:detalleRef:NO ORDER_STATUS_EN_DELIVERING " + mCabeceraOrden.getEstado());
+                    Log.i(LOG_TAG, "adapter:detalleRef:NO ORDEN_STATUS_EN_DELIVERING " + mCabeceraOrden.getEstado());
                 }
 
                 emptyView.setVisibility(View.GONE);
@@ -702,7 +701,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                 Map<String, Object> cabeceraOrdenValues = mCabeceraOrden.toMap();
 
 
-                                childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDER_STATUS_INICIAL + "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
+                                childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDEN_STATUS_INICIAL + "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
 /*1b*/
                                 childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()), cabeceraOrdenValues);
 
@@ -716,7 +715,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                                 NumberFormat format = NumberFormat.getCurrencyInstance();
                                                 mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
                                                 mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
-                                                mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDER_STATUS_INICIAL ? View.VISIBLE : View.GONE);
+                                                mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
 //                                            mKeyList.add(mproductKeyDato);
                                                 Log.i(LOG_TAG, "pasarOrdenAPickingl - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
 
@@ -727,7 +726,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                         mKeyList.clear();
                                         mKeyList = keyListBkp;
                                         Log.i(LOG_TAG, "pasarOrdenAPickingl updateChildren-onFailure " + mKeyList);
-                                        liberarRecusosTomados("", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                                        liberarRecusosTomados();
                                         liberarArrayTaskConBloqueos();
                                         onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
 
@@ -740,7 +739,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                         }).addOnFailureListener(new OnFailureListener() { // No puedo bloquear todas los productos
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                liberarRecusosTomados("", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                                liberarRecusosTomados();
                                 liberarArrayTaskConBloqueos();
                                 onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + "Producto Inicial");
                             }
@@ -754,7 +753,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        liberarRecusosTomados("", PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+                        liberarRecusosTomados();
                         liberarArrayTaskConBloqueos();
                         onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
 
@@ -813,7 +812,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             np.setMinValue(mDetalleAnterior.getProducto().getCantidadMinima());
             np.setWrapSelectorWheel(true);
 
-            if (mCabeceraOrden.getEstado() == ORDER_STATUS_EN_DELIVERING) {
+            if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERING) {
                 np.setValue(mDetalleAnterior.getCantidadOrden().intValue());
                 openButton.setVisibility(View.VISIBLE);
                 sendButton.setVisibility(View.VISIBLE);
@@ -834,7 +833,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                 @Override
                 public void onClick(View v) {
                     d.dismiss();
-                    if (mCabeceraOrden.getEstado() == ORDER_STATUS_EN_DELIVERING) {
+                    if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERING) {
                         abmDetalleDeOrdenDelivery((double) np.getValue(), productKey, mDetalleAnterior);
 //                        ca();
 //                        
@@ -1169,7 +1168,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
 
                 Log.i(LOG_TAG, "abmDetalleDeOrden refCabeceraOrden_1B " + refCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()).toString());
-                Log.i(LOG_TAG, "abmDetalleDeOrden refCabeceraOrden_2 " + refCabeceraOrden_2(ORDER_STATUS_INICIAL, mCabeceraOrden.getNumeroDeOrden()).toString());
+                Log.i(LOG_TAG, "abmDetalleDeOrden refCabeceraOrden_2 " + refCabeceraOrden_2(ORDEN_STATUS_INICIAL, mCabeceraOrden.getNumeroDeOrden()).toString());
                 Log.i(LOG_TAG, "abmDetalleDeOrden refDetalleOrden_1C " + refDetalleOrden_1C(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato).toString());
                 Log.i(LOG_TAG, "abmDetalleDeOrden refDetalleOrden_4 " + refDetalleOrden_4(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato).toString());
                 Log.i(LOG_TAG, "abmDetalleDeOrden refProductosXOrdenInicial_5 " + refProductosXOrdenInicial_5(mproductKeyDato, mCabeceraOrden.getNumeroDeOrden()).toString());
@@ -1180,7 +1179,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 /*1B*/
                 childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()), cabeceraOrdenValues);
 /*2 */
-                childUpdates.put(nodoCabeceraOrden_2(ORDER_STATUS_INICIAL, mCabeceraOrden.getNumeroDeOrden()), cabeceraOrdenValues);
+                childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_INICIAL, mCabeceraOrden.getNumeroDeOrden()), cabeceraOrdenValues);
 /*1c*/
                 childUpdates.put(nodoDetalleOrden_1C(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
 /*4 */
@@ -1196,7 +1195,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     public void onFailure(@NonNull Exception e) {
 
                         Log.i(LOG_TAG, "abmDetalleDeOrden updateChildren-onFailure " + e.toString());
-                        liberarRecusosTomados(mproductKeyDato, PICKING_STATUS_INICIAL, MainActivity.mPickingOrderSelected);
+                        liberarRecusosTomados();
                         liberarArrayTaskConBloqueos();
                         onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                     }
@@ -1223,7 +1222,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             public void onFailure(@NonNull Exception e) {
                 Log.i(LOG_TAG, "abmDetalleDeOrden addOnFailureListener= allTask" + e.toString());
                 onDialogAlert("No se pudo bloquear");
-                liberarRecusosTomados(mproductKeyDato, PICKING_STATUS_INICIAL, MainActivity.mPickingOrderSelected);
+                liberarRecusosTomados();
                 liberarArrayTaskConBloqueos();
                 onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
             }
@@ -1330,7 +1329,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 /*1B*/
                 childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()), cabeceraOrdenValues);
 /*2 */
-                childUpdates.put(nodoCabeceraOrden_2Status(ORDER_STATUS_EN_DELIVERING, mCabeceraOrden.getNumeroDeOrden(), mCabeceraOrden.getNumeroDePickingOrden()), cabeceraOrdenValues);
+                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERING, mCabeceraOrden.getNumeroDeOrden(), mCabeceraOrden.getNumeroDePickingOrden()), cabeceraOrdenValues);
 /*1c*/
                 childUpdates.put(nodoDetalleOrden_1C(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
 /*4 */
@@ -1344,7 +1343,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     public void onFailure(@NonNull Exception e) {
 
                         Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren-onFailure " + e.toString());
-                        liberarRecusosTomados(mproductKeyDato, PICKING_STATUS_INICIAL, MainActivity.mPickingOrderSelected);
+                        liberarRecusosTomados();
                         liberarArrayTaskConBloqueos();
                         onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                     }
@@ -1371,7 +1370,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.i(LOG_TAG, "abmDetalleDeOrden addOnFailureListener= allTask" + e.toString());
-                liberarRecusosTomados(mproductKeyDato, PICKING_STATUS_INICIAL, MainActivity.mPickingOrderSelected);
+                liberarRecusosTomados();
                 liberarArrayTaskConBloqueos();
                 onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
             }
@@ -1423,7 +1422,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 /*4 */
                     childUpdates.put(NODO_ORDENES_DETALLE + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, detalleOrdenValues);
 /*2 */
-                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDER_STATUS_INICIAL + "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
+                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDEN_STATUS_INICIAL + "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
 
                     mDatabase.updateChildren(childUpdates);
 
@@ -1500,7 +1499,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 /*4 */
                     childUpdates.put(NODO_ORDENES_DETALLE + mEmpresaKey + "/" + mCabeceraOrden.getNumeroDeOrden() + "/" + productoKey, null);
 /*2 */
-                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDER_STATUS_INICIAL + "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
+                    childUpdates.put(NODO_ORDENES_CABECERA + mEmpresaKey + "/" + ORDEN_STATUS_INICIAL + "/" + mCabeceraOrden.getNumeroDeOrden(), cabeceraOrdenValues);
 
                     mDatabase.updateChildren(childUpdates);
 

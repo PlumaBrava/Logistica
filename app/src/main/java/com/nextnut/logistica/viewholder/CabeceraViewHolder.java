@@ -3,18 +3,22 @@ package com.nextnut.logistica.viewholder;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.nextnut.logistica.MainActivity;
 import com.nextnut.logistica.R;
 import com.nextnut.logistica.modelos.CabeceraOrden;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
-import static com.nextnut.logistica.util.Constantes.ESTADO_ORDEN_ENTREGADA;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_DELIVERED_PARA_COMPENSAR;
+import static com.nextnut.logistica.util.MakeCall.makePhoneCallCliente;
 
 
 public class CabeceraViewHolder extends RecyclerView.ViewHolder {
@@ -38,16 +42,10 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
         mDate = (TextView) view.findViewById(R.id.dateOrderCard);
         mBottonPhoto = (ImageButton) view.findViewById(R.id.phoneClallButton);
         mBottonPhoto.setBackgroundColor(Color.TRANSPARENT);
-//        mBottonPhoto.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                mClickHandler.onMakeACall(mCustomerRefContacto);
-//            }
-//        });
     }
 
-    public void bindToPost(CabeceraOrden cabeceraOrden, View.OnClickListener cabeceraClickListener) {
-        if(cabeceraOrden.getEstado()== ESTADO_ORDEN_ENTREGADA){
+    public void bindToPost(final CabeceraOrden cabeceraOrden, View.OnClickListener cabeceraClickListener) {
+        if(cabeceraOrden.getEstado()>= ORDEN_STATUS_DELIVERED_PARA_COMPENSAR){
             ((View )(mOrderNumber.getParent().getParent())).setBackgroundColor(Color.RED);
             mOrderNumber.setTextColor(Color.GREEN);
         }else {
@@ -68,7 +66,38 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
 
         mDate.setText(sfd.format(new Date(cabeceraOrden.getFechaDeCreacion())) );
 //        mCustomerRefContacto=cursor.getString(5);
-        mBottonPhoto.setVisibility(cabeceraOrden.getCliente().getTelefono()!=null?View.VISIBLE:View.GONE);
+
+
+
+        if(cabeceraOrden.getCliente().getTelefonos()!=null){
+         
+
+            ArrayList mData;
+
+            mData = new ArrayList();
+            mData.addAll(cabeceraOrden.getCliente().getTelefonos().entrySet());
+//            Map.Entry<String, String> item = (Map.Entry) mData.get(0);
+//7
+//
+//            Log.i("call", "cabeceraOrden.getCliente(). item - " +item.getKey()+" -- "+ item.getValue());
+//            Log.i("call", "cabeceraOrden.getCliente(). mData.isEmpty() - " +mData.isEmpty());
+            Log.i("call", "cabeceraOrden.getCliente(). mData.sie - " +mData.size());
+            Log.i("call", "cabeceraOrden.getCliente().getTelefono() - no nulo" );
+            Log.i("call", "cabeceraOrden.getCliente().getTelefono() - " +cabeceraOrden.getCliente().getTelefonos().toString());
+            Log.i("call", "cabeceraOrden.getCliente().getTelefono().isEmpty() - " +cabeceraOrden.getCliente().getTelefonos().isEmpty());
+            if(!cabeceraOrden.getCliente().getTelefonos().isEmpty()){
+        mBottonPhoto.setVisibility(View.VISIBLE);
+                mBottonPhoto.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        makePhoneCallCliente (MainActivity.getMainActicity(),cabeceraOrden.getCliente());
+                    }
+                });
+        }else{
+            Log.i("call", "cabeceraOrden.getCliente().getTelefono() -  nulo" );
+
+            mBottonPhoto.setVisibility(View.GONE);
+            }}
         ((View)mDate.getParent()) . setOnClickListener(cabeceraClickListener);
 
     }

@@ -322,7 +322,7 @@ public class PagosFragment extends FragmentBasic {
                     // todo: reemplazar por un listado de telefonos.
 //                        mIdContact=null;// aqui deber ir la referencia al Id Android de contacto.
 //
-//                        mCuit.setText(cliente.getCuit());
+//                        mCuit.setText(cliente.getReponsable());
 //                        mIva.setText(Double.toString(cliente.getIva()));
 //                        mSpecial.setChecked(cliente.getEspecial());
 //                        Log.i("TelefonosArrayAdapter", "telefonos .size()antes" + telefonos.entrySet().size());
