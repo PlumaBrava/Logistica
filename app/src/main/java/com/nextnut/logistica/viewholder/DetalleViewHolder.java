@@ -116,7 +116,7 @@ public class DetalleViewHolder extends RecyclerView.ViewHolder  implements ItemT
 //        mRefProduct =cursor.getLong(1) ;
 //        mRefCustomer =cursor.getLong(9) ;
 
-        ((View) mTextcantidad.getParent()).setOnClickListener(detalleClickListener);
+        ((View) mTextcantidad.getParent().getParent().getParent()).setOnClickListener(detalleClickListener);
 
     }
 

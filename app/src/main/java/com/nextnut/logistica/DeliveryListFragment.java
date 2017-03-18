@@ -100,9 +100,11 @@ public class DeliveryListFragment extends FragmentBasic
     private Task<Void> allTask;
 
     private DataSnapshot mProductosEnOrdenDatos;
-    private DataSnapshot mOrdenesEnPickingDatos;
+    private DataSnapshot mProductosEnTotalPickingDatos;
 
-    private CabeceraPicking datosCabeceraPickingSeleccionada;
+
+    private CabeceraPicking datosCabeceraPickingSeleccionada;// Tiene los datos de la cabecera de picking, cuando se hace click en un Picking
+
 
     private FloatingActionButton fab_new;
     private FloatingActionButton fab_delete;
@@ -346,7 +348,7 @@ public class DeliveryListFragment extends FragmentBasic
             @Override
             public void onClick(View view) {
 
-                if(isNetworkAvailable(getApplicationContext())) {
+                if (isNetworkAvailable(getApplicationContext())) {
                     mDeliveryOrderTile.setVisibility(View.GONE);
                     mLinearProductos.setVisibility(View.GONE);
                     mLinearOrders.setVisibility(View.GONE);
@@ -360,8 +362,8 @@ public class DeliveryListFragment extends FragmentBasic
                     editor.remove(getString(R.string.PickingOrderFechaSeleccionada));
                     editor.commit();
                     desbloqueoPickingParaTrabajoOffLine();
-                }else{
-                        onDialogAlert("Para seleccionar Necesita estar conectado a Internet");
+                } else {
+                    onDialogAlert("Para seleccionar Necesita estar conectado a Internet");
 
                 }
             }
@@ -491,30 +493,44 @@ public class DeliveryListFragment extends FragmentBasic
         String fechaPickingAlmacenado = sharedPref.getString(getString(R.string.PickingOrderFechaSeleccionada), "");
 
         if (nroPickingAlmacenado > 0) {
-            datosCabeceraPickingSeleccionada = new CabeceraPicking(mUserKey, nroPickingAlmacenado, PICKING_STATUS_DELIVERY);
-            datosCabeceraPickingSeleccionada.setComentario(comentarioPickingAlmacenado);
+            refPicking_6(PICKING_STATUS_DELIVERY,nroPickingAlmacenado).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    datosCabeceraPickingSeleccionada = dataSnapshot.getValue(CabeceraPicking.class);
+//                    datosCabeceraPickingSeleccionada.setComentario(comentarioPickingAlmacenado);
 // Todo: fecha de cabecera sin cargar.
 
-            mTilePickingComent.setText(comentarioPickingAlmacenado);
-            mTilePickingOrderNumber.setText(String.valueOf(nroPickingAlmacenado));
-            mTilePickingComent.setVisibility(View.VISIBLE);
-            mCreationDate.setText(fechaPickingAlmacenado);
+                    mTilePickingComent.setText(datosCabeceraPickingSeleccionada.getComentario());
+                    mTilePickingOrderNumber.setText(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()));
+                    mTilePickingComent.setVisibility(View.VISIBLE);
+                    SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+                    mCreationDate.setText(sfd.format(new Date(datosCabeceraPickingSeleccionada.getFechaDeCreacion())));
 
 
-            mPickinOrdersAdapter.notifyDataSetChanged();
 
-            muestraTotalesProductosDelivery();
-            muestraOrdenesEnDelivey();
+                    mPickinOrdersAdapter.notifyDataSetChanged();
 
-            mCursorAdapterTotalProductos.notifyDataSetChanged();
-            recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.VISIBLE);
-            recyclerViewTotalProductos.setVisibility(View.VISIBLE);
+                    muestraTotalesProductosDelivery();
+                    muestraOrdenesEnDelivey();
+
+                    mCursorAdapterTotalProductos.notifyDataSetChanged();
+                    recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.VISIBLE);
+                    recyclerViewTotalProductos.setVisibility(View.VISIBLE);
 
 
-            recyclerView.setVisibility(View.GONE);
-            mLinearOrders.setVisibility(View.VISIBLE);
-            mLinearProductos.setVisibility(View.VISIBLE);
-            mDeliveryOrderTile.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    mLinearOrders.setVisibility(View.VISIBLE);
+                    mLinearProductos.setVisibility(View.VISIBLE);
+                    mDeliveryOrderTile.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
 
 
         }
@@ -728,38 +744,38 @@ public class DeliveryListFragment extends FragmentBasic
 
     private void bloqueoPickingParaTrabajoOffLine() {
 
-        if (hayTareaEnProceso()||!isNetworkAvailable(getApplicationContext())) {
+        if (hayTareaEnProceso() || !isNetworkAvailable(getApplicationContext())) {
             return;
         }
 
         taskList.clear();
 
         //Bloqueo los totales de Picking.
-        refPickingTotal_7_List(PICKING_STATUS_DELIVERY,datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
+        refPickingTotal_7_List(PICKING_STATUS_DELIVERY, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockPickingTotal tiene childre: " +dataSnapshot.hasChildren());
-                int i=0;
+                Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockPickingTotal tiene childre: " + dataSnapshot.hasChildren());
+                int i = 0;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Detalle det=(Detalle)snapshot.getValue(Detalle.class);
-                    Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockPickingTotal:" +snapshot.getKey());
-                    Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockPickingTotal:" +det.getProducto().getNombreProducto());
-                    readBlockPickingTotal(PICKING_STATUS_DELIVERY,datosCabeceraPickingSeleccionada.getNumeroDePickingOrden(), snapshot.getKey());
+                    Detalle det = (Detalle) snapshot.getValue(Detalle.class);
+                    Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockPickingTotal:" + snapshot.getKey());
+                    Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockPickingTotal:" + det.getProducto().getNombreProducto());
+                    readBlockPickingTotal(PICKING_STATUS_DELIVERY, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden(), snapshot.getKey());
                     taskList.add(mPickingTotalTask.get(i));
                     i++;
                 }
 
 
                 //Bloqueo las cabeceras.
-                refCabeceraOrden_2_List(ORDEN_STATUS_EN_DELIVERING,datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
+                refCabeceraOrden_2_List(ORDEN_STATUS_EN_DELIVERING, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockCabeceraOrden tiene children: " +dataSnapshot.hasChildren());
+                        Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockCabeceraOrden tiene children: " + dataSnapshot.hasChildren());
 
-                        int i=0;
+                        int i = 0;
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            CabeceraOrden cab=(CabeceraOrden)snapshot.getValue(CabeceraOrden.class);
-                            Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockCabeceraOrden:" +cab.getNumeroDeOrden());
+                            CabeceraOrden cab = (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
+                            Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockCabeceraOrden:" + cab.getNumeroDeOrden());
                             readBlockCabeceraOrden(cab.getNumeroDeOrden());
                             taskList.add(mCabeceraOrdenTask.get(i));
                             readBlockSaldosTotal(cab.getClienteKey());
@@ -768,7 +784,7 @@ public class DeliveryListFragment extends FragmentBasic
                             i++;
                         }
 
-                        readBlockPicking(PICKING_STATUS_DELIVERY,datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
+                        readBlockPicking(PICKING_STATUS_DELIVERY, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
                         taskList.add(mPickingTask);
                         allTask = Tasks.whenAll(taskList.toArray(new Task[taskList.size()]));
                         allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -776,7 +792,8 @@ public class DeliveryListFragment extends FragmentBasic
                             public void onSuccess(Void aVoid) {
                                 Log.i(LOG_TAG, "bloqueoPickingOffLine - OnSuccessListener");
                                 liberarArrayTaskCasoExitoso();
-                            }});
+                            }
+                        });
                         allTask.addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
@@ -786,7 +803,6 @@ public class DeliveryListFragment extends FragmentBasic
                                 liberarRecusosTomados();
                                 liberarArrayTaskConBloqueos();
                                 onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + e.getMessage().toString());
-
 
 
                             }
@@ -816,35 +832,34 @@ public class DeliveryListFragment extends FragmentBasic
         });
 
 
-
     }
 
 
     private void desbloqueoPickingParaTrabajoOffLine() {
 
-        if (hayTareaEnProceso()||!isNetworkAvailable(getApplicationContext())) {
+        if (hayTareaEnProceso() || !isNetworkAvailable(getApplicationContext())) {
             return;
         }
 
         liberarArrayTaskCasoExitoso();
 //        taskList.clear();
 
-        mPickingTotalEstado=PICKING_STATUS_DELIVERY;
-        mPickingTotalNumero=datosCabeceraPickingSeleccionada.getNumeroDePickingOrden();
+        mPickingTotalEstado = PICKING_STATUS_DELIVERY;
+        mPickingTotalNumero = datosCabeceraPickingSeleccionada.getNumeroDePickingOrden();
 
-        mPickingEstado=PICKING_STATUS_DELIVERY;
-        mPickingNumero=datosCabeceraPickingSeleccionada.getNumeroDePickingOrden();
+        mPickingEstado = PICKING_STATUS_DELIVERY;
+        mPickingNumero = datosCabeceraPickingSeleccionada.getNumeroDePickingOrden();
 
         //Bloqueo los totales de Picking.
-        refPickingTotal_7_List(PICKING_STATUS_DELIVERY,datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
+        refPickingTotal_7_List(PICKING_STATUS_DELIVERY, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockPickingTotal tiene childre: " +dataSnapshot.hasChildren());
-                int i=0;
+                Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockPickingTotal tiene childre: " + dataSnapshot.hasChildren());
+                int i = 0;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Detalle det=(Detalle)snapshot.getValue(Detalle.class);
-                    Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockPickingTotal:" +snapshot.getKey());
-                    Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockPickingTotal:" +det.getProducto().getNombreProducto());
+                    Detalle det = (Detalle) snapshot.getValue(Detalle.class);
+                    Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockPickingTotal:" + snapshot.getKey());
+                    Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockPickingTotal:" + det.getProducto().getNombreProducto());
                     mPickingTotalIndexLiberar.add(snapshot.getKey());
                     mLiberarSemaforoPickingTotal = true;
 //                    readBlockPickingTotal(PICKING_STATUS_DELIVERY,datosCabeceraPickingSeleccionada.getNumeroDePickingOrden(), snapshot.getKey());
@@ -854,16 +869,16 @@ public class DeliveryListFragment extends FragmentBasic
 
 
                 //Bloqueo las cabeceras.
-                refCabeceraOrden_2_List(ORDEN_STATUS_EN_DELIVERING,datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
+                refCabeceraOrden_2_List(ORDEN_STATUS_EN_DELIVERING, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockCabeceraOrden tiene children: " +dataSnapshot.hasChildren());
+                        Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockCabeceraOrden tiene children: " + dataSnapshot.hasChildren());
 
-                        int i=0;
+                        int i = 0;
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            CabeceraOrden cab=(CabeceraOrden)snapshot.getValue(CabeceraOrden.class);
-                            Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockCabeceraOrden Nro:" +cab.getNumeroDeOrden());
-                            Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockCabeceraOrden ClienteKey:" +cab.getClienteKey());
+                            CabeceraOrden cab = (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
+                            Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockCabeceraOrden Nro:" + cab.getNumeroDeOrden());
+                            Log.i(LOG_TAG, "desbloqueoPickingOffLine - readBlockCabeceraOrden ClienteKey:" + cab.getClienteKey());
 
 
                             mCabeceraOrdenLiberar.add(snapshot.getKey());
@@ -929,7 +944,6 @@ public class DeliveryListFragment extends FragmentBasic
         });
 
 
-
     }
 
 
@@ -939,274 +953,239 @@ public class DeliveryListFragment extends FragmentBasic
             return;
         }
 
-        taskList.clear();
 
-//        mCabeceraOrdenDato = cabeceraOrden;
-
-        readBlockCabeceraOrden(cabeceraOrden.getNumeroDeOrden());
-        mCabeceraOrdenTask.get(0).addOnCompleteListener(new OnCompleteListener() {
+        refDetalleOrden_4_ListaXOrden(cabeceraOrden.getNumeroDeOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task task) {
-                if (task.isSuccessful()) {
-                    final CabeceraOrden dataCabecera = ((DataSnapshot) mCabeceraOrdenTask.get(0).getResult()).getValue(CabeceraOrden.class);
-                    refDetalleOrden_4_ListaXOrden(dataCabecera.getNumeroDeOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            mProductosEnOrdenDatos = dataSnapshot;
-                            readBlockSaldosTotal(cabeceraOrden.getClienteKey());
-                            taskList.add(mSaldosTotalTask.get(0));
-                            Log.i(LOG_TAG, "pasarOrdenEntrega-  status picking " + PICKING_STATUS_DELIVERY + " cabeceraOrden.getNumeroDePickingOrden() " + cabeceraOrden.getNumeroDePickingOrden());
-                            readBlockPicking(PICKING_STATUS_DELIVERY, cabeceraOrden.getNumeroDePickingOrden());
-                            taskList.add(mPickingTask);
-                            int i = 0;
-                            for (DataSnapshot snapshot : mProductosEnOrdenDatos.getChildren()) {
-                                Log.i(LOG_TAG, "pasarOrdenEntrega- " + snapshot.getKey());
-                                String productKey = snapshot.getKey();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mProductosEnOrdenDatos = dataSnapshot;
+
+                totalProductos.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        mProductosEnTotalPickingDatos = dataSnapshot;
+
+                        refSaldoTotalClientes_10(cabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                CabeceraOrden saldo = dataSnapshot.getValue(CabeceraOrden.class);
+
+                                Map<String, Object> childUpdates = new HashMap<>();
+                                Map<String, Object> productosEnTotalPickingValues = null;
+                                int i = 0;
+                                for (DataSnapshot productoEnOrden : mProductosEnOrdenDatos.getChildren()) {
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- " + productoEnOrden.getKey());
+                                    // busca el producto dentro de la orden
+                                    String productKey = productoEnOrden.getKey();
+                                    Detalle detalleOrden = productoEnOrden.getValue(Detalle.class);
+                                    // creamos una copia con cantidad cero para usar en otras estructuras.
+                                    Detalle detalleOrdenAux = detalleOrden.copy();
+                                    detalleOrdenAux.modificarCantidadProductoDeOrden(0.0); // modificamos la cantidad a Cero para usarla para el calculo de Total
+                                    detalleOrdenAux.modificarCantidadProductoDeEntrega(0.0); // modificamos la cantidad a Cero para usarla para el calculo de Total
+                                    Boolean encontroLaLLave = false;
+                                    Detalle detalleTotalPicking=null;
+                                    for (DataSnapshot productoEnTotalPicking : mProductosEnTotalPickingDatos.getChildren()) {
+                                        String productTotalPickingKey = productoEnTotalPicking.getKey();
+
+                                        detalleTotalPicking = productoEnTotalPicking.getValue(Detalle.class);
+
+                                        if (productKey.equals(productTotalPickingKey)) {
+                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- producto" + detalleOrden.getProducto().getNombreProducto());
+                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad endtregada Orden" + detalleOrden.getCantidadEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking" +detalleTotalPicking.getCantidadEntrega());
+
+                                            //Actualizar totales de picking
+                                            encontroLaLLave = true;
+                                            detalleTotalPicking.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking modificado" +detalleTotalPicking.getCantidadEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking Actualizada" +detalleTotalPicking.getCantidadEntrega());
+                                            //Actualizo los totales entregado por producto en la orden de Picking
+                                            childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraOrden.getNumeroDePickingOrden(), productKey), detalleTotalPicking.toMap());
+                                            break;
+
+                                        }
+                                    }
+                                    if (!encontroLaLLave) {
+                                          detalleTotalPicking = new Detalle(0.0, detalleOrden.getProducto(), null);
+                                          detalleTotalPicking.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+                                        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking Actualizada" +detalleTotalPicking.getCantidadEntrega());
+                                        //Actualizo los totales entregado por producto en la orden de Picking
+                                        childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraOrden.getNumeroDePickingOrden(), productKey), detalleTotalPicking.toMap());
+
+                                    }
 
 
-                                readBlockPickingTotal(PICKING_STATUS_DELIVERY, cabeceraOrden.getNumeroDePickingOrden(), productKey);/*7*/
-                                taskList.add(mPickingTotalTask.get(i));
+                                }
 
 
-                                SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
+                                //Actualizo el Monto total Entregado en el Picking
+                                datosCabeceraPickingSeleccionada.getTotales().setSumaMontoEntregado(cabeceraOrden.getTotales().getMontoEntregado());
+                                childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY,String.valueOf ( datosCabeceraPickingSeleccionada.getNumeroDePickingOrden())), datosCabeceraPickingSeleccionada.toMap());
 
-                                Log.i(LOG_TAG, "pasarOrdenEntrega TIMESTAMP- " + aamm.format(new Date(System.currentTimeMillis())));
+                                //Actualizo las cabeceras de Ordenes
+                                cabeceraOrden.setEstado(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR);
+                                cabeceraOrden.bloquear();
+                                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden(), cabeceraOrden.getNumeroDePickingOrden()),cabeceraOrden.toMap());
+                                childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+                                childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+
+                                if (saldo == null) {
+                                    // di no existe esta estructura, se crea una en cero.
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldosTotal= NULL");
+
+                                    Totales totales = new Totales(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                                    saldo = new CabeceraOrden(cabeceraOrden.getClienteKey(), cabeceraOrden.getCliente(), ORDEN_STATUS_INICIAL, totales, "Sistema", 00);
+                                    saldo.setUsuarioCreador("Sistema");
+                                    saldo.bloquear();
+
+                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + cabeceraOrden.getTotales().getMontoEntregado());
+                                } else {
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = "+saldo.getTotales().getSaldo());
+                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + cabeceraOrden.getTotales().getMontoEntregado());
+                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + cabeceraOrden.getTotales().getMontoEntregado());
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= "+saldo.getTotales().getSaldo());
+
+                                }
+                                childUpdates.put(nodoSaldoTotalClientes_10(cabeceraOrden.getClienteKey()), saldo.toMap());
+
+                                mClienteKey = cabeceraOrden.getClienteKey();
+                                mCliente = cabeceraOrden.getCliente();
+
+                                Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar - : abro pagos" );
+                                Intent intent = new Intent(getApplicationContext(), PagosActivity.class);
+                                putExtraFirebase_Fragment(intent);
+                                startActivity(intent);
+
+                                mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+
+                                        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar updateChildren-onFailure " + e.toString());
+
+                                        onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+
+                                    }
+                                }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
 
 
-                                Log.i(LOG_TAG, "pasarOrdenEntrega TIMESTAMP- " + aamm.toString());
-                                readBlockReporteVentasCliente(dataCabecera.getClienteKey(), productKey, aamm.format(new Date(System.currentTimeMillis())));
-                                taskList.add(mReporteVentasClienteTask.get(i));
-                                readBlockReporteVentasProducto(productKey, aamm.format(new Date(System.currentTimeMillis())));
-                                taskList.add(mReporteVentasProductoTask.get(i));
 
 
-                                i++;
+                                    }
+                                });
                             }
 
-                            allTask = Tasks.whenAll(taskList.toArray(new Task[taskList.size()]));
+                            @Override // Caso de error en la lectura del saldo
+                            public void onCancelled(DatabaseError databaseError) {
 
-                            allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.i(LOG_TAG, "pasarOrdenEntrega Completo el bloqueo- ");
+                            }
+                        });
+                    }
 
-                                    Map<String, Object> childUpdates = new HashMap<>();
-                                    Map<String, Object> totalInicialDetalleValues = null;
-                                    int i = 0;
-                                    //            SimpleDateFormat aamm = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                                    SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
-                                    for (DataSnapshot productoEnOrden : mProductosEnOrdenDatos.getChildren()) {
-                                        // busca el producto dentro de la orden
-                                        String productKey = productoEnOrden.getKey();
-                                        Detalle detalleOrden = productoEnOrden.getValue(Detalle.class);
+                    @Override // Cancelacion en la lectura del total de productos de en Picking
+                    public void onCancelled(DatabaseError databaseError) {
 
-                                        // creamos una copia con cantidad cero para usar en otras estructuras.
-                                        Detalle detalleOrdenAux = detalleOrden.copy();
-                                        detalleOrdenAux.modificarCantidadProductoDeOrden(0.0); // modificamos la cantidad a Cero para usarla para el calculo de Total
-                                        detalleOrdenAux.modificarCantidadProductoDeEntrega(0.0); // modificamos la cantidad a Cero para usarla para el calculo de Total
+                    }
+                });
 
+            }
 
-                                        Detalle detallePickingTotal = ((DataSnapshot) mPickingTotalTask.get(i).getResult()).getValue(Detalle.class);
+            @Override // Cancelacion en la lectura del Productos en la oreden
+            public void onCancelled(DatabaseError databaseError) {
 
-
-                                        if (detallePickingTotal == null) {
-                                            // di no existe esta estructura, se crea una en cero.
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega TotalPicking= NULL");
-                                            detallePickingTotal = new Detalle(0.0, detalleOrden.getProducto(), null);
-                                            detallePickingTotal.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
-                                        } else {
-//                                            Log.i(LOG_TAG, "pasarOrdenEntrega TotalPicking=" + ((DataSnapshot) mTotalInicialTask.get(i).getResult()).getKey() );
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega- PickingTotal nombre Producto" + detallePickingTotal.getProducto().getNombreProducto());
-                                            detallePickingTotal.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
-                                        }
-
-                                            /*7 */
-                                        detallePickingTotal.liberar();
-                                        childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraOrden.getNumeroDePickingOrden(), productKey), detallePickingTotal.toMap());
-
-
-                                            /*5*/
-//                                        childUpdates.put(nodoProductosXOrdenInicial_5(productKey, mCabeceraOrdenDato.getNumeroDeOrden()), null);
-
-                                            /*4 */ //No se modifica, queda igual
-//                                            childUpdates.put(nodoDetalleOrden_4(mCabeceraOrdenDato.getNumeroDeOrden(), productKey), null);
-
-
-                                        // Reporte de Ventas de Productos /8/
-
-
-                                        Detalle ventasProducto = ((DataSnapshot) mReporteVentasProductoTask.get(i).getResult()).getValue(Detalle.class);
-// todo: Revisar
-                                        if (ventasProducto == null) {
-                                            // di no existe esta estructura, se crea una en cero.
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasProducto= NULL");
-                                            ventasProducto = new Detalle(0.0, detalleOrden.getProducto(), null);
-                                            ventasProducto.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
-                                        } else {
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasProducto=" + ((DataSnapshot) mReporteVentasProductoTask.get(i).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mReporteVentasProductoTask.get(i).getResult()).getValue(Detalle.class).getProducto().getNombreProducto());
-
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" + ventasProducto.getMontoItemEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" + ventasProducto.getCantidadEntrega());
-
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrden getMontoItemEntrega=" + detalleOrden.getMontoItemEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenget CantidadEntrega=" + detalleOrden.getCantidadEntrega());
-
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux getMontoItemEntrega=" + detalleOrdenAux.getMontoItemEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux CantidadEntrega=" + detalleOrdenAux.getCantidadEntrega());
-                                            ventasProducto.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" + ventasProducto.getMontoItemEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" + ventasProducto.getCantidadEntrega());
-
-                                        }
-                                        ventasProducto.liberar();
-                                        childUpdates.put(nodoReporteVentasProducto_8(productKey, aamm.format(new Date(System.currentTimeMillis()))), ventasProducto.toMap());
-
-
-                                        // Reporte de Ventas Por Cliente /9/
-
-
-                                        Detalle ventasCliente = ((DataSnapshot) mReporteVentasClienteTask.get(i).getResult()).getValue(Detalle.class);
-// todo: Revisar
-                                        if (ventasCliente == null) {
-                                            // di no existe esta estructura, se crea una en cero.
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente = NULL");
-                                            ventasCliente = new Detalle(0.0, detalleOrden.getProducto(), null);
-                                            ventasCliente.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
-                                        } else {
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente =" + ((DataSnapshot) mReporteVentasClienteTask.get(i).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mReporteVentasClienteTask.get(i).getResult()).getValue(Detalle.class).getProducto().getNombreProducto());
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" + ventasCliente.getMontoItemEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" + ventasCliente.getCantidadEntrega());
-
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrden getMontoItemEntrega=" + detalleOrden.getMontoItemEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenget CantidadEntrega=" + detalleOrden.getCantidadEntrega());
-
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux getMontoItemEntrega=" + detalleOrdenAux.getMontoItemEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux CantidadEntrega=" + detalleOrdenAux.getCantidadEntrega());
-
-
-                                            ventasCliente.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
-
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" + ventasCliente.getMontoItemEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" + ventasCliente.getCantidadEntrega());
-
-                                        }
-                                        ventasCliente.liberar();
-                                        childUpdates.put(nodoReporteVentasClientes_9(cabeceraOrden.getClienteKey(), productKey, aamm.format(new Date(System.currentTimeMillis()))), ventasCliente.toMap());
-
-                                        i++;
-                                    }
-
-                                    // Actualizacion de totales en Picking (6)
-
-
-                                    DataSnapshot d = ((DataSnapshot) mPickingTask.getResult());
-                                    Log.i(LOG_TAG, "pasarOrdenEntrega d.getRef() " + d.getRef());
-                                    Log.i(LOG_TAG, "pasarOrdenEntrega d.getRef() " + d.getKey());
-
-                                    CabeceraPicking cabeceraPicking = d.getValue(CabeceraPicking.class);
-                                    Log.i(LOG_TAG, "pasarOrdenEntrega getMontoEntregado " + cabeceraPicking.getTotales().getMontoEntregado());
-                                    Log.i(LOG_TAG, "pasarOrdenEntrega cabeceraOrden.getTotales().getMontoEntregado( " + cabeceraOrden.getTotales().getMontoEntregado());
-                                    cabeceraPicking.getTotales().setSumaMontoEntregado(cabeceraOrden.getTotales().getMontoEntregado());
-                                    cabeceraPicking.liberar();
-                                    childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY, ((DataSnapshot) mPickingTask.getResult()).getKey()), cabeceraPicking.toMap());
-
-
-                                /*2 */
-                                    cabeceraOrden.setEstado(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR);
-                                    cabeceraOrden.liberar();
-                                    cabeceraOrden.setNumeroDePickingOrden(cabeceraOrden.getNumeroDePickingOrden());
-                                    Log.i(LOG_TAG, "pasarOrdenEntrega getNumeroDeOrden() " + cabeceraOrden.getNumeroDeOrden());
-                                    Log.i(LOG_TAG, "pasarOrdenEntrega getNumeroDePickingOrden() " + cabeceraOrden.getNumeroDePickingOrden());
-
-                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden(), cabeceraOrden.getNumeroDePickingOrden()), null);
-                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, cabeceraOrden.getNumeroDeOrden(), cabeceraOrden.getNumeroDePickingOrden()), cabeceraOrden.toMap());
-                                    childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
-
-
-                                    CabeceraOrden saldosTotal = ((DataSnapshot) mSaldosTotalTask.get(0).getResult()).getValue(CabeceraOrden.class);
-
-                                    if (saldosTotal == null) {
-                                        // di no existe esta estructura, se crea una en cero.
-                                        Log.i(LOG_TAG, "pasarOrdenEntrega saldosTotal= NULL");
-
-                                        Totales totales = new Totales(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-                                        saldosTotal = new CabeceraOrden(cabeceraOrden.getClienteKey(), cabeceraOrden.getCliente(), ORDEN_STATUS_INICIAL, totales, "Sistema", 00);
-                                        cabeceraOrden.setUsuarioCreador("Sistema");
-
-                                        saldosTotal.getTotales().setMontoEntregado(saldosTotal.getTotales().getMontoEntregado() + cabeceraOrden.getTotales().getMontoEntregado());
-                                    } else {
-//                                        Log.i(LOG_TAG, "pasarOrdenEntrega saldosTotal=" + ((DataSnapshot) mSaldosTotalTask.get(0).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mSaldosTotalTask.get(0).getResult()).getValue(CabeceraOrden.class).getCliente().getNombre());
-//                                        Log.i(LOG_TAG, "pasarOrdenEntrega saldosTotal=" + saldosTotal.getTotales().getMontoEntregado() + "- cabeceraOrden.getTotales().getMontoEntregado()" + cabeceraOrden.getTotales().getMontoEntregado());
-                                        saldosTotal.getTotales().setMontoEntregado(saldosTotal.getTotales().getMontoEntregado() + cabeceraOrden.getTotales().getMontoEntregado());
-
-                                    }
-                                    saldosTotal.liberar();
-                                    childUpdates.put(nodoSaldoTotalClientes_10(cabeceraOrden.getClienteKey()), saldosTotal.toMap());
-
-
-                                    mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega updateChildren-onFailure " + e.toString());
-                                            liberarRecusosTomados();
-                                            liberarArrayTaskConBloqueos();
-                                            onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
-
-                                        }
-                                    }).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            liberarArrayTaskCasoExitoso();
-//                                            mMontoTotal.setText(mCabeceraOrden.getTotales().getMontoEnOrdenes().toString());
-//                                            mCantidadTotal.setText(String.valueOf( mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
-//                                            mKeyList.add(mproductKeyDato);
-                                            mClienteKey = cabeceraOrden.getClienteKey();
-                                            mCliente = cabeceraOrden.getCliente();
-
-                                            Log.i(LOG_TAG, "pasarOrdenEntrega - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
-                                            Intent intent = new Intent(getApplicationContext(), PagosActivity.class);
-                                            putExtraFirebase_Fragment(intent);
-                                            startActivity(intent);
-                                        }
-                                    });
-                                }
-
-
-                            });
-                            allTask.addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.i(LOG_TAG, "pasarOrdenEntrega - OnFailureListener:" + e.toString());
-                                    Log.i(LOG_TAG, "pasarOrdenEntrega - OnFailureListener:" + e.getMessage());
-
-                                    liberarRecusosTomados();
-                                    liberarArrayTaskConBloqueos();
-                                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + e.getMessage().toString());
-
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
-                } else {
-                    Log.i(LOG_TAG, "pasarOrdenAPickingl Operacion fallo- " + task.getException().toString());
-                    Log.i(LOG_TAG, "pasarOrdenAPickingl Operacion fallo- " + task.getException().getMessage());
-                    liberarRecusosTomados();
-                    liberarArrayTaskConBloqueos();
-                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + task.getException().getMessage().toString());
-                }
             }
         });
-   }
+
+        }
 
 
 
+
+    public  void cerrarPicking (final CabeceraPicking cabeceraPicking){
+
+
+
+//        Detalle ventasProducto = ((DataSnapshot) mReporteVentasProductoTask.get(i).getResult()).getValue(Detalle.class);
+//// todo: Revisar
+//        if (ventasProducto == null) {
+//        // di no existe esta estructura, se crea una en cero.
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasProducto= NULL");
+//        ventasProducto = new Detalle(0.0, detalleOrden.getProducto(), null);
+//        ventasProducto.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+//        } else {
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasProducto=" + ((DataSnapshot) mReporteVentasProductoTask.get(i).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mReporteVentasProductoTask.get(i).getResult()).getValue(Detalle.class).getProducto().getNombreProducto());
+//
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" + ventasProducto.getMontoItemEntrega());
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" + ventasProducto.getCantidadEntrega());
+//
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrden getMontoItemEntrega=" + detalleOrden.getMontoItemEntrega());
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenget CantidadEntrega=" + detalleOrden.getCantidadEntrega());
+//
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux getMontoItemEntrega=" + detalleOrdenAux.getMontoItemEntrega());
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux CantidadEntrega=" + detalleOrdenAux.getCantidadEntrega());
+//        ventasProducto.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" + ventasProducto.getMontoItemEntrega());
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" + ventasProducto.getCantidadEntrega());
+//
+//        }
+//
+//
+//        // Reporte de Ventas Por Cliente /9/
+//
+//
+//        Detalle ventasCliente = ((DataSnapshot) mReporteVentasClienteTask.get(i).getResult()).getValue(Detalle.class);
+//// todo: Revisar
+//        if (ventasCliente == null) {
+//        // di no existe esta estructura, se crea una en cero.
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente = NULL");
+//        ventasCliente = new Detalle(0.0, detalleOrden.getProducto(), null);
+//        ventasCliente.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+//        } else {
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente =" + ((DataSnapshot) mReporteVentasClienteTask.get(i).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mReporteVentasClienteTask.get(i).getResult()).getValue(Detalle.class).getProducto().getNombreProducto());
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" + ventasCliente.getMontoItemEntrega());
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" + ventasCliente.getCantidadEntrega());
+//
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrden getMontoItemEntrega=" + detalleOrden.getMontoItemEntrega());
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenget CantidadEntrega=" + detalleOrden.getCantidadEntrega());
+//
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux getMontoItemEntrega=" + detalleOrdenAux.getMontoItemEntrega());
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente detalleOrdenAux CantidadEntrega=" + detalleOrdenAux.getCantidadEntrega());
+//
+//
+//        ventasCliente.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+//
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getMontoItemEntrega()=" + ventasCliente.getMontoItemEntrega());
+//        Log.i(LOG_TAG, "pasarOrdenEntrega ventasCliente ventas getCantidadEntrega()=" + ventasCliente.getCantidadEntrega());
+//
+//        }
+//
+//        i++;
+//        }
+
+
+
+//        //            SimpleDateFormat aamm = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+//        SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
+//     Log.i(LOG_TAG,"pasarOrdenEntrega TIMESTAMP- "+aamm.format(new
+//
+//    Date(System.currentTimeMillis())));
+//
+//
+//                                Log.i(LOG_TAG,"pasarOrdenEntrega TIMESTAMP- "+aamm.toString());
+//
+//    readBlockReporteVentasCliente(cabeceraOrden.getClienteKey(),productKey,aamm.
+//
+//    format(new Date(System.currentTimeMillis())));
+//                                taskList.add(mReporteVentasClienteTask.get(i));
+//
+//    readBlockReporteVentasProducto(productKey, aamm.format(new Date(System.currentTimeMillis())));
+//                                taskList.add(mReporteVentasProductoTask.get(i));
+//
+//        ventasCliente.liberar();
+//        childUpdates.put(nodoReporteVentasClientes_9(cabeceraOrden.getClienteKey(), productKey, aamm.format(new Date(System.currentTimeMillis()))), ventasCliente.toMap());
+
+
+    }
 
     private void pasarPickingAInicial(final CabeceraPicking cabeceraPicking) {
         Log.i(LOG_TAG, "pasarPickingAEntrega Numero de picking- " + cabeceraPicking.getNumeroDePickingOrden());
@@ -1235,7 +1214,6 @@ public class DeliveryListFragment extends FragmentBasic
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key " + dataSnapshot.getKey());
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden Ref " + dataSnapshot.getRef());
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden ChildrenCount" + dataSnapshot.getChildrenCount());
-                            mOrdenesEnPickingDatos = dataSnapshot;
                             int i = 0;
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 String nroOrden = snapshot.getKey();

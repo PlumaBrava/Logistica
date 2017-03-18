@@ -25,6 +25,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.nextnut.logistica.modelos.CabeceraOrden;
 import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Pago;
 import com.nextnut.logistica.util.MakeCall;
@@ -78,6 +79,7 @@ public class PagosFragment extends FragmentBasic {
     private String mFotoChequePath;
 
     private String mPagoKey;
+    private Pago mPago;
 
 
     public ArrayAdapter<CharSequence> mAdapterTipoPago;
@@ -412,7 +414,6 @@ public class PagosFragment extends FragmentBasic {
         Log.i("pago", "savePago");
 
 
-        String pagoKey = null;
         long chequeDate = 0;
 
         if (!TextUtils.isEmpty(mFechaCheque.getText().toString())) {
@@ -428,7 +429,7 @@ public class PagosFragment extends FragmentBasic {
                 e.printStackTrace();
             }
         }
-        Pago pago = new Pago(
+        mPago = new Pago(
                 mClienteKey,
                 mCliente,
                 mTipoPago.getSelectedItem().toString(),
@@ -441,27 +442,48 @@ public class PagosFragment extends FragmentBasic {
                 mUserKey
         );
 
-        if (pagoKey == null) {
-            pagoKey = mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).push().getKey();
+        if (mPagoKey == null) {
+            mPagoKey = mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).push().getKey();
         }
 
-        Map<String, Object> pagoValues = pago.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-
-        childUpdates.put(nodoPagos(mClienteKey, pagoKey), pagoValues);
-
-        mDatabase.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+        refSaldoTotalClientes_10(mClienteKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.i("pago", "onComplete");
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                CabeceraOrden saldo = dataSnapshot.getValue(CabeceraOrden.class);
+
+
+                Map<String, Object> pagoValues = mPago.toMap();
+                Map<String, Object> childUpdates = new HashMap<>();
+
+                childUpdates.put(nodoPagos(mClienteKey, mPagoKey), pagoValues);
+
+                Log.i(LOG_TAG, "Pagos saldos = "+saldo.getTotales().getSaldo());
+                saldo.getTotales().setMontoPagado(saldo.getTotales().getMontoPagado() + mPago.getMonto());
+                saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() - mPago.getMonto());
+                Log.i(LOG_TAG, "Pagos saldos actualizado= "+saldo.getTotales().getSaldo());
+                childUpdates.put(nodoSaldoTotalClientes_10(mClienteKey), saldo.toMap());
+
+
+
+                mDatabase.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Log.i("pago", "onComplete");
 
 //                setEditingEnabled(true);
 //                getActivity().onBackPressed();
+                    }
+                });
+
+                setEditingEnabled(true);
+                getActivity().onBackPressed();
+
+            }
+            @Override // Caso de error en la lectura del saldo
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
-
-        setEditingEnabled(true);
-        getActivity().onBackPressed();
     }
 
 

@@ -82,7 +82,6 @@ import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_DETALLE;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERING;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
-import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
 import static com.nextnut.logistica.util.Constantes.detalleOrdenRef_1C;
@@ -1248,79 +1247,79 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         Log.i(LOG_TAG, "abmDetalleDeOrden Nro Pickign " + mNroPicking);
         Log.i(LOG_TAG, "abmDetalleDeOrden cantidad " + cantidad + " productokey " + productoKey + " Producto " + detalle.getProducto().getNombreProducto());
 
-        // leo y bloqueo Cabecera de Orden 1B
-        readBlockCabeceraOrden(mCabeceraOrden.getNumeroDeOrden());
+//        // leo y bloqueo Cabecera de Orden 1B
+//        readBlockCabeceraOrden(mCabeceraOrden.getNumeroDeOrden());
+//
+//        // leo y bloqueo Detalle
+//        readBlockPickingTotal(PICKING_STATUS_DELIVERY, mNroPicking, productoKey);/*7*/
+//
+//        Task<Void> allTask;
+//        allTask = Tasks.whenAll(mCabeceraOrdenTask.get(0), mPickingTotalTask.get(0));
+//        allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
+//            @Override
+//            public void onSuccess(Void aVoid) {
+//
+//                CabeceraOrden cabeceraOrden;
+//                Detalle totalInicialDetalle;
+//                Detalle nuevoDetalleOrden = mDetalleDato.copy();
+//
+//                DataSnapshot dataCabecera = (DataSnapshot) mCabeceraOrdenTask.get(0).getResult();
+//
+//                // do something with db data?
+//                if (dataCabecera.exists()) {
+//                    dataCabecera.getKey();
+//                    cabeceraOrden = dataCabecera.getValue(CabeceraOrden.class);
+//                    Log.i(LOG_TAG, "aabmDetalleDeEntrega mProductosEnOrdenesTask =" + dataCabecera.getKey() + "- monto cab" + dataCabecera.getValue(CabeceraOrden.class).getTotales().getMontoEnOrdenes());
+//
+//                } else {
+//                    //Debe existir, de lo contrario es un error.
+//                    Log.i(LOG_TAG, "abmDetalleDeEntrega mProductosEnOrdenesTask = NuLL- ");
+//                    return;
+//                }
+//
+//                // Actualizacion de totales en Picking (7)
+//
+//                Detalle detallePickingTotal = ((DataSnapshot) mPickingTotalTask.get(0).getResult()).getValue(Detalle.class);
+//
+//                if (detallePickingTotal == null) {
+//                    // si es nulo se trataria de un error puesto que existe en la orden y deberia estar sumado en el total
+//                    Log.i(LOG_TAG, "abmDetalleDeEntrega etallePickingTotal  Detalle = NuLL- ");
+//                } else {
+////                    detallePickingTotal.modificarCantidadEnTotalInicial(detalleOrdenAux, detalleOrden);
+////                    if (detallePickingTotal.getCantidadOrden() == 0) {
+////                        pickingTotalValues = null;
+////                    } else {
+////                        detallePickingTotal.liberar();
+////                        pickingTotalValues = detallePickingTotal.toMap();
+////                    }
+//
+//                }
 
-        // leo y bloqueo Detalle
-        readBlockPickingTotal(PICKING_STATUS_DELIVERY, mNroPicking, productoKey);/*7*/
+                mCabeceraOrden.getTotales().modificarCantidadProductoDeEntrega(mCantidadDato, mDetalleDato);
+                mDetalleAnterior.modificarCantidadProductoDeEntrega(mCantidadDato);
+//                mCabeceraOrden.setTotales(cabeceraOrden.getTotales());
+//                detallePickingTotal.modificarCantidadEnTotalDelivey(nuevoDetalleOrden, mDetalleDato);
 
-        Task<Void> allTask;
-        allTask = Tasks.whenAll(mCabeceraOrdenTask.get(0), mPickingTotalTask.get(0));
-        allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-
-                CabeceraOrden cabeceraOrden;
-                Detalle totalInicialDetalle;
-                Detalle nuevoDetalleOrden = mDetalleDato.copy();
-
-                DataSnapshot dataCabecera = (DataSnapshot) mCabeceraOrdenTask.get(0).getResult();
-
-                // do something with db data?
-                if (dataCabecera.exists()) {
-                    dataCabecera.getKey();
-                    cabeceraOrden = dataCabecera.getValue(CabeceraOrden.class);
-                    Log.i(LOG_TAG, "aabmDetalleDeEntrega mProductosEnOrdenesTask =" + dataCabecera.getKey() + "- monto cab" + dataCabecera.getValue(CabeceraOrden.class).getTotales().getMontoEnOrdenes());
-
-                } else {
-                    //Debe existir, de lo contrario es un error.
-                    Log.i(LOG_TAG, "abmDetalleDeEntrega mProductosEnOrdenesTask = NuLL- ");
-                    return;
-                }
-
-                // Actualizacion de totales en Picking (7)
-
-                Detalle detallePickingTotal = ((DataSnapshot) mPickingTotalTask.get(0).getResult()).getValue(Detalle.class);
-
-                if (detallePickingTotal == null) {
-                    // si es nulo se trataria de un error puesto que existe en la orden y deberia estar sumado en el total
-                    Log.i(LOG_TAG, "abmDetalleDeEntrega etallePickingTotal  Detalle = NuLL- ");
-                } else {
-//                    detallePickingTotal.modificarCantidadEnTotalInicial(detalleOrdenAux, detalleOrden);
-//                    if (detallePickingTotal.getCantidadOrden() == 0) {
-//                        pickingTotalValues = null;
-//                    } else {
-//                        detallePickingTotal.liberar();
-//                        pickingTotalValues = detallePickingTotal.toMap();
-//                    }
-
-                }
-
-                cabeceraOrden.getTotales().modificarCantidadProductoDeEntrega(mCantidadDato, mDetalleDato);
-                nuevoDetalleOrden.modificarCantidadProductoDeEntrega(mCantidadDato);
-                mCabeceraOrden.setTotales(cabeceraOrden.getTotales());
-                detallePickingTotal.modificarCantidadEnTotalDelivey(nuevoDetalleOrden, mDetalleDato);
-
-
-                cabeceraOrden.liberar();
-                nuevoDetalleOrden.liberar();
-                detallePickingTotal.liberar();
+//
+//                cabeceraOrden.liberar();
+//                nuevoDetalleOrden.liberar();
+//                detallePickingTotal.liberar();
 
 
                 Map<String, Object> cabeceraOrdenValues = null;
                 Map<String, Object> detalleOrdenValues = null;
-                Map<String, Object> detallePickingTotalValues = null;
+//                Map<String, Object> detallePickingTotalValues = null;
 
-                if (cabeceraOrden != null) {
-                    cabeceraOrdenValues = cabeceraOrden.toMap();
+                if (mCabeceraOrden != null) {
+                    cabeceraOrdenValues = mCabeceraOrden.toMap();
                 }
-                if (nuevoDetalleOrden != null) {
-                    detalleOrdenValues = nuevoDetalleOrden.toMap();
+                if (mDetalleAnterior != null) {
+                    detalleOrdenValues = mDetalleAnterior.toMap();
                 }
 
-                if (detallePickingTotal != null) {
-                    detallePickingTotalValues = detallePickingTotal.toMap();
-                }
+//                if (detallePickingTotal != null) {
+//                    detallePickingTotalValues = detallePickingTotal.toMap();
+//                }
 
                 Map<String, Object> childUpdates = new HashMap<>();
 
@@ -1335,46 +1334,46 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 /*4 */
                 childUpdates.put(nodoDetalleOrden_4(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
 /*7*/
-                childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, mNroPicking, productoKey), detallePickingTotalValues);
+//                childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, mNroPicking, productoKey), detallePickingTotalValues);
 
 
+        mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
+        NumberFormat format = NumberFormat.getCurrencyInstance();
+        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+        mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                 mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
                         Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren-onFailure " + e.toString());
-                        liberarRecusosTomados();
-                        liberarArrayTaskConBloqueos();
-                        onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+//                        liberarRecusosTomados();
+//                        liberarArrayTaskConBloqueos();
+//                        onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                     }
                 }).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
 
 
-                        mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
-                        NumberFormat format = NumberFormat.getCurrencyInstance();
-                        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-                        mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
 
-                        liberarArrayTaskCasoExitoso();
+//                        liberarArrayTaskCasoExitoso();
                         Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
 
                     }
                 });
 //
 
-            }
-        });
-        allTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.i(LOG_TAG, "abmDetalleDeOrden addOnFailureListener= allTask" + e.toString());
-                liberarRecusosTomados();
-                liberarArrayTaskConBloqueos();
-                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
-            }
-        });
+//            }
+//        });
+//        allTask.addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.i(LOG_TAG, "abmDetalleDeOrden addOnFailureListener= allTask" + e.toString());
+//                liberarRecusosTomados();
+//                liberarArrayTaskConBloqueos();
+//                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
+//            }
+//        });
 
 
     }
