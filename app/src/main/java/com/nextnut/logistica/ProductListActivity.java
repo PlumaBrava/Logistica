@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -231,6 +230,7 @@ public class ProductListActivity extends ActivityBasic {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
+            Log.i(LOG_TAG, "android.R.id.home");
             // This ID represents the Home or Up button. In the case of this
             // activity, the Up button is shown. Use NavUtils to allow users
             // to navigate up one level in the application structure. For
@@ -238,7 +238,8 @@ public class ProductListActivity extends ActivityBasic {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            NavUtils.navigateUpFromSameTask(this);
+            onBackPressed();
+//            NavUtils.navigateUpFromSameTask(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -285,4 +286,15 @@ public class ProductListActivity extends ActivityBasic {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        Log.i(LOG_TAG, "onBackPressed");
+        super.onBackPressed();
+    }
+
+    public boolean onSupportNavigateUp() {
+        Log.i(LOG_TAG, "onSupportNavigateUp");
+        onBackPressed();
+        return true;
+    }
 }

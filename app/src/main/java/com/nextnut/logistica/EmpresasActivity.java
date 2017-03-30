@@ -10,7 +10,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -63,7 +62,8 @@ import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
 import static com.nextnut.logistica.util.KeyMailConverter.getKeyFromEmail;
 
-public class EmpresasActivity extends AppCompatActivity {
+//public class EmpresasActivity extends AppCompatActivity {
+public class EmpresasActivity extends ActivityBasic {
     private static final String TAG = " EmpresasActivity";
     private DatabaseReference mDatabase;
     private FirebaseStorage mStorage;
@@ -104,7 +104,8 @@ public class EmpresasActivity extends AppCompatActivity {
                 // [START_EXCLUDE]
 
                 if (mUserListener != null) {
-                    mDatabase.child(ESQUEMA_USERS).child(mUser.getUid()).removeEventListener(mUserListener);
+//                    mDatabase.child(ESQUEMA_USERS).child(mUser.getUid()).removeEventListener(mUserListener);
+                    mDatabase.child(ESQUEMA_USERS).child(mUserKey).removeEventListener(mUserListener);
                     Log.i("producto", "onDataChange-removeEventListener ");
 
                 }
@@ -466,4 +467,17 @@ public class EmpresasActivity extends AppCompatActivity {
 //        AppIndex.AppIndexApi.end(client, getIndexApiAction());
 //        client.disconnect();
     }
+
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "onBackPressed");
+        super.onBackPressed();
+    }
+
+    public boolean onSupportNavigateUp() {
+        Log.i(TAG, "onSupportNavigateUp");
+        onBackPressed();
+        return true;
+    }
+
 }

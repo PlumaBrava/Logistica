@@ -15,6 +15,7 @@ import android.view.View;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.nextnut.logistica.modelos.EmpresaPerfil;
@@ -230,13 +231,14 @@ public class EmpresasListActivity extends ActivityBasic {
             mAdapter.cleanup();
         }
     }
-//    @Override
-//    public void onBackPressed() {
-//        Log.i(LOG_TAG, "onBackPressed");
-//
-//
-//
-//    }
+    @Override
+    public void onBackPressed() {
+        Log.i(LOG_TAG, "onBackPressed");
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(this, LoginActivity.class));
+
+
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -249,11 +251,14 @@ public class EmpresasListActivity extends ActivityBasic {
         return super.onOptionsItemSelected(item);
     }
 
-//    @Override
-//    public boolean onNavigateUp() {
-//                Log.i(LOG_TAG, "onNavigateUp()");
-//
+    @Override
+    public boolean onNavigateUp() {
+                Log.i(LOG_TAG, "onNavigateUp()");
+//        FirebaseAuth.getInstance().signOut();
+//        startActivity(new Intent(this, LoginActivity.class));
+//        finish();
+        return true;
 //        onBackPressed();
 //        return false;
-//    }
+    }
 }

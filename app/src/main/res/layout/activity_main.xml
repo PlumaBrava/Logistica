@@ -61,4 +61,15 @@
         android:src="@android:drawable/ic_input_add"
          />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_pasarAPicking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_media_ff"
+        app:layout_anchor="@+id/container"
+        app:layout_anchorGravity="top|end"
+
+        />
 </android.support.design.widget.CoordinatorLayout>

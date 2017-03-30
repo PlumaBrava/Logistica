@@ -13,20 +13,11 @@
     android:layout_marginTop="@dimen/custom_cardViewtMarginTop"
     android:layout_marginBottom="@dimen/custom_cardViewMarginBottom"
     android:elevation="@dimen/custom_cardViewElevation"
-    card_view:cardBackgroundColor ="@color/SaldosCard_background"
+    card_view:cardBackgroundColor ="@color/PagosCard_background"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?selectableItemBackground">
 
-    <ImageButton
-        android:id="@+id/phoneClallButton"
-
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:contentDescription="@string/contentDescription_butonMakeAcall"
-        android:gravity="end"
-        android:src="@android:drawable/sym_action_call" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,30 +39,17 @@
                 android:layout_marginLeft="@dimen/text_margin"
                 android:layout_marginStart="@dimen/text_margin"
                 android:gravity="start"
-                android:text="@string/cliente_SaldoViewHolder"
+                android:text="@string/tipoDePago_PagoViewHolder"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/nameOrderCard"
+                android:id="@+id/tipoDePago_PagoVH"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/text_margin"
                 android:layout_marginStart="@dimen/text_margin"
                 android:layout_gravity="start"
                 android:gravity="start"  />
-
-            <TextView
-                android:id="@+id/latNameOrderCard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-
-                android:gravity="start"
-                android:layout_marginLeft="@dimen/text_margin"
-                android:layout_marginStart="@dimen/text_margin"
-
-                />
-
 
         </LinearLayout>
 
@@ -83,29 +61,53 @@
 
             <TextView
 
-                android:text="@string/saldo_SaldoViewHolder"
+                android:text="@string/monto_PagoViewHolder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:layout_gravity="start"
-                android:layout_margin="@dimen/text_margin" />
-
-
-            <TextView
-                android:id="@+id/Saldo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
+                android:layout_marginLeft="@dimen/text_margin"
+                android:layout_marginStart="@dimen/text_margin"
                 />
 
+
             <TextView
-                android:id="@+id/cantidadOrdenesSinCompensar"
+                android:id="@+id/mont_Pago_PagoVH"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_marginLeft="@dimen/text_margin"
                 android:layout_marginStart="@dimen/text_margin"
                 />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+
+                android:text="@string/fecha_PagoViewHolder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:layout_gravity="start"
+                android:layout_marginLeft="@dimen/text_margin"
+                android:layout_marginStart="@dimen/text_margin"
+                />
+
+
+            <TextView
+                android:id="@+id/fecha_Pago_PagoVH"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="@dimen/text_margin"
+                android:layout_marginStart="@dimen/text_margin"
+                />
+
         </LinearLayout>
 
 

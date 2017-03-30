@@ -1,10 +1,13 @@
 package com.nextnut.logistica;
 
 import android.animation.ObjectAnimator;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -15,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -73,12 +77,69 @@ public class CustomOrderListFragment extends FragmentBasic {
     private static final String LOG_TAG = CustomOrderListFragment.class.getSimpleName();
     private CabeceraOrden mCabeceraOrdenDato;
     private DataSnapshot mProductosEnOrdenDatos;
+    private ArrayList<CabeceraOrden> mListadeOrdenesParaPasarApicking = new ArrayList<>();
+    ;
     ArrayList<Task> taskList = new ArrayList<Task>();
     Task<Void> allTask;
 
     public static final float LARGE_SCALE = 1.5f;
     private boolean symmetric = true;
     private boolean small = true;
+
+    public void pasarAPicking() {
+        Log.i(LOG_TAG, "pasarAPicking: " + mListadeOrdenesParaPasarApicking.toString());
+        if (MainActivity.getmPickingOrderSelected() == 0) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle("Seleccione Una Orden de Picking");
+            alert.setMessage("seleccione una orden de Picking para mover las ordenes marcadas");
+//            alert.setNegativeButton(getString(R.string.CANCEL), new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int whichButton) {
+//
+//                    dialog.cancel();
+//                }
+//            });
+            alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    return;
+                }
+            });
+            alert.create().show();
+//            DialogAlerta dialogAlerta = DialogAlerta.newInstance("");
+        }else
+
+        if(mListadeOrdenesParaPasarApicking.isEmpty()){
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setTitle("Seleccione  Ordenes ");
+            alert.setMessage("seleccione Ordenes para pasar a Picking");
+//            alert.setNegativeButton(getString(R.string.CANCEL), new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int whichButton) {
+//
+//                    dialog.cancel();
+//                }
+//            });
+            alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    return;
+                }
+            });
+            alert.create().show();
+        }else{
+            pasarPrimerOrden();
+        }
+    }
+
+    public void pasarPrimerOrden(){
+        if(mListadeOrdenesParaPasarApicking.isEmpty()){
+            return;
+        }else{
+            pasarOrdenAPicking(mListadeOrdenesParaPasarApicking.get(0));
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,6 +181,8 @@ public class CustomOrderListFragment extends FragmentBasic {
                 final DatabaseReference CabeceraRef = getRef(position);
                 emptyViewTotalProducts.setVisibility(View.GONE);
                 viewHolder.mfavorito.setVisibility(View.GONE);
+                viewHolder.mTextViewPrecio.setVisibility(View.GONE);
+                viewHolder.mTextViewPrecioTitulo.setVisibility(View.GONE);
                 Log.i(LOG_TAG, "adapter:CabeceraRef: " + CabeceraRef.toString());
 
                 // Set click listener for the whole post view
@@ -197,10 +260,11 @@ public class CustomOrderListFragment extends FragmentBasic {
         recyclerViewOrders = (RecyclerView) rootView.findViewById(R.id.customorder_list);
 
         recyclerViewOrders.setLayoutManager(new LinearLayoutManager(recyclerViewOrders.getContext()));
-
-        Query clientesQuery = getQuery(mDatabase);
+        mListadeOrdenesParaPasarApicking.clear();
+//        Query clientesQuery = getQuery(mDatabase);
+        Query cordenesQuery = refCabeceraOrdenList_Status(String.valueOf(ORDEN_STATUS_INICIAL));
         mCabeceraAdapter = new FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder>(CabeceraOrden.class, R.layout.customorder_list_content,
-                CabeceraViewHolder.class, clientesQuery) {
+                CabeceraViewHolder.class, cordenesQuery) {
             @Override
             protected void populateViewHolder(final CabeceraViewHolder viewHolder, final CabeceraOrden model, final int position) {
                 final DatabaseReference CabeceraRef = getRef(position);
@@ -238,6 +302,28 @@ public class CustomOrderListFragment extends FragmentBasic {
                         }
 
                 );
+                viewHolder.mpasarAPickingSelector.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (mListadeOrdenesParaPasarApicking.isEmpty()) {
+                            view.setBackgroundColor(Color.RED);
+                            mListadeOrdenesParaPasarApicking.add(model);
+                            Toast.makeText(getContext(), "pasar a Picking", Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            if (mListadeOrdenesParaPasarApicking != null && mListadeOrdenesParaPasarApicking.contains(model)) {
+                                view.setBackgroundColor(Color.TRANSPARENT);
+                                mListadeOrdenesParaPasarApicking.remove(model);
+                            } else {
+
+                                view.setBackgroundColor(Color.RED);
+                                mListadeOrdenesParaPasarApicking.add(model);
+                                Toast.makeText(getContext(), "pasar a Picking", Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    }
+                });
             }
 
             @Override
@@ -284,7 +370,9 @@ public class CustomOrderListFragment extends FragmentBasic {
 
                 }
             }
-        };
+        }
+
+        ;
 
         recyclerViewOrders.setAdapter(mCabeceraAdapter);
 
@@ -314,7 +402,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 //
 //
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                        Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
+//                        Pair<View, String> p2 = Pair.create((View) vh.mTipoDePago, getString(R.string.custom_icon_transition_name));
 //                        ActivityOptionsCompat activityOptions =
 //                                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p2);
 //                        startActivity(intent, activityOptions.toBundle());
@@ -423,7 +511,9 @@ public class CustomOrderListFragment extends FragmentBasic {
         mItemTouchHelper.attachToRecyclerView(recyclerViewOrders);
 
 
-        if (rootView.findViewById(R.id.customorder_detail_container) != null) {
+        if (rootView.findViewById(R.id.customorder_detail_container) != null)
+
+        {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
@@ -440,7 +530,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 
     private void pasarOrdenAPicking(final CabeceraOrden cabeceraOrden) {
 
-        if(hayTareaEnProceso()){
+        if (hayTareaEnProceso()) {
             return;
         }
 
@@ -490,7 +580,6 @@ public class CustomOrderListFragment extends FragmentBasic {
                                         detalleOrdenAux.modificarCantidadProductoDeOrden(0.0); // modificamos la cantidad a Cero para usarla para el calculo de Total
 
 
-
                                         // Actualizacion de Totales en Ordenes (3)
 
 
@@ -500,8 +589,9 @@ public class CustomOrderListFragment extends FragmentBasic {
                                             Log.i(LOG_TAG, "pasarOrdenAPickingl TotalInicial Detalle = NuLL- ");
                                         } else {
                                             detalleOrdenTotalInicial.modificarCantidadEnTotalInicial(detalleOrdenAux, detalleOrden);
-                                            if(detalleOrdenTotalInicial.getCantidadOrden()==0){totalInicialDetalleValues=null;}
-                                            else {
+                                            if (detalleOrdenTotalInicial.getCantidadOrden() == 0) {
+                                                totalInicialDetalleValues = null;
+                                            } else {
                                                 detalleOrdenTotalInicial.liberar();
                                                 totalInicialDetalleValues = detalleOrdenTotalInicial.toMap();
                                             }
@@ -510,62 +600,61 @@ public class CustomOrderListFragment extends FragmentBasic {
                                         }
 
 
-
                                         // Actualizacion de totales en Picking (7)
 
 
                                         Detalle detallePickingTotal = ((DataSnapshot) mPickingTotalTask.get(i).getResult()).getValue(Detalle.class);
 
 
-                                            if (detallePickingTotal == null) {
-                                                // di no existe esta estructura, se crea una en cero.
-                                                Log.i(LOG_TAG, "pasarOrdenAPickingl TotalPicking= NULL" );
-                                                detallePickingTotal = new Detalle(0.0, detalleOrdenTotalInicial.getProducto(), null);
-                                                detallePickingTotal.modificarCantidadEnTotalInicial(detalleOrden, detalleOrdenAux);
-                                            } else {
-                                                Log.i(LOG_TAG, "pasarOrdenAPickingl TotalPicking=" + ((DataSnapshot) mTotalInicialTask.get(i).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mTotalInicialTask.get(i).getResult()).getValue(Detalle.class).getProducto().getNombreProducto());
-                                                detallePickingTotal.modificarCantidadEnTotalInicial(detalleOrden, detalleOrdenAux);
-                                            }
+                                        if (detallePickingTotal == null) {
+                                            // di no existe esta estructura, se crea una en cero.
+                                            Log.i(LOG_TAG, "pasarOrdenAPickingl TotalPicking= NULL");
+                                            detallePickingTotal = new Detalle(0.0, detalleOrdenTotalInicial.getProducto(), null);
+                                            detallePickingTotal.modificarCantidadEnTotalInicial(detalleOrden, detalleOrdenAux);
+                                        } else {
+                                            Log.i(LOG_TAG, "pasarOrdenAPickingl TotalPicking=" + ((DataSnapshot) mTotalInicialTask.get(i).getResult()).getKey() + "- nombre Producto" + ((DataSnapshot) mTotalInicialTask.get(i).getResult()).getValue(Detalle.class).getProducto().getNombreProducto());
+                                            detallePickingTotal.modificarCantidadEnTotalInicial(detalleOrden, detalleOrdenAux);
+                                        }
 
                                             /*7 */
                                         detallePickingTotal.liberar();
-                                        childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_INICIAL,MainActivity.getmPickingOrderSelected(), productKey),detallePickingTotal.toMap());
+                                        childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected(), productKey), detallePickingTotal.toMap());
 
 
                                             /*5*/
-                                            childUpdates.put(nodoProductosXOrdenInicial_5(productKey, mCabeceraOrdenDato.getNumeroDeOrden()), null);
+                                        childUpdates.put(nodoProductosXOrdenInicial_5(productKey, mCabeceraOrdenDato.getNumeroDeOrden()), null);
 
                                             /*4 */ //No se modifica, queda igual
 //                                            childUpdates.put(nodoDetalleOrden_4(mCabeceraOrdenDato.getNumeroDeOrden(), productKey), null);
 
-                                    i++;
+                                        i++;
                                     }
 
                                     // Actualizacion de totales en Picking (6)
                                     CabeceraPicking cabeceraPicking = ((DataSnapshot) mPickingTask.getResult()).getValue(CabeceraPicking.class);
                                     cabeceraPicking.liberar();
-                                    childUpdates.put(nodoPicking_6(PICKING_STATUS_INICIAL,((DataSnapshot) mPickingTask.getResult()).getKey()),cabeceraPicking.toMap());
+                                    childUpdates.put(nodoPicking_6(PICKING_STATUS_INICIAL, ((DataSnapshot) mPickingTask.getResult()).getKey()), cabeceraPicking.toMap());
 
 
                                 /*2 */
                                     mCabeceraOrdenDato.setEstado(ORDEN_STATUS_PICKING);
                                     mCabeceraOrdenDato.liberar();
-                                    Log.i(LOG_TAG, "pasarOrdenAPickingl MainActivity.getmPickingOrderSelected() "+ MainActivity.getmPickingOrderSelected());
-                                    Log.i(LOG_TAG, "pasarOrdenAPickingl mCabeceraOrdenDato "+ mCabeceraOrdenDato.getNumeroDePickingOrden());
+                                    Log.i(LOG_TAG, "pasarOrdenAPickingl MainActivity.getmPickingOrderSelected() " + MainActivity.getmPickingOrderSelected());
+                                    Log.i(LOG_TAG, "pasarOrdenAPickingl mCabeceraOrdenDato " + mCabeceraOrdenDato.getNumeroDePickingOrden());
                                     mCabeceraOrdenDato.setNumeroDePickingOrden(MainActivity.getmPickingOrderSelected());
-                                    Log.i(LOG_TAG, "pasarOrdenAPickingl mCabeceraOrdenDato "+ mCabeceraOrdenDato.getNumeroDePickingOrden());
-                                    Log.i(LOG_TAG, "pasarOrdenAPickingl getNumeroDeOrden() "+ mCabeceraOrdenDato.getNumeroDeOrden());
-                                    Log.i(LOG_TAG, "pasarOrdenAPickingl getNumeroDePickingOrden() "+ mCabeceraOrdenDato.getNumeroDePickingOrden());
+                                    Log.i(LOG_TAG, "pasarOrdenAPickingl mCabeceraOrdenDato " + mCabeceraOrdenDato.getNumeroDePickingOrden());
+                                    Log.i(LOG_TAG, "pasarOrdenAPickingl getNumeroDeOrden() " + mCabeceraOrdenDato.getNumeroDeOrden());
+                                    Log.i(LOG_TAG, "pasarOrdenAPickingl getNumeroDePickingOrden() " + mCabeceraOrdenDato.getNumeroDePickingOrden());
 
-                                    childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_INICIAL,mCabeceraOrdenDato.getNumeroDeOrden()), null);
-                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_PICKING,mCabeceraOrdenDato.getNumeroDeOrden(),MainActivity.getmPickingOrderSelected() ),mCabeceraOrdenDato.toMap());
-                                    childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrdenDato.getNumeroDeOrden()),mCabeceraOrdenDato.toMap());
+                                    childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_INICIAL, mCabeceraOrdenDato.getNumeroDeOrden()), null);
+                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_PICKING, mCabeceraOrdenDato.getNumeroDeOrden(), MainActivity.getmPickingOrderSelected()), mCabeceraOrdenDato.toMap());
+                                    childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrdenDato.getNumeroDeOrden()), mCabeceraOrdenDato.toMap());
 
                                     mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
 
-                                            Log.i(LOG_TAG, "pasarOrdenAPickingl updateChildren-onFailure "+e.toString());
+                                            Log.i(LOG_TAG, "pasarOrdenAPickingl updateChildren-onFailure " + e.toString());
                                             liberarRecusosTomados();
                                             liberarArrayTaskConBloqueos();
                                             onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
@@ -578,8 +667,10 @@ public class CustomOrderListFragment extends FragmentBasic {
 //                                            mMontoTotal.setText(mCabeceraOrden.getTotales().getMontoEnOrdenes().toString());
 //                                            mCantidadTotal.setText(String.valueOf( mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
 //                                            mKeyList.add(mproductKeyDato);
-                                            Log.i(LOG_TAG, "pasarOrdenAPickingl - OnCompleteListener task.isSuccessful():"+task.isSuccessful());
-
+                                            Log.i(LOG_TAG, "pasarOrdenAPickingl - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
+                                            if(!mListadeOrdenesParaPasarApicking.isEmpty()){
+                                            mListadeOrdenesParaPasarApicking.remove(0);
+                                            pasarPrimerOrden();}
                                         }
                                     });
                                 }
@@ -592,7 +683,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 
                                     liberarRecusosTomados();
                                     liberarArrayTaskConBloqueos();
-                                    onDialogAlert(getResources().getString( R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
+                                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
 
                                 }
                             });
@@ -608,12 +699,11 @@ public class CustomOrderListFragment extends FragmentBasic {
                     Log.i(LOG_TAG, "pasarOrdenAPickingl Operacion fallo- " + task.getException().toString());
                     liberarRecusosTomados();
                     liberarArrayTaskConBloqueos();
-                    onDialogAlert(getResources().getString( R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
+                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
                 }
             }
         });
     }
-
 
 
     @Override
@@ -829,6 +919,8 @@ public class CustomOrderListFragment extends FragmentBasic {
     }
 
     public Query getQuery(DatabaseReference databaseReference) {
+//        mDatabase
+//                refCabeceraOrdenList_Status
         return databaseReference.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(String.valueOf(ORDEN_STATUS_INICIAL));
     }
 

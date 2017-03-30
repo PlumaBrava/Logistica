@@ -1,6 +1,5 @@
 package com.nextnut.logistica;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -96,7 +95,7 @@ public class UsuarioDetailActivity extends AppCompatActivity {
             arguments.putString(EXTRA_USER_KEY, getIntent().getStringExtra(EXTRA_USER_KEY));
             arguments.putString(EXTRA_EMPRESA_KEY, getIntent().getStringExtra(EXTRA_EMPRESA_KEY));
             arguments.putParcelable(EXTRA_EMPRESA, getIntent().getParcelableExtra(EXTRA_EMPRESA));
-            Empresa empresa= (Empresa) getIntent().getParcelableExtra("Empresa");
+            Empresa empresa= (Empresa) getIntent().getParcelableExtra(EXTRA_EMPRESA);
             Log.d(TAG, "empresa: Nombre " + empresa.getNombre());
             Log.d(TAG, "empresa: Ciudad " + empresa.getCiudad());
             Log.d(TAG, "empresa: Direccion " + empresa.getDireccion());
@@ -120,7 +119,7 @@ public class UsuarioDetailActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            navigateUpTo(new Intent(this, UsuarioListActivity.class));
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

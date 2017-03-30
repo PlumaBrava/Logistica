@@ -4,11 +4,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-
-import static com.nextnut.logistica.util.Constantes.EXTRA_ALMACEN_KEY;
 
 /**
  * An activity representing a single Custom detail screen. This
@@ -16,13 +13,13 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_ALMACEN_KEY;
  * item details are presented side-by-side with a list of items
  * in a {@link CustomListActivity}.
  */
-public class AlmacenesDetailActivity extends ActivityBasic {
-    private static final String LOG_TAG = AlmacenesDetailActivity.class.getSimpleName();
+public class MovimientosStockActivity extends ActivityBasic {
+    private static final String LOG_TAG = MovimientosStockActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_almacen_detail);
+        setContentView(R.layout.activity_movimientos_stock);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
@@ -30,13 +27,11 @@ public class AlmacenesDetailActivity extends ActivityBasic {
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlmacenesDetailFragment almacenesDetailFragment=(AlmacenesDetailFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.almacen_detail_container);
-                if (almacenesDetailFragment!=null){
-                    Log.i("almacenes", "almacenesDetailFragment!=null");
-                    almacenesDetailFragment.verificationAndsave();
-                }else{
-                    Log.i("almacenes", "almacenesDetailFragment=null");
+                PagosFragment pagosFragment=(PagosFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.pagos_container);
+                if (pagosFragment!=null){
+                    pagosFragment.setEditingEnabled(false);
+                    pagosFragment.verificationAndsave();
 
                 }
             }
@@ -47,14 +42,10 @@ public class AlmacenesDetailActivity extends ActivityBasic {
         fab_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlmacenesDetailFragment almacenesDetailFragment=(AlmacenesDetailFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.almacen_detail_container);
-                if (almacenesDetailFragment!=null){
-                    Log.i("almacenes", "almacenesDetailFragment!=null");
-                    almacenesDetailFragment.deleteCustomer();
-                }else{
-                    Log.i("almacenes", "almacenesDetailFragment=null");
-
+                CustomDetailFragment customDetailFragment=(CustomDetailFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.pagos_container);
+                if (customDetailFragment!=null){
+                    customDetailFragment.deleteCustomer();
                 }
 
             }
@@ -79,8 +70,8 @@ public class AlmacenesDetailActivity extends ActivityBasic {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
 
+
             Bundle arguments =  putBundleFirebase();
-            arguments.putString(EXTRA_ALMACEN_KEY,getIntent().getStringExtra(EXTRA_ALMACEN_KEY));
 //            Bundle arguments = new Bundle();
 //            arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(CustomDetailFragment.ARG_ITEM_ID,0));
 //            int mAction = getIntent().getIntExtra(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
@@ -99,10 +90,10 @@ public class AlmacenesDetailActivity extends ActivityBasic {
             }
 
 
-            AlmacenesDetailFragment fragment = new AlmacenesDetailFragment();
+            MovimientosStockFragment fragment = new MovimientosStockFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.almacen_detail_container, fragment)
+                    .add(R.id.movimietosStock_container, fragment)
                     .commit();
         }
     }

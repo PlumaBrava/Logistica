@@ -44,6 +44,7 @@ import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PAGOS;
 import static com.nextnut.logistica.util.Constantes.IMAGENES_PAGOS;
+import static com.nextnut.logistica.util.Constantes.PAGO_STATUS_INICIAL_SIN_COMPENSAR;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
 
@@ -247,7 +248,9 @@ public class PagosFragment extends FragmentBasic {
     @Override
     public void savePhoto(Bitmap bitmap) {
         if (mPagoKey == null) {
-            mPagoKey = refPagosListado_11("mClienteKey").push().getKey();
+            mPagoKey=  refPagosListado_11(mClienteKey,String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).push().getKey();
+//
+//            mPagoKey = refPagosListado_11("mClienteKey").push().getKey();
         }
         StorageReference ImagenRef = mStorageRef.child(IMAGENES_PAGOS).child(mEmpresaKey).child(mPagoKey);
         uploadImagen(bitmap, ImagenRef, mFotoCheque, spinner);
@@ -443,7 +446,8 @@ public class PagosFragment extends FragmentBasic {
         );
 
         if (mPagoKey == null) {
-            mPagoKey = mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).push().getKey();
+            mPagoKey=  refPagosListado_11(mClienteKey,String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).push().getKey();
+//            mPagoKey = mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).child(String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).push().getKey();
         }
 
         refSaldoTotalClientes_10(mClienteKey).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -455,7 +459,7 @@ public class PagosFragment extends FragmentBasic {
                 Map<String, Object> pagoValues = mPago.toMap();
                 Map<String, Object> childUpdates = new HashMap<>();
 
-                childUpdates.put(nodoPagos(mClienteKey, mPagoKey), pagoValues);
+                childUpdates.put(nodoPagosInicialSinCompensar(mClienteKey, mPagoKey), pagoValues);
 
                 Log.i(LOG_TAG, "Pagos saldos = "+saldo.getTotales().getSaldo());
                 saldo.getTotales().setMontoPagado(saldo.getTotales().getMontoPagado() + mPago.getMonto());

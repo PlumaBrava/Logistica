@@ -88,7 +88,7 @@
                 <!--android:layout_margin="@dimen/text_margin"-->
 
         <TextView
-            android:id="@+id/cantidadPicking"
+            android:id="@+id/cantidadUnidadesSolicitadas"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textStyle="bold"

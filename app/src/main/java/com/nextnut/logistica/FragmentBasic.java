@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static android.content.Intent.EXTRA_USER;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_ALMACENES;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_FAVORITOS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_CABECERA;
@@ -63,6 +64,7 @@ import static com.nextnut.logistica.util.Constantes.ESQUEMA_REPORTE_VENTAS_CLIEN
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_REPORTE_VENTAS_PRODUCTO;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_SALDOS_HISTORIAL;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_SALDO_TOTAL;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_STOCK;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_EMPRESA;
@@ -72,6 +74,7 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_PERFIL;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_USER_KEY;
+import static com.nextnut.logistica.util.Constantes.NODO_ALMACENES;
 import static com.nextnut.logistica.util.Constantes.NODO_FAVORITOS;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
@@ -85,6 +88,9 @@ import static com.nextnut.logistica.util.Constantes.NODO_REPORTE_VENTAS_CLIENTE;
 import static com.nextnut.logistica.util.Constantes.NODO_REPORTE_VENTAS_PRODUCTO;
 import static com.nextnut.logistica.util.Constantes.NODO_SALDOS_HISTORIAL;
 import static com.nextnut.logistica.util.Constantes.NODO_SALDO_TOTAL;
+import static com.nextnut.logistica.util.Constantes.NODO_STOCK;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_DELIVERED_PARA_COMPENSAR;
+import static com.nextnut.logistica.util.Constantes.PAGO_STATUS_INICIAL_SIN_COMPENSAR;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.UtilFirebase.getDatabase;
 
@@ -456,7 +462,7 @@ public abstract class FragmentBasic extends Fragment {
                     Log.i(LOG_TAG, "readBlockTotalInicial onComplete True ");
                     Detalle detalle = dataSnapshot.getValue(Detalle.class);
                     if (detalle == null) {
-                        Log.d(LOG_TAG, "readBlockTotalInicial:onComplete: detalle.getCantidadOrden() NULL");
+                        Log.d(LOG_TAG, "readBlockTotalInicial:onComplete: detalle.getCantidadUnidadesEnStock() NULL");
                     } else {
                         Log.d(LOG_TAG, "readBlockTotalInicial:onComplete: detalle.Semaforo " + detalle.getSemaforo()
                                 + "-" + detalle.getCantidadOrden());
@@ -564,7 +570,7 @@ public abstract class FragmentBasic extends Fragment {
                         Log.i(LOG_TAG, "liberarTotalInicial onComplete True ");
                         Detalle detalle = dataSnapshot.getValue(Detalle.class);
                         if (detalle == null) {
-                            Log.d(LOG_TAG, "liberarTotalInicial:onComplete: detalle.getCantidadOrden() NULL");
+                            Log.d(LOG_TAG, "liberarTotalInicial:onComplete: detalle.getCantidadUnidadesEnStock() NULL");
                         } else {
                             Log.d(LOG_TAG, "liberarTotalInicial:onComplete: detalle.semaforo" + detalle.getSemaforo()
                                     + "-" + detalle.getCantidadOrden());
@@ -2031,6 +2037,16 @@ public abstract class FragmentBasic extends Fragment {
         String statusString = String.valueOf(statusOrden);
         return NODO_ORDENES_CABECERA + "/" + mEmpresaKey + "/" + statusString + "/" + nuemeroOrdena;
     }
+    public DatabaseReference refCabeceraOrdenList_Status(String statusOrden) {
+     return   mDatabase.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(statusOrden);
+    }
+    public DatabaseReference refCabeceraOrdenList_ParaCompensar(String clienteKey) {
+        return   mDatabase.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(String.valueOf(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR)).child(clienteKey);
+    }
+    public String nodoCabeceraOrdenList_ParaCompensar(String clienteKey,long nuemeroOrdena) {
+        return NODO_ORDENES_CABECERA + "/" + mEmpresaKey + "/" + String.valueOf(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR) + "/" + clienteKey+"/"+String.valueOf(nuemeroOrdena);
+//        return   mDatabase.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(String.valueOf(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR)).child(clienteKey);
+    }
 
     public DatabaseReference refCabeceraOrden_2Status(int statusOrden, long nuemeroOrdena, long nroPicking) {
         String statusString = String.valueOf(statusOrden);
@@ -2145,19 +2161,24 @@ public abstract class FragmentBasic extends Fragment {
     }
 
     // Pagos 11-Retoran un puntero a las claves de pago (listado)
-    public DatabaseReference refPagosListado_11(String cliente) {
-        return mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).child(cliente);    }
+    public DatabaseReference refPagosListado_11(String cliente,String estadoListado) {
+        return mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).child(cliente).child(estadoListado);    }
 
-    public String nodoPagosListado_11(String cliente) {
-        return NODO_PAGOS + mEmpresaKey + "/" +cliente ;
+    public String nodoPagosListado_11(String cliente,String estadoListado) {
+        return NODO_PAGOS + mEmpresaKey + "/" +cliente +"/"+estadoListado;
     }
 
     public DatabaseReference refPagos(String cliente,String pagoKey) {
         return mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).child(cliente).child(pagoKey);
     }
 
-    public String nodoPagos(String cliente,String pagoKey) {
-        return NODO_PAGOS + mEmpresaKey + "/" +cliente +"/" +(pagoKey);
+    public DatabaseReference refPagosInicialSinCompensarList(String cliente) {
+        return mDatabase.child(NODO_PAGOS).child( mEmpresaKey).child(cliente).child(String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR))
+                ;
+    }
+
+    public String nodoPagosInicialSinCompensar(String cliente, String pagoKey) {
+        return NODO_PAGOS + mEmpresaKey + "/" +cliente + "/" +PAGO_STATUS_INICIAL_SIN_COMPENSAR+"/" +(pagoKey);
     }
 
     // Saldos x Client 12
@@ -2186,6 +2207,23 @@ public abstract class FragmentBasic extends Fragment {
     public String nodoListaFavoritosXCliente(String clienteKey) {
         return NODO_FAVORITOS + mEmpresaKey + "/" + clienteKey;
     }
+
+    public  DatabaseReference refListaAlmacenes() {
+        return mDatabase.child(ESQUEMA_ALMACENES).child(mEmpresaKey);
+    }
+
+    public String nodoAlmacen(String AlmacenKey) {
+        return NODO_ALMACENES + mEmpresaKey + "/" + AlmacenKey;
+    }
+
+    public  DatabaseReference refListaProductosEnStockEnUnAlmacen(String mAlmacenKey) {
+        return mDatabase.child(ESQUEMA_STOCK).child(mEmpresaKey).child(mAlmacenKey);
+    }
+
+    public String nodoStockProuctoEnAlmacen(String AlmacenKey,String productKey) {
+        return NODO_STOCK + mEmpresaKey + "/" + AlmacenKey+ "/" + productKey;
+    }
+
 
 }
 

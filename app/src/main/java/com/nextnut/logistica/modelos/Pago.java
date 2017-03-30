@@ -21,6 +21,10 @@ public class Pago implements Parcelable {
     private long fechaDePago;
     private String usuarioCreador;
     private Double monto;
+    private Double saldoAcompensar;
+
+
+
     private String tipoDePago;
     private String chequeBanco;
     private String chequeNumero;
@@ -98,7 +102,13 @@ public class Pago implements Parcelable {
         this.usuarioCreador = usuarioCreador;
     }
 
+    public Double getSaldoAcompensar() {
+        return saldoAcompensar;
+    }
 
+    public void setSaldoAcompensar(Double saldoAcompensar) {
+        this.saldoAcompensar = saldoAcompensar;
+    }
 
     public Pago() {
         // Default constructor required for calls to DataSnapshot.getValue(CabeceraOrden.class)
@@ -115,6 +125,7 @@ public class Pago implements Parcelable {
         this.monto = monto;
         this.usuarioCreador = usuarioCreador;
         this.tipoDePago = tipoDePago;
+        this.saldoAcompensar=monto;
 
     }
 
@@ -187,6 +198,7 @@ public class Pago implements Parcelable {
         result.put("chequeFecha",chequeFecha);
         result.put("estado", estado);
         result.put("semaforo", semaforo);
+        result.put("saldoAcompensar", saldoAcompensar);
 
         return result;
     }
@@ -228,6 +240,7 @@ public class Pago implements Parcelable {
         parcel.writeLong(fechaDePago);
         parcel.writeString(usuarioCreador);
         parcel.writeDouble(monto);
+        parcel.writeDouble(saldoAcompensar);
         parcel.writeString(tipoDePago);
         parcel.writeString(chequeBanco);
         parcel.writeString(chequeNumero);
@@ -283,6 +296,7 @@ public class Pago implements Parcelable {
         this.fechaDePago =in.readLong();
         this.usuarioCreador=in.readString();
         this.monto=in.readDouble();
+        this.saldoAcompensar=in.readDouble();
         this.tipoDePago= in.readString();
         this.chequeBanco= in.readString();
         this.chequeNumero= in.readString();

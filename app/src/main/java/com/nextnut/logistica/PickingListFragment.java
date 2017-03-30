@@ -462,7 +462,7 @@ public class PickingListFragment extends FragmentBasic {
 
 
 //        recyclerViewCustomOrderInPickingOrder.setVisibility(View.GONE);
-//        emptyViewCustomOrder.setVisibility(View.GONE);
+//        emptyViewProductosEnStock.setVisibility(View.GONE);
 
 //        mLinearOrders.setVisibility(View.GONE);
 //        mLinearProductos.setVisibility(View.GONE);
@@ -558,7 +558,7 @@ public class PickingListFragment extends FragmentBasic {
         };
 
 
-//        mCustomsOrdersCursorAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyViewCustomOrder, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
+//        mCustomsOrdersCursorAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyViewProductosEnStock, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
 //            @Override
 //            public void onClick(long id, CustomsOrdersCursorAdapter.ViewHolder vh) {
 //
@@ -587,7 +587,7 @@ public class PickingListFragment extends FragmentBasic {
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //
 //
-//                        Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
+//                        Pair<View, String> p2 = Pair.create((View) vh.mTipoDePago, getString(R.string.custom_icon_transition_name));
 //                        ActivityOptionsCompat activityOptions =
 //                                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p2);
 //                        startActivity(intent, activityOptions.toBundle());

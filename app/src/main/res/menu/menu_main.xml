@@ -84,5 +84,11 @@
         android:visible="true"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_migrarClientes"
+        android:title="MigrarClientes"
+        android:visible="true"
+        app:showAsAction="never" />
+
     <!-- Revisar iconos -->
 </menu>

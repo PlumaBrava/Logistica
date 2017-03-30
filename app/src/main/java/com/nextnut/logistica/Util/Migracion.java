@@ -1,25 +1,29 @@
 package com.nextnut.logistica.util;
 
-import android.content.ContentProviderOperation;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
+import com.nextnut.logistica.ActivityBasic;
 import com.nextnut.logistica.data.CustomColumns;
-import com.nextnut.logistica.data.CustomOrdersColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
+import com.nextnut.logistica.modelos.Cliente;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
+import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_CLIENTES;
 
 /**
  * Created by perez.juan.jose on 12/11/2016.
  */
 
-public class Migracion extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>  {
+public class Migracion extends ActivityBasic implements LoaderManager.LoaderCallbacks<Cursor>  {
     private static final int DETAIL_CUSTOM_LOADER = 0;
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
@@ -50,6 +54,22 @@ public class Migracion extends AppCompatActivity implements LoaderManager.Loader
                 case DETAIL_CUSTOM_LOADER:
                     if (data != null && data.moveToFirst()) {
 
+                        writeNewCliente(
+                                data.getString(data.getColumnIndex(CustomColumns.ID_CUSTOM)),
+                                data.getString(data.getColumnIndex(CustomColumns.NAME_CUSTOM)),
+                                data.getString(data.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)),
+                                data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM)),
+                                data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM)),
+                                data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)),
+                                data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)),
+                                Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
+                                data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
+                                data.getInt (data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
+                                        null
+                        );
+                    }
+
+
 //            mCustomName.setText(data.getString(data.getColumnIndex(CustomColumns.NAME_CUSTOM)));
 //            mLastName.setText(data.getString(data.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));
 //            mDeliveyAddress.setText(data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)));
@@ -76,7 +96,6 @@ public class Migracion extends AppCompatActivity implements LoaderManager.Loader
 
                     }
             }}
-    }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -85,27 +104,35 @@ public class Migracion extends AppCompatActivity implements LoaderManager.Loader
 
     // Usar este esquema para migrar datos.
 
-    public void updateDateFormat() {
+    public void upMigracionClientes() {
         try {
-            Cursor c =getContentResolver().query(LogisticaProvider.CustomOrders.CONTENT_URI,
+            Cursor data =getContentResolver().query(LogisticaProvider.Customs.CONTENT_URI,
                     null,
                     null,
                     null,
                     null,
                     null);
 
-            if (c != null && c.getCount() > 0) {
-                c.moveToFirst();
+            if (data != null && data.getCount() > 0) {
+                data.moveToFirst();
 
 
                 do {
 
-                    ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-                    ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(c.getLong(0)));
-                    builder.withValue(CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER, "2016-08-15");
-                    batchOperations.add(builder.build());
-                    getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-                } while (c.moveToNext());
+                    writeNewCliente(
+                            data.getString(data.getColumnIndex(CustomColumns.ID_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.NAME_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)),
+                            Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
+                            data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
+                            data.getInt (data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
+                            null
+                    );
+                } while (data.moveToNext());
 
 
             } else {
@@ -114,6 +141,59 @@ public class Migracion extends AppCompatActivity implements LoaderManager.Loader
         } catch (Exception e) {
         }
     }
+
+
+
+
+    // [START basic_write]
+    private void writeNewCliente(String Id,
+                                 String nombre,
+                                 String apellido,
+                                 String telefono,
+                                 String fotoCliente,
+                                 String direccionDeEntrega,
+                                 String ciudad,
+                                 Double iva,
+                                 String cuit,
+                                 Boolean especial,
+                                 Map<String, String> telefonos
+    ){
+        if (true) {//validar formulario
+            Log.i("migracionCliente", "writeNewClient: nombre " + nombre);
+            Log.i("migracionCliente", "writeNewClient: apellido " + apellido);
+            Log.i("migracionCliente", "writeNewClient: telefono " + telefono);
+            Log.i("migracionCliente", "writeNewClient: fotoCliente " + fotoCliente);
+            Log.i("migracionCliente", "writeNewClient: direccionDeEntrega " + direccionDeEntrega);
+            Log.i("migracionCliente", "writeNewClient: ciudad " + ciudad);
+            Log.i("migracionCliente", "writeNewClient: IVA " + iva);
+            Log.i("migracionCliente", "writeNewClient: cUIT " + cuit);
+            Log.i("migracionCliente", "writeNewClient: especial " + especial);
+
+
+            Cliente cliente = new Cliente("Migracion",
+                    nombre,
+                    apellido,
+                    telefono,
+                    fotoCliente,
+                    direccionDeEntrega,
+                    ciudad,
+                    iva,
+                    cuit,
+                    especial,telefonos);
+
+            if (mClienteKey == null) {
+                mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();
+            }
+
+            Map<String, Object> clienteValues =  cliente.toMap();
+            Map<String, Object> childUpdates = new HashMap<>();
+
+            childUpdates.put(NODO_EMPRESA_CLIENTES + mEmpresaKey +"/"+ Id, clienteValues);
+
+            mDatabase.updateChildren(childUpdates);
+        }
+    }
+
 
 
 

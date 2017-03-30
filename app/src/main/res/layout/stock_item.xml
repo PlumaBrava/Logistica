@@ -14,7 +14,7 @@
     android:elevation="@dimen/Poduct_cardViewElevation"
     android:clickable="true"
     android:focusable="true"
-    card_view:cardBackgroundColor="@color/ProductCard_background"
+    card_view:cardBackgroundColor="@color/StockCard_background"
 
     android:foreground="?selectableItemBackground">
 
@@ -82,14 +82,14 @@
 
             <!--android:layout_margin="@dimen/text_margin"-->
 
-            <CheckBox
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/favorito"
-                android:contentDescription="@string/favorito"
-                android:id="@+id/favorito"
-                android:layout_weight="1"/>
+            <!--<CheckBox-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:gravity="center"-->
+                <!--android:text="@string/favorito"-->
+                <!--android:contentDescription="@string/favorito"-->
+                <!--android:id="@+id/favorito"-->
+                <!--android:layout_weight="1"/>-->
 
 
         </LinearLayout>
@@ -101,24 +101,24 @@
             >
 
             <TextView
-                android:text="@string/price"
-                android:id="@+id/precioTitulo"
+                android:text="@string/blancoStockItem"
+                android:id="@+id/stockTitulo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:layout_gravity="center_vertical"
                 android:gravity="start"
-                android:contentDescription="@string/priceTitle"
+                android:contentDescription="@string/blancoStockItem"
                 android:layout_weight="1"/>
             <!--android:layout_margin="@dimen/text_margin"-->
             <TextView
-                android:text="@string/quantity"
+                android:text="@string/cantidadUnidadesStockItem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="start"
                 android:textStyle="bold"
-                android:contentDescription="@string/quantityTitle"
+                android:contentDescription="@string/cantidadUnidadesStockItem"
                 android:layout_marginStart="@dimen/text_margin"
                 android:layout_marginLeft="@dimen/text_margin"
                 android:layout_weight="1"
@@ -126,14 +126,14 @@
 
 
             <TextView
-                android:text="@string/total"
+                android:text="@string/cantidadKgStockItem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="start"
                 android:textStyle="bold"
                 android:layout_weight="1"
-                android:contentDescription="@string/totalTitle"
+                android:contentDescription="@string/cantidadKgStockItem"
                 />
             <!--android:layout_margin="@dimen/text_margin"-->
         </LinearLayout>
@@ -146,21 +146,19 @@
             >
 
         <TextView
-            android:id="@+id/precioProducto"
+            android:text="@string/cantidadKgStockItem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:gravity="start"
-            android:contentDescription="@string/product"
             android:layout_weight="1"/>
             <!--android:layout_margin="@dimen/text_margin"-->
         <TextView
-            android:id="@+id/cantidad"
+            android:id="@+id/unidadesEnStock"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="start"
-            android:contentDescription="@string/quantity"
             android:layout_marginStart="@dimen/text_margin"
             android:layout_marginLeft="@dimen/text_margin"
             android:layout_weight="1"
@@ -168,7 +166,7 @@
 
 
         <TextView
-            android:id="@+id/total"
+            android:id="@+id/kgEnStock"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -186,7 +184,7 @@
             >
 
             <TextView
-                android:id="@+id/precioProductoDelivery"
+                android:text="@string/SolicitadoStockItem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/deliverPrice"
@@ -197,22 +195,20 @@
                 android:layout_weight="1"/>
             <!--android:layout_margin="@dimen/text_margin"-->
             <TextView
-                android:id="@+id/cantidadDelivery"
+                android:id="@+id/unidadesSolicitadas"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="start"
                 android:textStyle="bold"
-                android:background="@drawable/edittext_bg"
                 android:layout_marginLeft="@dimen/text_margin"
                 android:layout_marginRight="@dimen/text_margin"
                 android:layout_weight="1"
-                android:contentDescription="@string/deliverqantity"
                 />
 
 
             <TextView
-                android:id="@+id/totalDelivery"
+                android:id="@+id/kgSoliciados"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -220,36 +216,8 @@
                 android:contentDescription="@string/deliverPricetotalTitle"
                 android:layout_weight="1"
                 />
-            <!--android:layout_margin="@dimen/text_margin"-->
         </LinearLayout>
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal"-->
-            <!--&gt;-->
-
-        <!--<TextView-->
-            <!--android:text="@string/description"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="start"-->
-            <!--android:gravity="start"-->
-            <!--android:textStyle="bold"-->
-            <!--android:contentDescription="@string/description"-->
-            <!--/>-->
-        <!--<TextView-->
-            <!--android:id="@+id/descriptionProducto"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="start"-->
-            <!--android:gravity="start"-->
-
-
-            <!--/>-->
-        <!--android:layout_margin="@dimen/text_margin"-->
-
-        <!--</LinearLayout>-->
         </LinearLayout>
 
 

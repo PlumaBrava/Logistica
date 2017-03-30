@@ -52,7 +52,7 @@ public class SaldosViewHolder extends RecyclerView.ViewHolder {
         mCantidadOrdenesSinCompensar.setText(sfd.format(new Date(cabeceraOrden.getFechaDeCreacion())) );
 
         view. setOnClickListener(cabeceraClickListener);
-//        ((View) mCantidadOrdenesSinCompensar.getParent()) . setOnClickListener(cabeceraClickListener);
+//        ((View) mFechaDePago.getParent()) . setOnClickListener(cabeceraClickListener);
 
     }
 }

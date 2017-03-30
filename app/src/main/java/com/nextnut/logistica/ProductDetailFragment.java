@@ -390,6 +390,8 @@ public class ProductDetailFragment extends FragmentBasic
     public boolean verificationFromulario() {
         boolean verification = true;
         if (!verifyName(mProductName.getText().toString())) {
+            mProductName.setError(getResources().getString(R.string.theproductNameToLong));
+            mProductName.requestFocus();
             verification = false;
         }
         if (!isthePriceCorrect()) {
@@ -402,6 +404,53 @@ public class ProductDetailFragment extends FragmentBasic
             verification = false;
 
         }
+
+        int c_min =0;
+        int c_def =0;
+        int c_max =0;
+        try {
+            c_def = Integer.parseInt(String.valueOf(mCantidadDefault.getText().toString()));
+        }catch (Exception e){
+            mCantidadDefault.setError(getResources().getString(R.string.error_CantidadDefault));
+            mCantidadDefault.requestFocus();
+            return false;
+        }
+
+        try {
+            c_min = Integer.parseInt(String.valueOf(mCantidadMinima.getText().toString()));
+
+        }catch (Exception e){
+            mCantidadMinima.setError(getResources().getString(R.string.error_CantidadMinima));
+            mCantidadMinima.requestFocus();
+            return false;
+        }
+        try {
+            c_max = Integer.parseInt(String.valueOf(mCantidadMaxima.getText().toString()));
+        }catch (Exception e){
+            mCantidadMaxima.setError(
+                    String.format(
+                    getResources().getString(R.string.error_CantidadMaxima),getResources().getInteger(R.integer.quantityMax)));
+            mCantidadMaxima.requestFocus();
+            return false;
+        }
+
+        if(c_min<getResources().getInteger(R.integer.quantityMin)){
+            mCantidadMinima.setError(getResources().getString(R.string.error_CantidadMinima));
+            mCantidadMinima.requestFocus();
+            verification = false;
+        }
+
+        if( c_def<c_min||c_def>c_max){
+            mCantidadDefault.setError(getResources().getString(R.string.error_CantidadDefault));
+            mCantidadDefault.requestFocus();
+            verification = false;
+        }
+        if( c_max>getResources().getInteger(R.integer.quantityMax)){
+            mCantidadMaxima.setError(getResources().getString(R.string.error_CantidadMaxima)+getResources().getInteger(R.integer.quantityMax));
+            mCantidadMaxima.requestFocus();
+            verification = false;
+        }
+
         return verification;
     }
 
@@ -496,6 +545,7 @@ public class ProductDetailFragment extends FragmentBasic
             DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproductdesccantbenull));
             // Show DialogFragment
             mProductDescription.setError(getResources().getString(R.string.product_name_error_cantBeNull));
+            mProductDescription.requestFocus();
             dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductDescription.setTextColor(getResources().getColor(R.color.ValidationERROR));
             return false;
@@ -508,6 +558,7 @@ public class ProductDetailFragment extends FragmentBasic
             dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductDescription.setTextColor(getResources().getColor(R.color.ValidationERROR));
             mProductDescription.setError(getResources().getString(R.string.product_name_error_tooLong));
+            mProductDescription.requestFocus();
             return false;
         } else {
             mProductDescription.setTextColor(getResources().getColor(R.color.ValidationOK));
@@ -525,6 +576,7 @@ public class ProductDetailFragment extends FragmentBasic
             dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
             mProductPrice.setError(getResources().getString(R.string.price_error_cantBeNull));
+            mProductPrice.requestFocus();
             return false;
 
         } else {
@@ -536,6 +588,8 @@ public class ProductDetailFragment extends FragmentBasic
                 // Show DialogFragment
                 mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
                 mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                mProductPrice.requestFocus();
+
                 return false;
             } else if (price <= 0) {
 
@@ -543,6 +597,8 @@ public class ProductDetailFragment extends FragmentBasic
                 // Show DialogFragment
                 mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
                 mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                mProductPrice.requestFocus();
+
                 return false;
             } else {
 
@@ -561,6 +617,8 @@ public class ProductDetailFragment extends FragmentBasic
             dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
             mProductPriceSpecial.setError(getResources().getString(R.string.price_error_cantBeNull));
+            mProductPriceSpecial.requestFocus();
+
             return false;
 
         } else {
@@ -572,6 +630,7 @@ public class ProductDetailFragment extends FragmentBasic
                 // Show DialogFragment
                 mProductPriceSpecial.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
                 mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                mProductPriceSpecial.requestFocus();
                 return false;
             } else if (specialPrice <= 0) {
 
@@ -579,6 +638,7 @@ public class ProductDetailFragment extends FragmentBasic
                 // Show DialogFragment
                 mProductPriceSpecial.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
                 mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                mProductPriceSpecial.requestFocus();
                 return false;
             } else {
 

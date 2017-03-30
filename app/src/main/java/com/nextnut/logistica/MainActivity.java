@@ -1,6 +1,7 @@
 package com.nextnut.logistica;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -28,7 +29,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.nextnut.logistica.data.CustomColumns;
+import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.modelos.CabeceraOrden;
+import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.modelos.Totales;
@@ -37,12 +41,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
+import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_CLIENTES;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
@@ -75,6 +81,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     public static long mPickingOrderSelected = 0;
     public FloatingActionButton mFab;
+    public FloatingActionButton mFabPasarAPicking;
 
     private static AppCompatActivity mContext;
     public static AppCompatActivity getMainActicity() {
@@ -169,6 +176,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                 switch (position) {
                     case CUSTOM_ORDER_FRAGMENT: {
                         mFab.setVisibility(View.VISIBLE);
+                        mFabPasarAPicking.setVisibility(View.VISIBLE);
                         break;
                     }
                     case PICKING_FRAGMENT: {
@@ -177,18 +185,22 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                         } else {
                             mFab.setVisibility(View.VISIBLE);
                         }
+                        mFabPasarAPicking.setVisibility(View.GONE);
                         break;
                     }
                     case DELIVERY_FRAGMENT: {
                         mFab.setVisibility(View.GONE);
+                        mFabPasarAPicking.setVisibility(View.GONE);
                         break;
                     }
                     case PAGOS_FRAGMENT: {
                         mFab.setVisibility(View.VISIBLE);
+                        mFabPasarAPicking.setVisibility(View.GONE);
                         break;
                     }
                     case STOCK_FRAGMENT: {
                         mFab.setVisibility(View.VISIBLE);
+                        mFabPasarAPicking.setVisibility(View.GONE);
                         break;
                     }
 
@@ -200,9 +212,25 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);//hace que los tabs se puedan escrolear.MODE.FIX entran todos en la pantalla, los apiña
         tabLayout.setupWithViewPager(mViewPager);
 
+
+        mFabPasarAPicking = (FloatingActionButton) findViewById(R.id.fab_pasarAPicking);
+        mFabPasarAPicking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("main", "FabPasarAPicking click");
+                CustomOrderListFragment fragment = (CustomOrderListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
+
+                if (fragment != null) {
+                    Log.i("main", "FabPasarAPicking no Nulo");
+                    fragment.pasarAPicking();
+                }else {
+                    Log.i("main", "FabPasarAPicking  Nulo");
+
+                }
+            }
+        });
+
         mFab = (FloatingActionButton) findViewById(R.id.fab);
-
-
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -500,6 +528,11 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             return true;
         }
 
+        if (id == R.id.action_migrarClientes) {
+            migracionClientes();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -554,9 +587,9 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                     return d;
 
                 case STOCK_FRAGMENT:
-                    SaldosListFragment e = new SaldosListFragment();
-                    e.setArguments(putBundleFirebase());
-                    return e;
+                    StockListFragment f = new StockListFragment();
+                    f.setArguments(putBundleFirebase());
+                    return f;
 
                 default:
 
@@ -726,6 +759,16 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                 break;
             }
 
+            case STOCK_FRAGMENT: {
+
+                Intent intent = new Intent(getApplicationContext(), MovimientosStockActivity.class);
+                putExtraFirebase(intent);
+                startActivity(intent);
+
+
+                break;
+            }
+
 
             default:
         }
@@ -842,5 +885,101 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         }
 
     }
+
+    public void migracionClientes() {
+        Log.i("migracionCliente", "inicio");
+        try {
+            Cursor data =getContentResolver().query(LogisticaProvider.Customs.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+            Log.i("migracionCliente", "cursor");
+
+            if (data != null && data.getCount() > 0) {
+                data.moveToFirst();
+                Log.i("migracionCliente", "cursor >0");
+
+
+                do {
+
+                    writeNewCliente(
+                            data.getString(data.getColumnIndex(CustomColumns.ID_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.NAME_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)),
+                            data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)),
+                            Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
+                            data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
+                            data.getInt (data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
+                            null
+                    );
+                } while (data.moveToNext());
+
+
+            } else {
+                Log.i("migracionCliente", "cursor <=0");
+
+            }
+
+        } catch (Exception e) {
+        }
+    }
+
+
+
+
+    // [START basic_write]
+    private void writeNewCliente(String Id,
+                                 String nombre,
+                                 String apellido,
+                                 String telefono,
+                                 String fotoCliente,
+                                 String direccionDeEntrega,
+                                 String ciudad,
+                                 Double iva,
+                                 String cuit,
+                                 Boolean especial,
+                                 Map<String, String> telefonos
+    ){
+        if (true) {//validar formulario
+            Log.i("migracionCliente", "writeNewClient: nombre " + nombre);
+            Log.i("migracionCliente", "writeNewClient: apellido " + apellido);
+            Log.i("migracionCliente", "writeNewClient: telefono " + telefono);
+            Log.i("migracionCliente", "writeNewClient: fotoCliente " + fotoCliente);
+            Log.i("migracionCliente", "writeNewClient: direccionDeEntrega " + direccionDeEntrega);
+            Log.i("migracionCliente", "writeNewClient: ciudad " + ciudad);
+            Log.i("migracionCliente", "writeNewClient: IVA " + iva);
+            Log.i("migracionCliente", "writeNewClient: cUIT " + cuit);
+            Log.i("migracionCliente", "writeNewClient: especial " + especial);
+
+
+            Cliente cliente = new Cliente("Migracion",
+                    nombre,
+                    apellido,
+                    telefono,
+                    fotoCliente,
+                    direccionDeEntrega,
+                    ciudad,
+                    iva,
+                    cuit,
+                    especial,telefonos);
+
+            if (mClienteKey == null) {
+                mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();
+            }
+
+            Map<String, Object> clienteValues =  cliente.toMap();
+            Map<String, Object> childUpdates = new HashMap<>();
+
+            childUpdates.put(NODO_EMPRESA_CLIENTES + mEmpresaKey +"/"+ Id, clienteValues);
+
+            mDatabase.updateChildren(childUpdates);
+        }
+    }
+
 
 }

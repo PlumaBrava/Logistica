@@ -418,6 +418,17 @@ public class LoginActivity
                             // No es necesario llamar a esta funcion esta el listener escuchando y la llama directamente
 //                            onAuthSuccess(task.getResult().getUser().getUid());
                         } else {
+//                            AlertDialog.Builder alert = new AlertDialog.Builder(getApplication());
+//                            alert.setTitle(getString(R.string.MensajeErrorTituloRegistro));
+//                            alert.setMessage(task.getException().getMessage().toString());
+//
+//                            alert.setPositiveButton(getString(R.string.MensajeErrorOK), new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int whichButton) {
+//
+//                                }
+//                            });
+//                            alert.create().show();
                             Log.d(TAG, "signInFormEmail:" + task.getException().getMessage().toString());
                             Toast.makeText(LoginActivity.this, task.getException().getMessage().toString(),
                                     Toast.LENGTH_LONG).show();
@@ -627,18 +638,44 @@ public class LoginActivity
         boolean result = true;
         if (TextUtils.isEmpty(mEmailView.getText().toString())) {
             mEmailView.setError(getResources().getString(R.string.Required));
+            mEmailView.requestFocus();
+            result = false;
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(mEmailView.getText().toString()).matches()) {
+            mEmailView.setError(getResources().getString(R.string.DebeTenerMailCorrecto));
+            mEmailView.requestFocus();
             result = false;
         } else {
             mEmailView.setError(null);
-        }
 
-        if (TextUtils.isEmpty(mPasswordView.getText().toString())) {
-            mPasswordView.setError(getResources().getString(R.string.Required));
-            result = false;
-        } else {
-            mPasswordView.setError(null);
-        }
 
+            if (TextUtils.isEmpty(mPasswordView.getText().toString())) {
+                mPasswordView.setError(getResources().getString(R.string.Required));
+                mPasswordView.requestFocus();
+                result = false;
+            } else if (mPasswordView.getText().toString().length() < getResources().getInteger(R.integer.LogitudPassword)) {
+                mPasswordView.setError(getResources().getString(R.string.DebeTenerCantidad));
+                mPasswordView.requestFocus();
+                result = false;
+            } else if (!mPasswordView.getText().toString().matches(".*[A-Z].*")) {
+                mPasswordView.setError(getResources().getString(R.string.DebeTenerMayusculas));
+                mPasswordView.requestFocus();
+                result = false;
+            } else if (!mPasswordView.getText().toString().matches(".*[a-z].*")) {
+                mPasswordView.setError(getResources().getString(R.string.DebeTenerMinusculas));
+                mPasswordView.requestFocus();
+                result = false;
+            } else if (!mPasswordView.getText().toString().matches(".*\\d.*")) {
+                mPasswordView.setError(getResources().getString(R.string.DebeTenerNumeros));
+                mPasswordView.requestFocus();
+                result = false;
+            } else if (!mPasswordView.getText().toString().matches(".*[^0-9A-Za-z].*")) {
+                mPasswordView.setError(getResources().getString(R.string.DebeTenerSignosEspeciales));
+                mPasswordView.requestFocus();
+                result = false;
+            } else {
+                mPasswordView.setError(null);
+            }
+        }
         return result;
     }
 
@@ -667,6 +704,7 @@ public class LoginActivity
                         Log.d(TAG, "EmailAndPassword-createUser:onComplete:" + task.isSuccessful());
 
                         hideProgressDialog();
+                        showProgress(false);
 
                         if (task.isSuccessful()) {
                             showProgress(false);
@@ -690,7 +728,17 @@ public class LoginActivity
 
 
                         } else {
-
+//                            AlertDialog.Builder alert = new AlertDialog.Builder(getApplication());
+//                            alert.setTitle(getString(R.string.MensajeErrorTituloLoggin));
+//                            alert.setMessage(task.getException().getMessage().toString());
+//
+//                            alert.setPositiveButton(getString(R.string.MensajeErrorOK), new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int whichButton) {
+//
+//                                }
+//                            });
+//                            alert.create().show();
                             Log.d(TAG, "EmailAndPassword:Error:" + task.getException().getMessage().toString());
                             Toast.makeText(LoginActivity.this, task.getException().getMessage().toString(),
                                     Toast.LENGTH_LONG).show();

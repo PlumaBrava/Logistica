@@ -77,14 +77,14 @@ public class ActivityBasic extends AppCompatActivity {
             mProducto =  getIntent().getParcelableExtra(EXTRA_PRODUCT);
             mCliente =  getIntent().getParcelableExtra(EXTRA_CLIENTE);
 
-            Log.d(LOG_TAG, "savedInstanceState == nullmFirebaseUrl:" + mFirebaseUrl);
-            Log.d(LOG_TAG, "savedInstanceState == null-mUserKey:" + mUserKey);
-            Log.d(LOG_TAG, "savedInstanceState == null-mUsuario:" + mUsuario.getUsername() + " - " + mUsuario.getEmail());
-            Log.d(LOG_TAG, "savedInstanceState == null-mEmpresaKey:" + mEmpresaKey);
-            Log.d(LOG_TAG, "savedInstanceState == null-mEmpresa:" + mEmpresa.getNombre());
-            Log.d(LOG_TAG, "savedInstanceState == null-Perfil:" + mPerfil.getClientes());
-            Log.d(LOG_TAG, "savedInstanceState == null-mClienteKey:" + mClienteKey);
-            Log.d(LOG_TAG, "savedInstanceState == null-mProductKeyl:" + mProductKey);
+//            Log.d(LOG_TAG, "savedInstanceState == nullmFirebaseUrl:" + mFirebaseUrl);
+//            Log.d(LOG_TAG, "savedInstanceState == null-mUserKey:" + mUserKey);
+//            Log.d(LOG_TAG, "savedInstanceState == null-mUsuario:" + mUsuario.getUsername() + " - " + mUsuario.getEmail());
+//            Log.d(LOG_TAG, "savedInstanceState == null-mEmpresaKey:" + mEmpresaKey);
+//            Log.d(LOG_TAG, "savedInstanceState == null-mEmpresa:" + mEmpresa.getNombre());
+//            Log.d(LOG_TAG, "savedInstanceState == null-Perfil:" + mPerfil.getClientes());
+//            Log.d(LOG_TAG, "savedInstanceState == null-mClienteKey:" + mClienteKey);
+//            Log.d(LOG_TAG, "savedInstanceState == null-mProductKeyl:" + mProductKey);
 
         } else {
             leerVariablesGlobales(savedInstanceState);
@@ -98,18 +98,18 @@ public class ActivityBasic extends AppCompatActivity {
             // Save the user's current state
 
 
-            Log.d(LOG_TAG, "onSaveInstanceState-mFirebaseUrl:" + mFirebaseUrl);
-
-            Log.d(LOG_TAG, "onSaveInstanceState-onAuthStateChanged:mUserKey:" + mUserKey);
-            Log.d(LOG_TAG, "onSaveInstanceState-onAuthStateChanged:mUsuario:" + mUsuario.getUsername()+" - "+mUsuario.getEmail());
-
-
-            Log.d(LOG_TAG, "onSaveInstanceState-mEmpresaKey:" + mEmpresaKey);
-            Log.d(LOG_TAG, "onSaveInstanceState-mEmpresa:" + mEmpresa.getNombre());
-
-            Log.d(LOG_TAG, "onSaveInstanceState-Perfil:" + mPerfil.getClientes());
-            Log.d(LOG_TAG, "onSaveInstanceState-mClienteKey:" + mClienteKey);
-            Log.d(LOG_TAG, "onSaveInstanceState-mProductKey:" +mProductKey);
+//            Log.d(LOG_TAG, "onSaveInstanceState-mFirebaseUrl:" + mFirebaseUrl);
+//
+//            Log.d(LOG_TAG, "onSaveInstanceState-onAuthStateChanged:mUserKey:" + mUserKey);
+//            Log.d(LOG_TAG, "onSaveInstanceState-onAuthStateChanged:mUsuario:" + mUsuario.getUsername()+" - "+mUsuario.getEmail());
+//
+//
+//            Log.d(LOG_TAG, "onSaveInstanceState-mEmpresaKey:" + mEmpresaKey);
+//            Log.d(LOG_TAG, "onSaveInstanceState-mEmpresa:" + mEmpresa.getNombre());
+//
+//            Log.d(LOG_TAG, "onSaveInstanceState-Perfil:" + mPerfil.getClientes());
+//            Log.d(LOG_TAG, "onSaveInstanceState-mClienteKey:" + mClienteKey);
+//            Log.d(LOG_TAG, "onSaveInstanceState-mProductKey:" +mProductKey);
 
 
             savedInstanceState.putString(EXTRA_FIREBASE_URL, mFirebaseUrl);
@@ -191,12 +191,12 @@ public void putExtraFirebase(Intent intent){   // para pasar información a una 
     intent.putExtra(EXTRA_PRODUCT_KEY, mProductKey);
     intent.putExtra(EXTRA_PRODUCT, mProducto);
     intent.putExtra(EXTRA_CLIENTE, mCliente);
-    Log.d(LOG_TAG, "putExtraFirebase-mFirebaseUrl:" + mFirebaseUrl);
-    Log.d(LOG_TAG, "putExtraFirebase-:mUserKey:" + mUserKey);
-    Log.d(LOG_TAG, "putExtraFirebase-:mUsuario:" + mUsuario.getUsername()+" - "+mUsuario.getEmail());
-    Log.d(LOG_TAG, "putExtraFirebase-mEmpresaKey:" + mEmpresaKey);
-    Log.d(LOG_TAG, "putExtraFirebase-mEmpresa,nombre:" + mEmpresa.getNombre());
-    Log.d(LOG_TAG, "putExtraFirebase-Perfil,Cliente:" + mPerfil.getClientes());
+//    Log.d(LOG_TAG, "putExtraFirebase-mFirebaseUrl:" + mFirebaseUrl);
+//    Log.d(LOG_TAG, "putExtraFirebase-:mUserKey:" + mUserKey);
+//    Log.d(LOG_TAG, "putExtraFirebase-:mUsuario:" + mUsuario.getUsername()+" - "+mUsuario.getEmail());
+//    Log.d(LOG_TAG, "putExtraFirebase-mEmpresaKey:" + mEmpresaKey);
+//    Log.d(LOG_TAG, "putExtraFirebase-mEmpresa,nombre:" + mEmpresa.getNombre());
+//    Log.d(LOG_TAG, "putExtraFirebase-Perfil,Cliente:" + mPerfil.getClientes());
 }
 
 public Bundle putBundleFirebase()  // Se usa para enviar información desde una Actividad a un fragment

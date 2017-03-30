@@ -9,6 +9,15 @@
 
     <!--Loging Activity-->
     <string name="Required">requerido</string>
+    <string name="MensajeErrorTituloRegistro">Error al Registrar Mail</string>
+    <string name="MensajeErrorTituloLoggin">Error al Ingresar</string>
+    <string name="MensajeErrorOK">OK</string>
+    <string name="DebeTenerMailCorrecto">El email no es correcto</string>
+    <string name="DebeTenerMayusculas">Debe contener Mayusculas</string>
+    <string name="DebeTenerMinusculas">Debe contener Minusculas</string>
+    <string name="DebeTenerNumeros">Debe contener Numeros</string>
+    <string name="DebeTenerCantidad">Debe tener 8 Caracteres</string>
+    <string name="DebeTenerSignosEspeciales">Debe contener Signos especiales</string>
     <string name="sign_in">ingresar</string>
     <string name="sign_up">registrarse</string>
     <string name="error_usuario">Error al buscar datos del usuario</string>
@@ -85,6 +94,7 @@
 
     <!--Saldos List Fragment-->
     <string name="empty_ordenes_saldos_list">Sin Ordenes para mostrar</string>
+    <string name="empty_pagos_saldos_list">Sin Pagos para mostrar</string>
     <string name="empty_saldos_list">Sin Saldos Para Mostrar</string>
     <string name="empty_custom_ssOrder_list">Sisss</string>
 
@@ -103,6 +113,10 @@
     <string name="price_error_cantBeNull">No puede estar en blanco</string>
     <string name="price_error_mustBegraterthan0">Debe ser mayor que cero</string>
     <string name="price_error_cantBeCero">No puede ser cero</string>
+
+    <string name="error_CantidadMinima">Debe ser mayor que cero</string>
+    <string name="error_CantidadDefault">Debe estar entre Minimo y Máximo</string>
+    <string name="error_CantidadMaxima">Debe ser menora a : %d </string>
 
     <string name="product_priceSpecal_text">Precio Especial:</string>
     <string name="enter_priceSpecia_message">Ingrese precio especial</string>
@@ -132,6 +146,23 @@
     <string name="productMinCantidadUnitaria" >Cantidad Minima: </string>
     <string name="productMaxCantidadUnitaria" >Cantidad Máxima: </string>
     <string name="productDefaultCantidadUnitaria" >Cantidad Default: </string>
+
+
+    <string name="TituloMovimiento">Movimentos: </string>
+    <string name="tipoMovimiento">Tipo: </string>
+    <string-array name="tipoMovimiento_array">
+        <item>Fabricación</item>
+        <item>Traslado</item>
+        <item>Salida x Picking</item>
+        <item>Salida para Consumo</item>
+        <item>Baja x Diferencia de Inventario</item>
+    </string-array>
+    <string name="origenMovimiento">Origen: </string>
+    <string name="destinoMovimiento">Destino: </string>
+    <string name="productoMovimiento">Producto: </string>
+    <string name="cantidadMovimiento">Cantidad: </string>
+    <string name="fechaMovimiento">Fecha: </string>
+    <string name="usuarioMovimiento">usuario: </string>
 
 
     <!--Verifications Message In Product-->
@@ -174,6 +205,11 @@
     <string name="validacionEmisor_pagos_fragment">Emisor del cheque </string>
     <string name="validacionNumeroCheque_pagos_fragment">Ingrese Nro de cheque </string>
     <string name="validacionNumeroFoto_pagos_fragment">Foto del cheque </string>
+
+<!-- Stock List Fragment -->
+    <string name="empty_Stock">Almacen sin Stock </string>
+    <string name="empty_Almacenes">Sin Almacenes Para Mostrar </string>
+    <string name="almacen_StockTitle">Almacen: </string>
 
 
     <!--Custom Detail Activity-->
@@ -304,6 +340,7 @@
 
     <!--Custom ORDER CARD (customorder_list_contet.xml-->
     <string name="custom_card_order_number">ORDEN: </string>
+    <string name="custom_card_monto">Monto</string>
     <string name="custom_card_empty_custom_list">Sin Ordenes para mostrar </string>
 
 
@@ -313,6 +350,20 @@
     <string name="picking_card_Text_Coment">Ingrese su Comentario </string>
     <string name="picking_card_saveButton_contentDescription">Boton Grabar</string>
 
+
+    <!--Saldos Titulos(saldos_title.xml-->
+    <string name="cliente_SaldoTitle">Cliente: </string>
+    <string name="saldo_SaldoTitle">Saldo: </string>
+
+
+    <!--Saldos viewHolder(saldos_list_content.xml-->
+    <string name="cliente_SaldoViewHolder">Cliente: </string>
+    <string name="saldo_SaldoViewHolder">Saldo: </string>
+
+    <!--Pagos viewHolder(pagos_list_content.xml-->
+    <string name="tipoDePago_PagoViewHolder">Tipo: </string>
+    <string name="monto_PagoViewHolder">Monto: </string>
+    <string name="fecha_PagoViewHolder">Fecha: </string>
 
     <!--Custom ORDER DETAIL ITEM (order_detail_item.xml-->
     <string name="favorito">Favorito</string>
@@ -378,6 +429,15 @@
     <string name="quantityPicking">Cantidad en Preparacion"</string>
     <string name="quantityDelivered">Cantidad en Entrega"</string>
 
+
+    <!-- Stock_item -->
+    <string name="blancoStockItem"></string>
+    <string name="cantidadUnidadesStockItem">Unidades</string>
+    <string name="cantidadKgStockItem">Kg</string>
+    <string name="enStockStockItem">Stock</string>
+    <string name="SolicitadoStockItem">Solicitado</string>
+
+
     <!-- Imagenes -->
     <string name="TakePhoto">Sacar una Foto</string>
     <string name="ChoosefromLibrary">Elegir de la Libreria</string>
@@ -425,7 +485,7 @@
     <string name="hint_empresaCodigoPostal">Código Postal</string>
     <string name="hint_empresaTelefono">Teléfono</string>
     <string name="hint_empresaLogo">Logo</string>
-    <string name="title_activity_empesas_list">EmpesasListActivity</string>
+    <string name="title_activity_empesas_list">Lista de Empresas</string>
     <string name="action_settings">Settings</string>
     <string name="olvidaste_tu_constrase_a">¿Olvidaste tu constraseña?</string>
     <string name="logo">Logo</string>

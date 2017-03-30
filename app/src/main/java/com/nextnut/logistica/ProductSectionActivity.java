@@ -104,7 +104,7 @@ public class ProductSectionActivity extends ActivityBasic {
 //            public void onClick(long id, ProductCursorAdapter.ViewHolder vh) {
 //                Intent intent = new Intent();
 //                intent.putExtra(KEY_RefPRODUCTO, id);
-//                intent.putExtra(KEY_PRODUCTO_NAME, vh.mTextViewNombre.getText());
+//                intent.putExtra(KEY_PRODUCTO_NAME, vh.mNombreProducto.getText());
 //
 //                intent.putExtra(KEY_PRODUCTO_PRICE,vh.mTextViewPrecio.getText().toString());
 //                intent.putExtra(KEY_PRODUCTO_PRICES_ESPECIAL,vh.mTextViewPrecioEspecial.getText().toString());

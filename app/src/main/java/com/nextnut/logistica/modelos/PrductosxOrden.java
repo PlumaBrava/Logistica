@@ -1,5 +1,7 @@
 package com.nextnut.logistica.modelos;
 
+import android.util.Log;
+
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
@@ -67,12 +69,16 @@ public class PrductosxOrden {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-
+        Log.i("informe", "Producto x Orden map - producto " + detalle.getProducto().getNombreProducto());
+        Log.i("informe", "Producto x Orden map -  cantidad " + detalle.getCantidadOrden());
         result.put("cliente", cliente);
-        result.put("detalle", detalle);
+        result.put("detalle", detalle.toMap());
         result.put("semaforo", semaforo);
-
-
+        Log.i("informe", "Producto x Orden map - D1 producto" );
+//        Detalle d= (Detalle) result.get("detalle");
+//        Log.i("informe", "Producto x Orden map - D producto " + d.getProducto().getNombreProducto());
+//        Log.i("informe", "Producto x Orden map - D cantidad " + d.getCantidadUnidadesEnStock());
+//        Log.i("informe", "Producto x Orden map - D precio " + d.getPrecio());
 
         return result;
     }

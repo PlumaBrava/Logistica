@@ -24,23 +24,25 @@ import static com.nextnut.logistica.util.MakeCall.makePhoneCallCliente;
 public class CabeceraViewHolder extends RecyclerView.ViewHolder {
     Context mContext;
     public TextView mOrderNumber;
-    public TextView mName;
-    public TextView mLastname;
+    public TextView mApellidoyNombre;
+//    public TextView mLastname;
     public ImageButton mBottonPhoto;
     public String mCustomerRefContacto;
 
     public TextView mTotalPrice;
     public TextView mDate;
+    public ImageButton mpasarAPickingSelector;
 
     public CabeceraViewHolder(View view) {
         super(view);
         mContext=view.getContext();
         mOrderNumber = (TextView) view.findViewById(R.id.numberOrderCard);
-        mName = (TextView) view.findViewById(R.id.nameOrderCard);
-        mLastname = (TextView) view.findViewById(R.id.latNameOrderCard);
+        mApellidoyNombre = (TextView) view.findViewById(R.id.ApellidoyNombreOrderCard);
+//        mLastname = (TextView) view.findViewById(R.id.latNameOrderCard);
         mTotalPrice = (TextView) view.findViewById(R.id.totalPriceOrderCard);
         mDate = (TextView) view.findViewById(R.id.dateOrderCard);
         mBottonPhoto = (ImageButton) view.findViewById(R.id.phoneClallButton);
+        mpasarAPickingSelector = (ImageButton) view.findViewById(R.id.pasarPickingSelector);
         mBottonPhoto.setBackgroundColor(Color.TRANSPARENT);
     }
 
@@ -57,11 +59,12 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
 
 //        mcursorId=cursor.getLong(0);
         mOrderNumber.setText(String.valueOf(cabeceraOrden.getNumeroDeOrden()));
-        mName.setText(cabeceraOrden.getCliente().getNombre());
-        mLastname.setText(cabeceraOrden.getCliente().getApellido());
+        mApellidoyNombre.setText(cabeceraOrden.getCliente().getNombre()+" "+cabeceraOrden.getCliente().getApellido());
+//        mLastname.setText();
         NumberFormat format = NumberFormat.getCurrencyInstance();
         mTotalPrice.setText(format.format(cabeceraOrden.getTotales().getMontoEnOrdenes()));
-        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+//        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy");
 
 
         mDate.setText(sfd.format(new Date(cabeceraOrden.getFechaDeCreacion())) );
@@ -98,7 +101,7 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
 
             mBottonPhoto.setVisibility(View.GONE);
             }}
-        ((View)mDate.getParent()) . setOnClickListener(cabeceraClickListener);
+        ((View)mDate.getParent().getParent().getParent()) . setOnClickListener(cabeceraClickListener);
 
     }
 }

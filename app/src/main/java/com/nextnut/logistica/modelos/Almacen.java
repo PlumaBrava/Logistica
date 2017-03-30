@@ -24,6 +24,7 @@ public class Almacen implements Parcelable{
     private String telefono;
     private long fechaModificacion;
     private String uid;
+    private String almacenKey;
 
     private String logo;
 
@@ -33,7 +34,7 @@ public class Almacen implements Parcelable{
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Almacen(String uid, String nombre, String responsable, String ciudad, String direccion, String tipoAlmacen, String telefono, String logo) {
+    public Almacen(String uid, String nombre, String responsable, String ciudad, String direccion, String tipoAlmacen, String telefono, String logo, String almacenKey) {
         this.uid=uid;
         this.nombre = nombre;
         this.reponsable = responsable;
@@ -42,6 +43,15 @@ public class Almacen implements Parcelable{
         this.tipodeAlmacen = tipoAlmacen;
         this.telefono = telefono;
         this.logo = logo;
+        this.almacenKey = almacenKey;
+    }
+
+    public String getAlmacenKey() {
+        return almacenKey;
+    }
+
+    public void setAlmacenKey(String almacenKey) {
+        this.almacenKey = almacenKey;
     }
 
     public String getUid() {
@@ -122,6 +132,7 @@ public class Almacen implements Parcelable{
         result.put("logo", logo);
         result.put("uid", uid);
         result.put("fechaModificacion", ServerValue.TIMESTAMP);
+        result.put("almacenKey", almacenKey);
         return result;
     }
     // [END post_to_map]
@@ -155,6 +166,7 @@ public class Almacen implements Parcelable{
         parcel.writeLong(fechaModificacion);
         parcel.writeString(uid);
         parcel.writeString(logo);
+        parcel.writeString(almacenKey);
 
     }
     // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
@@ -179,6 +191,7 @@ public class Almacen implements Parcelable{
         fechaModificacion= in.readLong();
         uid= in.readString();
         logo =in.readString();
+        almacenKey =in.readString();
 
     }
 }

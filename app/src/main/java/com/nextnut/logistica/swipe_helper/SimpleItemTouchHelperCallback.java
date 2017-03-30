@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 
 import com.nextnut.logistica.R;
@@ -43,7 +44,10 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
     private Paint p = new Paint();
     @Override
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-
+        Log.i("ItemTouchHelper", " actionState" +actionState );
+        Log.i("ItemTouchHelper", " isCurrentlyActive" +isCurrentlyActive );
+        Log.i("ItemTouchHelper", "  dX" + dX );
+        Log.i("ItemTouchHelper", " dY" + dY );
         Bitmap icon=null;
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
 

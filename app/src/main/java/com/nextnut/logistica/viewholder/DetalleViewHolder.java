@@ -24,14 +24,12 @@ public class DetalleViewHolder extends RecyclerView.ViewHolder  implements ItemT
     Boolean mfavoriteVisibe = true;
     Boolean mDeliveryState = false;
 
-    public Long mDetalleOrderId ;
-    public Long mRefCustomer ;
-    public Long mRefProduct ;
     public String mphotString;
     public ImageView mphotoProducto;
     public TextView mTextViewNombre;
 
     public TextView mTextViewPrecio;
+    public TextView mTextViewPrecioTitulo;
     public TextView mTextcantidad;
     public TextView mTextToal;
 
@@ -39,7 +37,6 @@ public class DetalleViewHolder extends RecyclerView.ViewHolder  implements ItemT
     public TextView mTextcantidadDelivery;
     public TextView mTextToalDelivery;
 
-//    public TextView mTextViewDescition;
     public CheckBox mfavorito;
 
     public void setDeliveryState() {this.mDeliveryState=true;}
@@ -50,8 +47,8 @@ public class DetalleViewHolder extends RecyclerView.ViewHolder  implements ItemT
         mContext=view.getContext();
         mphotoProducto = (ImageView) view.findViewById(R.id.photoProducto);
         mTextViewNombre = (TextView) view.findViewById(R.id.nombreProducto);
-//        mTextViewDescition = (TextView) view.findViewById(R.id.descriptionProducto);
         mTextViewPrecio = (TextView) view.findViewById(R.id.precioProducto);
+        mTextViewPrecioTitulo = (TextView) view.findViewById(R.id.precioTitulo);
         mTextcantidad = (TextView) view.findViewById(R.id.cantidad);
         mTextToal = (TextView) view.findViewById(R.id.total);
         mTextViewPrecioDelivery = (TextView) view.findViewById(R.id.precioProductoDelivery);
@@ -102,7 +99,7 @@ public class DetalleViewHolder extends RecyclerView.ViewHolder  implements ItemT
         mTextToal.setText(format.format(detalle.getMontoItemOrden()));
         Log.d("detalle2", "Delivery " + mDeliveryState);
         Log.d("detalle2", "Cantidad Picking " + detalle.getCantidadPicking());
-        Log.d("detalle2", "antes saveDetalle-detalle.getMontoItemOrden()) " + detalle.getMontoItemOrden());
+        Log.d("detalle2", "antes saveDetalle-detalle.getKilosEnStock()) " + detalle.getMontoItemOrden());
 
         if(detalle.getCantidadPicking() > -1) {
            mTextViewPrecioDelivery.setText(format.format(detalle.getPrecio()));
@@ -111,10 +108,6 @@ public class DetalleViewHolder extends RecyclerView.ViewHolder  implements ItemT
 
         }
 
-//        mTextViewDescition.setText(detalle.getProducto().getDescripcionProducto());
-//        mfavorito.setChecked(detalle.getProducto().get);
-//        mRefProduct =cursor.getLong(1) ;
-//        mRefCustomer =cursor.getLong(9) ;
 
         ((View) mTextcantidad.getParent().getParent().getParent()).setOnClickListener(detalleClickListener);
 

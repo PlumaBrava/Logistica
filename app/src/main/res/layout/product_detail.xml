@@ -199,23 +199,7 @@
                 />
 
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <!--app:counterEnabled="true"-->
-            <!--app:counterMaxLength="@integer/customNameMaxLength"-->
 
-            <EditText
-                android:id="@+id/productCantidadDefault"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/productDefaultCantidadUnitaria"
-                android:hint="@string/productDefaultCantidadUnitaria"
-                android:inputType="number"
-                android:padding="8dp"
-                />
-
-        </android.support.design.widget.TextInputLayout>
 
         /////
         <LinearLayout
@@ -238,6 +222,24 @@
                     android:inputType="number"
                     android:padding="8dp"
                   />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <!--app:counterEnabled="true"-->
+                <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+
+                <EditText
+                    android:id="@+id/productCantidadDefault"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/productDefaultCantidadUnitaria"
+                    android:hint="@string/productDefaultCantidadUnitaria"
+                    android:inputType="number"
+                    android:padding="8dp"
+                    />
 
             </android.support.design.widget.TextInputLayout>
 

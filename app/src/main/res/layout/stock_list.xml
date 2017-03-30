@@ -12,21 +12,18 @@
         android:orientation="vertical">
 
 
-        <include layout="@layout/saldos_title" />
+        <include layout="@layout/stock_title" />
 
 
         <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/saldos_listRV"
+            android:id="@+id/almacenes_listRV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp" />
-        <!--app:layoutManager="LinearLayoutManager"-->
-        <!--tools:context=".PickingListFragment"-->
-        <!--tools:listitem="@layout/picking_orders_list_content"-->
 
         <TextView
-            android:id="@+id/recyclerview_saldos_empty"
+            android:id="@+id/recyclerview_almacenes_empty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -36,21 +33,19 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingStart="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin"
-            android:text="@string/empty_saldos_list"
+            android:text="@string/empty_Almacenes"
 
             />
-        <!--app:layout_anchorGravity="fill"-->
-        <!--app:layout_anchor="@+id/saldos_title"-->
 
 
         <LinearLayout
-            android:id="@+id/linearOrdersyPagos"
+            android:id="@+id/linearProductosEnStock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/customOrderEnSaldos_list"
+                android:id="@+id/productoEnStock_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -61,7 +56,7 @@
             <!--tools:context=".PagosFragment"-->
 
             <TextView
-                android:id="@+id/recyclerview_orden_empty"
+                android:id="@+id/recyclerview_productosEnStock_empty"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal"
@@ -71,31 +66,31 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingStart="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                android:text="@string/empty_ordenes_saldos_list" />
+                android:text="@string/empty_Stock" />
 
-            <!--app:layout_anchor="@+id/customOrderEnSaldos_list"-->
-            <!--app:layout_anchorGravity="fill"-->
-            <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/pagosEnSaldos_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp" />
-            <!--app:layoutManager="LinearLayoutManager"-->
-            <!--tools:context=".PagosFragment"-->
+            <!--&lt;!&ndash;app:layout_anchor="@+id/customOrderEnSaldos_list"&ndash;&gt;-->
+            <!--&lt;!&ndash;app:layout_anchorGravity="fill"&ndash;&gt;-->
+            <!--<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"-->
+                <!--android:id="@+id/pagosEnSaldos_list"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="16dp"-->
+                <!--android:layout_marginRight="16dp" />-->
+            <!--&lt;!&ndash;app:layoutManager="LinearLayoutManager"&ndash;&gt;-->
+            <!--&lt;!&ndash;tools:context=".PagosFragment"&ndash;&gt;-->
 
-            <TextView
-                android:id="@+id/recyclerview_pagos_empty"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:text="@string/empty_pagos_saldos_list" />
+            <!--<TextView-->
+                <!--android:id="@+id/recyclerview_pagos_empty"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:paddingBottom="@dimen/activity_vertical_margin"-->
+                <!--android:paddingEnd="@dimen/activity_horizontal_margin"-->
+                <!--android:paddingLeft="@dimen/activity_horizontal_margin"-->
+                <!--android:paddingRight="@dimen/activity_horizontal_margin"-->
+                <!--android:paddingStart="@dimen/activity_horizontal_margin"-->
+                <!--android:paddingTop="@dimen/activity_vertical_margin"-->
+                <!--android:text="@string/empty_pagos_saldos_list" />-->
             <!--app:layout_anchor="@+id/pagosEnSaldos_list"-->
             <!--app:layout_anchorGravity="fill"-->
         </LinearLayout>

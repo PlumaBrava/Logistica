@@ -153,6 +153,11 @@ public class Constantes {
 
 
 
+    public static String ESQUEMA_STOCK = "stock";
+    public static String NODO_STOCK ="/" + ESQUEMA_STOCK+ "/";
+
+
+
     // Constantes para pasar datos entre actividades.
     public static  final String EXTRA_FIREBASE_URL ="FIREBASE_URL";
     public static  final String EXTRA_USER_KEY ="user_key";
@@ -216,6 +221,7 @@ public class Constantes {
     public static final int   ADAPTER_DETALLE_DELIVEY=9;
     public static final int   ADAPTER_CABECERA_ORDEN_EN_PICKING=10;
     public static final int   ADAPTER_CABECERA_ORDEN_EN_DELIVEY=11;
+    public static final int   ADAPTER_PAGOS_EN_DELIVEY=12;
 
     public static  String detalleOrdenRef_1C(String mEmpresaKey,long numeroDeOrdena,String productoKey){
         String numeroDeOrden =String.valueOf(numeroDeOrdena);

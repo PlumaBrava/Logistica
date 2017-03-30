@@ -16,31 +16,31 @@ import java.util.Map;
  * En ella se guardan los datos del producto, y si este cambia no se actualiza esta entrada. Contiene los datos de su creacion. Ej, precio
  */
 @IgnoreExtraProperties
-public class Detalle {
+public class Stock {
 
     private Producto producto;
-    private Double cantidadOrden=0.0;
-    private Double cantidadPicking=0.0;
+    private Double cantidadUnidadesEnStock =0.0;
+    private Double cantidadUnidadesSolicitadas =0.0;
     private Double cantidadEntrega=0.0;
     private Double precio=0.0;
-    private Double montoItemOrden=0.0;
-    private Double montoItemPicking=0.0;
+    private Double kilosEnStock =0.0;
+    private Double kilosSolicitados =0.0;
     private Double montoItemEntrega=0.0;
     private Double montoImpuesto=0.0;
     private Boolean semaforo=true; // Si el semaforo es true, significa que esta verde. Se puede modificar el contenidos. si es false esta bloquedao para modificacioens/
 
-    public Detalle() {
+    public Stock() {
         // Default constructor required for calls to DataSnapshot.getValue(Totales.class)
     }
-    public Detalle copy(){
-            Detalle detalleCppy=new Detalle();
+    public Stock copy(){
+            Stock detalleCppy=new Stock();
             detalleCppy.setProducto(producto);
-            detalleCppy.setCantidadOrden(cantidadOrden);
-            detalleCppy.setCantidadPicking(cantidadPicking);
+            detalleCppy.setCantidadUnidadesEnStock(cantidadUnidadesEnStock);
+            detalleCppy.setCantidadUnidadesSolicitadas(cantidadUnidadesSolicitadas);
             detalleCppy.setCantidadEntrega(cantidadEntrega);
             detalleCppy.setPrecio(precio);
-            detalleCppy.setMontoItemOrden(montoItemOrden);
-            detalleCppy.setMontoItemPicking(montoItemPicking);
+            detalleCppy.setKilosEnStock(kilosEnStock);
+            detalleCppy.setKilosSolicitados(kilosSolicitados);
             detalleCppy.setMontoItemEntrega(montoItemEntrega);
             detalleCppy.setMontoImpuesto(montoImpuesto);
             detalleCppy.setMontoImpuesto(montoImpuesto);
@@ -48,18 +48,7 @@ public class Detalle {
                 return detalleCppy;
     }
 
-    public Detalle(Double cantidadOrden, Producto producto, Cliente cliente) {
-        this.cantidadOrden = cantidadOrden;
-        this.producto = producto;
-        if (cliente!=null){
-            if(cliente.getEspecial()){
-                this.precio=producto.getPrecioEspcecial();
-            }else {
-                this.precio=producto.getPrecio();
-            }
-            this.montoItemOrden=cantidadOrden*this.precio;
-        }
-    }
+
 
     public Double getCantidadEntrega() {
         return cantidadEntrega;
@@ -69,20 +58,20 @@ public class Detalle {
         this.cantidadEntrega = cantidadEntrega;
     }
 
-    public Double getCantidadOrden() {
-        return cantidadOrden;
+    public Double getCantidadUnidadesEnStock() {
+        return cantidadUnidadesEnStock;
     }
 
-    public void setCantidadOrden(Double cantidadOrden) {
-        this.cantidadOrden = cantidadOrden;
+    public void setCantidadUnidadesEnStock(Double cantidadUnidadesEnStock) {
+        this.cantidadUnidadesEnStock = cantidadUnidadesEnStock;
     }
 
-    public Double getCantidadPicking() {
-        return cantidadPicking;
+    public Double getCantidadUnidadesSolicitadas() {
+        return cantidadUnidadesSolicitadas;
     }
 
-    public void setCantidadPicking(Double cantidadPicking) {
-        this.cantidadPicking = cantidadPicking;
+    public void setCantidadUnidadesSolicitadas(Double cantidadUnidadesSolicitadas) {
+        this.cantidadUnidadesSolicitadas = cantidadUnidadesSolicitadas;
     }
 
     public Double getMontoImpuesto() {
@@ -110,22 +99,22 @@ public class Detalle {
     }
 
 
-    public Double getMontoItemOrden() {
-        return montoItemOrden;
+    public Double getKilosEnStock() {
+        return kilosEnStock;
     }
 
 
-    public void setMontoItemOrden(Double montoItemOrden) {
-        this.montoItemOrden = montoItemOrden;
+    public void setKilosEnStock(Double kilosEnStock) {
+        this.kilosEnStock = kilosEnStock;
     }
 
-    public Double getMontoItemPicking() {
-        return montoItemPicking;
+    public Double getKilosSolicitados() {
+        return kilosSolicitados;
     }
 
 
-    public void setMontoItemPicking(Double montoItemPicking) {
-        this.montoItemPicking = montoItemPicking;
+    public void setKilosSolicitados(Double kilosSolicitados) {
+        this.kilosSolicitados = kilosSolicitados;
     }
 
 
@@ -161,39 +150,39 @@ public class Detalle {
     // Metodos para modificar en detalle en Como Items.
 
     public void ingresaProductoEnOrden(Double cantidadOrden,  Producto producto, Boolean clienteEspecial) {
-//        this.cantidadOrden = cantidadOrden;
-        setCantidadOrden(cantidadOrden);
+//        this.cantidadUnidadesEnStock = cantidadUnidadesEnStock;
+        setCantidadUnidadesEnStock(cantidadOrden);
         Log.d("detalle2", "antes IngresaProductoenOrden-this.precio) " + this.precio);
 //        this.producto = producto;
         setProducto(producto);
         if (clienteEspecial) {
             setPrecio( producto.getPrecioEspcecial());
             Log.d("detalle2", "despues-especial IngresaProductoenOrden-this.precio) " + this.precio);
-//            this.montoItemOrden = cantidadOrden * producto.getPrecioEspcecial();
-            setMontoItemOrden(cantidadOrden * producto.getPrecioEspcecial());
+//            this.kilosEnStock = cantidadUnidadesEnStock * producto.getPrecioEspcecial();
+            setKilosEnStock(cantidadOrden * producto.getPrecioEspcecial());
         } else {
             setPrecio(producto.getPrecio());
             Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
-//            this.montoItemOrden = cantidadOrden * producto.getPrecio();
-            setMontoItemOrden(cantidadOrden * producto.getPrecio());
+//            this.kilosEnStock = cantidadUnidadesEnStock * producto.getPrecio();
+            setKilosEnStock(cantidadOrden * producto.getPrecio());
 
         }
 
     }
-    public void modificarCantidadEnTotalInicial(Detalle detalleOrdenNuevo,  Detalle detalleOrdenAnterior) {
-        Log.d("EnTotalInicial", "this.montoItemOrden) " + this.montoItemOrden);
-        Log.d("EnTotalInicial", "detalleOrdenNuevo.getKilosEnStock() " + detalleOrdenNuevo.getMontoItemOrden());
-        Log.d("EnTotalInicial", "detalleOrdenAnterior.getKilosEnStock() " + detalleOrdenAnterior.getMontoItemOrden());
-        this.cantidadOrden = this.cantidadOrden+detalleOrdenNuevo.getCantidadOrden()-detalleOrdenAnterior.getCantidadOrden();
-        this.montoItemOrden = this.montoItemOrden+detalleOrdenNuevo.getMontoItemOrden()-detalleOrdenAnterior.getMontoItemOrden();
+    public void modificarCantidadEnTotalInicial(Stock detalleOrdenNuevo, Stock detalleOrdenAnterior) {
+        Log.d("EnTotalInicial", "this.kilosEnStock) " + this.kilosEnStock);
+        Log.d("EnTotalInicial", "detalleOrdenNuevo.getKilosEnStock() " + detalleOrdenNuevo.getKilosEnStock());
+        Log.d("EnTotalInicial", "detalleOrdenAnterior.getKilosEnStock() " + detalleOrdenAnterior.getKilosEnStock());
+        this.cantidadUnidadesEnStock = this.cantidadUnidadesEnStock +detalleOrdenNuevo.getCantidadUnidadesEnStock()-detalleOrdenAnterior.getCantidadUnidadesEnStock();
+        this.kilosEnStock = this.kilosEnStock +detalleOrdenNuevo.getKilosEnStock()-detalleOrdenAnterior.getKilosEnStock();
 
     }
 
-    public void modificarCantidadEnTotalDelivey(Detalle detalleOrdenNuevo,  Detalle detalleOrdenAnterior) {
-        Log.d("EnTotalDelivey", "this.montoItemOrden) " + this.montoItemOrden);
+    public void modificarCantidadEnTotalDelivey(Stock detalleOrdenNuevo, Stock detalleOrdenAnterior) {
+        Log.d("EnTotalDelivey", "this.kilosEnStock) " + this.kilosEnStock);
         Log.d("EnTotalDelivey", "detalleOrdenNuevo.getCantidadEntrega()" + detalleOrdenNuevo.getCantidadEntrega());
         Log.d("EnTotalDelivey", "detalleOrdenNuevo.getMontoItemEntrega()" + detalleOrdenNuevo.getMontoItemEntrega());
-        Log.d("EnTotalDelivey", "detalleOrdenAnterior.getKilosEnStock() " + detalleOrdenAnterior.getMontoItemOrden());
+        Log.d("EnTotalDelivey", "detalleOrdenAnterior.getKilosEnStock() " + detalleOrdenAnterior.getKilosEnStock());
         Log.d("EnTotalDelivey", "detalleOrdenAnterior.getMontoItemEntrega() " + detalleOrdenAnterior.getMontoItemEntrega());
         this.cantidadEntrega = this.cantidadEntrega+detalleOrdenNuevo.getCantidadEntrega()-detalleOrdenAnterior.getCantidadEntrega();
         this.montoItemEntrega = this.montoItemEntrega+detalleOrdenNuevo.getMontoItemEntrega()-detalleOrdenAnterior.getMontoItemEntrega();
@@ -202,8 +191,8 @@ public class Detalle {
 
 
     public void modificarCantidadProductoDeOrden(Double cantidadOrdenNueva){
-        this.cantidadOrden = cantidadOrdenNueva;
-        this.montoItemOrden = cantidadOrdenNueva * this.precio;
+        this.cantidadUnidadesEnStock = cantidadOrdenNueva;
+        this.kilosEnStock = cantidadOrdenNueva * this.precio;
 
     }
 
@@ -216,16 +205,16 @@ public class Detalle {
     // Se usa en 7-Al pasar al orden al Picking
     public void ingresaProductoEnPicking(Double cantidad,  Producto producto) {
         // En picking el monto se suma de la orden y en la cabecera del picking en funcion de las ordenes.
-        this.cantidadPicking = cantidad;
-//       this.montoItemPicking = this.montoItemPicking+monto;
+        this.cantidadUnidadesSolicitadas = cantidad;
+//       this.kilosSolicitados = this.kilosSolicitados+monto;
 
     }
 
 //    Se usa en 7 onClick
     public void modificarCantidadProductoDePicking(Double cantidadNueva){
-        this.cantidadPicking = cantidadNueva;
+        this.cantidadUnidadesSolicitadas = cantidadNueva;
 // El monto en picking no se suma. no se sabe exactamente cual es el precio.
-//        this.montoItemPicking = cantidadNueva * this.precio;
+//        this.kilosSolicitados = cantidadNueva * this.precio;
     }
 
 
@@ -250,29 +239,29 @@ public class Detalle {
 
     // Metodos para modificar en detalle en Cabeceras
 
-    public void modificarCantidadTotalDeOrden(Double cantidadOrdenNueva, Detalle detalleAnterior){
+    public void modificarCantidadTotalDeOrden(Double cantidadOrdenNueva, Stock detalleAnterior){
         //El detalle que ingresa tiene los datos de la posición de una orden.
         // El detalle que estamos modificando tiene los datos Totaliazos por producto.
         // detalle tienen los datos anteriores y precio y MontoTotal del Item (precio x Canidad).
 //        Cantidad nueva es la nueva cantidad
-        Log.i("detalle1", "this.cantidadOrden "+this.cantidadOrden);
-        Log.i("detalle1", "cantidadAnterior "+detalleAnterior.getCantidadOrden());
-        Log.i("detalle1", "cantidadMonto "+detalleAnterior.getMontoItemOrden());
+        Log.i("detalle1", "this.cantidadUnidadesEnStock "+this.cantidadUnidadesEnStock);
+        Log.i("detalle1", "cantidadAnterior "+detalleAnterior.getCantidadUnidadesEnStock());
+        Log.i("detalle1", "cantidadMonto "+detalleAnterior.getKilosEnStock());
         Log.i("detalle1", "cantidadOrdenNueva "+cantidadOrdenNueva);
-        this.cantidadOrden = this.cantidadOrden +cantidadOrdenNueva-detalleAnterior.getCantidadOrden();
-        this.montoItemOrden = montoItemOrden+cantidadOrdenNueva*detalleAnterior.getPrecio()-detalleAnterior.getMontoItemOrden();
+        this.cantidadUnidadesEnStock = this.cantidadUnidadesEnStock +cantidadOrdenNueva-detalleAnterior.getCantidadUnidadesEnStock();
+        this.kilosEnStock = kilosEnStock +cantidadOrdenNueva*detalleAnterior.getPrecio()-detalleAnterior.getKilosEnStock();
     }
 
-    public void modificarCantidadTotalDePicking(Double cantidadOrdenNueva, Detalle detalleAnterior){
+    public void modificarCantidadTotalDePicking(Double cantidadOrdenNueva, Stock detalleAnterior){
         //  El detalle que ingresa tiene los datos del item anterior
         //  El detalle que estamos modificando tiene los datos Totaliazos por producto.
         //  detalle tienen los datos anteriores y precio y MontoTotal del Item (precio x Canidad).
         //  Cantidad nueva es la nueva cantidad
 
-        this.cantidadPicking = this.cantidadPicking +cantidadOrdenNueva-detalleAnterior.getCantidadPicking();
-        this.montoItemPicking = montoItemPicking+cantidadOrdenNueva*detalleAnterior.getPrecio()-detalleAnterior.getMontoItemPicking();
+        this.cantidadUnidadesSolicitadas = this.cantidadUnidadesSolicitadas +cantidadOrdenNueva-detalleAnterior.getCantidadUnidadesSolicitadas();
+        this.kilosSolicitados = kilosSolicitados +cantidadOrdenNueva*detalleAnterior.getPrecio()-detalleAnterior.getKilosSolicitados();
     }
-    public void modificarCantidadTotalDeEntrega(Double cantidadOrdenNueva, Detalle detalleAnterior){
+    public void modificarCantidadTotalDeEntrega(Double cantidadOrdenNueva, Stock detalleAnterior){
         //  El detalle que ingresa tiene los datos del item anterior
         //  El detalle que estamos modificando tiene los datos Totaliazos por producto.
         //  detalle tienen los datos anteriores y precio y MontoTotal del Item (precio x Canidad).
@@ -289,14 +278,14 @@ public class Detalle {
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         Log.i("informe", "detalle map - producto" + getProducto().getNombreProducto());
-        Log.i("informe", "detalle map -  cantidad" + cantidadOrden);
+        Log.i("informe", "detalle map -  cantidad" + cantidadUnidadesEnStock);
         result.put("producto", producto);
-        result.put("cantidadOrden", cantidadOrden);
-        result.put("cantidadPicking", cantidadPicking);
+        result.put("cantidadUnidadesEnStock", cantidadUnidadesEnStock);
+        result.put("cantidadUnidadesSolicitadas", cantidadUnidadesSolicitadas);
         result.put("cantidadEntrega", cantidadEntrega);
         result.put("precio", precio);
-        result.put("montoItemOrden", montoItemOrden);
-        result.put("montoItemPicking", montoItemPicking);
+        result.put("kilosEnStock", kilosEnStock);
+        result.put("kilosSolicitados", kilosSolicitados);
         result.put("montoItemEntrega", montoItemEntrega);
         result.put("montoImpuesto", montoImpuesto);
         result.put("semaforo", semaforo);

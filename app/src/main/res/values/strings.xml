@@ -86,6 +86,8 @@
     <string name="price_error_mustBegraterthan0">must be grater than cero</string>
     <string name="price_error_cantBeCero">Can no be cero </string>
 
+
+
     <string name="product_priceSpecal_text">Special Price:</string>
     <string name="enter_priceSpecia_message">Enter Special Price</string>
     <string name="product_photo_text">Picture</string>

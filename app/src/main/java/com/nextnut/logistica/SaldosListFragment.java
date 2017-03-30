@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,67 +14,51 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.nextnut.logistica.modelos.CabeceraOrden;
+import com.nextnut.logistica.modelos.Pago;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
 import com.nextnut.logistica.viewholder.CabeceraViewHolder;
+import com.nextnut.logistica.viewholder.PagosViewHolder;
 import com.nextnut.logistica.viewholder.SaldosViewHolder;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.text.NumberFormat;
 
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
+import static com.nextnut.logistica.util.Constantes.ADAPTER_PAGOS_EN_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
-import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_DELIVERED_PARA_COMPENSAR;
 
 public class SaldosListFragment extends FragmentBasic
 {
 
 
-    private long mCustomOrderIdSelected;
 
-    private long mIDPickingOrderSelected;
-    View emptyViewTotalProducts;
-    private Query totalProductos;
 
     View emptyViewCustomOrder;
+    View emptyViewPagos;
     private FirebaseRecyclerAdapter<CabeceraOrden, SaldosViewHolder> mSaldosAdapter;
     private FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder> mCustomsOrdersCursorAdapter;
+    private FirebaseRecyclerAdapter<Pago, PagosViewHolder> mPagosCursorAdapter;
 
     private RecyclerView recyclerViewSaldos;
     private RecyclerView recyclerViewCustomOrderEnSaldos;
+    private RecyclerView recyclerViewPagos;
 
     private CardView mSaldosTile;
-    private TextView mTilePickingOrderNumber;
-    private EditText mTilePickingComent;
-    private TextView mCreationDate;
-
-    private   ArrayList<Task> taskList = new ArrayList<Task>();
-    private   Task<Void> allTask;
-
-    private DataSnapshot mProductosEnOrdenDatos;
-    private DataSnapshot mOrdenesEnPickingDatos;
-
-//private CabeceraPicking datosCabeceraPickingSeleccionada;
-
-    private FloatingActionButton fab_new;
-    private FloatingActionButton fab_delete;
+    private TextView mNombreClienteTitle;
+    private TextView mSaldoDelCliente;
 
 
+    private LinearLayout mLinearOrdersyPagos;
 
-    private LinearLayout mLinearOrders;
 
 
     /**
@@ -132,19 +115,19 @@ public class SaldosListFragment extends FragmentBasic
             @Override
             public void onClick(View view) {
 
-                mIDPickingOrderSelected = 0;
                 mSaldosTile.setVisibility(View.GONE);
                 recyclerViewCustomOrderEnSaldos.setVisibility(View.GONE);
                 recyclerViewSaldos.setVisibility(View.VISIBLE);
+                recyclerViewPagos.setVisibility(View.GONE);
             }
         });
         mSaldosTile.setVisibility(View.GONE);
-        mTilePickingOrderNumber = (TextView) mSaldosTile.findViewById(R.id.titlepickingNumberOrderCard);
-        mTilePickingComent = (EditText) mSaldosTile.findViewById(R.id.TitlepickingOrderComents);
-        mCreationDate = (TextView) mSaldosTile.findViewById(R.id.titlePicckinOder_creationdate);
+        mNombreClienteTitle = (TextView) mSaldosTile.findViewById(R.id.nombreClienteSaldoTitle);
+//        mTilePickingComent = (EditText) mSaldosTile.findViewById(R.id.TitlepickingOrderComents);
+        mSaldoDelCliente = (TextView) mSaldosTile.findViewById(R.id.saldo_SaldoTitle);
 
 
-        mLinearOrders =(LinearLayout)rootView.findViewById(R.id.linearOrders);
+        mLinearOrdersyPagos =(LinearLayout)rootView.findViewById(R.id.linearOrdersyPagos);
 
 
 
@@ -154,8 +137,24 @@ public class SaldosListFragment extends FragmentBasic
         // Lista de saldos
         recyclerViewSaldos = (RecyclerView) rootView.findViewById(R.id.saldos_listRV );
         recyclerViewSaldos.setLayoutManager(layoutManager);
-
         final View saldosEmpty = rootView.findViewById(R.id.recyclerview_saldos_empty);
+
+
+
+        recyclerViewCustomOrderEnSaldos = (RecyclerView) rootView.findViewById(R.id.customOrderEnSaldos_list);
+        recyclerViewCustomOrderEnSaldos.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        recyclerViewPagos = (RecyclerView) rootView.findViewById(R.id.pagosEnSaldos_list);
+        recyclerViewPagos.setLayoutManager(new LinearLayoutManager(getContext()));
+
+
+
+        // Custom Orders
+        emptyViewCustomOrder = rootView.findViewById(R.id.recyclerview_orden_empty);
+        emptyViewPagos = rootView.findViewById(R.id.recyclerview_pagos_empty);
+
+
+
         Query saldosQuery = refSaldoTotalClientes_10List();
 //         = mDatabase.child(ESQUEMA_PICKING).child(mEmpresaKey).child(String.valueOf(PICKING_STATUS_INICIAL));
         mSaldosAdapter = new FirebaseRecyclerAdapter<CabeceraOrden, SaldosViewHolder>(CabeceraOrden.class, R.layout.saldos_list_content,
@@ -167,30 +166,20 @@ public class SaldosListFragment extends FragmentBasic
                     public void onClick(View view) {
 
                         saldosEmpty.setVisibility(View.GONE);
-                        mTilePickingOrderNumber.setText(String.valueOf( model.getNumeroDePickingOrden()));
-                        mTilePickingComent.setVisibility(View.VISIBLE);
-                        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-
-                        mCreationDate.setText(sfd.format(new Date(model.getFechaDeCreacion())));
-
-
-
-
-
-
+                        mNombreClienteTitle.setText(String.valueOf( model.getCliente().getApellido()+model.getCliente().getNombre()));
+                        NumberFormat format = NumberFormat.getCurrencyInstance();
+                        mSaldoDelCliente.setText(format.format( model .getTotales().getSaldo()));
                         mSaldosAdapter.notifyDataSetChanged();
-
-
+                        mClienteKey =model.getClienteKey();
                         muestraOrdenesSinCompensar();
-
-//                        mCursorAdapterTotalProductos.notifyDataSetChanged();
+                        muestraPagosSinCompensar();
+//                     mCustomsOrdersCursorAdapter .notifyDataSetChanged();
+//                     mPagosCursorAdapter .notifyDataSetChanged();
                         recyclerViewCustomOrderEnSaldos.setVisibility(View.VISIBLE);
-
-
-
+                        recyclerViewPagos.setVisibility(View.VISIBLE);
 
                         recyclerViewSaldos.setVisibility(View.GONE);
-                        mLinearOrders.setVisibility(View.VISIBLE);
+                        mLinearOrdersyPagos.setVisibility(View.VISIBLE);
                         mSaldosTile.setVisibility(View.VISIBLE);
 
                     }
@@ -224,10 +213,11 @@ public class SaldosListFragment extends FragmentBasic
             @Override
             public void onClick(View view) {
 
-                mIDPickingOrderSelected = 0;
+
                 mSaldosTile.setVisibility(View.GONE);
-                mLinearOrders.setVisibility(View.GONE);
+                mLinearOrdersyPagos.setVisibility(View.GONE);
                 recyclerViewCustomOrderEnSaldos.setVisibility(View.GONE);
+                recyclerViewPagos.setVisibility(View.GONE);
                 recyclerViewSaldos.setVisibility(View.VISIBLE);
 
             }
@@ -235,17 +225,9 @@ public class SaldosListFragment extends FragmentBasic
 
 
 
-        recyclerViewCustomOrderEnSaldos = (RecyclerView) rootView.findViewById(R.id.customOrderEnSaldos_list);
-        recyclerViewCustomOrderEnSaldos.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-
-        // Custom Orders
-       emptyViewCustomOrder = rootView.findViewById(R.id.recyclerview_orden_empty);
-
-
-
-        mLinearOrders.setVisibility(View.GONE);
+        mLinearOrdersyPagos.setVisibility(View.GONE);
 
         //Todo: revisar para el caso de tablets
         if (rootView.findViewById(R.id.customorder_detail_container) != null) {
@@ -261,20 +243,22 @@ public class SaldosListFragment extends FragmentBasic
 
 
     public void muestraOrdenesSinCompensar() {
-        Query listadoOrdenesEnPickingQuery = refCabeceraOrden_2_List(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, 4);
-        Log.i(LOG_TAG, "muestraOrdenesSinCompensar:Query: " + listadoOrdenesEnPickingQuery.getRef().toString());
+//        Query listadoOrdenesSinCompensar = refCabeceraOrdenList_Status(String.valueOf(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR));
+        Query listadoOrdenesSinCompensar =refCabeceraOrdenList_ParaCompensar(mClienteKey);
+//        Query listadoOrdenesSinCompensar = refCabeceraOrden_2_List(ORDEN_STATUS_EN_DELIVERING, 11);
+        Log.i(LOG_TAG, "muestraProductosEnStokDeUnAlmacen:Query: " + listadoOrdenesSinCompensar.getRef().toString());
 
         mCustomsOrdersCursorAdapter = new FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder>(CabeceraOrden.class, R.layout.customorder_list_content,
-                CabeceraViewHolder.class, listadoOrdenesEnPickingQuery) {
+                CabeceraViewHolder.class, listadoOrdenesSinCompensar) {
             @Override
             protected void populateViewHolder(final CabeceraViewHolder viewHolder, final CabeceraOrden model, final int position) {
                 final DatabaseReference CabeceraRef = getRef(position);
                 emptyViewCustomOrder.setVisibility(View.GONE);
-                Log.i(LOG_TAG, "muestraOrdenesSinCompensar:CabeceraRef: " + CabeceraRef.toString());
+                Log.i(LOG_TAG, "muestraProductosEnStokDeUnAlmacen:CabeceraRef: " + CabeceraRef.toString());
 
                 // Set click listener for the whole post view
                 final String orderKey = CabeceraRef.getKey();
-                Log.i(LOG_TAG, "muestraOrdenesSinCompensar:orderKey: " + orderKey);
+                Log.i(LOG_TAG, "muestraProductosEnStokDeUnAlmacen:orderKey: " + orderKey);
 
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                                                            @Override
@@ -338,6 +322,79 @@ public class SaldosListFragment extends FragmentBasic
         recyclerViewCustomOrderEnSaldos.setAdapter(mCustomsOrdersCursorAdapter);
     }
 
+
+
+
+    public void muestraPagosSinCompensar() {
+//        Query listadoOrdenesEnPickingQuery = refCabeceraOrden_2_List(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, 4);
+        Query listadoPagosSinCompensar = refPagosInicialSinCompensarList(mClienteKey);
+        Log.i(LOG_TAG, "muestraPagosSinCompensar:Query: " + listadoPagosSinCompensar.getRef().toString());
+
+        mPagosCursorAdapter = new FirebaseRecyclerAdapter<Pago, PagosViewHolder>(Pago.class, R.layout.pagos_list_content,
+                PagosViewHolder.class, listadoPagosSinCompensar) {
+            @Override
+            protected void populateViewHolder(final PagosViewHolder viewHolder, final Pago model, final int position) {
+                final DatabaseReference PagoRef = getRef(position);
+                emptyViewPagos.setVisibility(View.GONE);
+                Log.i(LOG_TAG, "muestraPagosSinCompensar:CabeceraRef: " + PagoRef.toString());
+
+                // Set click listener for the whole post view
+                final String pagoKey = PagoRef.getKey();
+                Log.i(LOG_TAG, "muestraPagosSinCompensar:orderKey: " + pagoKey);
+
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                                                           @Override
+                                                           public void onClick(View v) {
+
+
+                                                           }
+                                                       }
+                );
+
+                viewHolder.bindToPost(model, new View.OnClickListener()
+
+                        {
+                            @Override
+                            public void onClick(View starView) {
+                                Log.d(LOG_TAG, "muestraPagosSinCompensar:onClick model: " + model.getCliente().getNombre());
+                                Intent intent = new Intent(getContext(), PagosActivity.class);
+                                mCliente = model.getCliente();
+                                putExtraFirebase_Fragment(intent);
+                                intent.putExtra(EXTRA_CABECERA_ORDEN, model);
+//                                Log.d(LOG_TAG, "muestraOrdenesEnPickin CabeceraPicking Nro: "+datosCabeceraPickingSeleccionada.getNumeroDePickingOrden() );
+
+                                //todo: sacaar el 4 y evaluar agrupar las ordenes por cliente.
+                                intent.putExtra(EXTRA_NRO_PICKIG, 4);
+                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+                                startActivity(intent);
+                            }
+                        }
+
+                );
+            }
+
+            @Override
+            protected void onItemDismissHolder(Pago model, int position) {
+                Log.i(LOG_TAG, "muestraPagosEndelivery Modelo:  " + model.getCliente().getNombre()+" "+model.getMonto());
+
+            }
+
+            @Override
+            protected void onItemAcceptedHolder(Pago model, int position) {
+                Log.i(LOG_TAG, "muestraPagosEndelivery Modelo:  " + model.getCliente().getNombre()+" "+model.getMonto());
+            }
+
+        };
+
+
+
+
+        ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallback(mPagosCursorAdapter, ADAPTER_PAGOS_EN_DELIVEY);
+        ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
+        mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewPagos);
+
+        recyclerViewPagos.setAdapter(mPagosCursorAdapter);
+    }
 
 
 

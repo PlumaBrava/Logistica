@@ -49,9 +49,9 @@ public class CabeceraPickingViewHolder extends RecyclerView.ViewHolder {
         }
         Log.d("picking1", "cabeceraPicking.getNumeroDePickingOrden() " + cabeceraPicking.getNumeroDePickingOrden());
         Log.d("picking1", "cabeceraPicking.getComentario() " + cabeceraPicking.getComentario());
-        Log.d("picking1", "cabeceraPicking.getUsuarioCreador() " + cabeceraPicking.getUsuarioCreador());
+        Log.d("picking1", "cabeceraPicking.getUsuarioCompensador() " + cabeceraPicking.getUsuarioCreador());
         Log.d("picking1", "cabeceraPicking.getFecha() " + cabeceraPicking.getFechaDeCreacion());
-        Log.d("picking1", "cabeceraPicking.getUsuarioCreador " + cabeceraPicking.getUsuarioCreador());
+        Log.d("picking1", "cabeceraPicking.getUsuarioCompensador " + cabeceraPicking.getUsuarioCreador());
         mPickingOrderId = cabeceraPicking.getNumeroDePickingOrden();
         mPickingOrderNumber.setText(Long.toString(cabeceraPicking.getNumeroDePickingOrden()));
         mpickingOrderComents.setText(cabeceraPicking.getComentario());
@@ -60,6 +60,6 @@ public class CabeceraPickingViewHolder extends RecyclerView.ViewHolder {
         mCreationDate.setText(sfd.format(new Date(cabeceraPicking.getFechaDeCreacion())) );
         mCreationUser.setText(cabeceraPicking.getUsuarioCreador());
 
-        ((View)mCreationDate.getParent()) . setOnClickListener(clickListener);
+        ((View)mCreationDate.getParent().getParent().getParent()) . setOnClickListener(clickListener);
     }
 }

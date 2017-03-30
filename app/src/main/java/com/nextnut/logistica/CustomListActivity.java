@@ -3,7 +3,6 @@ package com.nextnut.logistica;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -321,8 +320,8 @@ public class CustomListActivity extends ActivityBasic {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-
-            NavUtils.navigateUpFromSameTask(this);
+            onBackPressed();
+//            NavUtils.navigateUpFromSameTask(this);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -337,6 +336,17 @@ public class CustomListActivity extends ActivityBasic {
         return databaseReference.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey);
     }
 
+    @Override
+    public void onBackPressed() {
+        Log.i(LOG_TAG, "onBackPressed");
+        super.onBackPressed();
+    }
 
-
+    public boolean onSupportNavigateUp() {
+        Log.i(LOG_TAG, "onSupportNavigateUp");
+        onBackPressed();
+        return true;
+    }
 }
+
+

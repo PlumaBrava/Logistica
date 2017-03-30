@@ -34,7 +34,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.nextnut.logistica.modelos.CabeceraOrden;
 import com.nextnut.logistica.modelos.CabeceraPicking;
+import com.nextnut.logistica.modelos.Compensacion;
 import com.nextnut.logistica.modelos.Detalle;
+import com.nextnut.logistica.modelos.Pago;
 import com.nextnut.logistica.modelos.Totales;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
@@ -48,7 +50,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
@@ -57,6 +58,7 @@ import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_DELIVERED_PARA_
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERING;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_PICKING;
+import static com.nextnut.logistica.util.Constantes.PAGO_STATUS_INICIAL_SIN_COMPENSAR;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Network.isNetworkAvailable;
@@ -203,7 +205,7 @@ public class DeliveryListFragment extends FragmentBasic
                     @Override
                     public void onClick(View view) {
 
-                        if (isNetworkAvailable(getApplicationContext())) {
+                        if (isNetworkAvailable(getContext())) {
 
                             datosCabeceraPickingSeleccionada = model.Copy();
                             mTilePickingComent.setText(model.getComentario());
@@ -348,7 +350,7 @@ public class DeliveryListFragment extends FragmentBasic
             @Override
             public void onClick(View view) {
 
-                if (isNetworkAvailable(getApplicationContext())) {
+                if (isNetworkAvailable(getContext())) {
                     mDeliveryOrderTile.setVisibility(View.GONE);
                     mLinearProductos.setVisibility(View.GONE);
                     mLinearOrders.setVisibility(View.GONE);
@@ -417,7 +419,7 @@ public class DeliveryListFragment extends FragmentBasic
 //
 //
 //                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                        Pair<View, String> p2 = Pair.create((View) vh.mName, getString(R.string.custom_icon_transition_name));
+//                        Pair<View, String> p2 = Pair.create((View) vh.mTipoDePago, getString(R.string.custom_icon_transition_name));
 //                        ActivityOptionsCompat activityOptions =
 //                                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p2);
 //                        startActivity(intent, activityOptions.toBundle());
@@ -744,7 +746,7 @@ public class DeliveryListFragment extends FragmentBasic
 
     private void bloqueoPickingParaTrabajoOffLine() {
 
-        if (hayTareaEnProceso() || !isNetworkAvailable(getApplicationContext())) {
+        if (hayTareaEnProceso() || !isNetworkAvailable(getContext())) {
             return;
         }
 
@@ -773,14 +775,22 @@ public class DeliveryListFragment extends FragmentBasic
                         Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockCabeceraOrden tiene children: " + dataSnapshot.hasChildren());
 
                         int i = 0;
+                        int j=0;
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             CabeceraOrden cab = (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
                             Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockCabeceraOrden:" + cab.getNumeroDeOrden());
                             readBlockCabeceraOrden(cab.getNumeroDeOrden());
                             taskList.add(mCabeceraOrdenTask.get(i));
+                            // bloqueo el saldo si no fue anteriormente bloqueado por otra orden
+                            Log.i(LOG_TAG, "bloqueoPickingOffLine - SaldoNoRepetido Index:" + mSaldosTotalIndex.indexOf(cab.getClienteKey()));
+                            if(!(mSaldosTotalIndex.indexOf(cab.getClienteKey())>-1)){
+                                Log.i(LOG_TAG, "bloqueoPickingOffLine - SaldoNoRepetido:" + cab.getNumeroDeOrden());
+                                Log.i(LOG_TAG, "bloqueoPickingOffLine - SaldoNoRepetido:" + cab.getClienteKey());
                             readBlockSaldosTotal(cab.getClienteKey());
-                            taskList.add(mSaldosTotalTask.get(i));
-
+                                Log.i(LOG_TAG, "bloqueoPickingOffLine - SaldoNoRepetido Index after:" + mSaldosTotalIndex.indexOf(cab.getClienteKey()));
+                            taskList.add(mSaldosTotalTask.get(j));
+                                j++;
+                            }
                             i++;
                         }
 
@@ -837,7 +847,7 @@ public class DeliveryListFragment extends FragmentBasic
 
     private void desbloqueoPickingParaTrabajoOffLine() {
 
-        if (hayTareaEnProceso() || !isNetworkAvailable(getApplicationContext())) {
+        if (hayTareaEnProceso() || !isNetworkAvailable(getContext())) {
             return;
         }
 
@@ -1025,7 +1035,8 @@ public class DeliveryListFragment extends FragmentBasic
                                 cabeceraOrden.setEstado(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR);
                                 cabeceraOrden.bloquear();
                                 childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden(), cabeceraOrden.getNumeroDePickingOrden()),cabeceraOrden.toMap());
-                                childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+                                childUpdates.put(nodoCabeceraOrdenList_ParaCompensar(cabeceraOrden.getClienteKey(),cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+//                                childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
                                 childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
 
                                 if (saldo == null) {
@@ -1036,8 +1047,12 @@ public class DeliveryListFragment extends FragmentBasic
                                     saldo = new CabeceraOrden(cabeceraOrden.getClienteKey(), cabeceraOrden.getCliente(), ORDEN_STATUS_INICIAL, totales, "Sistema", 00);
                                     saldo.setUsuarioCreador("Sistema");
                                     saldo.bloquear();
-
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = "+saldo.getTotales().getSaldo());
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar monto entreado = "+cabeceraOrden.getTotales().getMontoEntregado());
                                     saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + cabeceraOrden.getTotales().getMontoEntregado());
+                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + cabeceraOrden.getTotales().getMontoEntregado());
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= "+saldo.getTotales().getSaldo());
+
                                 } else {
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = "+saldo.getTotales().getSaldo());
                                     saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + cabeceraOrden.getTotales().getMontoEntregado());
@@ -1051,7 +1066,7 @@ public class DeliveryListFragment extends FragmentBasic
                                 mCliente = cabeceraOrden.getCliente();
 
                                 Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar - : abro pagos" );
-                                Intent intent = new Intent(getApplicationContext(), PagosActivity.class);
+                                Intent intent = new Intent(getContext(), PagosActivity.class);
                                 putExtraFirebase_Fragment(intent);
                                 startActivity(intent);
 
@@ -1098,7 +1113,53 @@ public class DeliveryListFragment extends FragmentBasic
 
         }
 
+public void compensarCuenta(String clienteKey){
+    refCabeceraOrdenList_ParaCompensar(clienteKey).addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            final DataSnapshot ordenesSinCompensar=dataSnapshot;
 
+            refPagosListado_11(mClienteKey,String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    DataSnapshot pagosSinCompensar=dataSnapshot;
+
+                   for( DataSnapshot ordenCabecera : ordenesSinCompensar.getChildren()){
+                    String nroOrden = ordenCabecera.getKey();
+                    CabeceraOrden orden = ordenCabecera.getValue(CabeceraOrden.class);
+
+                       if(orden.sepuedeModificar()){
+                       for( DataSnapshot pago : pagosSinCompensar.getChildren()){
+                           String pagoKey = ordenCabecera.getKey();
+                           Pago p = pago.getValue(Pago.class);
+
+                           Compensacion compesacion=new Compensacion(orden,p,pagoKey,mUserKey);
+
+
+                       }
+                       }else{
+                           continue;
+                       }
+                   }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    });
+
+
+}
 
 
     public  void cerrarPicking (final CabeceraPicking cabeceraPicking){

@@ -186,6 +186,15 @@
                 android:value="com.nextnut.logistica.MainActivity" />
         </activity>
         <activity
+            android:name=".MovimientosStockActivity"
+            android:label="@string/TituloMovimiento"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.Dialog_NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nextnut.logistica.MainActivity" />
+        </activity>
+        <activity
             android:name=".ReporteMensualxCliente"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">

@@ -29,7 +29,6 @@ import java.util.Map;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ALMACENES;
 import static com.nextnut.logistica.util.Constantes.EXTRA_ALMACEN_KEY;
 import static com.nextnut.logistica.util.Constantes.IMAGENES_ALMACENES;
-import static com.nextnut.logistica.util.Constantes.NODO_ALMACENES;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
 
@@ -88,7 +87,7 @@ public class AlmacenesDetailFragment extends FragmentBasic  {
         AppCompatActivity activity = (AppCompatActivity) this.getContext();
         appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
         if (appBarLayout != null) {
-            if (mClienteKey==null){
+            if (this.mAlmacenKey ==null){
                 appBarLayout.setTitle(getResources().getString(R.string.almacen_nuevo));
             }else
                 appBarLayout.setTitle(getResources().getString(R.string.almacen_titulo)+" " );
@@ -202,7 +201,7 @@ public class AlmacenesDetailFragment extends FragmentBasic  {
 
 
             if (mAlmacenKey != null) {//Si mProductKey existe leo los datos de Firebase y los muestro.
-                Log.i("producto", "onActivityCreated-mClienteKey: " + mClienteKey);
+                Log.i("producto", "onActivityCreated-mClienteKey: " + this.mAlmacenKey);
                 Log.i("producto", "onActivityCreated:- mEmpresaKey;  " + mEmpresaKey);
                 // Add value event listener to show the data.
                 // [START post_value_event_listener]
@@ -302,7 +301,11 @@ public class AlmacenesDetailFragment extends FragmentBasic  {
 
         if (true) {//validar formulario
 
+            if (mAlmacenKey == null) {
+                Log.i("almacenes", "genera una key");
 
+                mAlmacenKey = mDatabase.child(ESQUEMA_ALMACENES).child(mEmpresaKey).push().getKey();
+            }
 
             Almacen almacen= new Almacen(mUserKey,
             mNombreAlmacen.getText().toString(),
@@ -311,19 +314,16 @@ public class AlmacenesDetailFragment extends FragmentBasic  {
             mDireccion.getText().toString(),
             mTipoAlmacen.getText().toString(),
             mTelefono.getText().toString(),
-            mCurrentPhotoPath
+            mCurrentPhotoPath,mAlmacenKey
            );
 
-            if (mAlmacenKey == null) {
-                Log.i("almacenes", "genera una key");
 
-                mAlmacenKey = mDatabase.child(ESQUEMA_ALMACENES).child(mEmpresaKey).push().getKey();
-            }
 
             Map<String, Object> almacenValues =  almacen.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
 
-            childUpdates.put(NODO_ALMACENES + mEmpresaKey +"/"+ mAlmacenKey, almacenValues);
+            childUpdates.put(nodoAlmacen(mAlmacenKey), almacenValues);
+//            childUpdates.put(NODO_ALMACENES + mEmpresaKey +"/"+ mClienteKey, almacenValues);
             Log.i("almacenes", "graba y retonra");
 
             mDatabase.updateChildren(childUpdates);

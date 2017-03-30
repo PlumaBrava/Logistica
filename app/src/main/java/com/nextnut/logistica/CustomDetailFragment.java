@@ -104,7 +104,7 @@ public class CustomDetailFragment extends FragmentBasic  {
         AppCompatActivity activity = (AppCompatActivity) this.getContext();
         appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
         if (appBarLayout != null) {
-            if (mClienteKey==null){
+            if (mClienteKey ==null){
                 appBarLayout.setTitle(getResources().getString(R.string.custom_new));
             }else
                 appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" " );
@@ -346,7 +346,7 @@ public class CustomDetailFragment extends FragmentBasic  {
         if (mClienteKey == null) {
             mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();
         }
-        StorageReference ImagenRef = mStorageRef.child(IMAGENES_CLIENTES).child(mEmpresaKey).child( mClienteKey);
+        StorageReference ImagenRef = mStorageRef.child(IMAGENES_CLIENTES).child(mEmpresaKey).child(mClienteKey);
          uploadImagen(bitmap,ImagenRef,mImageCustomer,spinner);
         Log.i("subirFotoReturnUri", "onSuccess: mCurrentPhotoPath"+ mCurrentPhotoPath);
 
@@ -389,7 +389,7 @@ public class CustomDetailFragment extends FragmentBasic  {
 
 
 
-            if (mClienteKey != null) {//Si mProductKey existe leo los datos de Firebase y los muestro.
+            if (mClienteKey != null) {//Si mClienteKey existe leo los datos de Firebase y los muestro.
                 Log.i("producto", "onActivityCreated-mClienteKey: " + mClienteKey);
                 Log.i("producto", "onActivityCreated:- mEmpresaKey;  " + mEmpresaKey);
                 // Add value event listener to show the data.

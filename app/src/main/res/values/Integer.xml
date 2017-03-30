@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <integer name="productoNameMaxLength" >50</integer>
+    <integer name="productoNameMaxLength" >15</integer>
     <integer name="productoPriceMaxLength" >15</integer>
-    <integer name="productoDescritionMaxLength" >20</integer>
+    <integer name="productoDescritionMaxLength" >25</integer>
     <integer name="customNameMaxLength" >15</integer>
     <integer name="customLastNameMaxLength" >15</integer>
     <integer name="customAddressMaxLength" >25</integer>
@@ -13,6 +13,8 @@
     <integer name="customIvaMaxLength" >5</integer>
     <integer name="quantityPickerMax">5000</integer>
     <integer name="quantityPickerMin">1</integer>
+    <integer name="quantityMin">0</integer> //Canitidad Minima permitida para un Producto
+    <integer name="quantityMax">15000</integer> //Canitidad Máxima permitida para un Producto
 
 
 
@@ -38,6 +40,7 @@
 
     <integer name="MaxPickerNumber" >5000</integer>
     <integer name="MinPickerNumber" >1</integer>
+    <integer name="LogitudPassword" >8</integer>
 
 
 

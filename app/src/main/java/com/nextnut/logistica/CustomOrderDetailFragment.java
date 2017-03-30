@@ -442,7 +442,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             @Override
             protected void populateViewHolder(final DetalleViewHolder viewHolder, final Detalle model, final int position) {
                 final DatabaseReference detalleRef = getRef(position);
-                if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERING) {
+                if (mCabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERING) {
                     Log.i(LOG_TAG, "adapter:detalleRef:ORDEN_STATUS_EN_DELIVERING " + mCabeceraOrden.getEstado());
                     viewHolder.setDeliveryState();
                     viewHolder.mTextViewPrecioDelivery.setVisibility(View.VISIBLE);
@@ -621,7 +621,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                     mKeyList.add(productKey);
 
                                     Detalle d = data.getValue(Detalle.class);
-                                    Double cantidad = d.getCantidadOrden();
+                                    Double cantidad =(Double) d.getCantidadOrden();
                                     Producto producto = d.getProducto();
                                     Log.d(LOG_TAG, "favorito  keyProducto: " + productKey);
                                     Log.d(LOG_TAG, "favorito  d : " + d.getProducto().getNombreProducto() + " - " + d.getCantidadOrden());
@@ -641,6 +641,15 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                     Log.i("ClienteViewHolder", "saveCustomOrderProductproductoKey" + productKey);
                                     Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Nombre" + producto.getNombreProducto());
                                     Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Precio" + producto.getPrecio());
+                                    Log.i("informe", "det producto" + detalle.getProducto().getNombreProducto());
+                                    Log.i("informe", "det cantidad" + detalle.getCantidadOrden());
+/*5 */
+                                    PrductosxOrden detallexOrden = new PrductosxOrden(mCliente, detalle);
+                                     Map<String, Object> prductosxOrdenValues =  detallexOrden.toMap();
+                                    Log.i("informe", "PrductosxOrden producto" + detallexOrden.getDetalle().getProducto().getNombreProducto());
+                                    Log.i("informe", "PrductosxOrden cantidad" + detallexOrden.getDetalle().getCantidadOrden());
+                                    childUpdates.put(nodoProductosXOrdenInicial_5(productKey, mCabeceraOrden.getNumeroDeOrden()), prductosxOrdenValues);
+
 
 
                                     // Actualizacion de Totales en Ordenes (3)
@@ -685,12 +694,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
 
 
-/*5 */
-                                    PrductosxOrden detallexOrden = new PrductosxOrden(mCliente, detalle);
-                                    childUpdates.put(nodoProductosXOrdenInicial_5(productKey, mCabeceraOrden.getNumeroDeOrden()), detallexOrden.toMap());
-
-
-//                                        saveOrdenProductoXCliente(productKey, detalle); // tiene el valor final que se graba en la orden
                                     mKeyList.add(productKey); // Agrega productkey para que no se repita.
                                     i++;
                                 }
@@ -836,11 +839,11 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                         abmDetalleDeOrdenDelivery((double) np.getValue(), productKey, mDetalleAnterior);
 //                        ca();
 //                        
-//                        vh.mTextcantidadDelivery.setText(String.valueOf(np.getValue()));
+//                        vh.mUnidadesSolicitadas.setText(String.valueOf(np.getValue()));
 //                        CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecioDelivery.getText().toString());
 //                        double total = np.getValue() * price.convert();
 //                        NumberFormat format = NumberFormat.getCurrencyInstance();
-//                        vh.mTextToalDelivery.setText(format.format(total));
+//                        vh.mKgSolicitados.setText(format.format(total));
 //                        saveCantidad(vh.mDetalleOrderId, Integer.valueOf(np.getValue()));
 //
 //                        d.dismiss();
@@ -850,11 +853,11 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                         Log.d("detalle1", "showDialogNumberPicker-np.getValue() " + np.getValue());
                         abmDetalleDeOrden((double) np.getValue(), productKey, mDetalleAnterior);
 //                        modificarCantidadDeProductoEnOrden(np.getValue(), productKey);
-//                        vh.mTextcantidad.setText(String.valueOf(np.getValue()));
+//                        vh.mUnidadesEnStock.setText(String.valueOf(np.getValue()));
 //                        CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecio.getText().toString());
 //                        double total = np.getValue() * price.convert();
 //                        NumberFormat format = NumberFormat.getCurrencyInstance();
-//                        vh.mTextToal.setText(format.format(total));
+//                        vh.mKgEnStock.setText(format.format(total));
 //                        saveCantidad(vh.mDetalleOrderId, Integer.valueOf(np.getValue()));
 
 
@@ -1286,7 +1289,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 //                    Log.i(LOG_TAG, "abmDetalleDeEntrega etallePickingTotal  Detalle = NuLL- ");
 //                } else {
 ////                    detallePickingTotal.modificarCantidadEnTotalInicial(detalleOrdenAux, detalleOrden);
-////                    if (detallePickingTotal.getCantidadOrden() == 0) {
+////                    if (detallePickingTotal.getCantidadUnidadesEnStock() == 0) {
 ////                        pickingTotalValues = null;
 ////                    } else {
 ////                        detallePickingTotal.liberar();
@@ -1539,7 +1542,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
     public void saveDetalleInicialTotales(final Double cantidadNueva, final String productoKey) {
 
-//        final Double cantidadAnterior = detalle.getCantidadOrden();
+//        final Double cantidadAnterior = detalle.getCantidadUnidadesEnStock();
 //        final Producto producto=detalle.getProducto();
 //
 //        Log.d("detalle1", "saveDetalleInicialTotales-detalleAnterior) " + cantidadAnterior);
@@ -1582,7 +1585,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                 Log.d(LOG_TAG, "orden:SaveDetalleInicialTotales:onComplete:  databaseError" + databaseError);
                 Log.d(LOG_TAG, "orden:SaveDetalleInicialTotales: boolean b" + commited);
                 Detalle detalle = dataSnapshot.getValue(Detalle.class);
-                Log.d(LOG_TAG, "orden:SaveDetalleInicialTotales:onComplete: detalle.getCantidadOrden() " + detalle.getCantidadOrden());
+                Log.d(LOG_TAG, "orden:SaveDetalleInicialTotales:onComplete: detalle.getCantidadUnidadesEnStock() " + detalle.getCantidadOrden());
 
             }
         });
@@ -1621,7 +1624,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                 Log.d(LOG_TAG, "orden:SaveDetallexOrden:onComplete:  databaseError" + databaseError);
                 Log.d(LOG_TAG, "orden:SaveDetallexOrden: boolean b" + commited);
                 PrductosxOrden detalle = dataSnapshot.getValue(PrductosxOrden.class);
-                Log.d(LOG_TAG, "orden:SaveDetallexOrden:onComplete: detalle.getCantidadOrden() " + detalle.getDetalle().getCantidadOrden());
+                Log.d(LOG_TAG, "orden:SaveDetallexOrden:onComplete: detalle.getCantidadUnidadesEnStock() " + detalle.getDetalle().getCantidadOrden());
 
             }
         });
