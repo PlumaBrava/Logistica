@@ -31,6 +31,7 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.nextnut.logistica.data.CustomColumns;
 import com.nextnut.logistica.data.LogisticaProvider;
+import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.modelos.CabeceraOrden;
 import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Detalle;
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
@@ -49,6 +51,7 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_CLIENTES;
+import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_PRODUCTOS;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
@@ -84,9 +87,11 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     public FloatingActionButton mFabPasarAPicking;
 
     private static AppCompatActivity mContext;
+
     public static AppCompatActivity getMainActicity() {
         return mContext;
     }
+
     public static long getmPickingOrderSelected() {
         return mPickingOrderSelected;
     }
@@ -105,7 +110,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mContext= this;
+        mContext = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 //        mAuth = FirebaseAuth.getInstance();
@@ -223,7 +228,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                 if (fragment != null) {
                     Log.i("main", "FabPasarAPicking no Nulo");
                     fragment.pasarAPicking();
-                }else {
+                } else {
                     Log.i("main", "FabPasarAPicking  Nulo");
 
                 }
@@ -239,7 +244,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                     showInsterstitial();
                 } else {
                     fabActions();
-                                    }
+                }
             }
         });
 
@@ -272,11 +277,11 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         if (requestCode == REQUEST_CUSTOMER && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
 
-            mClienteKey =bundle.getString(EXTRA_CLIENTE_KEY);
-            mCliente=bundle.getParcelable(EXTRA_CLIENTE);
-            Log.e(LOG_TAG, "mClienteKey: " +mClienteKey);
-            Log.e(LOG_TAG, "cliente-apellido: " +mCliente.getNombre());
-            Log.e(LOG_TAG, "cliente-Nombre: " +mCliente.getApellido());
+            mClienteKey = bundle.getString(EXTRA_CLIENTE_KEY);
+            mCliente = bundle.getParcelable(EXTRA_CLIENTE);
+            Log.e(LOG_TAG, "mClienteKey: " + mClienteKey);
+            Log.e(LOG_TAG, "cliente-apellido: " + mCliente.getNombre());
+            Log.e(LOG_TAG, "cliente-Nombre: " + mCliente.getApellido());
 
 
 //            long customRef = bundle.getLong(CustomSelectionActivity.RESULTADO);
@@ -342,7 +347,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                         }
                     });
 
-                }else if(mViewPagerFabItem==PAGOS_FRAGMENT){
+                } else if (mViewPagerFabItem == PAGOS_FRAGMENT) {
 
                     Intent intent = new Intent(getApplicationContext(), PagosActivity.class);
                     putExtraFirebase(intent);
@@ -385,9 +390,9 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
 
             if (fragmentCustomOrder != null) {
-                Producto p= (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
-                Detalle detalle = new Detalle(0.0,p,mCliente);
-                fragmentCustomOrder.abmDetalleDeOrden(p.getCantidadDefault()*1.0,data.getExtras().getString(EXTRA_PRODUCT_KEY),detalle
+                Producto p = (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
+                Detalle detalle = new Detalle(0.0, p, mCliente);
+                fragmentCustomOrder.abmDetalleDeOrden(p.getCantidadDefault() * 1.0, data.getExtras().getString(EXTRA_PRODUCT_KEY), detalle
 
                 );
 
@@ -398,7 +403,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
         // Cambio en a empresa seleccionada para trabajar.
         if (requestCode == REQUEST_EMPRESA && resultCode == RESULT_OK) {
-                        Log.d(LOG_TAG, "Cambio enmpres LLego OnResult:" );
+            Log.d(LOG_TAG, "Cambio enmpres LLego OnResult:");
 
             Bundle bundle = data.getExtras();
             leerVariablesGlobales(bundle);
@@ -422,7 +427,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         menu.setGroupVisible(R.id.productos_, mPerfil.getProductos());
         menu.setGroupEnabled(R.id.customs_, mPerfil.getClientes());
         menu.setGroupVisible(R.id.customs_, mPerfil.getClientes());
-         menu.setGroupEnabled(R.id.almacenes_, mPerfil.getClientes());
+        menu.setGroupEnabled(R.id.almacenes_, mPerfil.getClientes());
         menu.setGroupVisible(R.id.almacenes_, mPerfil.getClientes());
         menu.setGroupEnabled(R.id.action_usuarios_, mPerfil.getUsuarios());
 
@@ -522,7 +527,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
 
         if (id == R.id.action_usuarios) {
-            Intent intent =new Intent(this, UsuarioListActivity.class);
+            Intent intent = new Intent(this, UsuarioListActivity.class);
             putExtraFirebase(intent);
             startActivity(intent);
             return true;
@@ -550,8 +555,6 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     }
 
 
-
-
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -568,7 +571,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             switch (mSeccionesDisponibles.get(position)) {
 
                 case CUSTOM_ORDER_FRAGMENT:
-                    CustomOrderListFragment a= new CustomOrderListFragment();
+                    CustomOrderListFragment a = new CustomOrderListFragment();
                     a.setArguments(putBundleFirebase());
                     return a;
 
@@ -694,7 +697,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                         Toast.LENGTH_SHORT).show();
 
                 super.onAdFailedToLoad(errorCode);
-        Log.d(LOG_TAG, getString(R.string.AddonFailedToLoad)+ mErrorReason);
+                Log.d(LOG_TAG, getString(R.string.AddonFailedToLoad) + mErrorReason);
 
 // Se muestra el erro pero no se reintenta mostrar el aviso nuevamente.
 //                mInterstitial = newInterstitialAd();
@@ -723,10 +726,9 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     }
 
 
-
     public void fabActions() {
         mViewPagerFabItem = mViewPager.getCurrentItem();
-        switch ( mViewPagerFabItem) {
+        switch (mViewPagerFabItem) {
             case CUSTOM_ORDER_FRAGMENT: {
                 Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
                 putExtraFirebase(intent);
@@ -889,7 +891,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     public void migracionClientes() {
         Log.i("migracionCliente", "inicio");
         try {
-            Cursor data =getContentResolver().query(LogisticaProvider.Customs.CONTENT_URI,
+            Cursor data = getContentResolver().query(LogisticaProvider.Customs.CONTENT_URI,
                     null,
                     null,
                     null,
@@ -914,7 +916,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                             data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)),
                             Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
                             data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
-                            data.getInt (data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
+                            data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
                             null
                     );
                 } while (data.moveToNext());
@@ -930,8 +932,6 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
     }
 
 
-
-
     // [START basic_write]
     private void writeNewCliente(String Id,
                                  String nombre,
@@ -944,7 +944,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                                  String cuit,
                                  Boolean especial,
                                  Map<String, String> telefonos
-    ){
+    ) {
         if (true) {//validar formulario
             Log.i("migracionCliente", "writeNewClient: nombre " + nombre);
             Log.i("migracionCliente", "writeNewClient: apellido " + apellido);
@@ -966,18 +966,102 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                     ciudad,
                     iva,
                     cuit,
-                    especial,telefonos);
+                    especial, telefonos);
 
             if (mClienteKey == null) {
                 mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();
             }
 
-            Map<String, Object> clienteValues =  cliente.toMap();
+            Map<String, Object> clienteValues = cliente.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
 
-            childUpdates.put(NODO_EMPRESA_CLIENTES + mEmpresaKey +"/"+ Id, clienteValues);
+            childUpdates.put(NODO_EMPRESA_CLIENTES + mEmpresaKey + "/" + Id, clienteValues);
 
             mDatabase.updateChildren(childUpdates);
+        }
+    }
+
+
+    public void migracionProductos() {
+        Log.i("migracionCliente", "inicio");
+        try {
+            Cursor data = getContentResolver().query(LogisticaProvider.Products.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+            Log.i("migracionCliente", "cursor");
+
+            if (data != null && data.getCount() > 0) {
+                data.moveToFirst();
+                Log.i("migracionCliente", "cursor >0");
+
+
+                do {
+
+                    writeNewProducto(data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)),
+                            data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)),
+                            data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_SPECIAL_PRODUCTO)),
+                            data.getString(data.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)),
+                            "mCurrentPhotoPath",
+                            mUserKey,
+                            "Rubro 1",
+                            "Unidad",
+                            1,
+                            1,
+                            5000
+                    );
+
+                } while (data.moveToNext());
+
+
+            } else {
+                Log.i("migracionCliente", "cursor <=0");
+
+            }
+
+        } catch (Exception e) {
+        }
+    }
+
+
+    // [START basic_write]
+    private void writeNewProducto(String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto, String uid,
+                                  String rubro,
+                                  String tipoUnidad,
+                                  int cantidadMinima,
+                                  int cantidadMaxima,
+                                  int cantidadDefault
+
+    ) {
+        if (true) {//validar formulario
+            Log.i("producto", "writeNewProducto: nombre " + nombreProducto);
+            Log.i("producto", "writeNewProducto: precio " + precio);
+            Log.i("producto", "writeNewProducto: precio " + precio);
+            Log.i("producto", "writeNewProducto: precioEspcecial " + precioEspcecial);
+            Log.i("producto", "writeNewProducto: fotoProducto " + fotoProducto);
+            Log.i("producto", "writeNewProducto: uid " + uid);
+            Log.i("producto", "writeNewProducto: mProductKey " + mProductKey);
+
+            Producto producto = new Producto(uid, nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto,
+                    rubro,
+                    tipoUnidad,
+                    cantidadMinima,
+                    cantidadMaxima,
+                    cantidadDefault);
+
+            Map<String, Object> productoValues = producto.toMap();
+            Map<String, Object> childUpdates = new HashMap<>();
+
+
+            if (mProductKey == null) { // Si exite mProductKey es que estamos modificando un producto.
+                mProductKey = mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).push().getKey();
+            }
+            childUpdates.put(NODO_EMPRESA_PRODUCTOS + mEmpresaKey + "/" + mProductKey, productoValues);
+
+            mDatabase.updateChildren(childUpdates);
+
         }
     }
 
