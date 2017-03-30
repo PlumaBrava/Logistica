@@ -535,6 +535,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
         if (id == R.id.action_migrarClientes) {
             migracionClientes();
+            migracionProductos();
             return true;
         }
 
@@ -983,7 +984,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
 
     public void migracionProductos() {
-        Log.i("migracionCliente", "inicio");
+        Log.i("migracionProductos", "inicio");
         try {
             Cursor data = getContentResolver().query(LogisticaProvider.Products.CONTENT_URI,
                     null,
@@ -991,7 +992,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                     null,
                     null,
                     null);
-            Log.i("migracionCliente", "cursor");
+            Log.i("migracionProductos", "cursor");
 
             if (data != null && data.getCount() > 0) {
                 data.moveToFirst();
@@ -1017,7 +1018,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
 
             } else {
-                Log.i("migracionCliente", "cursor <=0");
+                Log.i("migracionProductos", "cursor <=0");
 
             }
 
