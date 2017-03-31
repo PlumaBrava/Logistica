@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
-import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
@@ -59,6 +58,7 @@ import static com.nextnut.logistica.util.Constantes.REQUEST_CUSTOMER;
 import static com.nextnut.logistica.util.Constantes.REQUEST_EMPRESA;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
+import static com.nextnut.logistica.util.MakeCall.migrarTelefonosDelContactoAsociado;
 import static com.nextnut.logistica.util.Network.isNetworkAvailable;
 
 
@@ -918,7 +918,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                             Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
                             data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
                             data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
-                            null
+                            migrarTelefonosDelContactoAsociado(data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM)))
                     );
                 } while (data.moveToNext());
 
@@ -1001,7 +1001,9 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
                 do {
 
-                    writeNewProducto(data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)),
+                    writeNewProducto(
+                            data.getString(data.getColumnIndex(ProductsColumns._ID_PRODUCTO)),
+                            data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)),
                             data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)),
                             data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_SPECIAL_PRODUCTO)),
                             data.getString(data.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)),
@@ -1028,7 +1030,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
 
     // [START basic_write]
-    private void writeNewProducto(String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto, String uid,
+    private void writeNewProducto(String Id,String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto, String uid,
                                   String rubro,
                                   String tipoUnidad,
                                   int cantidadMinima,
@@ -1037,13 +1039,13 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
     ) {
         if (true) {//validar formulario
-            Log.i("producto", "writeNewProducto: nombre " + nombreProducto);
-            Log.i("producto", "writeNewProducto: precio " + precio);
-            Log.i("producto", "writeNewProducto: precio " + precio);
-            Log.i("producto", "writeNewProducto: precioEspcecial " + precioEspcecial);
-            Log.i("producto", "writeNewProducto: fotoProducto " + fotoProducto);
-            Log.i("producto", "writeNewProducto: uid " + uid);
-            Log.i("producto", "writeNewProducto: mProductKey " + mProductKey);
+            Log.i("migracionProductos", "writeNewProducto: nombre " + nombreProducto);
+            Log.i("migracionProductos", "writeNewProducto: precio " + precio);
+            Log.i("migracionProductos", "writeNewProducto: precio " + precio);
+            Log.i("migracionProductos", "writeNewProducto: precioEspcecial " + precioEspcecial);
+            Log.i("migracionProductos", "writeNewProducto: fotoProducto " + fotoProducto);
+            Log.i("migracionProductos", "writeNewProducto: uid " + uid);
+            Log.i("migracionProductos", "writeNewProducto: mProductKey " + mProductKey);
 
             Producto producto = new Producto(uid, nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto,
                     rubro,
@@ -1056,10 +1058,8 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             Map<String, Object> childUpdates = new HashMap<>();
 
 
-            if (mProductKey == null) { // Si exite mProductKey es que estamos modificando un producto.
-                mProductKey = mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).push().getKey();
-            }
-            childUpdates.put(NODO_EMPRESA_PRODUCTOS + mEmpresaKey + "/" + mProductKey, productoValues);
+
+            childUpdates.put(NODO_EMPRESA_PRODUCTOS + mEmpresaKey + "/" + Id, productoValues);
 
             mDatabase.updateChildren(childUpdates);
 

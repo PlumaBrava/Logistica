@@ -18,6 +18,7 @@ import com.nextnut.logistica.R;
 import com.nextnut.logistica.modelos.Cliente;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +72,8 @@ public class MakeCall {
     }
 
     public static void makePhoneCall(String id) {
+
+        Map<String, String> telefonos= new HashMap<>();
         Cursor cursor = null;
         String phoneNumber = "";
         int type = 0;
@@ -171,6 +174,86 @@ public class MakeCall {
             }
         }
     }
+
+
+    public static Map<String, String> migrarTelefonosDelContactoAsociado(String id) {
+
+        Map<String, String> telefonos = new HashMap<>();
+        Cursor cursor = null;
+        String phoneNumber = "";
+        int type = 0;
+        String phoneType = "";
+        List<String> allNumbers = new ArrayList<String>();
+        int phoneIdx = 0;
+        int displayNameKeyIdx = 0;
+
+        if (ContextCompat.checkSelfPermission(mContext,
+                android.Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(mActivity,
+                    new String[]{android.Manifest.permission.READ_CONTACTS},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACT);
+        } else {
+
+            // No explanation needed, we can request the permission.
+
+
+            try {
+
+
+                cursor = mActivity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
+                phoneIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                displayNameKeyIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
+                if (cursor.moveToFirst()) {
+                    while (cursor.isAfterLast() == false) {
+                        phoneNumber = cursor.getString(phoneIdx);
+                        type = cursor.getInt(displayNameKeyIdx);
+                        switch (type) {
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+
+                                phoneType = mContext.getResources().getString(R.string.NomberTypeHome);
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+                                phoneType = mContext.getResources().getString(R.string.NomberTypeMovile);
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+                                phoneType = mContext.getResources().getString(R.string.NomberTypeWork);
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_FAX_WORK:
+                                phoneType = mContext.getResources().getString(R.string.NomberTypeFaxWork);
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_MAIN:
+                                phoneType = mContext.getResources().getString(R.string.NomberTypeMain);
+                                break;
+                            default:
+                                phoneType = mContext.getResources().getString(R.string.NomberTypeOtro);
+                        }
+                        telefonos.put(phoneType, phoneNumber);
+                        allNumbers.add(phoneType + " : " + phoneNumber);
+                        cursor.moveToNext();
+
+                    }
+                } else {
+                    return null;
+                }
+
+
+            } catch (Exception e) {
+                //error actions
+                return null;
+
+            } finally {
+
+                return telefonos;
+            }
+
+
+        }
+        return null;
+    }
+
+
+
 
     public static void makePhoneCallCliente(Activity aplication,Cliente cliente) {
         mContext = aplication;

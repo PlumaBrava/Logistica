@@ -1,9 +1,12 @@
 package com.nextnut.logistica;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +27,6 @@ import com.nextnut.logistica.modelos.Perfil;
 import com.nextnut.logistica.modelos.Usuario;
 import com.nextnut.logistica.modelos.UsuarioPerfil;
 import com.nextnut.logistica.util.Constantes;
-import com.nextnut.logistica.util.DialogAlerta;
 import com.rey.material.widget.CheckBox;
 import com.rey.material.widget.ProgressView;
 import com.rey.material.widget.Switch;
@@ -264,10 +266,24 @@ public class UsuarioDetailFragment extends Fragment {
                             Log.d(TAG, "mail Children count"+ dataSnapshot.getChildrenCount());
                             Log.d(TAG, "mail key"+ dataSnapshot.getKey());
                             if(dataSnapshot.getChildrenCount()>0){
-                                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproducNametcantbenull));
+                                AlertDialog.Builder alert;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    alert = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
+                                } else {
+                                    alert = new AlertDialog.Builder(getContext());
+                                }
+                                alert.setMessage(getResources().getString(R.string.theproducNametcantbenull));
+
+                                alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                });
+                                alert.create().show();
+
                                 // Show DialogFragment
                                 mEmail.setError(getString(R.string.usuario_emailyaExisite));
-                                dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
                             Log.d(TAG, "mail Children count"+ dataSnapshot.getChildrenCount());
                             Log.d(TAG, "mail key"+ dataSnapshot.getKey());
                             for (DataSnapshot messageSnapshot: dataSnapshot.getChildren()) {

@@ -240,7 +240,7 @@ public class DeliveryListFragment extends FragmentBasic
                             mLinearProductos.setVisibility(View.VISIBLE);
                             mDeliveryOrderTile.setVisibility(View.VISIBLE);
                         } else {
-                            onDialogAlert("Para seleccionar Necesita estar conectado a Internet");
+                            muestraMensajeEnDialogo("Para seleccionar Necesita estar conectado a Internet");
                         }
                     }
 
@@ -257,86 +257,6 @@ public class DeliveryListFragment extends FragmentBasic
 
             }
         };
-
-//        mPickinOrdersAdapter = new PickingOrdersCursorAdapter(
-//                getContext(),
-//                null,
-//                emptyViewPicking,
-//                new PickingOrdersCursorAdapter.PinckingOrdersCursorAdapterOnClickHandler() {
-//                    @Override
-//                    public void onClick(long id, PickingOrdersCursorAdapter.ViewHolder vh) {
-//                        mTilePickingComent.setText(vh.mpickingOrderComents.getText());
-//                        mTilePickingOrderNumber.setText(vh.mPickingOrderNumber.getText());
-//                        mTilePickingComent.setVisibility(View.VISIBLE);
-//                        mCreationDate.setText(vh.mCreationDate.getText());
-//                        mIDPickingOrderSelected = id;
-//                        mPickinOrdersAdapter.notifyDataSetChanged();
-//
-//                        mCursorAdapterTotalProductos.notifyDataSetChanged();
-//                        recyclerView.setVisibility(View.GONE);
-//                        mLinearOrders.setVisibility(View.VISIBLE);
-//                        mLinearProductos.setVisibility(View.VISIBLE);
-//                        mDeliveryOrderTile.setVisibility(View.VISIBLE);
-//                    }
-//
-//                    @Override
-//                    public void onDataChange() {
-//
-//                        mCursorAdapterTotalProductos.notifyDataSetChanged();
-//                        mPickinOrdersAdapter.notifyDataSetChanged();
-//                        mCursorAdapterTotalProductos.notifyDataSetChanged();
-//                    }
-//
-//                    @Override
-//                    public void onItemDismissCall(long cursorID) {
-//                        mIDPickingOrderSelected = cursorID;
-//                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-//                        ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
-//                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PICKING_STATUS_INICIAL);
-//                        batchOperations.add(builder.build());
-//
-//
-//                        try {
-//                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-//                            onDataChange();
-//                        } catch (RemoteException | OperationApplicationException e) {
-//                        } finally {
-//                            onDataChange();
-//                            upDateWitget(getContext());
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onItemAceptedCall(long cursorID) {
-//
-//                        mIDPickingOrderSelected = cursorID;
-//                        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-//                        ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.PickingOrders.withId(mIDPickingOrderSelected));
-//                        builder.withValue(PickingOrdersColumns.STATUS_PICKING_ORDERS, PICKING_STATUS_CERRADA);
-//                        batchOperations.add(builder.build());
-//                        try {
-//                            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-//                            onDataChange();
-//                        } catch (RemoteException | OperationApplicationException e) {
-//
-//                        } finally {
-//                            onDataChange();
-//                            upDateWitget(getContext());
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onDialogAlert(String message) {
-//                        DialogAlerta dFragment = DialogAlerta.newInstance(message);
-//                        dFragment.show(getFragmentManager(), "Dialog Fragment");
-//                    }
-//
-//                    @Override
-//                    public void sharePickingorder(PickingOrdersCursorAdapter.ViewHolder vh) {
-//                        sharePickingOrder(getContext(), vh.mPickingOrderNumber.getText().toString(), mTilePickingComent.getText().toString());
-//                    }
-//                }
-//        );
 
 
         recyclerView.setAdapter(mPickinOrdersAdapter);
@@ -365,7 +285,7 @@ public class DeliveryListFragment extends FragmentBasic
                     editor.commit();
                     desbloqueoPickingParaTrabajoOffLine();
                 } else {
-                    onDialogAlert("Para seleccionar Necesita estar conectado a Internet");
+                    muestraMensajeEnDialogo("Para seleccionar Necesita estar conectado a Internet");
 
                 }
             }
@@ -377,111 +297,15 @@ public class DeliveryListFragment extends FragmentBasic
         recyclerViewTotalProductos = (RecyclerView) rootView.findViewById(R.id.total_products_pickingOrder);
 
         recyclerViewTotalProductos.setLayoutManager(new LinearLayoutManager(getContext()));
-
-
-//        mCursorAdapterTotalProductos = new PickingOrderProductsAdapter(getContext(), null,
-//                emptyViewTotalProducts,
-//                new PickingOrderProductsAdapter.ProductCursorAdapterOnClickHandler() {
-//                    @Override
-//                    public void onClick(long id, PickingOrderProductsAdapter.ViewHolder vh) {
-//
-//                    }
-//                }
-//        );
-
-
         recyclerViewTotalProductos.setAdapter(mCursorAdapterTotalProductos);
+
         recyclerViewCustomOrderInDeliveyOrder = (RecyclerView) rootView.findViewById(R.id.customOrderInpickingOrder_list);
         recyclerViewCustomOrderInDeliveyOrder.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
         // Custom Orders
         emptyViewCustomOrder = rootView.findViewById(R.id.recyclerview_custom_empty);
-//        mCustomsOrdersCursorAdapter = new CustomsOrdersCursorAdapter(getContext(), null, emptyView, new CustomsOrdersCursorAdapter.CustomsOrdersCursorAdapterOnClickHandler() {
-//            @Override
-//            public void onClick(long id, CustomsOrdersCursorAdapter.ViewHolder vh) {
-//
-//                if (mTwoPane) {
-//                    Bundle arguments = new Bundle();
-//
-////                    arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, id);
-//                    arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-//                    CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
-//                    fragment.setArguments(arguments);
-//                    getActivity().getSupportFragmentManager().beginTransaction()
-//                            .addToBackStack(null)
-//                            .replace(R.id.customorder_detail_container, fragment)
-//                            .commit();
-//                } else {
-//                    Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
-//                    intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY);
-////                    intent.putExtra(CustomDetailFragment.ARG_ITEM_ID, id);
-//
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                        Pair<View, String> p2 = Pair.create((View) vh.mTipoDePago, getString(R.string.custom_icon_transition_name));
-//                        ActivityOptionsCompat activityOptions =
-//                                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p2);
-//                        startActivity(intent, activityOptions.toBundle());
-//
-//                    } else {
-//                        startActivity(intent);
-//                    }
-//
-//                }
-//
-//
-//            }
-//
-//            @Override
-//            public void onMakeACall(String ContactID) {
-//                makeTheCall(getActivity(), ContactID);
-//            }
-//
-//            @Override
-//            public void onDialogAlert(String message) {
-//
-//            }
-//
-//            @Override
-//            public void onItemDismissCall(long cursorID) {
-//                mCustomOrderIdSelected = cursorID;
-//            }
-//
-//            @Override
-//            public void onItemAceptedCall(long cursorID) {
-//                mCustomOrderIdSelected = cursorID;
-//                ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-//                ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mCustomOrderIdSelected));
-//                builder.withValue(CustomOrdersColumns.STATUS_CUSTOM_ORDER, ORDER_STATUS_DELIVERED);
-//                batchOperations.add(builder.build());
-//                try {
-//                    getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-//                } catch (RemoteException | OperationApplicationException e) {
-//
-//                } finally {
-//                    onDataChange();
-//                }
-//
-//
-//            }
-//
-//            @Override
-//            public void onDataChange() {
-//
-//                mCursorAdapterTotalProductos.notifyDataSetChanged();
-//                mPickinOrdersAdapter.notifyDataSetChanged();
-//                mCursorAdapterTotalProductos.notifyDataSetChanged();
-//            }
-//        }
-//
-//        );
-//
-//        recyclerViewCustomOrderInDeliveyOrder.setAdapter(mCustomsOrdersCursorAdapter);
 
-//        ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallbackDeleveyCustomOrder(mCustomsOrdersCursorAdapter);
-//        ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
-//        mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewCustomOrderInDeliveyOrder);
 
 
         mLinearOrders.setVisibility(View.GONE);
@@ -812,7 +636,7 @@ public class DeliveryListFragment extends FragmentBasic
 
                                 liberarRecusosTomados();
                                 liberarArrayTaskConBloqueos();
-                                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + e.getMessage().toString());
+                                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + e.getMessage().toString());
 
 
                             }
@@ -825,7 +649,7 @@ public class DeliveryListFragment extends FragmentBasic
 
 //                liberarRecusosTomados("", PICKING_STATUS_DELIVERY, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
 //                liberarArrayTaskConBloqueos();
-//                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + databaseError.getMessage().toString());
+//                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + databaseError.getMessage().toString());
 
                     }
                 });
@@ -923,7 +747,7 @@ public class DeliveryListFragment extends FragmentBasic
 //
 //                                liberarRecusosTomados();
 //                                liberarArrayTaskConBloqueos();
-//                                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + e.getMessage().toString());
+//                                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + e.getMessage().toString());
 //
 //
 //
@@ -937,7 +761,7 @@ public class DeliveryListFragment extends FragmentBasic
 
 //                liberarRecusosTomados("", PICKING_STATUS_DELIVERY, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
 //                liberarArrayTaskConBloqueos();
-//                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + databaseError.getMessage().toString());
+//                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + databaseError.getMessage().toString());
 
                     }
                 });
@@ -1076,7 +900,7 @@ public class DeliveryListFragment extends FragmentBasic
 
                                         Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar updateChildren-onFailure " + e.toString());
 
-                                        onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                        muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
 
                                     }
                                 }).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -1275,12 +1099,21 @@ public void compensarCuenta(String clienteKey){
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key " + dataSnapshot.getKey());
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden Ref " + dataSnapshot.getRef());
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden ChildrenCount" + dataSnapshot.getChildrenCount());
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                              CabeceraOrden cabeceraOrden= (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
+                                if (cabeceraOrden.getEstado()>=ORDEN_STATUS_EN_DELIVERING){
+                                    Log.i(LOG_TAG, "pasarPickingAEntrega Hay Ordenes Entregadas" + cabeceraOrden.getNumeroDeOrden());
+
+                                    return;
+                                }
+
+                            }
+
                             int i = 0;
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 String nroOrden = snapshot.getKey();
                                 Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key " + nroOrden);
 
-//                        CabeceraOrden cabeceraOrden= (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
                                 readBlockCabeceraOrden(Long.parseLong(nroOrden));
                                 taskList.add(mCabeceraOrdenTask.get(i));
                                 i++;
@@ -1372,7 +1205,7 @@ public void compensarCuenta(String clienteKey){
                                                     Log.i(LOG_TAG, "pasarPickingAEntrega updateChildren-onFailure " + e.toString());
                                                     liberarRecusosTomados();
                                                     liberarArrayTaskConBloqueos();
-                                                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                                    muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
 
                                                 }
                                             }).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -1392,7 +1225,7 @@ public void compensarCuenta(String clienteKey){
                                                                      public void onFailure(@NonNull Exception e) {
                                                                          liberarRecusosTomados();
                                                                          liberarArrayTaskConBloqueos();
-                                                                         onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                                                         muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                                                                      }
                                                                  }
 
@@ -1405,7 +1238,7 @@ public void compensarCuenta(String clienteKey){
                                 public void onCancelled(DatabaseError databaseError) {
                                     liberarRecusosTomados();
                                     liberarArrayTaskConBloqueos();
-                                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                    muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                                 }
                             });
                         }
@@ -1415,7 +1248,7 @@ public void compensarCuenta(String clienteKey){
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key lee cabeceras onCancelled");
                             liberarRecusosTomados();
                             liberarArrayTaskConBloqueos();
-                            onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                            muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                         }
                     });
 
@@ -1428,7 +1261,7 @@ public void compensarCuenta(String clienteKey){
             public void onFailure(@NonNull Exception e) {
                 liberarRecusosTomados();
                 liberarArrayTaskConBloqueos();
-                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
+                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
             }
         });
     }

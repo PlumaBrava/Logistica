@@ -51,13 +51,13 @@
     <string name="AddonFailedToLoad">Error al cargar Publicidad(%S)</string>
 
     <!--Make a Call-->
-    <string name="MakeCall_Choose">Choose a number</string>
+    <string name="MakeCall_Choose">Elija Un Número</string>
     <string name="NomberTypeOtro">Otro</string>
-    <string name="NomberTypeMain">MAIN</string>
-    <string name="NomberTypeFaxWork">FAX WORK</string>
-    <string name="NomberTypeWork">WORK</string>
-    <string name="NomberTypeMovile">MOVILE</string>
-    <string name="NomberTypeHome">HOME</string>
+    <string name="NomberTypeMain">Principal</string>
+    <string name="NomberTypeFaxWork">Fax</string>
+    <string name="NomberTypeWork">Trabajo</string>
+    <string name="NomberTypeMovile">Celular</string>
+    <string name="NomberTypeHome">Casa</string>
     <string name="MakeCall_Tel">tel:</string>
 
 

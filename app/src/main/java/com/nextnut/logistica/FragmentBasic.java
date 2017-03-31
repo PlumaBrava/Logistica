@@ -1675,7 +1675,7 @@ public abstract class FragmentBasic extends Fragment {
     }
 
 
-    public void onDialogAlert(String mensaje) {
+    public void muestraMensajeEnDialogo(String mensaje) {
         AlertDialog.Builder alert;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             alert = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Light_Dialog_Alert);
@@ -1683,13 +1683,14 @@ public abstract class FragmentBasic extends Fragment {
             alert = new AlertDialog.Builder(getContext());
         }
         alert.setMessage(mensaje);
-        alert.create().show();
+
         alert.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
             }
         });
+        alert.create().show();
     }
 
     public Boolean  hayTareaEnProceso() {
@@ -1739,7 +1740,7 @@ public abstract class FragmentBasic extends Fragment {
 
 
         if (tamanoTareas > 0) {
-            onDialogAlert("aguarde un momento, A "+tamanoTareas);
+            muestraMensajeEnDialogo("aguarde un momento, A "+tamanoTareas);
             Log.i(LOG_TAG, "hayTareaEnProceso suma "+tamanoTareas );
 
             return true;
@@ -1760,7 +1761,7 @@ public abstract class FragmentBasic extends Fragment {
         // Cabecera Picking 6
         mPickingTask != null ||
         mLiberarPickingTask != null){
-         onDialogAlert("aguarde un momento, B");
+         muestraMensajeEnDialogo("aguarde un momento, B");
          Log.i(LOG_TAG, "hayTareaEnProceso B" );
 
         return true;

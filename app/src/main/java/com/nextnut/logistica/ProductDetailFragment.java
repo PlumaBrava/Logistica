@@ -26,7 +26,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.util.CurrencyToDouble;
-import com.nextnut.logistica.util.DialogAlerta;
 import com.nextnut.logistica.util.NumberTextWatcher;
 import com.rey.material.widget.ProgressView;
 import com.rey.material.widget.Spinner;
@@ -468,11 +467,10 @@ public class ProductDetailFragment extends FragmentBasic
 
 //return true if the product exist or can not be saved because its a modification, else false
         if (productName.equals("")) {
-            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproducNametcantbenull));
+            muestraMensajeEnDialogo(getResources().getString(R.string.theproducNametcantbenull));
             // Show DialogFragment
             mProductName.setError(getResources().getString(R.string.product_name_error_cantBeNull));
 
-            dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
             return;
         }
@@ -506,11 +504,10 @@ public class ProductDetailFragment extends FragmentBasic
 
                             }
 
-                            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.product_name_error_yaexiste));
+                            muestraMensajeEnDialogo(getResources().getString(R.string.product_name_error_yaexiste));
                             // Show DialogFragment
                             mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
                             mProductName.setError(getResources().getString(R.string.product_name_error_yaexiste));
-                            dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
                         }
 
                     }
@@ -528,9 +525,8 @@ public class ProductDetailFragment extends FragmentBasic
     public boolean isNameMaxLengthCorrect(String name) {
         if (name.length() > getResources().getInteger(R.integer.productoNameMaxLength)) {
 
-            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproductNameToLong));
+            muestraMensajeEnDialogo(getResources().getString(R.string.theproductNameToLong));
             // Show DialogFragment
-            dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductName.setTextColor(getResources().getColor(R.color.ValidationERROR));
             mProductName.setError(getResources().getString(R.string.product_name_error_tooLong));
             return false;
@@ -542,20 +538,18 @@ public class ProductDetailFragment extends FragmentBasic
 
     public boolean isDescriptionMaxLengthCorrect(String desc) {
         if (desc.equals("")) {
-            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproductdesccantbenull));
+            muestraMensajeEnDialogo(getResources().getString(R.string.theproductdesccantbenull));
             // Show DialogFragment
             mProductDescription.setError(getResources().getString(R.string.product_name_error_cantBeNull));
             mProductDescription.requestFocus();
-            dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductDescription.setTextColor(getResources().getColor(R.color.ValidationERROR));
             return false;
         }
 
         if (desc.length() > getResources().getInteger(R.integer.productoNameMaxLength)) {
 
-            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.theproductdescToLong));
+            muestraMensajeEnDialogo(getResources().getString(R.string.theproductdescToLong));
             // Show DialogFragment
-            dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductDescription.setTextColor(getResources().getColor(R.color.ValidationERROR));
             mProductDescription.setError(getResources().getString(R.string.product_name_error_tooLong));
             mProductDescription.requestFocus();
@@ -571,9 +565,8 @@ public class ProductDetailFragment extends FragmentBasic
         Double price = null;
         if (mProductPrice.getText().toString() == null) {
 
-            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+            muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
             // Show DialogFragment
-            dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
             mProductPrice.setError(getResources().getString(R.string.price_error_cantBeNull));
             mProductPrice.requestFocus();
@@ -584,7 +577,7 @@ public class ProductDetailFragment extends FragmentBasic
 
             if (price == null) {
 
-                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
                 // Show DialogFragment
                 mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
                 mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
@@ -593,7 +586,7 @@ public class ProductDetailFragment extends FragmentBasic
                 return false;
             } else if (price <= 0) {
 
-                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
                 // Show DialogFragment
                 mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
                 mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
@@ -612,9 +605,8 @@ public class ProductDetailFragment extends FragmentBasic
         Double specialPrice = null;
         if (mProductPriceSpecial.getText().toString() == null) {
 
-            DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+            muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
             // Show DialogFragment
-            dFragment.show(getFragmentManager(), DIALOG_FRAGMENT);
             mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
             mProductPriceSpecial.setError(getResources().getString(R.string.price_error_cantBeNull));
             mProductPriceSpecial.requestFocus();
@@ -626,7 +618,7 @@ public class ProductDetailFragment extends FragmentBasic
 
             if (specialPrice == null) {
 
-                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
                 // Show DialogFragment
                 mProductPriceSpecial.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
                 mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
@@ -634,7 +626,7 @@ public class ProductDetailFragment extends FragmentBasic
                 return false;
             } else if (specialPrice <= 0) {
 
-                DialogAlerta dFragment = DialogAlerta.newInstance(getResources().getString(R.string.priceError));
+                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
                 // Show DialogFragment
                 mProductPriceSpecial.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
                 mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));

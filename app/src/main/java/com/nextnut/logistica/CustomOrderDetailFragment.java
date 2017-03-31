@@ -730,7 +730,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                         Log.i(LOG_TAG, "pasarOrdenAPickingl updateChildren-onFailure " + mKeyList);
                                         liberarRecusosTomados();
                                         liberarArrayTaskConBloqueos();
-                                        onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                        muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
 
                                     }
                                 });
@@ -743,7 +743,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                             public void onFailure(@NonNull Exception e) {
                                 liberarRecusosTomados();
                                 liberarArrayTaskConBloqueos();
-                                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + "Producto Inicial");
+                                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + "Producto Inicial");
                             }
                         });
 
@@ -757,7 +757,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     public void onFailure(@NonNull Exception e) {
                         liberarRecusosTomados();
                         liberarArrayTaskConBloqueos();
-                        onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
+                        muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
 
                     }
                 })
@@ -1199,7 +1199,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                         Log.i(LOG_TAG, "abmDetalleDeOrden updateChildren-onFailure " + e.toString());
                         liberarRecusosTomados();
                         liberarArrayTaskConBloqueos();
-                        onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                        muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                     }
                 }).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -1223,10 +1223,10 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.i(LOG_TAG, "abmDetalleDeOrden addOnFailureListener= allTask" + e.toString());
-                onDialogAlert("No se pudo bloquear");
+                muestraMensajeEnDialogo("No se pudo bloquear");
                 liberarRecusosTomados();
                 liberarArrayTaskConBloqueos();
-                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
+                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
             }
         });
 
@@ -1351,7 +1351,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                         Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren-onFailure " + e.toString());
 //                        liberarRecusosTomados();
 //                        liberarArrayTaskConBloqueos();
-//                        onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+//                        muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                     }
                 }).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -1374,7 +1374,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 //                Log.i(LOG_TAG, "abmDetalleDeOrden addOnFailureListener= allTask" + e.toString());
 //                liberarRecusosTomados();
 //                liberarArrayTaskConBloqueos();
-//                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
+//                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
 //            }
 //        });
 

@@ -106,7 +106,6 @@ public class CustomOrderListFragment extends FragmentBasic {
                 }
             });
             alert.create().show();
-//            DialogAlerta dialogAlerta = DialogAlerta.newInstance("");
         }else
 
         if(mListadeOrdenesParaPasarApicking.isEmpty()){
@@ -337,7 +336,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 
                 if (MainActivity.mPickingOrderSelected == 0) {
 
-                    onDialogAlert(getResources().getString(R.string.selectPickingOrderToAssing));
+                    muestraMensajeEnDialogo(getResources().getString(R.string.selectPickingOrderToAssing));
 //                    onDataChange();
                 } else {
 
@@ -476,7 +475,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 //
 //                if (MainActivity.mPickingOrderSelected == 0) {
 //
-//                    onDialogAlert(getResources().getString(R.string.selectPickingOrderToAssing));
+//                    muestraMensajeEnDialogo(getResources().getString(R.string.selectPickingOrderToAssing));
 //                    onDataChange();
 //                } else {
 //                    ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
@@ -657,7 +656,7 @@ public class CustomOrderListFragment extends FragmentBasic {
                                             Log.i(LOG_TAG, "pasarOrdenAPickingl updateChildren-onFailure " + e.toString());
                                             liberarRecusosTomados();
                                             liberarArrayTaskConBloqueos();
-                                            onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                            muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
 
                                         }
                                     }).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -683,7 +682,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 
                                     liberarRecusosTomados();
                                     liberarArrayTaskConBloqueos();
-                                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
+                                    muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
 
                                 }
                             });
@@ -699,7 +698,7 @@ public class CustomOrderListFragment extends FragmentBasic {
                     Log.i(LOG_TAG, "pasarOrdenAPickingl Operacion fallo- " + task.getException().toString());
                     liberarRecusosTomados();
                     liberarArrayTaskConBloqueos();
-                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
+                    muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
                 }
             }
         });

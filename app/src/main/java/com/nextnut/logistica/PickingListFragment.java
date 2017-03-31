@@ -345,7 +345,7 @@ public class PickingListFragment extends FragmentBasic {
 //                                if (exitenCUasignedtoPickingOrder()) {
 //
 //
-//                                    onDialogAlert(getResources().getString(R.string.detete_picking_order_Existen_CustomOrders_Asigned));
+//                                    muestraMensajeEnDialogo(getResources().getString(R.string.detete_picking_order_Existen_CustomOrders_Asigned));
 //                                } else {
 //
 //
@@ -383,7 +383,7 @@ public class PickingListFragment extends FragmentBasic {
 //
 //                        if (!exitenCUasignedtoPickingOrder()) {
 //
-//                            onDialogAlert(getResources().getString(R.string.detete_picking_order_NO_Existen_CustomOrders_Asigned));
+//                            muestraMensajeEnDialogo(getResources().getString(R.string.detete_picking_order_NO_Existen_CustomOrders_Asigned));
 //                            onDataChange();
 //                        } else {
 //
@@ -413,7 +413,7 @@ public class PickingListFragment extends FragmentBasic {
 //                    }
 //
 //                    @Override
-//                    public void onDialogAlert(String message) {
+//                    public void muestraMensajeEnDialogo(String message) {
 //
 //                        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
 //
@@ -529,7 +529,7 @@ public class PickingListFragment extends FragmentBasic {
                 Log.i(LOG_TAG, "muestraOrdenesEnPicking Modelo: Numero de orden- " + model.getNumeroDeOrden());
                 if (MainActivity.mPickingOrderSelected == 0) {
 
-                    onDialogAlert(getResources().getString(R.string.selectPickingOrderToAssing));
+                    muestraMensajeEnDialogo(getResources().getString(R.string.selectPickingOrderToAssing));
 //                    onDataChange();
                 } else {
 
@@ -545,7 +545,7 @@ public class PickingListFragment extends FragmentBasic {
 
                 if (MainActivity.mPickingOrderSelected == 0) {
 
-                    onDialogAlert(getResources().getString(R.string.selectPickingOrderToAssing));
+                    muestraMensajeEnDialogo(getResources().getString(R.string.selectPickingOrderToAssing));
 //                    onDataChange();
                 } else {
 
@@ -608,7 +608,7 @@ public class PickingListFragment extends FragmentBasic {
 //            }
 //
 //            @Override
-//            public void onDialogAlert(String message) {
+//            public void muestraMensajeEnDialogo(String message) {
 //
 //            }
 //
@@ -1196,7 +1196,7 @@ public class PickingListFragment extends FragmentBasic {
                                 public void onFailure(@NonNull Exception e) {
                                     liberarRecusosTomados();
                                     liberarArrayTaskConBloqueos();
-                                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + "allTask");
+                                    muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + "allTask");
 
 
                                 }
@@ -1213,7 +1213,7 @@ public class PickingListFragment extends FragmentBasic {
                     Log.i(LOG_TAG, "pasarOrdenAInicial Operacion fallo- " + task.getException().toString());
                     liberarRecusosTomados();
                     liberarArrayTaskConBloqueos();
-                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
+                    muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -1221,7 +1221,7 @@ public class PickingListFragment extends FragmentBasic {
             public void onFailure(@NonNull Exception e) {
                 liberarRecusosTomados( );
                 liberarArrayTaskConBloqueos();
-                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
+                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
             }
         });
     }
@@ -1350,7 +1350,7 @@ public class PickingListFragment extends FragmentBasic {
                                                         Log.i(LOG_TAG, "pasarPickingAEntrega updateChildren-onFailure " + e.toString());
                                                         liberarRecusosTomados();
                                                         liberarArrayTaskConBloqueos();
-                                                        onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                                        muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
 
                                                     }
                                                 }).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -1370,7 +1370,7 @@ public class PickingListFragment extends FragmentBasic {
                                                                          public void onFailure(@NonNull Exception e) {
                                                                              liberarRecusosTomados();
                                                                              liberarArrayTaskConBloqueos();
-                                                                             onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                                                             muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                                                                          }
                                                                      }
 
@@ -1383,7 +1383,7 @@ public class PickingListFragment extends FragmentBasic {
                                 public void onCancelled(DatabaseError databaseError) {
                                     liberarRecusosTomados( );
                                     liberarArrayTaskConBloqueos();
-                                    onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                    muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                                 }
                             });
                         }
@@ -1393,7 +1393,7 @@ public class PickingListFragment extends FragmentBasic {
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden key lee cabeceras onCancelled");
                             liberarRecusosTomados();
                             liberarArrayTaskConBloqueos();
-                            onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                            muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                         }
                     });
 
@@ -1406,7 +1406,7 @@ public class PickingListFragment extends FragmentBasic {
             public void onFailure(@NonNull Exception e) {
                 liberarRecusosTomados( );
                 liberarArrayTaskConBloqueos();
-                onDialogAlert(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
+                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
             }
         });
     }

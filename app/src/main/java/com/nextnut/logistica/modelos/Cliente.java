@@ -26,7 +26,7 @@ public class Cliente implements Parcelable {
     private String cuit;
     private Boolean especial;
     private long fechaModificacion;
-    private Map<String, String> telefonos= new HashMap<>();;
+    private Map<String, String> telefonos= new HashMap<>();
     private String uid;
 
     public Map<String, String> getTelefonos() {
