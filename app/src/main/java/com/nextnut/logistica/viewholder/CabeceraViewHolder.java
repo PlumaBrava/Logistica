@@ -93,7 +93,7 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
                 mBottonPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        makePhoneCallCliente (MainActivity.getMainActicity(),cabeceraOrden.getCliente());
+                        makePhoneCallCliente (MainActivity.getMainActivity(),cabeceraOrden.getCliente());
                     }
                 });
         }else{

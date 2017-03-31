@@ -88,7 +88,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
     private static AppCompatActivity mContext;
 
-    public static AppCompatActivity getMainActicity() {
+    public static AppCompatActivity getMainActivity() {
         return mContext;
     }
 
@@ -918,7 +918,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                             Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
                             data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
                             data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
-                            migrarTelefonosDelContactoAsociado(data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM)))
+                            migrarTelefonosDelContactoAsociado(getMainActivity() ,data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM)))
                     );
                 } while (data.moveToNext());
 

@@ -1,8 +1,10 @@
 package com.nextnut.logistica;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -48,6 +50,7 @@ import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_CLIENTES;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
 import static com.nextnut.logistica.util.MakeCall.getUserName;
+import static com.nextnut.logistica.util.MakeCall.migrarTelefonosDelContactoAsociado;
 
 /**
  * A fragment representing a single Custom detail screen.
@@ -69,7 +72,7 @@ public class CustomDetailFragment extends FragmentBasic  {
     private EditText mLastName;
     private EditText mDeliveyAddress;
     private EditText mCity;
-    private Button button;
+    private Button buttonContactoAgendado;
     private ImageView mImageCustomer;
     private EditText mCuit;
     private EditText mIva;
@@ -119,8 +122,8 @@ public class CustomDetailFragment extends FragmentBasic  {
         View rootView = inflater.inflate(R.layout.custom_detail, container, false);
         mCustomName = (EditText) rootView.findViewById(R.id.custom_name_text);
         mLastName = (EditText) rootView.findViewById(R.id.product_Lastname);
-        button = (Button) rootView.findViewById(R.id.custom_imagen_button);
-        button.setOnClickListener(new View.OnClickListener() {
+        buttonContactoAgendado = (Button) rootView.findViewById(R.id.contactoAgendado_button);
+        buttonContactoAgendado.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
@@ -277,45 +280,45 @@ public class CustomDetailFragment extends FragmentBasic  {
     static final int PICK_CONTACT_REQUEST = 1;  // The request code
     String number;
     String mIdContact;
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//
-//            // Make sure the request was successful
-//            if (resultCode == Activity.RESULT_OK) {
-//
-//                // Check which request it is that we're responding to
-//                if (requestCode == PICK_CONTACT_REQUEST) {
-//                // Get the URI that points to the selected contact
-//                Uri contactUri = data.getData();
-//                // We only need the NUMBER column, because there will be only one row in the result
-//                String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER,
-//                ContactsContract.CommonDataKinds.Phone._ID,
-//                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-//               ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
-//
-//                // Perform the query on the contact to get the NUMBER column
-//                // We don't need a selection or sort order (there's only one result for the given URI)
-//                // CAUTION: The query() method should be called from a separate thread to avoid blocking
-//                // your app's UI thread. (For simplicity of the sample, this code doesn't do that.)
-//                // Consider using CursorLoader to perform the query.
-//                Cursor cursor = getContext().getContentResolver()
-//                        .query(contactUri, projection, null, null, null);
-//                cursor.moveToFirst();
-//
-//                // Retrieve the phone number from the NUMBER column
-//                int column1 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-//                int column2 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-//                int column3 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
-//               number = cursor.getString(column1);
-//                String name = cursor.getString(column2);
-//                mIdContact = cursor.getString(column3);
-//                if (mCustomId!=null){
-//                    button.setBackgroundColor(Color.GREEN);
-//
-//                }
-//
-//                button.setText(name);
-//            }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+            // Make sure the request was successful
+            if (resultCode == Activity.RESULT_OK) {
+
+                // Check which request it is that we're responding to
+                if (requestCode == PICK_CONTACT_REQUEST) {
+                // Get the URI that points to the selected contact
+                Uri contactUri = data.getData();
+                // We only need the NUMBER column, because there will be only one row in the result
+                String[] projection = {ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.CommonDataKinds.Phone._ID,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+               ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
+
+                // Perform the query on the contact to get the NUMBER column
+                // We don't need a selection or sort order (there's only one result for the given URI)
+                // CAUTION: The query() method should be called from a separate thread to avoid blocking
+                // your app's UI thread. (For simplicity of the sample, this code doesn't do that.)
+                // Consider using CursorLoader to perform the query.
+                Cursor cursor = getContext().getContentResolver()
+                        .query(contactUri, projection, null, null, null);
+                cursor.moveToFirst();
+
+                // Retrieve the phone number from the NUMBER column
+                int column1 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                int column2 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                int column3 = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID);
+               number = cursor.getString(column1);
+                String name = cursor.getString(column2);
+                mIdContact = cursor.getString(column3);
+
+                    mTelefonos.putAll(migrarTelefonosDelContactoAsociado(getActivity(),mIdContact));
+                    mTipoTelefono.setText("");
+                    mTelefono.setText("");
+                    mAdapterTelefonos.swap(mTelefonos);
+                buttonContactoAgendado.setText(name);
+            }
 //                if (requestCode == Imagenes.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
 //                    mCurrentPhotoPath = getString(R.string.file) + savePhotoReturnPath(getContext(),(Bitmap) data.getExtras().get(getString(R.string.data)));
 //
@@ -338,8 +341,8 @@ public class CustomDetailFragment extends FragmentBasic  {
 //                            .into(mImageCustomer);
 //                }
 //
-//            }
-//    }
+            }
+    }
 
     @Override
     public void savePhoto(Bitmap bitmap){
@@ -364,7 +367,7 @@ public class CustomDetailFragment extends FragmentBasic  {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     if (mCustomId!=null){
-                        button.setBackgroundColor(Color.GREEN);
+                        buttonContactoAgendado.setBackgroundColor(Color.GREEN);
                     }
 
 
@@ -431,8 +434,8 @@ public class CustomDetailFragment extends FragmentBasic  {
 //                        mAdapterTelefonos.notifyAll();
 
                         if (mIdContact != null){
-                            button.setBackgroundColor(Color.GREEN);
-                            button.setText(getUserName(getContext() ,mIdContact));
+                            buttonContactoAgendado.setBackgroundColor(Color.GREEN);
+                            buttonContactoAgendado.setText(getUserName(getContext() ,mIdContact));
                         }
 
                         Drawable drawable = dimensiona(getContext(), R.drawable.com_facebook_profile_picture_blank_square);
@@ -722,8 +725,8 @@ public class CustomDetailFragment extends FragmentBasic  {
 //
 //
 //            if (mIdContact != null){
-//            button.setBackgroundColor(Color.GREEN);
-//                button.setText(getUserName(getContext() ,mIdContact));
+//            buttonContactoAgendado.setBackgroundColor(Color.GREEN);
+//                buttonContactoAgendado.setText(getUserName(getContext() ,mIdContact));
 //            }
 //
 //            Drawable drawable = dimensiona(getContext(), R.drawable.ic_action_image_timer_auto);

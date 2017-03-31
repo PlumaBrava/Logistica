@@ -176,8 +176,10 @@ public class MakeCall {
     }
 
 
-    public static Map<String, String> migrarTelefonosDelContactoAsociado(String id) {
-
+    public static Map<String, String> migrarTelefonosDelContactoAsociado(Activity aplication,String id) {
+        Log.i(LOG_TAG, "migrarTelefonosDelContactoAsociado "+id);
+        mContext = aplication;
+        mActivity = aplication;
         Map<String, String> telefonos = new HashMap<>();
         Cursor cursor = null;
         String phoneNumber = "";
@@ -190,6 +192,7 @@ public class MakeCall {
         if (ContextCompat.checkSelfPermission(mContext,
                 android.Manifest.permission.READ_CONTACTS)
                 != PackageManager.PERMISSION_GRANTED) {
+            Log.i(LOG_TAG, "Permisos "+ContextCompat.checkSelfPermission(mContext,android.Manifest.permission.READ_CONTACTS));
             ActivityCompat.requestPermissions(mActivity,
                     new String[]{android.Manifest.permission.READ_CONTACTS},
                     MY_PERMISSIONS_REQUEST_READ_CONTACT);
@@ -200,11 +203,13 @@ public class MakeCall {
 
             try {
 
+                Log.i(LOG_TAG, "read contacts ");
 
                 cursor = mActivity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
                 phoneIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
                 displayNameKeyIdx = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
                 if (cursor.moveToFirst()) {
+                    Log.i(LOG_TAG, " moveToFirst");
                     while (cursor.isAfterLast() == false) {
                         phoneNumber = cursor.getString(phoneIdx);
                         type = cursor.getInt(displayNameKeyIdx);
@@ -229,26 +234,34 @@ public class MakeCall {
                                 phoneType = mContext.getResources().getString(R.string.NomberTypeOtro);
                         }
                         telefonos.put(phoneType, phoneNumber);
+                        Log.i(LOG_TAG, " telefono agregado"+telefonos.toString());
+
                         allNumbers.add(phoneType + " : " + phoneNumber);
                         cursor.moveToNext();
 
                     }
                 } else {
+                    Log.i(LOG_TAG, " Return Null");
                     return null;
                 }
 
 
             } catch (Exception e) {
                 //error actions
+                Log.i(LOG_TAG, " Return Null");
+
                 return null;
 
             } finally {
+                Log.i(LOG_TAG, " Return "+telefonos.toString());
 
                 return telefonos;
             }
 
 
         }
+        Log.i(LOG_TAG, " Return Null");
+
         return null;
     }
 

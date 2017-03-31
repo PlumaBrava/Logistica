@@ -294,7 +294,7 @@
                     android:textStyle="bold" />
 
                 <Button
-                    android:id="@+id/custom_imagen_button"
+                    android:id="@+id/contactoAgendado_button"
                     style="?android:attr/titleTextStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
