@@ -245,7 +245,7 @@ public class SaldosListFragment extends FragmentBasic
     public void muestraOrdenesSinCompensar() {
 //        Query listadoOrdenesSinCompensar = refCabeceraOrdenList_Status(String.valueOf(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR));
         Query listadoOrdenesSinCompensar =refCabeceraOrdenList_ParaCompensar(mClienteKey);
-//        Query listadoOrdenesSinCompensar = refCabeceraOrden_2_List(ORDEN_STATUS_EN_DELIVERING, 11);
+//        Query listadoOrdenesSinCompensar = refCabeceraOrden_2_List(ORDEN_STATUS_EN_DELIVERY, 11);
         Log.i(LOG_TAG, "muestraProductosEnStokDeUnAlmacen:Query: " + listadoOrdenesSinCompensar.getRef().toString());
 
         mCustomsOrdersCursorAdapter = new FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder>(CabeceraOrden.class, R.layout.customorder_list_content,

@@ -62,11 +62,12 @@ import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_PI
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_PICKING;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PICKING;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
-import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERING;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_PICKING;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
+import static com.nextnut.logistica.util.Network.isNetworkAvailable;
 import static com.nextnut.logistica.util.SharePickingOrder.sharePickingOrder;
 
 /**
@@ -1228,7 +1229,7 @@ public class PickingListFragment extends FragmentBasic {
 
     private void pasarPickingAEntrega(final CabeceraPicking cabeceraPicking) {
         Log.i(LOG_TAG, "pasarPickingAEntrega Numero de picking- " + cabeceraPicking.getNumeroDePickingOrden());
-        if (hayTareaEnProceso()) {
+        if (hayTareaEnProceso() && isNetworkAvailable(getContext())) {
             return;
         }
 
@@ -1333,12 +1334,12 @@ public class PickingListFragment extends FragmentBasic {
                                                     Log.i(LOG_TAG, "pasarPickingAEntrega nroDeOrden = " + cabeceraOrden.getNumeroDeOrden());
 
                                     /*2 */
-                                                    cabeceraOrden.setEstado(ORDEN_STATUS_EN_DELIVERING);
+                                                    cabeceraOrden.setEstado(ORDEN_STATUS_EN_DELIVERY);
                                                     cabeceraOrden.liberar();
                                                     childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_PICKING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), null);
 
-                                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), cabeceraOrden.toMap());
-//                                        childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_EN_DELIVERING, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+                                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), cabeceraOrden.toMap());
+//                                        childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_EN_DELIVERY, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
                                                     childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
 
                                                 }

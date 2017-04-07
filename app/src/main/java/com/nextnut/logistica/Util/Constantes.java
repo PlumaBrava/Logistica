@@ -185,7 +185,7 @@ public class Constantes {
 
     public static final int ORDEN_STATUS_INICIAL = 0;                   // Estado de Inicial de una orden
     public static final int ORDEN_STATUS_PICKING = 1;                   // Estado En Picking de una orden
-    public static final int ORDEN_STATUS_EN_DELIVERING = 2;             // Estado  EN ENTREGA de una orden
+    public static final int ORDEN_STATUS_EN_DELIVERY = 2;             // Estado  EN ENTREGA de una orden
     public static final int ORDEN_STATUS_DELIVERED_PARA_COMPENSAR = 3;  // Estado Orden entregada.
     public static final int ORDEN_STATUS_DELIVERED_COMPENSADA_PARCIALMENTE = 4;  // Estado entregada, pagada parcialmente
     public static final int ORDEN_STATUS_COMPENSADA = 5;            // Estado TOTALMENTE PAGAD

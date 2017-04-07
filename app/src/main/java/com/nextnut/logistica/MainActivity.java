@@ -426,12 +426,14 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         menu.setGroupEnabled(R.id.productos_, mPerfil.getProductos());
         menu.setGroupVisible(R.id.productos_, mPerfil.getProductos());
         menu.setGroupEnabled(R.id.customs_, mPerfil.getClientes());
-        menu.setGroupVisible(R.id.customs_, mPerfil.getClientes());
+//        menu.setGroupVisible(R.id.customs_, mPerfil.getClientes());
         menu.setGroupEnabled(R.id.almacenes_, mPerfil.getClientes());
         menu.setGroupVisible(R.id.almacenes_, mPerfil.getClientes());
         menu.setGroupEnabled(R.id.action_usuarios_, mPerfil.getUsuarios());
-
-        menu.setGroupEnabled(R.id.grupo_reportes, mPerfil.getReportes());
+        Log.i(LOG_TAG, "menu: mPerfil.getUsuarios" + mPerfil.getUsuarios());
+        Log.i(LOG_TAG, "menu: mPerfil.getReportes" + mPerfil.getReportes());
+//        menu.setGroupEnabled(R.id.grupo_reportes_, mPerfil.getReportes());
+        menu.setGroupEnabled(R.id.grupo_reportes_, mPerfil.getReportes());
 //        menu.clear();
 
 

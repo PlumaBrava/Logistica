@@ -186,6 +186,7 @@ public abstract class FragmentBasic extends Fragment {
     public ArrayList<String> mReporteVentasClienteClienteKeyIndexLiberar = new ArrayList<String>();
     public ArrayList<String> mReporteVentasClienteAAMMIndexLiberar = new ArrayList<String>();
     public ArrayList<String> mReporteVentasClienteProductKeyIndexLiberar = new ArrayList<String>();
+    public ArrayList<String> mReporteVentasClienteClaveIndexLiberar = new ArrayList<String>();
     public ArrayList<Task> mReporteVentasClienteTask = new ArrayList<Task>();
     public ArrayList<TaskCompletionSource<Object>> mReporteVentasClienteCompletionTask = new ArrayList<TaskCompletionSource<Object>>();
     public ArrayList<Task> mLiberarReporteVentasClienteTask = new ArrayList<Task>();
@@ -615,6 +616,7 @@ public abstract class FragmentBasic extends Fragment {
                     Log.i(LOG_TAG, "readBlockCabeceraOrden onComplete getRef().parent.key " + ((DataSnapshot) task.getResult()).getRef().getParent().getKey());
 
                     mCabeceraOrdenLiberar.add(((DataSnapshot) task.getResult()).getRef().getParent().getKey());// /agrego las Key de los productos bloqueados
+                    Log.i(LOG_TAG, "readBlockCabeceraOrden mCabeceraOrdenLiberar " + mCabeceraOrdenLiberar.toString());
 
                     mLiberarSemaforoCabeceraOrden = true;
                 }
@@ -786,7 +788,7 @@ public abstract class FragmentBasic extends Fragment {
                     } else {
                         Log.i(LOG_TAG, "liberarCabeceraOrden CabeceraOrden = not NuLL- cabeceraOrden.sepuedeModificar()" + cabeceraOrden.sepuedeModificar());
                         if (!cabeceraOrden.sepuedeModificar()) {
-                            Log.i(LOG_TAG, "liberarCabeceraOrden Si, se puede Modificar y bloqueo");
+                            Log.i(LOG_TAG, "liberarCabeceraOrden Si, se puede Modificar y liberar");
                             cabeceraOrden.liberar();
                         } else {
                             Log.i(LOG_TAG, "liberarCabeceraOrden No se puede Lberar ");
@@ -808,6 +810,8 @@ public abstract class FragmentBasic extends Fragment {
                     // Transaction completed
                     Log.d(LOG_TAG, "liberarCabeceraOrden: boolean b" + commited);
                     int index = mCabeceraOrdenLiberar.indexOf(dataSnapshot.getRef().getParent().getKey());
+                    Log.d(LOG_TAG, "liberarCabeceraOrden: index" + index);
+                    Log.d(LOG_TAG, "liberarCabeceraOrden: key" + dataSnapshot.getRef().getParent().getKey());
 
                     if (commited) {
                         mLiberarcabeceraOrdenCompletionTask.get(index).setResult(dataSnapshot);
@@ -1384,9 +1388,18 @@ public abstract class FragmentBasic extends Fragment {
     public void readBlockReporteVentasCliente(String cliente, String productKey,String aamm) {
 
 //        Lee y bloquea  Reporte de Ventas Cliente 9
-        mReporteVentasClienteIndex.add(productKey);
 
-        Log.i("RB_ReporteVentaCliente", " productKey " + productKey);
+//        if(!mReporteVentasClienteIndex.isEmpty()){
+//            if(mReporteVentasClienteIndex.indexOf(cliente+productKey+aamm)>0){
+//                return;
+//            }
+//            else{
+//                mReporteVentasClienteIndex.add(cliente+productKey+aamm);
+//            }
+//        }else{
+        mReporteVentasClienteIndex.add(cliente+productKey+aamm);
+
+        Log.i("RB_ReporteVentaCliente", " clave " + cliente+productKey+aamm);
 
         mReporteVentasClienteCompletionTask.add(new TaskCompletionSource<>());
         mReporteVentasClienteTask.add(mReporteVentasClienteCompletionTask.get(mReporteVentasClienteCompletionTask.size() - 1).getTask());
@@ -1401,6 +1414,12 @@ public abstract class FragmentBasic extends Fragment {
                     mReporteVentasClienteClienteKeyIndexLiberar.add(((DataSnapshot) task.getResult()).getRef().getParent().getParent().getKey());// /agrego las Key de los productos bloqueados
                     mReporteVentasClienteProductKeyIndexLiberar.add(((DataSnapshot) task.getResult()).getRef().getParent() .getKey());// /agrego las Key de los productos bloqueados
                     mReporteVentasClienteAAMMIndexLiberar.add(((DataSnapshot) task.getResult()).getKey());// /agrego las Key de los productos bloqueados
+                    mReporteVentasClienteClaveIndexLiberar.add(
+                            ((DataSnapshot) task.getResult()).getRef().getParent().getParent().getKey()+
+                            ((DataSnapshot) task.getResult()).getRef().getParent() .getKey()+
+                            ((DataSnapshot) task.getResult()).getRef().getKey()
+                            );// /agrego las Key de los productos bloqueados
+
                     mLiberarSemaforoReporteVentasCliente = true;
                 }
             }
@@ -1430,9 +1449,11 @@ public abstract class FragmentBasic extends Fragment {
             @Override
             public void onComplete(DatabaseError databaseError, boolean commited,
                                    DataSnapshot dataSnapshot) {
-                Log.i("RB_ReporteVentaCliente", "onComplete dataSnapshot.getKey()" + dataSnapshot.getKey());
-                Log.i("RB_ReporteVentaCliente", "onComplete getRef().getParent().getKey()" + dataSnapshot.getRef().getParent().getKey());
-                int index = mReporteVentasClienteIndex.indexOf(dataSnapshot.getRef().getParent().getKey());
+                Log.i("RB_ReporteVentaCliente", "onComplete aamm" + dataSnapshot.getKey());
+                Log.i("RB_ReporteVentaCliente", "onComplete productKey" + dataSnapshot.getRef().getParent().getKey());
+                Log.i("RB_ReporteVentaCliente", "onComplete clienteKey" + dataSnapshot.getRef().getParent().getParent().getKey());
+                Log.i("RB_ReporteVentaCliente", "clave:" + dataSnapshot.getRef().getParent().getParent().getKey()+dataSnapshot.getRef().getParent().getKey()+dataSnapshot.getKey());
+                int index = mReporteVentasClienteIndex.indexOf(dataSnapshot.getRef().getParent().getParent().getKey()+dataSnapshot.getRef().getParent().getKey()+dataSnapshot.getKey());
                 Log.i("RB_ReporteVentaCliente", "onComplete index" + index);
                 if (commited) {
                     Log.i("RB_ReporteVentaCliente", "Task completa commited " + commited);
@@ -1461,20 +1482,25 @@ public abstract class FragmentBasic extends Fragment {
                 public void onComplete(@NonNull Task task) {
                     if (task.isSuccessful()) {
                         Log.i("ReporteVentasCliente", "task.isSuccessful()" + task.isSuccessful());
-                        int index = mReporteVentasClienteClienteKeyIndexLiberar.indexOf(((DataSnapshot) task.getResult()).getRef().getParent().getParent().getKey());
+                        int index = mReporteVentasClienteClaveIndexLiberar.indexOf(
+                                ((DataSnapshot) task.getResult()).getRef().getParent().getParent().getKey()+
+                                ((DataSnapshot) task.getResult()).getRef().getParent().getKey()+
+                                ((DataSnapshot) task.getResult()).getRef().getKey()
+                        );
                         Log.i("ReporteVentasCliente", "getKey: " + ((DataSnapshot) task.getResult()).getKey() + " index: " + index);
                         if (index > -1) {
                             Log.i("LiberarCliente", "Liberacion de la key" + ((DataSnapshot) task.getResult()).getKey() + " - index: " + index);
-                            mReporteVentasClienteClienteKeyIndexLiberar.set(index, "0");
+                            mReporteVentasClienteClaveIndexLiberar.set(index, "0");
 
                         }
-                        if (sonTodosCeros(mReporteVentasClienteClienteKeyIndexLiberar)) {
+                        if (sonTodosCeros(mReporteVentasClienteClaveIndexLiberar)) {
                             Log.i("Liberar Cliente", "Liberacion Completa");
                             mLiberarSemaforoReporteVentasCliente = false;
                             mLiberarReporteVentasClienteCompletionTask.clear();
                             mLiberarReporteVentasClienteTask.clear();
                             mReporteVentasClienteClienteKeyIndexLiberar.clear();
                             mReporteVentasClienteProductKeyIndexLiberar.clear();
+                            mReporteVentasClienteClaveIndexLiberar.clear();
                             mReporteVentasClienteAAMMIndexLiberar.clear();
                         }
                     }
@@ -1511,7 +1537,11 @@ public abstract class FragmentBasic extends Fragment {
 
                 @Override
                 public void onComplete(DatabaseError databaseError, boolean commited, DataSnapshot dataSnapshot) {
-                    int index = mReporteVentasClienteProductKeyIndexLiberar.indexOf(dataSnapshot.getRef().getParent().getKey());
+                    int index = mReporteVentasClienteClaveIndexLiberar.indexOf(
+                            dataSnapshot.getRef().getParent().getParent().getKey()+
+                            dataSnapshot.getRef().getParent().getKey()+
+                            dataSnapshot.getRef().getKey()
+                    );
                     Log.i("ReporteVentasCliente", "ProductKey " + dataSnapshot.getRef().getParent().getKey());
 
                     Log.i("ReporteVentasCliente", "onComplete  index " + index);
@@ -1633,6 +1663,8 @@ public abstract class FragmentBasic extends Fragment {
 
 /*10*/
 
+            Log.i("SaldosTotal", "sepide Linerar Saldo" + mSaldosTotalIndexLiberar.get(a));
+
             refSaldoTotalClientes_10(mSaldosTotalIndexLiberar.get(a)).runTransaction(new Transaction.Handler() {
 
                 @Override
@@ -1643,6 +1675,8 @@ public abstract class FragmentBasic extends Fragment {
 
                     } else {
                         Log.i("SaldosTotal", "Apellido" + saldos.getCliente().getApellido());
+                        Log.i("SaldosTotal", "Saldo Cliente key" + saldos.getClienteKey());
+                        Log.i("SaldosTotal", "Saldo semaforo" + saldos.sepuedeModificar());
 
                         if (!saldos.sepuedeModificar()) {
                             saldos.liberar();

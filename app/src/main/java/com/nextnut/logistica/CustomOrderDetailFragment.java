@@ -80,7 +80,7 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_DETALLE;
-import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERING;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
@@ -442,15 +442,16 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             @Override
             protected void populateViewHolder(final DetalleViewHolder viewHolder, final Detalle model, final int position) {
                 final DatabaseReference detalleRef = getRef(position);
-                if (mCabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERING) {
-                    Log.i(LOG_TAG, "adapter:detalleRef:ORDEN_STATUS_EN_DELIVERING " + mCabeceraOrden.getEstado());
+                if (mCabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERY) {
+                    Log.i(LOG_TAG, "adapter:detalleRef:ORDEN_STATUS_EN_DELIVERY " + mCabeceraOrden.getEstado());
                     viewHolder.setDeliveryState();
                     viewHolder.mTextViewPrecioDelivery.setVisibility(View.VISIBLE);
                     viewHolder.mTextcantidadDelivery.setVisibility(View.VISIBLE);
                     viewHolder.mTextToalDelivery.setVisibility(View.VISIBLE);
                     viewHolder.mfavorito.setVisibility(View.GONE);
+
                 } else {
-                    Log.i(LOG_TAG, "adapter:detalleRef:NO ORDEN_STATUS_EN_DELIVERING " + mCabeceraOrden.getEstado());
+                    Log.i(LOG_TAG, "adapter:detalleRef:NO ORDEN_STATUS_EN_DELIVERY " + mCabeceraOrden.getEstado());
                 }
 
                 emptyView.setVisibility(View.GONE);
@@ -490,11 +491,13 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             protected void onItemDismissHolder(Detalle model, int position) {
                 // TODO: ACTUALIZAR TOTALES !!!
                 mDetalleAnterior = model;
-                abmDetalleDeOrden(0.0, getRef(position).getKey(), model);
+                if (mCabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERY) {}
+                else {
+                    abmDetalleDeOrden(0.0, getRef(position).getKey(), model);
 //                borrarProductoDeOrden(getRef(position).getKey(), model);
-                Log.d(LOG_TAG, " onItemDismissHolder: " + model.getProducto().getNombreProducto() + " pos: " + position);
-                Log.d(LOG_TAG, " onItemDismissHolder: " + " key: " + getRef(position).getKey());
-
+                    Log.d(LOG_TAG, " onItemDismissHolder: " + model.getProducto().getNombreProducto() + " pos: " + position);
+                    Log.d(LOG_TAG, " onItemDismissHolder: " + " key: " + getRef(position).getKey());
+                }
                 mDetalleRecyclerView.setEnabled(false);
             }
 
@@ -790,12 +793,12 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     public void showDialogNumberPicker(final String productKey) {
 
         {
-            Log.i(LOG_TAG, "pasarOrdenEntrega TIMESTAMe1P4- " + System.currentTimeMillis());
+            Log.i("Picker"," - " + System.currentTimeMillis());
 
 //            SimpleDateFormat aamm = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
             aamm.format(new Date(System.currentTimeMillis()));
-            Log.i(LOG_TAG, "pasarOrdenEntrega TIMESTAMP- " + aamm.format(new Date(System.currentTimeMillis())));
+            Log.i("Picker", "pasarOrdenEntrega TIMESTAMP- " + aamm.format(new Date(System.currentTimeMillis())));
 //            Log.i(LOG_TAG, "pasarOrdenEntrega TIMESTAMP- " + aamm);
 
 
@@ -814,11 +817,14 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             np.setMinValue(mDetalleAnterior.getProducto().getCantidadMinima());
             np.setWrapSelectorWheel(true);
 
-            if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERING) {
+            if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
+                Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
+
                 np.setValue(mDetalleAnterior.getCantidadOrden().intValue());
                 openButton.setVisibility(View.VISIBLE);
                 sendButton.setVisibility(View.VISIBLE);
             } else {
+                Log.i("Picker", "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
 
                 if (mDetalleAnterior.getCantidadOrden() == null) {
                     np.setValue(mDetalleAnterior.getProducto().getCantidadDefault());
@@ -834,8 +840,11 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             b1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.i("Picker",  "b1.setOnClickListener");
                     d.dismiss();
-                    if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERING) {
+                    if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
+                        Log.i("Picker",  "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
+                        Log.i("Picker",  "abmDetalleDeOrdenDelivery");
                         abmDetalleDeOrdenDelivery((double) np.getValue(), productKey, mDetalleAnterior);
 //                        ca();
 //                        
@@ -849,8 +858,12 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 //                        d.dismiss();
 
                     } else {
-                        Log.d("detalle1", "showDialogNumberPicker-detalle) " + mDetalleAnterior.getCantidadOrden());
-                        Log.d("detalle1", "showDialogNumberPicker-np.getValue() " + np.getValue());
+                        Log.i("Picker",  "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
+
+                        Log.d("Picker", "showDialogNumberPicker-detalle) " + mDetalleAnterior.getCantidadOrden());
+                        Log.d("Picker", "showDialogNumberPicker-np.getValue() " + np.getValue());
+                        Log.i("Picker",  "abmDetalleDeOrden");
+
                         abmDetalleDeOrden((double) np.getValue(), productKey, mDetalleAnterior);
 //                        modificarCantidadDeProductoEnOrden(np.getValue(), productKey);
 //                        vh.mUnidadesEnStock.setText(String.valueOf(np.getValue()));
@@ -871,6 +884,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     d.dismiss();
                 }
             });
+            Log.i("Picker",  "b2.setOnClickListener");
+
             d.show();
 
 
@@ -1247,8 +1262,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         mproductKeyDato = productoKey;
         mDetalleDato = detalle; // tiene los valores del detalle que se quiere modificar
 
-        Log.i(LOG_TAG, "abmDetalleDeOrden Nro Pickign " + mNroPicking);
-        Log.i(LOG_TAG, "abmDetalleDeOrden cantidad " + cantidad + " productokey " + productoKey + " Producto " + detalle.getProducto().getNombreProducto());
+        Log.i(LOG_TAG, "abmDetalleDeEntrega Nro Pickign " + mNroPicking);
+        Log.i(LOG_TAG, "abmDetalleDeEntrega cantidad " + cantidad + " productokey " + productoKey + " Producto " + detalle.getProducto().getNombreProducto());
 
 //        // leo y bloqueo Cabecera de Orden 1B
 //        readBlockCabeceraOrden(mCabeceraOrden.getNumeroDeOrden());
@@ -1331,7 +1346,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 /*1B*/
                 childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()), cabeceraOrdenValues);
 /*2 */
-                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERING, mCabeceraOrden.getNumeroDeOrden(), mCabeceraOrden.getNumeroDePickingOrden()), cabeceraOrdenValues);
+                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, mCabeceraOrden.getNumeroDeOrden(), mCabeceraOrden.getNumeroDePickingOrden()), cabeceraOrdenValues);
 /*1c*/
                 childUpdates.put(nodoDetalleOrden_1C(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
 /*4 */
@@ -1344,6 +1359,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         NumberFormat format = NumberFormat.getCurrencyInstance();
         mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
         mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+        Log.i(LOG_TAG, "abmDetalleDeEntrega UpDate " );
                 mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {

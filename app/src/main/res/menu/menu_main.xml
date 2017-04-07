@@ -54,7 +54,7 @@
     </group>
     <!-- Grupo de reportes -->
     <group
-        android:id="@+id/grupo_reportes"
+        android:id="@+id/grupo_reportes_"
         android:menuCategory="container">
     <item
     android:id="@+id/reportes_"
