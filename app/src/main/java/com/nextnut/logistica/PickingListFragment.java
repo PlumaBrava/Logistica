@@ -67,7 +67,6 @@ import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_PICKING;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
-import static com.nextnut.logistica.util.Network.isNetworkAvailable;
 import static com.nextnut.logistica.util.SharePickingOrder.sharePickingOrder;
 
 /**
@@ -1229,7 +1228,7 @@ public class PickingListFragment extends FragmentBasic {
 
     private void pasarPickingAEntrega(final CabeceraPicking cabeceraPicking) {
         Log.i(LOG_TAG, "pasarPickingAEntrega Numero de picking- " + cabeceraPicking.getNumeroDePickingOrden());
-        if (hayTareaEnProceso() && isNetworkAvailable(getContext())) {
+        if (hayTareaEnProceso() ) {
             return;
         }
 

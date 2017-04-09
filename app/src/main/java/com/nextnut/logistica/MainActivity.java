@@ -29,13 +29,18 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.nextnut.logistica.data.CustomColumns;
+import com.nextnut.logistica.data.CustomOrdersColumns;
+import com.nextnut.logistica.data.CustomOrdersDetailColumns;
+import com.nextnut.logistica.data.LogisticaDataBase;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.modelos.CabeceraOrden;
 import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.modelos.Producto;
+import com.nextnut.logistica.modelos.ReporteClienteProducto;
 import com.nextnut.logistica.modelos.Totales;
 
 import java.util.ArrayList;
@@ -43,6 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
@@ -53,6 +59,8 @@ import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_CLIENTES;
 import static com.nextnut.logistica.util.Constantes.NODO_EMPRESA_PRODUCTOS;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
+import static com.nextnut.logistica.util.Constantes.NODO_REPORTE_VENTAS_CLIENTE;
+import static com.nextnut.logistica.util.Constantes.NODO_REPORTE_VENTAS_PRODUCTO;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.REQUEST_CUSTOMER;
 import static com.nextnut.logistica.util.Constantes.REQUEST_EMPRESA;
@@ -1068,5 +1076,247 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         }
     }
 
+    public void migrarReporteXCliente(){
+
+        mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshotProductos) {
+
+
+                mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshotClientes) {
+                        String texto ="";
+                        String select[] = {
+
+
+                                "strftime('%Y-%m', "+ LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER+ " ) ",
+                                LogisticaDataBase.CUSTOMS + "." + CustomColumns.ID_CUSTOM,
+                                LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+                                LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+                                LogisticaDataBase.PRODUCTS + "." + ProductsColumns._ID_PRODUCTO,
+                                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
+                                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) as Qdeliver ",
+                                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) as Qorder ",
+                        };
+
+                        try {
+                            Cursor c = getContentResolver().query(LogisticaProvider.reporte.CONTENT_URI,
+                                    select,
+                                    null,
+                                    null,
+                                    null,
+                                    null);
+
+
+                            String mes=c.getString(0)+"-";
+                            texto= mes +"     ORDEN            ENTREGADO  \n";
+                            Map<String, Object> childUpdates = new HashMap<>();
+                            String producto=null;
+
+                            if (c != null && c.getCount() > 0) {
+                                c.moveToFirst();
+                                do {
+                                    String productkey;
+                                    Producto prod = null;
+                                    String clientekey = null;
+                                    Cliente cliente = null;
+                                    Detalle detalleReporteProducto = null;
+                                    ReporteClienteProducto reporteClienteProducto;
+                                    producto=c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
+                                    texto=texto+"    "+producto+": "+c.getString(c.getColumnIndex("Qorder"))+"  -  "+c.getString(c.getColumnIndex("Qdeliver"))+ "\n";
+
+                                    for (final DataSnapshot snapshot : dataSnapshotProductos.getChildren()) {
+                                        productkey = snapshot.getKey();
+                                        if(productkey.equals(c.getString(4))){
+
+                                            prod =dataSnapshotProductos.getValue(Producto.class);
+                                            detalleReporteProducto = new Detalle(0.0, prod, null);
+                                            detalleReporteProducto.setCantidadEntrega(Double.parseDouble(c.getString(c.getColumnIndex("Qdeliver"))));
+                                            detalleReporteProducto.setCantidadOrden(Double.parseDouble(c.getString(c.getColumnIndex("Qorder"))));
+                                            break;
+                                        }
+
+                                        for ( DataSnapshot snapshotCliente : dataSnapshotClientes.getChildren()) {
+                                            clientekey = snapshotCliente.getKey();
+                                            if(clientekey.equals(c.getString(1))){
+                                                cliente=dataSnapshotClientes.getValue(Cliente.class);
+                                                break;
+                                            }
+
+                                        }
+
+                                        reporteClienteProducto= new ReporteClienteProducto (cliente,detalleReporteProducto);
+                                        childUpdates.put(NODO_REPORTE_VENTAS_CLIENTE + mEmpresaKey + "/" +clientekey+ "/" + (productkey)+ "/" + c.getString(0), reporteClienteProducto.toMap());
+                                    }
+
+
+
+
+                                } while (c.moveToNext());
+
+                                mDatabase.updateChildren(childUpdates);
+                            }
+
+                        } catch (Exception e) {
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+//
+//        String texto ="";
+//        String select[] = {
+//
+//
+//                "strftime('%Y-%m', "+ LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER+ " ) ",
+//
+//                LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+//                LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+//                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
+//                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) as Qdeliver ",
+//                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) as Qorder ",
+//        };
+//
+//
+//
+//        try {
+//            Cursor c = getContentResolver().query(LogisticaProvider.reporte.CONTENT_URI,
+//                    select,
+//                    null,
+//                    null,
+//                    null,
+//                    null);
+//
+//            if (c != null && c.getCount() > 0) {
+//                c.moveToFirst();
+//
+//                String mes=c.getString(0)+"-";
+//                texto= mes +"     ORDEN            ENTREGADO  \n";
+//                String cliente=c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
+//                texto=texto+cliente+"\n";
+//                String producto=null;
+//                do {
+//                    if(!mes.equals(c.getString(0)+"-")){
+//                        mes=c.getString(0)+"-";
+//                        texto= texto+ mes +"\n";
+//                    }if(!cliente.equals(
+//                            c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM))
+//                    )) {
+//                        cliente=c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
+//                        texto=texto+cliente+ "\n";
+//                    }
+//                    producto=c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
+//                    texto=texto+"    "+producto+": "+c.getString(c.getColumnIndex("Qorder"))+"  -  "+c.getString(c.getColumnIndex("Qdeliver"))+ "\n";
+//
+//                } while (c.moveToNext());
+//
+//
+//            } else {
+//            }
+//
+//        } catch (Exception e) {
+//        }
+
+    }
+
+
+
+    public void migrarReportXProducto(){
+
+
+        mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String texto ="";
+                String select[] = {
+                        "strftime('%Y-%m', "+ LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER+ " ) ",
+                        LogisticaDataBase.PRODUCTS + "." + ProductsColumns._ID_PRODUCTO,
+                        LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
+                        "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) as Qdeliver ",
+                        "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) as Qorder "
+                };
+
+                try {
+                    Cursor c = getContentResolver().query(LogisticaProvider.reportexMes.CONTENT_URI,
+                            select,
+                            null,
+                            null,
+                            null,
+                            null);
+
+                    if (c != null && c.getCount() > 0) {
+                        c.moveToFirst();
+
+                        String mes=c.getString(0)+"-";
+                        texto= mes +"     ORDEN            ENTREGADO  \n";
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        String producto=null;
+
+                        do {
+                            if(!mes.equals(c.getString(0)+"-")){
+                                mes=c.getString(0)+"-";
+                                texto= texto+ mes +"\n";
+                            }
+
+                            producto=c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
+                            texto=texto+"    "+producto+": "+c.getString(c.getColumnIndex("Qorder"))+"  -  "+c.getString(c.getColumnIndex("Qdeliver"))+ "\n";
+
+                            for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                String productkey = snapshot.getKey();
+                                if(productkey.equals(c.getString(1))){
+                                    Producto prod=dataSnapshot.getValue(Producto.class);
+                                    Detalle detalleReporteProducto = new Detalle(0.0, prod, null);
+                                    detalleReporteProducto.setCantidadEntrega(Double.parseDouble(c.getString(c.getColumnIndex("Qdeliver"))));
+                                    detalleReporteProducto.setCantidadOrden(Double.parseDouble(c.getString(c.getColumnIndex("Qorder"))));
+                                    childUpdates.put(NODO_REPORTE_VENTAS_PRODUCTO + mEmpresaKey + "/" + (productkey)+ "/" + c.getString(0), detalleReporteProducto.toMap());
+                                    break;
+                                }
+
+                            }
+
+
+                        } while (c.moveToNext());
+
+                        mDatabase.updateChildren(childUpdates);
+                    }
+
+                } catch (Exception e) {
+                }
+
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
+
+    }
 
 }

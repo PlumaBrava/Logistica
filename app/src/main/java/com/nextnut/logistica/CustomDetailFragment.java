@@ -553,6 +553,8 @@ public class CustomDetailFragment extends FragmentBasic  {
                 mTelefonos);
     }
 
+
+
     // [START basic_write]
     private void writeNewCliente(String uid,
             String nombre,

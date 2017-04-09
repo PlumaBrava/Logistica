@@ -16,9 +16,18 @@ import com.nextnut.logistica.data.CustomOrdersDetailColumns;
 import com.nextnut.logistica.data.LogisticaDataBase;
 import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
+import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Detalle;
+import com.nextnut.logistica.modelos.Producto;
+import com.nextnut.logistica.modelos.ReporteClienteProducto;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_REPORTE_VENTAS_CLIENTE;
+import static com.nextnut.logistica.util.Constantes.NODO_REPORTE_VENTAS_CLIENTE;
 
 public class ReporteMensualxCliente extends ActivityBasic {
 
@@ -39,62 +48,7 @@ public class ReporteMensualxCliente extends ActivityBasic {
     }
 
 
-    public void reportTotalesXProductoy(){
-        String texto ="";
-        String select[] = {
 
-
-                "strftime('%Y-%m', "+ LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER+ " ) ",
-
-                LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
-                LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
-                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
-                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) as Qdeliver ",
-                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) as Qorder ",
-        };
-
-
-
-        try {
-            Cursor c = getContentResolver().query(LogisticaProvider.reporte.CONTENT_URI,
-                    select,
-                    null,
-                    null,
-                    null,
-                    null);
-
-            if (c != null && c.getCount() > 0) {
-                c.moveToFirst();
-
-                String mes=c.getString(0)+"-";
-                texto= mes +"     ORDEN            ENTREGADO  \n";
-                String cliente=c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
-                texto=texto+cliente+"\n";
-                String producto=null;
-                do {
-                    if(!mes.equals(c.getString(0)+"-")){
-                        mes=c.getString(0)+"-";
-                        texto= texto+ mes +"\n";
-                    }if(!cliente.equals(
-                            c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM))
-                    )) {
-                        cliente=c.getString(c.getColumnIndex(CustomColumns.NAME_CUSTOM))+" "+c.getString(c.getColumnIndex(CustomColumns.LASTNAME_CUSTOM));
-                        texto=texto+cliente+ "\n";
-                    }
-                    producto=c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
-                    texto=texto+"    "+producto+": "+c.getString(c.getColumnIndex("Qorder"))+"  -  "+c.getString(c.getColumnIndex("Qdeliver"))+ "\n";
-
-                } while (c.moveToNext());
-
-
-            } else {
-            }
-
-        } catch (Exception e) {
-        }
-        modenesXProducto.setText(texto);
-
-    }
 
     public void reportTotalesXClienteFirebase() {
 
@@ -107,8 +61,8 @@ public class ReporteMensualxCliente extends ActivityBasic {
                 String detalle ="";
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String clienteKey = snapshot.getKey() ;
-                    ClienteText = clienteKey + "\n";
-                    texto=texto+ClienteText;
+                    ClienteText = "";
+
                     Log.i("reporteMes", "clienteKey  " + clienteKey);
                     for (final DataSnapshot sn : snapshot.getChildren()) {
                         String productkey = sn.getKey();
@@ -117,14 +71,18 @@ public class ReporteMensualxCliente extends ActivityBasic {
                         for (final DataSnapshot s : sn.getChildren()) {
                             String aamm = s.getKey();
                             Log.i("reporteMes", "aamm " + aamm);
-                            Detalle detalleOrden = s.getValue(Detalle.class);
-                            producto = detalleOrden.getProducto().getNombreProducto() + "\n";
-                            detalle = detalle + aamm + " " + detalleOrden.getProducto().getNombreProducto() + " " + detalleOrden.getCantidadEntrega() + " " + detalleOrden.getMontoItemEntrega() + "\n";
-                            Log.i("reporteMes", "nombreProducto " + detalleOrden.getProducto().getNombreProducto());
-                            Log.i("reporteMes", "Cantidad Entrega " + detalleOrden.getCantidadEntrega());
-                            Log.i("reporteMes", "Monto Entrega " + detalleOrden.getMontoItemEntrega());
+                            ReporteClienteProducto reporte = s.getValue(ReporteClienteProducto.class);
+                            if(ClienteText.equals("")){
+                                ClienteText=reporte.getCliente().getApellido()+" "+reporte.getCliente().getNombre();
+                                texto=texto+ "\n"+ClienteText+ "\n";
+                            }
+                            producto = reporte.getDetalle().getProducto().getNombreProducto() + "\n";
+                            detalle = detalle + aamm + " " + reporte.getDetalle().getProducto().getNombreProducto() + " " + reporte.getDetalle().getCantidadEntrega() + " " + reporte.getDetalle().getMontoItemEntrega() + "\n";
+                            Log.i("reporteMes", "nombreProducto " + reporte.getDetalle().getProducto().getNombreProducto());
+                            Log.i("reporteMes", "Cantidad Entrega " + reporte.getDetalle().getCantidadEntrega());
+                            Log.i("reporteMes", "Monto Entrega " + reporte.getDetalle().getMontoItemEntrega());
                         }
-                        texto = texto + producto + detalle;
+                        texto = texto +  detalle;
                     }
                 }
                 modenesXProducto.setText(texto);

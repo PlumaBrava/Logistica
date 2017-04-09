@@ -36,6 +36,7 @@ import com.nextnut.logistica.modelos.CabeceraPicking;
 import com.nextnut.logistica.modelos.Compensacion;
 import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.modelos.Pago;
+import com.nextnut.logistica.modelos.ReporteClienteProducto;
 import com.nextnut.logistica.modelos.Totales;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
 import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
@@ -936,7 +937,7 @@ public class DeliveryListFragment extends FragmentBasic
 
         }
 
-public void compensarCuenta(String clienteKey){
+public void compensarCuentaOffine(String clienteKey){
     refCabeceraOrdenList_ParaCompensar(clienteKey).addListenerForSingleValueEvent(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -1384,13 +1385,13 @@ public void compensarCuenta(String clienteKey){
                                                 Log.i(LOG_TAG, "pasarPickingACerrado RRRRRRRRRRRReproteVentas " +h);
 
                                                 DataSnapshot reporteventaclienteSnap = ((DataSnapshot) mReporteVentasClienteTask.get(h).getResult());
-                                                Detalle detalleReporteCliente = reporteventaclienteSnap.getValue(Detalle.class);
+                                                ReporteClienteProducto detalleReporteCliente = reporteventaclienteSnap.getValue(ReporteClienteProducto.class);
 
                                                 if(detalleReporteCliente==null){
                                                     Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente: null " );
                                                 }else{
-                                                    Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente: " + detalleReporteCliente.getProducto().getNombreProducto() + " - " +
-                                                            detalleReporteCliente.getCantidadEntrega());
+                                                    Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente: " + detalleReporteCliente.getDetalle().getProducto().getNombreProducto() + " - " +
+                                                            detalleReporteCliente.getDetalle().getCantidadEntrega());
                                                 }
 
                                                 for (int a = 0; a < mCabeceraOrdenTask.size(); a++) {
@@ -1418,16 +1419,18 @@ public void compensarCuenta(String clienteKey){
                                                         if (detalleReporteCliente == null) {
                                                             // di no existe esta estructura, se crea una en cero.
                                                             Log.i(LOG_TAG, "pasarPickingACerrado ventasCliente = NULL");
-                                                            detalleReporteCliente = new Detalle(0.0, detalleOrden.getProducto(), cabeceraOrden.getCliente());
+                                                            Detalle det = new Detalle(0.0, detalleOrden.getProducto(), cabeceraOrden.getCliente());
+                                                            detalleReporteCliente = new ReporteClienteProducto(cabeceraOrden.getCliente(),det);
+
                                                         } else {
                                                             Log.i(LOG_TAG, "pasarPickingACerrado ventasCliente != NULL");
                                                         }
-                                                            detalleReporteCliente.setCantidadEntrega(detalleReporteCliente.getCantidadEntrega() + detalleOrden.getCantidadEntrega());
-                                                            detalleReporteCliente.setMontoItemEntrega(detalleReporteCliente.getMontoItemEntrega() + detalleOrden.getMontoItemEntrega());
+                                                            detalleReporteCliente.getDetalle().setCantidadEntrega(detalleReporteCliente.getDetalle().getCantidadEntrega() + detalleOrden.getCantidadEntrega());
+                                                            detalleReporteCliente.getDetalle().setMontoItemEntrega(detalleReporteCliente.getDetalle().getMontoItemEntrega() + detalleOrden.getMontoItemEntrega());
                                                             detalleReporteCliente.liberar();
                                                             childUpdates.put(nodoReporteVentasClientes_9(cabeceraOrden.getClienteKey(), productKey, aamm), detalleReporteCliente.toMap());
-                                                            Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente.getCantidadEntrega() "+detalleReporteCliente.getCantidadEntrega());
-                                                            Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente.getMontoEntrega() "+detalleReporteCliente.getMontoItemEntrega());
+                                                            Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente.getCantidadEntrega() "+detalleReporteCliente.getDetalle().getCantidadEntrega());
+                                                            Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente.getMontoEntrega() "+detalleReporteCliente.getDetalle().getMontoItemEntrega());
                                                             Log.i(LOG_TAG, "pasarPickingACerrado XXXXXXXXXXXXXXXXXXXXXXXXXX");
                                                             Log.i(LOG_TAG, "pasarPickingACerrado XXXXXXXXXXXXXXXXXXXXXXXXXX");
                                                             Log.i(LOG_TAG, "pasarPickingACerrado XXXXXXXXXXXXXXXXXXXXXXXXXX");
@@ -1514,7 +1517,13 @@ public void compensarCuenta(String clienteKey){
         });
     }
 
+    @Override
+    public void onDestroy() {
+        if(hayTareaEnProceso()){
+            liberarRecusosTomados();
+            return;
+        }
 
-
-
+        super.onDestroy();
+    }
 }

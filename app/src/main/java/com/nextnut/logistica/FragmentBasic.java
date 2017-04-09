@@ -39,6 +39,7 @@ import com.nextnut.logistica.modelos.Empresa;
 import com.nextnut.logistica.modelos.Perfil;
 import com.nextnut.logistica.modelos.PrductosxOrden;
 import com.nextnut.logistica.modelos.Producto;
+import com.nextnut.logistica.modelos.ReporteClienteProducto;
 import com.nextnut.logistica.modelos.Usuario;
 import com.nextnut.logistica.util.Constantes;
 import com.nextnut.logistica.util.Imagenes;
@@ -1429,20 +1430,20 @@ public abstract class FragmentBasic extends Fragment {
         refReporteVentasClientes_9(cliente,productKey,aamm ).runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
-                Detalle detalle = mutableData.getValue(Detalle.class);
-                if (detalle == null) {
+                ReporteClienteProducto reporteCliente = mutableData.getValue(ReporteClienteProducto.class);
+                if (reporteCliente == null) {
                     Log.i("RB_ReporteVentaCliente", " tdetalle == null");
                 } else {
-                    if (detalle.sepuedeModificar()) {
-                        Log.i("RB_ReporteVentaCliente", "detalle.sepuedeModificar() " + detalle.sepuedeModificar());
-                        detalle.bloquear();
+                    if (reporteCliente.sepuedeModificar()) {
+                        Log.i("RB_ReporteVentaCliente", "detalle.sepuedeModificar() " + reporteCliente.sepuedeModificar());
+                        reporteCliente.bloquear();
                     } else {
-                        Log.i("RB_ReporteVentaCliente", "Bloqueado " + detalle.getProducto().getNombreProducto());
+                        Log.i("RB_ReporteVentaCliente", "Bloqueado " + reporteCliente.getDetalle().getProducto().getNombreProducto());
                         return Transaction.abort();
                     }
 
                 }
-                mutableData.setValue(detalle);
+                mutableData.setValue(reporteCliente);
                 return Transaction.success(mutableData);
             }
 
@@ -1518,20 +1519,20 @@ public abstract class FragmentBasic extends Fragment {
 
                 @Override
                 public Transaction.Result doTransaction(MutableData mutableData) {
-                    Detalle detalle = mutableData.getValue(Detalle.class);
-                    if (detalle == null) {
+                    ReporteClienteProducto reporteClienteProducto = mutableData.getValue(ReporteClienteProducto.class);
+                    if (reporteClienteProducto == null) {
                         Log.i("ReporteVentasCliente", "detalle null");
 
                     } else {
-                        Log.i("ReporteVentasCliente", "detalle" + detalle.getProducto().getNombreProducto() + " " + detalle.getSemaforo());
+                        Log.i("ReporteVentasCliente", "detalle" + reporteClienteProducto.getDetalle().getProducto().getNombreProducto() + " " + reporteClienteProducto.getSemaforo());
 
-                        if (!detalle.sepuedeModificar()) {
-                            detalle.liberar();
+                        if (!reporteClienteProducto.sepuedeModificar()) {
+                            reporteClienteProducto.liberar();
                         } else {
                             return Transaction.abort();
                         }
                     }
-                    mutableData.setValue(detalle);
+                    mutableData.setValue(reporteClienteProducto);
                     return Transaction.success(mutableData);
                 }
 
@@ -1978,6 +1979,18 @@ public abstract class FragmentBasic extends Fragment {
 
 
     }
+
+    @Override
+    public void onDestroy() {
+        if(hayTareaEnProceso()){
+            liberarRecusosTomados();
+            return;
+        }
+
+        super.onDestroy();
+    }
+
+
 
 
 //    public void liberarRecusosTomados(String productKey, int statusPicking, long nroPicking) {
