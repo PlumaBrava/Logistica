@@ -1775,7 +1775,7 @@ public abstract class FragmentBasic extends Fragment {
 
 
         if (tamanoTareas > 0) {
-            muestraMensajeEnDialogo("aguarde un momento, A "+tamanoTareas);
+            muestraMensajeEnDialogo("aguarde un momento, Hay  "+tamanoTareas+" en proceso A");
             Log.i(LOG_TAG, "hayTareaEnProceso suma "+tamanoTareas );
 
             return true;
@@ -1796,7 +1796,7 @@ public abstract class FragmentBasic extends Fragment {
         // Cabecera Picking 6
         mPickingTask != null ||
         mLiberarPickingTask != null){
-         muestraMensajeEnDialogo("aguarde un momento, B");
+            muestraMensajeEnDialogo("aguarde un momento, Hay  "+tamanoTareas+"  en proceso B");
          Log.i(LOG_TAG, "hayTareaEnProceso B" );
 
         return true;

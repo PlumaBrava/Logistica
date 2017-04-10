@@ -20,6 +20,7 @@ import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_PI
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_PICKING;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_DETALLE_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_DETALLE_ORDEN;
+import static com.nextnut.logistica.util.Constantes.ADAPTER_PAGOS_EN_DELIVEY;
 
 /**
  * Created by sam_chordas on 8/14/15.
@@ -78,6 +79,9 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
                     case ADAPTER_CABECERA_ORDEN_EN_DELIVEY:
                         icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
                         break;
+                    case ADAPTER_PAGOS_EN_DELIVEY:
+                        icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
+                        break;
 
                 }
 
@@ -109,6 +113,10 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback{
                     case ADAPTER_CABECERA_ORDEN_EN_DELIVEY:
                         icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
                         break;
+                    case ADAPTER_PAGOS_EN_DELIVEY:
+                        icon = BitmapFactory.decodeResource(recyclerView.getResources(), R.drawable.ic_carga);
+                        break;
+
 
 
                 }

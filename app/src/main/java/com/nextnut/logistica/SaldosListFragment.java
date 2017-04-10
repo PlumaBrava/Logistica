@@ -32,7 +32,6 @@ import java.text.NumberFormat;
 
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
-import static com.nextnut.logistica.util.Constantes.ADAPTER_PAGOS_EN_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
 
@@ -240,7 +239,12 @@ public class SaldosListFragment extends FragmentBasic
         return rootView;
     }
 
-
+    public void cerrarVisualizacionDetallesSaldo() {
+        mSaldosTile.setVisibility(View.GONE);
+        recyclerViewCustomOrderEnSaldos.setVisibility(View.GONE);
+        recyclerViewSaldos.setVisibility(View.VISIBLE);
+        recyclerViewPagos.setVisibility(View.GONE);
+    }
 
     public void muestraOrdenesSinCompensar() {
 //        Query listadoOrdenesSinCompensar = refCabeceraOrdenList_Status(String.valueOf(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR));
@@ -389,11 +393,12 @@ public class SaldosListFragment extends FragmentBasic
 
 
 
-        ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallback(mPagosCursorAdapter, ADAPTER_PAGOS_EN_DELIVEY);
-        ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
-        mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewPagos);
+//        ItemTouchHelper.Callback callback1 = new SimpleItemTouchHelperCallback(mPagosCursorAdapter, ADAPTER_PAGOS_EN_DELIVEY);
+//        ItemTouchHelper mItemTouchHelperCustomOrder = new ItemTouchHelper(callback1);
+//        mItemTouchHelperCustomOrder.attachToRecyclerView(recyclerViewPagos);
 
         recyclerViewPagos.setAdapter(mPagosCursorAdapter);
+
     }
 
 

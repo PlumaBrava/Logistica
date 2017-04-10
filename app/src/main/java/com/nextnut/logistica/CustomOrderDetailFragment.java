@@ -51,6 +51,7 @@ import com.nextnut.logistica.data.LogisticaProvider;
 import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.modelos.CabeceraOrden;
 import com.nextnut.logistica.modelos.Detalle;
+import com.nextnut.logistica.modelos.Pago;
 import com.nextnut.logistica.modelos.PrductosxOrden;
 import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.swipe_helper.SimpleItemTouchHelperCallback;
@@ -117,6 +118,9 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     private String mproductKeyDato;
     private DataSnapshot mDataSanpshotFavoritosDato;//Tiene los datos a ser cargados en una operacion
     private DataSnapshot mDataSanpshotPrinting;//para imprimir
+    private DataSnapshot mDataCabecerasParaCompensarPrinting;//para imprimir
+    private DataSnapshot mDataPagosSinCompensarPrinting;//para imprimir
+    private CabeceraOrden mSaldoPrinting;//para imprimir
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -270,8 +274,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
         openButton = (Button) mRootView.findViewById(R.id.open);
         sendButton = (Button) mRootView.findViewById(R.id.send);
-        openButton.setVisibility(View.GONE);
-        sendButton.setVisibility(View.GONE);
+
         // open bluetooth connection
         openButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -302,11 +305,54 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                                 if (dataSnapshot.exists()) {
                                     mDataSanpshotPrinting = dataSnapshot;
-                                    try {
-                                        sendData();
-                                    } catch (IOException ex) {
-                                        ex.printStackTrace();
-                                    }
+
+                                    refCabeceraOrdenList_ParaCompensar(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            // ordenes para compensar
+                                            mDataCabecerasParaCompensarPrinting = dataSnapshot;
+
+                                            refPagosInicialSinCompensarList(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    // pagos Para Compensar
+                                                    mDataPagosSinCompensarPrinting = dataSnapshot;
+
+
+                                                    refSaldoTotalClientes_10(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                            mSaldoPrinting = dataSnapshot.getValue(CabeceraOrden.class);
+                                                            try {
+                                                                sendData();
+                                                            } catch (IOException ex) {
+                                                                ex.printStackTrace();
+                                                            }
+
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(DatabaseError databaseError) {
+
+                                                        }
+                                                    });
+
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+
                                 }
                             }
 
@@ -437,6 +483,13 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                     }
                 });
+        if (mCabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERY) {
+            openButton.setVisibility(View.VISIBLE);
+            sendButton.setVisibility(View.VISIBLE);
+        } else {
+            openButton.setVisibility(View.GONE);
+            sendButton.setVisibility(View.GONE);
+        }
         mDetalleAdapter = new FirebaseRecyclerAdapter<Detalle, DetalleViewHolder>(Detalle.class, R.layout.order_detail_item,
                 DetalleViewHolder.class, productosAsignados) {
             @Override
@@ -491,8 +544,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             protected void onItemDismissHolder(Detalle model, int position) {
                 // TODO: ACTUALIZAR TOTALES !!!
                 mDetalleAnterior = model;
-                if (mCabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERY) {}
-                else {
+                if (mCabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERY) {
+                } else {
                     abmDetalleDeOrden(0.0, getRef(position).getKey(), model);
 //                borrarProductoDeOrden(getRef(position).getKey(), model);
                     Log.d(LOG_TAG, " onItemDismissHolder: " + model.getProducto().getNombreProducto() + " pos: " + position);
@@ -624,7 +677,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                     mKeyList.add(productKey);
 
                                     Detalle d = data.getValue(Detalle.class);
-                                    Double cantidad =(Double) d.getCantidadOrden();
+                                    Double cantidad = (Double) d.getCantidadOrden();
                                     Producto producto = d.getProducto();
                                     Log.d(LOG_TAG, "favorito  keyProducto: " + productKey);
                                     Log.d(LOG_TAG, "favorito  d : " + d.getProducto().getNombreProducto() + " - " + d.getCantidadOrden());
@@ -648,11 +701,10 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                     Log.i("informe", "det cantidad" + detalle.getCantidadOrden());
 /*5 */
                                     PrductosxOrden detallexOrden = new PrductosxOrden(mCliente, detalle);
-                                     Map<String, Object> prductosxOrdenValues =  detallexOrden.toMap();
+                                    Map<String, Object> prductosxOrdenValues = detallexOrden.toMap();
                                     Log.i("informe", "PrductosxOrden producto" + detallexOrden.getDetalle().getProducto().getNombreProducto());
                                     Log.i("informe", "PrductosxOrden cantidad" + detallexOrden.getDetalle().getCantidadOrden());
                                     childUpdates.put(nodoProductosXOrdenInicial_5(productKey, mCabeceraOrden.getNumeroDeOrden()), prductosxOrdenValues);
-
 
 
                                     // Actualizacion de Totales en Ordenes (3)
@@ -693,8 +745,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
 
 //                                        saveDetalleInicialTotales(cantidad, productKey); // cantidad es el valor nuevo y detalle tiene el anterior en este caso esta en cero
-
-
 
 
                                     mKeyList.add(productKey); // Agrega productkey para que no se repita.
@@ -793,7 +843,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     public void showDialogNumberPicker(final String productKey) {
 
         {
-            Log.i("Picker"," - " + System.currentTimeMillis());
+            Log.i("Picker", " - " + System.currentTimeMillis());
 
 //            SimpleDateFormat aamm = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
@@ -821,8 +871,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                 Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
 
                 np.setValue(mDetalleAnterior.getCantidadOrden().intValue());
-                openButton.setVisibility(View.VISIBLE);
-                sendButton.setVisibility(View.VISIBLE);
+
             } else {
                 Log.i("Picker", "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
 
@@ -840,11 +889,11 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             b1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.i("Picker",  "b1.setOnClickListener");
+                    Log.i("Picker", "b1.setOnClickListener");
                     d.dismiss();
                     if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
-                        Log.i("Picker",  "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
-                        Log.i("Picker",  "abmDetalleDeOrdenDelivery");
+                        Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
+                        Log.i("Picker", "abmDetalleDeOrdenDelivery");
                         abmDetalleDeOrdenDelivery((double) np.getValue(), productKey, mDetalleAnterior);
 //                        ca();
 //                        
@@ -858,11 +907,11 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 //                        d.dismiss();
 
                     } else {
-                        Log.i("Picker",  "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
+                        Log.i("Picker", "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
 
                         Log.d("Picker", "showDialogNumberPicker-detalle) " + mDetalleAnterior.getCantidadOrden());
                         Log.d("Picker", "showDialogNumberPicker-np.getValue() " + np.getValue());
-                        Log.i("Picker",  "abmDetalleDeOrden");
+                        Log.i("Picker", "abmDetalleDeOrden");
 
                         abmDetalleDeOrden((double) np.getValue(), productKey, mDetalleAnterior);
 //                        modificarCantidadDeProductoEnOrden(np.getValue(), productKey);
@@ -884,7 +933,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     d.dismiss();
                 }
             });
-            Log.i("Picker",  "b2.setOnClickListener");
+            Log.i("Picker", "b2.setOnClickListener");
 
             d.show();
 
@@ -1313,8 +1362,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 //
 //                }
 
-                mCabeceraOrden.getTotales().modificarCantidadProductoDeEntrega(mCantidadDato, mDetalleDato);
-                mDetalleAnterior.modificarCantidadProductoDeEntrega(mCantidadDato);
+        mCabeceraOrden.getTotales().modificarCantidadProductoDeEntrega(mCantidadDato, mDetalleDato);
+        mDetalleAnterior.modificarCantidadProductoDeEntrega(mCantidadDato);
 //                mCabeceraOrden.setTotales(cabeceraOrden.getTotales());
 //                detallePickingTotal.modificarCantidadEnTotalDelivey(nuevoDetalleOrden, mDetalleDato);
 
@@ -1324,33 +1373,33 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 //                detallePickingTotal.liberar();
 
 
-                Map<String, Object> cabeceraOrdenValues = null;
-                Map<String, Object> detalleOrdenValues = null;
+        Map<String, Object> cabeceraOrdenValues = null;
+        Map<String, Object> detalleOrdenValues = null;
 //                Map<String, Object> detallePickingTotalValues = null;
 
-                if (mCabeceraOrden != null) {
-                    cabeceraOrdenValues = mCabeceraOrden.toMap();
-                }
-                if (mDetalleAnterior != null) {
-                    detalleOrdenValues = mDetalleAnterior.toMap();
-                }
+        if (mCabeceraOrden != null) {
+            cabeceraOrdenValues = mCabeceraOrden.toMap();
+        }
+        if (mDetalleAnterior != null) {
+            detalleOrdenValues = mDetalleAnterior.toMap();
+        }
 
 //                if (detallePickingTotal != null) {
 //                    detallePickingTotalValues = detallePickingTotal.toMap();
 //                }
 
-                Map<String, Object> childUpdates = new HashMap<>();
+        Map<String, Object> childUpdates = new HashMap<>();
 
 
 
 /*1B*/
-                childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()), cabeceraOrdenValues);
+        childUpdates.put(nodoCabeceraOrden_1B(mCabeceraOrden.getNumeroDeOrden()), cabeceraOrdenValues);
 /*2 */
-                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, mCabeceraOrden.getNumeroDeOrden(), mCabeceraOrden.getNumeroDePickingOrden()), cabeceraOrdenValues);
+        childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, mCabeceraOrden.getNumeroDeOrden(), mCabeceraOrden.getNumeroDePickingOrden()), cabeceraOrdenValues);
 /*1c*/
-                childUpdates.put(nodoDetalleOrden_1C(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
+        childUpdates.put(nodoDetalleOrden_1C(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
 /*4 */
-                childUpdates.put(nodoDetalleOrden_4(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
+        childUpdates.put(nodoDetalleOrden_4(mCabeceraOrden.getNumeroDeOrden(), mproductKeyDato), detalleOrdenValues);
 /*7*/
 //                childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, mNroPicking, productoKey), detallePickingTotalValues);
 
@@ -1359,27 +1408,26 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         NumberFormat format = NumberFormat.getCurrencyInstance();
         mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
         mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
-        Log.i(LOG_TAG, "abmDetalleDeEntrega UpDate " );
-                mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+        Log.i(LOG_TAG, "abmDetalleDeEntrega UpDate ");
+        mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
 
-                        Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren-onFailure " + e.toString());
+                Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren-onFailure " + e.toString());
 //                        liberarRecusosTomados();
 //                        liberarArrayTaskConBloqueos();
 //                        muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
-                    }
-                }).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
 
 
 //                        liberarArrayTaskCasoExitoso();
-                        Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
+                Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
 
-                    }
-                });
+            }
+        });
 //
 
 //            }
@@ -1891,7 +1939,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             //Label Legth  in dots 8dots/mm. (203 dpi)
 
 //            msg = "^LL600";
-            msg = "^LL700";
+            msg = "^LL1900";
             mmOutputStream.write(msg.getBytes());
 
 
@@ -1907,7 +1955,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
 
 //            SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
-            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yy");
             String formattedDate = df.format(new Date());
 
 
@@ -1918,7 +1966,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
             msg = "^FO5," + h + "^ADN,36,20^FD" + "Orden Nro: " + mCabeceraOrden.getNumeroDeOrden() + "^FS";
             mmOutputStream.write(msg.getBytes());
-
 
 
             h = h + i + i;
@@ -2016,6 +2063,60 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
             msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden * (1 + mIvaCalculo / 100)) + "^FS";
             mmOutputStream.write(msg.getBytes());
+
+            // Saldo
+            h = h + i + i;
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Saldo: " + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(mSaldoPrinting.getTotales().getSaldo()) + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+// Recorro Ordenes sin Compensar
+            for (DataSnapshot data : mDataCabecerasParaCompensarPrinting.getChildren()) {
+
+                Log.i(LOG_TAG, "mDataCabecerasParaCompensarPrinting- " + data.getKey());
+                h = h + i;
+                CabeceraOrden cabeceraOrden = data.getValue(CabeceraOrden.class);
+
+                msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + "orden" + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + cabeceraOrden.getNumeroDeOrden() + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + format.format(cabeceraOrden.getTotales().getMontoEntregado()) + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + format.format(cabeceraOrden.getTotales().getSaldo()) + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+
+            }
+
+            // Recorro Pagos
+            for (DataSnapshot data : mDataPagosSinCompensarPrinting.getChildren()) {
+
+                h = h + i;
+                Log.i(LOG_TAG, "mDataPagosSinCompensarPrinting- " + data.getKey());
+
+                Pago pago = data.getValue(Pago.class);
+
+                msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + pago.getTipoDePago() + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+//                msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + cabeceraOrden.getNumeroDeOrden() + "^FS";
+//                mmOutputStream.write(msg.getBytes());
+
+                msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + format.format(pago.getMonto()) + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+//                msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + format.format(cabeceraOrden.getTotales().getSaldo()) + "^FS";
+//                mmOutputStream.write(msg.getBytes());
+
+            }
+
+
             // Print a barCode
 //            msg="^B8N,100,Y,N";
 //            mmOutputStream.write(msg.getBytes());

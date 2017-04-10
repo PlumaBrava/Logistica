@@ -393,7 +393,8 @@ public static final Uri CONTENT_URI = buildUri(Path.JOINORDERCUSTOMER );
 
                 ,
 
-                groupBy = "1,2,3,4 "
+//                groupBy = "1,2,3,4 "
+                groupBy = "1,2,3,4,5 "
 
         )
 

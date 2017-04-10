@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_DELIVERED_PARA_COMPENSAR;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERY;
 import static com.nextnut.logistica.util.MakeCall.makePhoneCallCliente;
 
 
@@ -62,9 +63,15 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
         mApellidoyNombre.setText(cabeceraOrden.getCliente().getNombre()+" "+cabeceraOrden.getCliente().getApellido());
 //        mLastname.setText();
         NumberFormat format = NumberFormat.getCurrencyInstance();
+
+        if(cabeceraOrden.getEstado()>= ORDEN_STATUS_EN_DELIVERY) {
+            mTotalPrice.setText(format.format(cabeceraOrden.getTotales().getMontoEntregado()));
+
+        }else{
         mTotalPrice.setText(format.format(cabeceraOrden.getTotales().getMontoEnOrdenes()));
+        }
 //        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yy");
 
 
         mDate.setText(sfd.format(new Date(cabeceraOrden.getFechaDeCreacion())) );

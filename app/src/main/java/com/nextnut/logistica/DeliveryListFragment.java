@@ -186,7 +186,7 @@ public class DeliveryListFragment extends FragmentBasic
         mLinearOrders = (LinearLayout) rootView.findViewById(R.id.linearOrders);
 
 
-        View emptyViewPicking = rootView.findViewById(R.id.recyclerview_pickingOrders_empty);
+       final View emptyViewPicking = rootView.findViewById(R.id.recyclerview_pickingOrders_empty);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
@@ -204,6 +204,7 @@ public class DeliveryListFragment extends FragmentBasic
                 viewHolder.bindToPost(model, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        emptyViewPickingOrders.setVisibility(View.GONE);
 
                         if (isNetworkAvailable(getContext())) {
 
@@ -782,6 +783,11 @@ public class DeliveryListFragment extends FragmentBasic
 
 
     private void pasarOrdenAEntregadaParaCompensar(final CabeceraOrden cabeceraOrden) {
+
+        if(cabeceraOrden.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR){
+            muestraMensajeEnDialogo("Orden ya entregada");
+            return;
+        }
 
         if (hayTareaEnProceso()) {
             return;

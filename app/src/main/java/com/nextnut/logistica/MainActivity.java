@@ -545,7 +545,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
         if (id == R.id.action_migrarClientes) {
             migracionClientes();
-            migracionProductos();
+
             return true;
         }
 
@@ -764,6 +764,16 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
             case PAGOS_FRAGMENT: {
 
+                SaldosListFragment fragment = (SaldosListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
+
+                if (fragment != null) {
+                    Log.i("main", "FabPasarAPicking no Nulo");
+                    fragment.cerrarVisualizacionDetallesSaldo();
+                } else {
+                    Log.i("main", "FabPasarAPicking  Nulo");
+
+                }
+
                 Intent intent = new Intent(getApplicationContext(), CustomSelectionActivity.class);
                 putExtraFirebase(intent);
                 startActivityForResult(intent, REQUEST_CUSTOMER);
@@ -931,6 +941,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                             migrarTelefonosDelContactoAsociado(getMainActivity() ,data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM)))
                     );
                 } while (data.moveToNext());
+                migracionProductos();
 
 
             } else {
@@ -1027,6 +1038,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                     );
 
                 } while (data.moveToNext());
+                migrarReporteXCliente();
 
 
             } else {
@@ -1078,29 +1090,48 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
     public void migrarReporteXCliente(){
 
+        Log.i(LOG_TAG, "ReporteXCliente - inicio" );
+
         mDatabase.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshotProductos) {
+                Log.i(LOG_TAG, "ReporteXCliente - llegan Productos");
 
 
                 mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshotClientes) {
-                        String texto ="";
+                        Log.i(LOG_TAG, "ReporteXCliente - llegan ckientes");
+                        String texto = "";
+
+//                        String select[] = {
+//
+//
+//                                "strftime('%Y-%m', "+ LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER+ " ) ",
+//
+//                                LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
+//                                LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
+//                                LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
+//                                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) as Qdeliver ",
+//                                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) as Qorder ",
+//                        };
+
+
                         String select[] = {
 
 
-                                "strftime('%Y-%m', "+ LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER+ " ) ",
+                                "strftime('%Y-%m', " + LogisticaDataBase.CUSTOM_ORDERS + "." + CustomOrdersColumns.CREATION_DATE_CUSTOM_ORDER + " ) ",
                                 LogisticaDataBase.CUSTOMS + "." + CustomColumns.ID_CUSTOM,
                                 LogisticaDataBase.CUSTOMS + "." + CustomColumns.NAME_CUSTOM,
                                 LogisticaDataBase.CUSTOMS + "." + CustomColumns.LASTNAME_CUSTOM,
                                 LogisticaDataBase.PRODUCTS + "." + ProductsColumns._ID_PRODUCTO,
                                 LogisticaDataBase.PRODUCTS + "." + ProductsColumns.NOMBRE_PRODUCTO,
-                                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL+" ) as Qdeliver ",
-                                "sum( "+ LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL+" ) as Qorder ",
+                                "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL + " ) as Qdeliver ",
+                                "sum( " + LogisticaDataBase.CUSTOM_ORDERS_DETAIL + "." + CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL + " ) as Qorder ",
                         };
 
                         try {
+
                             Cursor c = getContentResolver().query(LogisticaProvider.reporte.CONTENT_URI,
                                     select,
                                     null,
@@ -1108,57 +1139,63 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                                     null,
                                     null);
 
-
-                            String mes=c.getString(0)+"-";
-                            texto= mes +"     ORDEN            ENTREGADO  \n";
+                            c.moveToFirst();
+                            String mes = c.getString(0) + "-";
+                            texto = mes + "     ORDEN            ENTREGADO  \n";
                             Map<String, Object> childUpdates = new HashMap<>();
-                            String producto=null;
-
+                            String producto = null;
+                            Log.i(LOG_TAG, "ReporteXCliente - c.getCount():  " + c.getCount());
                             if (c != null && c.getCount() > 0) {
+                                Log.i(LOG_TAG, "ReporteXCliente - c.getCount():  " + c.getCount());
                                 c.moveToFirst();
                                 do {
-                                    String productkey;
+                                    String productkey=null;
                                     Producto prod = null;
                                     String clientekey = null;
                                     Cliente cliente = null;
                                     Detalle detalleReporteProducto = null;
                                     ReporteClienteProducto reporteClienteProducto;
-                                    producto=c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
-                                    texto=texto+"    "+producto+": "+c.getString(c.getColumnIndex("Qorder"))+"  -  "+c.getString(c.getColumnIndex("Qdeliver"))+ "\n";
+                                    producto = c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
+                                    texto = texto + "    " + producto + ": " + c.getString(c.getColumnIndex("Qorder")) + "  -  " + c.getString(c.getColumnIndex("Qdeliver")) + "\n";
 
                                     for (final DataSnapshot snapshot : dataSnapshotProductos.getChildren()) {
                                         productkey = snapshot.getKey();
-                                        if(productkey.equals(c.getString(4))){
 
-                                            prod =dataSnapshotProductos.getValue(Producto.class);
+                                        Log.i(LOG_TAG, "ReporteXCliente - productkey " + productkey + "c.getString(4)" + c.getString(4));
+                                        if (productkey.equals(c.getString(4))) {
+
+                                            prod = snapshot.getValue(Producto.class);
                                             detalleReporteProducto = new Detalle(0.0, prod, null);
+
                                             detalleReporteProducto.setCantidadEntrega(Double.parseDouble(c.getString(c.getColumnIndex("Qdeliver"))));
                                             detalleReporteProducto.setCantidadOrden(Double.parseDouble(c.getString(c.getColumnIndex("Qorder"))));
                                             break;
                                         }
+                                    }
+                                    for (DataSnapshot snapshotCliente : dataSnapshotClientes.getChildren()) {
 
-                                        for ( DataSnapshot snapshotCliente : dataSnapshotClientes.getChildren()) {
-                                            clientekey = snapshotCliente.getKey();
-                                            if(clientekey.equals(c.getString(1))){
-                                                cliente=dataSnapshotClientes.getValue(Cliente.class);
-                                                break;
-                                            }
+                                        clientekey = snapshotCliente.getKey();
+                                        Log.i(LOG_TAG, "ReporteXCliente - clientekey " + clientekey + "c.getString(1)" + c.getString(1));
 
+                                        if (clientekey.equals(c.getString(1))) {
+                                            cliente = snapshotCliente.getValue(Cliente.class);
+                                            break;
                                         }
 
-                                        reporteClienteProducto= new ReporteClienteProducto (cliente,detalleReporteProducto);
-                                        childUpdates.put(NODO_REPORTE_VENTAS_CLIENTE + mEmpresaKey + "/" +clientekey+ "/" + (productkey)+ "/" + c.getString(0), reporteClienteProducto.toMap());
                                     }
-
-
+                                    Log.i(LOG_TAG, "ReporteXCliente" + cliente.getNombre() + " " + prod.getNombreProducto());
+                                    reporteClienteProducto = new ReporteClienteProducto(cliente, detalleReporteProducto);
+                                    childUpdates.put(NODO_REPORTE_VENTAS_CLIENTE + mEmpresaKey + "/" + clientekey + "/" + (productkey) + "/" + c.getString(0), reporteClienteProducto.toMap());
 
 
                                 } while (c.moveToNext());
-
                                 mDatabase.updateChildren(childUpdates);
+                                migrarReportXProducto();
                             }
 
+
                         } catch (Exception e) {
+                            Log.i(LOG_TAG, "ReporteXCliente Exception e" +e.toString());
                         }
 
                     }
@@ -1263,20 +1300,17 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                             null,
                             null,
                             null);
-
+                    Log.i(LOG_TAG, "ReporteXProducto  c.getCount()"+  c.getCount());
                     if (c != null && c.getCount() > 0) {
                         c.moveToFirst();
-
+                        Log.i(LOG_TAG, "ReporteXProducto  c.getCount()"+  c.getCount());
                         String mes=c.getString(0)+"-";
                         texto= mes +"     ORDEN            ENTREGADO  \n";
                         Map<String, Object> childUpdates = new HashMap<>();
                         String producto=null;
 
                         do {
-                            if(!mes.equals(c.getString(0)+"-")){
-                                mes=c.getString(0)+"-";
-                                texto= texto+ mes +"\n";
-                            }
+
 
                             producto=c.getString(c.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO));
                             texto=texto+"    "+producto+": "+c.getString(c.getColumnIndex("Qorder"))+"  -  "+c.getString(c.getColumnIndex("Qdeliver"))+ "\n";
@@ -1284,8 +1318,9 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                             for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 String productkey = snapshot.getKey();
                                 if(productkey.equals(c.getString(1))){
-                                    Producto prod=dataSnapshot.getValue(Producto.class);
+                                    Producto prod=snapshot.getValue(Producto.class);
                                     Detalle detalleReporteProducto = new Detalle(0.0, prod, null);
+                                    Log.i(LOG_TAG, "ReporteXProducto"+ prod.getNombreProducto());
                                     detalleReporteProducto.setCantidadEntrega(Double.parseDouble(c.getString(c.getColumnIndex("Qdeliver"))));
                                     detalleReporteProducto.setCantidadOrden(Double.parseDouble(c.getString(c.getColumnIndex("Qorder"))));
                                     childUpdates.put(NODO_REPORTE_VENTAS_PRODUCTO + mEmpresaKey + "/" + (productkey)+ "/" + c.getString(0), detalleReporteProducto.toMap());

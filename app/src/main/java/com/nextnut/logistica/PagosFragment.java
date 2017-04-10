@@ -28,6 +28,7 @@ import com.google.firebase.storage.StorageReference;
 import com.nextnut.logistica.modelos.CabeceraOrden;
 import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Pago;
+import com.nextnut.logistica.modelos.Totales;
 import com.nextnut.logistica.util.MakeCall;
 import com.rey.material.app.DatePickerDialog;
 import com.rey.material.app.Dialog;
@@ -44,6 +45,7 @@ import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PAGOS;
 import static com.nextnut.logistica.util.Constantes.IMAGENES_PAGOS;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.PAGO_STATUS_INICIAL_SIN_COMPENSAR;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
@@ -455,6 +457,12 @@ public class PagosFragment extends FragmentBasic {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 CabeceraOrden saldo = dataSnapshot.getValue(CabeceraOrden.class);
 
+                if(saldo==null){
+                    Totales totales = new Totales(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                    saldo = new CabeceraOrden(mClienteKey, mCliente, ORDEN_STATUS_INICIAL, totales, mUsuario.getUsername(), 0);
+
+
+                }
 
                 Map<String, Object> pagoValues = mPago.toMap();
                 Map<String, Object> childUpdates = new HashMap<>();

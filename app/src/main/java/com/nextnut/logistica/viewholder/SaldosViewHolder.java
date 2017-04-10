@@ -46,7 +46,8 @@ public class SaldosViewHolder extends RecyclerView.ViewHolder {
         mLastname.setText(cabeceraOrden.getCliente().getApellido());
         NumberFormat format = NumberFormat.getCurrencyInstance();
         mSaldo.setText(format.format(cabeceraOrden.getTotales().getSaldo()));
-        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+//        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yy");
 
 
         mCantidadOrdenesSinCompensar.setText(sfd.format(new Date(cabeceraOrden.getFechaDeCreacion())) );
