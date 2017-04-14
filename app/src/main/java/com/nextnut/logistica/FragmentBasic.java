@@ -82,6 +82,7 @@ import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_DETALLE;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_TOTAL_INICIAL;
 import static com.nextnut.logistica.util.Constantes.NODO_PAGOS;
+import static com.nextnut.logistica.util.Constantes.NODO_PAGOS_PICKING;
 import static com.nextnut.logistica.util.Constantes.NODO_PICKING;
 import static com.nextnut.logistica.util.Constantes.NODO_PICKING_TOTAL;
 import static com.nextnut.logistica.util.Constantes.NODO_PRODUCTOS_EN_ORDENES_INICIAL;
@@ -2109,8 +2110,7 @@ public abstract class FragmentBasic extends Fragment {
     }
 
     public DatabaseReference refCabeceraOrden_2_List(int statusOrden, long nroPicking) {
-        String statusString = String.valueOf(statusOrden);
-        return mDatabase.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(String.valueOf(statusString)).child(String.valueOf(nroPicking));
+        return mDatabase.child(ESQUEMA_ORDENES_CABECERA).child(mEmpresaKey).child(String.valueOf(statusOrden)).child(String.valueOf(nroPicking));
     }
 
 
@@ -2227,6 +2227,15 @@ public abstract class FragmentBasic extends Fragment {
 
     public String nodoPagosInicialSinCompensar(String cliente, String pagoKey) {
         return NODO_PAGOS + mEmpresaKey + "/" +cliente + "/" +PAGO_STATUS_INICIAL_SIN_COMPENSAR+"/" +(pagoKey);
+    }
+
+
+    public DatabaseReference refPagosxPickingList(String nroPicking) {
+        return mDatabase.child(NODO_PAGOS_PICKING).child( mEmpresaKey).child(nroPicking);
+    }
+
+    public String nodoPagosxPicking(String nroPicking,String pagoKey) {
+        return NODO_PAGOS_PICKING + mEmpresaKey + "/" +nroPicking + "/" +(pagoKey);
     }
 
     // Saldos x Client 12

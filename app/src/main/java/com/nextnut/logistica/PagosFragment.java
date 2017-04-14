@@ -1,5 +1,7 @@
 package com.nextnut.logistica;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -26,7 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.nextnut.logistica.modelos.CabeceraOrden;
-import com.nextnut.logistica.modelos.Cliente;
+import com.nextnut.logistica.modelos.CabeceraPicking;
 import com.nextnut.logistica.modelos.Pago;
 import com.nextnut.logistica.modelos.Totales;
 import com.nextnut.logistica.util.MakeCall;
@@ -43,25 +45,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.nextnut.logistica.util.Constantes.ESQUEMA_PAGOS;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PAGO;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PAGO_KEY;
 import static com.nextnut.logistica.util.Constantes.IMAGENES_PAGOS;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.PAGO_STATUS_INICIAL_SIN_COMPENSAR;
+import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
 import static com.nextnut.logistica.util.Imagenes.dimensiona;
 import static com.nextnut.logistica.util.Imagenes.selectImage;
 
-/**
- * A fragment representing a single Custom detail screen.
- * This fragment is either contained in a {@link CustomListActivity}
- * in two-pane mode (on tablets) or a {@link CustomDetailActivity}
- * on handsets.
- */
 public class PagosFragment extends FragmentBasic {
-
-    /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
-     */
 
 
     private EditText mCustomName;
@@ -70,6 +63,7 @@ public class PagosFragment extends FragmentBasic {
 
 
     private EditText mFechaPago;
+    private EditText mOrdenPickingPago;
     private EditText mMontoPago;
     private com.rey.material.widget.Spinner mTipoPago;
     private LinearLayout mBancoLinear;
@@ -81,8 +75,10 @@ public class PagosFragment extends FragmentBasic {
     public ProgressView spinner;
     private String mFotoChequePath;
 
-    private String mPagoKey;
-    private Pago mPago;
+    private String mPagoKey = null;
+    private Pago mPago = null;
+    private long mNroPickingAlmacenado;
+    private CabeceraPicking datosCabeceraPickingSeleccionada;
 
 
     public ArrayAdapter<CharSequence> mAdapterTipoPago;
@@ -114,7 +110,8 @@ public class PagosFragment extends FragmentBasic {
             } else
                 appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text) + " ");
         }
-
+        mPago = getArguments().getParcelable(EXTRA_PAGO);
+        mPagoKey = getArguments().getString(EXTRA_PAGO_KEY);
 
     }
 
@@ -123,7 +120,9 @@ public class PagosFragment extends FragmentBasic {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.pagos_fragment, container, false);
         mCustomName = (EditText) rootView.findViewById(R.id.custom_name_text);
+        mCustomName.setEnabled(false);
         mLastName = (EditText) rootView.findViewById(R.id.product_Lastname);
+        mLastName.setEnabled(false);
 //        button = (Button) rootView.findViewById(R.id.custom_imagen_button);
 //        button.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -138,6 +137,7 @@ public class PagosFragment extends FragmentBasic {
 //            }
 //        });
         mImageCustomer = (ImageView) rootView.findViewById(R.id.custom_imagen);
+
 //        mImageCustomer.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -147,6 +147,12 @@ public class PagosFragment extends FragmentBasic {
 
 
         mFechaPago = (EditText) rootView.findViewById(R.id.fechaDePago);
+
+        mOrdenPickingPago = (EditText) rootView.findViewById(R.id.ordenPicking);
+        mOrdenPickingPago.setEnabled(false);
+
+
+
 
         SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.dayFormat));
 
@@ -250,9 +256,7 @@ public class PagosFragment extends FragmentBasic {
     @Override
     public void savePhoto(Bitmap bitmap) {
         if (mPagoKey == null) {
-            mPagoKey=  refPagosListado_11(mClienteKey,String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).push().getKey();
-//
-//            mPagoKey = refPagosListado_11("mClienteKey").push().getKey();
+            mPagoKey = refPagosListado_11(mClienteKey, String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).push().getKey();
         }
         StorageReference ImagenRef = mStorageRef.child(IMAGENES_PAGOS).child(mEmpresaKey).child(mPagoKey);
         uploadImagen(bitmap, ImagenRef, mFotoCheque, spinner);
@@ -292,6 +296,34 @@ public class PagosFragment extends FragmentBasic {
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("Mis Preferencias", Context.MODE_PRIVATE);
+//
+//        SharedPreferences sharedPref = getContext().getSharedPreferences() getDefaultSharedPreferences(getActivity());
+//        SharedPreferences pref = getDefaultSharedPreferences(getContext());
+         mNroPickingAlmacenado = sharedPref.getLong(getString(R.string.PickingOrderSeleccionada), 0);
+
+        if (mNroPickingAlmacenado > 0) {
+            refPicking_6(PICKING_STATUS_DELIVERY, mNroPickingAlmacenado).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    datosCabeceraPickingSeleccionada = dataSnapshot.getValue(CabeceraPicking.class);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        Log.d(LOG_TAG, "pago-parent mNroPickingAlmacenado:" + mNroPickingAlmacenado);
+        if(mNroPickingAlmacenado ==0){
+            mOrdenPickingPago.setVisibility(View.VISIBLE);
+            Log.d(LOG_TAG, "pago-parent Picking Seleccionado: == 0 " + mNroPickingAlmacenado);
+        }else{
+            mOrdenPickingPago.setText(String.valueOf (mNroPickingAlmacenado));
+        }
+
 
         if (mClienteKey != null) {
             mCustomName.setText(mCliente.getNombre());
@@ -313,92 +345,56 @@ public class PagosFragment extends FragmentBasic {
         if (mPagoKey != null) {//Si mProductKey existe leo los datos de Firebase y los muestro.
             Log.i("pago", "mPagoKey " + mPagoKey);
             // [START post_value_event_listener]
-            ValueEventListener customListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.i("producto", "onDataChange: ");
-                    Log.i("producto", "onDataChange: count " + dataSnapshot.getChildrenCount());
-                    // Get Post object and use the values to update the UI
-                    Cliente cliente = (Cliente) dataSnapshot.getValue(Cliente.class);
-                    // [START_EXCLUDE]
-                    Log.i("producto", "onDataChange:cliente.getNombre() " + cliente.getNombre());
 
-                    mCustomName.setText(cliente.getNombre());
-                    mLastName.setText(cliente.getApellido());
-                    mCurrentPhotoPath = cliente.getFotoCliente();
-                    // todo: reemplazar por un listado de telefonos.
-//                        mIdContact=null;// aqui deber ir la referencia al Id Android de contacto.
-//
-//                        mCuit.setText(cliente.getReponsable());
-//                        mIva.setText(Double.toString(cliente.getIva()));
-//                        mSpecial.setChecked(cliente.getEspecial());
-//                        Log.i("TelefonosArrayAdapter", "telefonos .size()antes" + telefonos.entrySet().size());
-//
-//                        telefonos=cliente.getTelefonos();
-//                        Log.i("TelefonosArrayAdapter", "telefonos .size()" + telefonos.entrySet().size());
-////                        telefonos.clear();
-//                        for(Map.Entry<String,String> entry : cliente.getTelefonos().entrySet()) {
-//                            telefonos.put(entry.getKey(),entry.getValue());
-//                            Log.i("TelefonosArrayAdapter", "telefonos .key" + entry.getKey());
-//                            Log.i("TelefonosArrayAdapter", "telefonos .value" + entry.getValue());
-//                        }
-//                        mAdapterTelefonos.swap(telefonos);
-////                        mListadeTelefonos.invalidate();
-////                        mAdapterTelefonos.notifyDataSetChanged();
-////                        mAdapterTelefonos.notifyAll();
-//
-//                        if (mIdContact != null){
-//                            button.setBackgroundColor(Color.GREEN);
-//                            button.setText(getUserName(getContext() ,mIdContact));
-//                        }
+            Log.i("producto", "onDataChange: ");
+            // [START_EXCLUDE]
+            Log.i("producto", "onDataChange:cliente.getNombre() " + mPago.getCliente().getNombre());
 
-                    Drawable drawable = dimensiona(getContext(), R.drawable.com_facebook_profile_picture_blank_square);
-                    Picasso.with(getContext())
-                            .load(mCurrentPhotoPath)
-                            .placeholder(drawable)
-                            .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
-                            .into(mFotoCheque);
+            mCustomName.setText(mPago.getCliente().getNombre());
+            mLastName.setText(mPago.getCliente().getApellido());
+            SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yy");
 
 
-                    if (appBarLayout != null) {
-                        {
-                            appBarLayout.setTitle(cliente.getNombre() + " " + cliente.getApellido());
-                        }
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Getting Post failed, log a message
-                    Log.w(LOG_TAG, "loadPost:onCancelled", databaseError.toException());
-                    // [START_EXCLUDE]
-                    Toast.makeText(getContext(), "Failed to load Products.",
-                            Toast.LENGTH_SHORT).show();
-                    // [END_EXCLUDE]
-                }
-            };
-            Log.i(LOG_TAG, " mDatabase: " + mDatabase);
-            mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).child(mClienteKey).addListenerForSingleValueEvent(customListener);
+            mFechaPago.setText(sfd.format(new Date(mPago.getFechaDePago())));
+            mFechaPago.getText();
+            mMontoPago.setText(mPago.getMonto().toString());
+            mTipoPago.setSelection(mAdapterTipoPago.getPosition(mPago.getTipoDePago()));
+            mOrdenPickingPago.setText(String.valueOf( mPago.getNumeroDePickingOrden()));
+            if (mTipoPago.getSelectedItemPosition() == 1) {
+                mBancoLinear.setVisibility(View.VISIBLE);
+                mBbancoCheque.setText(mPago.getChequeBanco());
 
 
+                mFechaCheque.setText(sfd.format(new Date(mPago.getChequeFecha())));
+                mNuemroCheque.setText(mPago.getChequeNumero());
+                mEmisorCheque.setText(mPago.getChequeEmisor());
+
+
+                Drawable drawable = dimensiona(getContext(), R.drawable.com_facebook_profile_picture_blank_square);
+                Picasso.with(getContext())
+                        .load(mPago.getChequeFotoPath())
+                        .placeholder(drawable)
+                        .resize(getResources().getDimensionPixelSize(R.dimen.product_picture_w), getResources().getDimensionPixelSize(R.dimen.product_picture_h))
+                        .into(mFotoCheque);
+            } else {
+                mBancoLinear.setVisibility(View.GONE);
+            }
         } else {
+            Log.i(LOG_TAG, " mDatabase: " + mDatabase);
+
+
             Log.i("producto", "onActivityCreated: mProductKey: Null");
 
         }
 
         super.onActivityCreated(savedInstanceState);
-
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
         if (appBarLayout != null) {
-//            if (mItem==0){
-//                appBarLayout.setTitle(getResources().getString(R.string.custom_new)+ mItem);
-//            }else
-//                appBarLayout.setTitle(getResources().getString(R.string.custom_Id_text)+" "+ mItem);
         }
     }
 
@@ -444,11 +440,12 @@ public class PagosFragment extends FragmentBasic {
                 mEmisorCheque.getText().toString(),
                 mCurrentPhotoPath,
                 mNuemroCheque.getText().toString(),
-                mUserKey
+                mUserKey,
+                mNroPickingAlmacenado
         );
 
         if (mPagoKey == null) {
-            mPagoKey=  refPagosListado_11(mClienteKey,String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).push().getKey();
+            mPagoKey = refPagosListado_11(mClienteKey, String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).push().getKey();
 //            mPagoKey = mDatabase.child(ESQUEMA_PAGOS).child(mEmpresaKey).child(String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).push().getKey();
         }
 
@@ -457,7 +454,7 @@ public class PagosFragment extends FragmentBasic {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 CabeceraOrden saldo = dataSnapshot.getValue(CabeceraOrden.class);
 
-                if(saldo==null){
+                if (saldo == null) {
                     Totales totales = new Totales(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
                     saldo = new CabeceraOrden(mClienteKey, mCliente, ORDEN_STATUS_INICIAL, totales, mUsuario.getUsername(), 0);
 
@@ -466,17 +463,20 @@ public class PagosFragment extends FragmentBasic {
 
                 Map<String, Object> pagoValues = mPago.toMap();
                 Map<String, Object> childUpdates = new HashMap<>();
+                if(datosCabeceraPickingSeleccionada!=null) {
+                    Log.i(LOG_TAG, "Pagos saldos getMontoRecaudad = " +datosCabeceraPickingSeleccionada.getMontoRecaudado() );
 
+                    datosCabeceraPickingSeleccionada.setMontoRecaudado(datosCabeceraPickingSeleccionada.getMontoRecaudado() + mPago.getMonto());
+                    childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY,String.valueOf( datosCabeceraPickingSeleccionada.getNumeroDePickingOrden())),datosCabeceraPickingSeleccionada.toMap());
+                    childUpdates.put(nodoPagosxPicking(String.valueOf( datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()),mPagoKey),pagoValues);
+                }
                 childUpdates.put(nodoPagosInicialSinCompensar(mClienteKey, mPagoKey), pagoValues);
 
-                Log.i(LOG_TAG, "Pagos saldos = "+saldo.getTotales().getSaldo());
+                Log.i(LOG_TAG, "Pagos saldos = " + saldo.getTotales().getSaldo());
                 saldo.getTotales().setMontoPagado(saldo.getTotales().getMontoPagado() + mPago.getMonto());
                 saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() - mPago.getMonto());
-                Log.i(LOG_TAG, "Pagos saldos actualizado= "+saldo.getTotales().getSaldo());
+                Log.i(LOG_TAG, "Pagos saldos actualizado= " + saldo.getTotales().getSaldo());
                 childUpdates.put(nodoSaldoTotalClientes_10(mClienteKey), saldo.toMap());
-
-
-
                 mDatabase.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -489,9 +489,9 @@ public class PagosFragment extends FragmentBasic {
 
                 setEditingEnabled(true);
                 getActivity().onBackPressed();
-
             }
-            @Override // Caso de error en la lectura del saldo
+
+            @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
@@ -499,30 +499,9 @@ public class PagosFragment extends FragmentBasic {
     }
 
 
+
     public Boolean verification() {
         Boolean isvalid = true;
-
-
-//        private long fechaDePago;
-//        private String usuarioCreador;
-//        private Double monto;
-//        private String tipoDePago;
-//        private String chequeBanco;
-//        private String chequeNumero;
-//        private String chequeEmisor;
-//        private String chequeFotoPath;
-//        private long chequeFecha;
-//        private int estado;
-//        private Boolean semaforo=true;
-
-//        if(mClienteKey==null){
-//            isvalid=false;
-//        }
-//        if(mCliente==null){
-//            isvalid=false;
-//        }
-
-//        if(mTipoPago.getAdapter(Integer.valueOf(mTipoPago.getSelectedItem().toString())))
 
         // Valida el Monto
         if (TextUtils.isEmpty(mMontoPago.getText().toString())) {
@@ -542,22 +521,6 @@ public class PagosFragment extends FragmentBasic {
 
 
         }
-//            if( mCustomName.getText().toString().equals(null))
-//        {
-//            isvalid =false;
-//            mCustomName.setBackgroundColor(Color.RED);
-//        } else {
-//            mCustomName.setBackgroundColor(Color.TRANSPARENT);
-//        }
-//
-//
-//        if( mLastName.getText().toString().equals(""))
-//        {
-//            isvalid =false;
-//            mLastName.setBackgroundColor(Color.RED);
-//        } else {
-//            mLastName.setBackgroundColor(Color.TRANSPARENT);
-//        }
 
         return isvalid;
     }
@@ -571,11 +534,6 @@ public class PagosFragment extends FragmentBasic {
         mEmisorCheque.setEnabled(enabled);
         mNuemroCheque.setEnabled(enabled);
 
-//        if (enabled) {
-//            mfab.setVisibility(View.VISIBLE);
-//        } else {
-//            mfab.setVisibility(View.GONE);
-//        }
     }
 
 

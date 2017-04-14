@@ -9,6 +9,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import static com.nextnut.logistica.util.Constantes.EXTRA_PAGO;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PAGO_KEY;
+
 /**
  * An activity representing a single Custom detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
@@ -40,18 +43,7 @@ public class PagosActivity extends ActivityBasic {
 
         });
 
-        FloatingActionButton fab_delete = (FloatingActionButton) findViewById(R.id.fab_delete);
-        fab_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CustomDetailFragment customDetailFragment=(CustomDetailFragment)
-                        getSupportFragmentManager().findFragmentById(R.id.pagos_container);
-                if (customDetailFragment!=null){
-                    customDetailFragment.deleteCustomer();
-                }
 
-            }
-        });
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -74,22 +66,19 @@ public class PagosActivity extends ActivityBasic {
 
 
             Bundle arguments =  putBundleFirebase();
-//            Bundle arguments = new Bundle();
-//            arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, getIntent().getLongExtra(CustomDetailFragment.ARG_ITEM_ID,0));
-//            int mAction = getIntent().getIntExtra(CustomDetailFragment.CUSTOM_ACTION, CustomDetailFragment.CUSTOM_SELECTION);
-//            arguments.putInt(ProductDetailFragment.PRODUCT_ACTION, mActCion);
-//
-//            arguments.putParcelable(EXTRA_EMPRESA, getIntent().getParcelableExtra(EXTRA_EMPRESA));
-//            arguments.putString(EXTRA_EMPRESA_KEY, getIntent().getStringExtra(EXTRA_EMPRESA_KEY));
-//            arguments.putParcelable(EXTRA_PERFIL,getIntent().getParcelableExtra(EXTRA_PERFIL));
 
-            if(mClienteKey==null){//Si la key es null se trata de un cliente Nuevo
-                fab_delete.setVisibility(View.GONE);
-                fab_save.setVisibility(View.VISIBLE);
-            }else {
-                fab_delete.setVisibility(View.VISIBLE);
-                fab_save.setVisibility(View.VISIBLE);
-            }
+
+            String pagokey =getIntent().getStringExtra(EXTRA_PAGO_KEY);
+            arguments.putParcelable(EXTRA_PAGO, getIntent().getParcelableExtra(EXTRA_PAGO));
+            arguments.putString(EXTRA_PAGO_KEY, pagokey);
+
+//            if(pagokey==null){//Si la key es null se trata de un cliente Nuevo
+//                fab_delete.setVisibility(View.GONE);
+//                fab_save.setVisibility(View.VISIBLE);
+//            }else {
+//                fab_delete.setVisibility(View.VISIBLE);
+//                fab_save.setVisibility(View.VISIBLE);
+//            }
 
 
             PagosFragment fragment = new PagosFragment();

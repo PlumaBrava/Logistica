@@ -5,16 +5,13 @@ import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.ContentProviderOperation;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AlertDialog;
@@ -77,14 +74,13 @@ import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_DETALLE;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_KEYLIST;
-import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_DETALLE;
+import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_DELIVERED_PARA_COMPENSAR;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
-import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
 import static com.nextnut.logistica.util.Constantes.detalleOrdenRef_1C;
 import static com.nextnut.logistica.util.Constantes.detalleOrdenRef_4;
 
@@ -106,7 +102,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     /**
      * The dummy content this fragment is presenting.
      */
-    private long mItem;
+//    private long mItem;
     private long mCustomRef = 0;
     private long mIdDetailCustomOrder_for_favorite = 0;
     private CheckBox mCheckBox_for_favorite;
@@ -126,8 +122,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
      * fragment (e.g. upon screen orientation changes).
      */
 
-    public static final String ARG_ITEM_ID = "item_id";
-    public static final String CUSTOM_ORDER_ACTION = "custom_order_action";
+//    public static final String ARG_ITEM_ID = "item_id";
+//    public static final String CUSTOM_ORDER_ACTION = "custom_order_action";
 
 
     private TextView mOrderNumber;
@@ -147,14 +143,13 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     public TextView mMontoTotalDelivey;
 
     public CabeceraOrden mCabeceraOrden;
-    public Long mNroPicking;
+//    public Long mNroPicking;
 
     ArrayList<Task> taskList = new ArrayList<Task>();
     Task<Void> allTask;
-    private Button mBotonSeleccionCliente;
+//    private Button mBotonSeleccionCliente;
     private Button mBotonSeleccionProduto;
 
-    private int mAction;
 
 
     // This paramenter is use the define the acction we need to do.
@@ -166,10 +161,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     public static final int CUSTOM_ORDER_SELECTION = 3; // A order was selected.
     public static final int ACTION_CUSTOM_ORDER_DELIVERY = 104;
 
-    public static final int STATUS_ORDER_INICIAL = 0;
-    public static final int STATUS_ORDER_PICKING = 1;
-    public static final int STATUS_ORDER_DELIVEY = 2;
-    public static final int STATUS_ORDER_DELIVED = 3;
+
 
     CollapsingToolbarLayout appBarLayout;
 
@@ -204,17 +196,16 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-
-            mItem = getArguments().getLong(ARG_ITEM_ID, -1);
-        }
-        mAction = getArguments().getInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
+//        if (getArguments().containsKey(ARG_ITEM_ID)) {
+//
+//            mItem = getArguments().getLong(ARG_ITEM_ID, -1);
+//        }
 
         Activity activity = this.getActivity();
         appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
 
         mCabeceraOrden = getArguments().getParcelable(EXTRA_CABECERA_ORDEN);
-        mNroPicking = getArguments().getLong(EXTRA_NRO_PICKIG);
+//        mNroPicking = getArguments().getLong(EXTRA_NRO_PICKIG);
         Log.d(LOG_TAG, "orden:onComplete: mcabeceraOrden " + mCabeceraOrden.getClienteKey());
         Log.d(LOG_TAG, "orden:onComplete: mcabeceraOrden " + mCabeceraOrden.getNumeroDeOrden());
         Log.d(LOG_TAG, "orden:onComplete: mcabeceraOrden " + mCabeceraOrden.getCliente().getNombre());
@@ -368,8 +359,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         });
 
         mOrderNumber = (TextView) mRootView.findViewById(R.id.orderNumber);
-        mBotonSeleccionCliente = (Button) mRootView.findViewById(R.id.botonSelecionCliente);
-        mBotonSeleccionCliente.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
+//        mBotonSeleccionCliente = (Button) mRootView.findViewById(R.id.botonSelecionCliente);
+//        mBotonSeleccionCliente.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
 
         mBotonSeleccionProduto = (Button) mRootView.findViewById(R.id.botonSelecionProdcuto);
         mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
@@ -388,16 +379,16 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         mMontoTotalDelivey = (TextView) mRootView.findViewById(R.id.montoToalDelivery);
 
 
-        mBotonSeleccionCliente.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(getContext(), CustomSelectionActivity.class);
-                putExtraFirebase_Fragment(intent);
-                getActivity().startActivityForResult(intent, UPDATE_CUSTOMER);
-            }
-
-        });
+//        mBotonSeleccionCliente.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                Intent intent = new Intent(getContext(), CustomSelectionActivity.class);
+//                putExtraFirebase_Fragment(intent);
+//                getActivity().startActivityForResult(intent, UPDATE_CUSTOMER);
+//            }
+//
+//        });
 
 
         mBotonSeleccionProduto.setOnClickListener(new View.OnClickListener() {
@@ -409,7 +400,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                 intent.putExtra(EXTRA_KEYLIST, mKeyList);
                 Log.d(LOG_TAG, "mKeyList: " + mKeyList.toString());
-                intent.putExtra("ITEM", mItem);
+//                intent.putExtra("ITEM", mItem);
                 getActivity().startActivityForResult(intent, REQUEST_PRODUCT);
 
             }
@@ -531,6 +522,11 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                         {
                             @Override
                             public void onClick(View view) {
+
+                                if(mCabeceraOrden.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR){
+                                    muestraMensajeEnDialogo("Orden ya entregada");
+                                    return;
+                                }
                                 Log.d(LOG_TAG, "adapter:onClick model: " + model.getProducto().getNombreProducto());
                                 mDetalleAnterior = model;
                                 showDialogNumberPicker(productKey);
@@ -561,9 +557,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         };
 
 
-        if (mAction == CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY) {
-//            mDetalleAdapter.setDeliveryState();
-        }
 
         assert mDetalleRecyclerView != null;
         setupRecyclerView(mDetalleRecyclerView);
@@ -768,8 +761,18 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                                 liberarArrayTaskCasoExitoso();
                                                 mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
                                                 NumberFormat format = NumberFormat.getCurrencyInstance();
-                                                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-                                                mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+
+                                                if(mCabeceraOrden.getCliente().getEspecial()) {
+                                                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+                                                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+                                                }else{
+                                                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                                                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                                                }
+
+
+//                                                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+//                                                mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                                                 mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
 //                                            mKeyList.add(mproductKeyDato);
                                                 Log.i(LOG_TAG, "pasarOrdenAPickingl - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
@@ -835,8 +838,16 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         mIsSpecialCustom.setChecked(mCliente.getEspecial());
         mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
         NumberFormat format = NumberFormat.getCurrencyInstance();
-        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-        mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+        if(mCabeceraOrden.getCliente().getEspecial()) {
+            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+        }else{
+            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+        }
+
+//        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+//        mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
     }
 
 
@@ -953,22 +964,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     }
 
 
-    public void saveTotalPrice(double totalPrice) {
-        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-
-        ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrders.withId(mItem));
-        builder.withValue(CustomOrdersColumns.TOTAL_PRICE_CUSTOM_ORDER, totalPrice);
-
-
-        batchOperations.add(builder.build());
-        try {
-
-            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-        } catch (RemoteException | OperationApplicationException e) {
-        }
-
-
-    }
 
 
     public void reportTotalesXProductoy() {
@@ -1270,8 +1265,13 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     public void onComplete(@NonNull Task<Void> task) {
                         mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
                         NumberFormat format = NumberFormat.getCurrencyInstance();
-                        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-                        mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+                        if(mCabeceraOrden.getCliente().getEspecial()) {
+                            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+                            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+                        }else{
+                            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                        }
 
                         liberarArrayTaskCasoExitoso();
 
@@ -1311,7 +1311,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         mproductKeyDato = productoKey;
         mDetalleDato = detalle; // tiene los valores del detalle que se quiere modificar
 
-        Log.i(LOG_TAG, "abmDetalleDeEntrega Nro Pickign " + mNroPicking);
+//        Log.i(LOG_TAG, "abmDetalleDeEntrega Nro Pickign " + mNroPicking);
         Log.i(LOG_TAG, "abmDetalleDeEntrega cantidad " + cantidad + " productokey " + productoKey + " Producto " + detalle.getProducto().getNombreProducto());
 
 //        // leo y bloqueo Cabecera de Orden 1B
@@ -1364,6 +1364,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
         mCabeceraOrden.getTotales().modificarCantidadProductoDeEntrega(mCantidadDato, mDetalleDato);
         mDetalleAnterior.modificarCantidadProductoDeEntrega(mCantidadDato);
+
+
 //                mCabeceraOrden.setTotales(cabeceraOrden.getTotales());
 //                detallePickingTotal.modificarCantidadEnTotalDelivey(nuevoDetalleOrden, mDetalleDato);
 
@@ -1406,9 +1408,19 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
         mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
         NumberFormat format = NumberFormat.getCurrencyInstance();
-        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-        mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+
+        if(mCabeceraOrden.getCliente().getEspecial()) {
+            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+        }else{
+            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+        }
+
+//        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+//        mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
         Log.i(LOG_TAG, "abmDetalleDeEntrega UpDate ");
+        Log.i(LOG_TAG, "abmDetalleDeEntrega mCabeceraOrden.getEstado() "+mCabeceraOrden.getEstado());
         mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
@@ -1517,8 +1529,16 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                 mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
                 NumberFormat format = NumberFormat.getCurrencyInstance();
-                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-                mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+                if(mCabeceraOrden.getCliente().getEspecial()) {
+                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+                }else{
+                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                }
+
+//                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+//                mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                 mDetalleAdapter.notifyDataSetChanged();
             }
 
@@ -1597,8 +1617,18 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                 mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
                 NumberFormat format = NumberFormat.getCurrencyInstance();
-                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-                mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+
+                if(mCabeceraOrden.getCliente().getEspecial()) {
+                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
+                }else{
+                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                }
+//
+//
+//                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
+//                mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                 mDetalleAdapter.notifyDataSetChanged();
             }
         });
@@ -1694,68 +1724,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         });
     }
 
-    public void saveCantidad(long id, int cantidad) {
-
-        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-        if (id != 0) {
-
-            double q = Double.valueOf(cantidad);
-            ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrdersDetail.withId(id));
-            if (mAction == CustomOrderDetailFragment.ACTION_CUSTOM_ORDER_DELIVERY) {
-                builder.withValue(CustomOrdersDetailColumns.QUANTITY_DELIVER_CUSTOM_ORDER_DETAIL, cantidad);
-            } else {
-
-                builder.withValue(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL, cantidad);
-            }
-            batchOperations.add(builder.build());
-        }
-        try {
-            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-//            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
-//            getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-        } catch (RemoteException | OperationApplicationException e) {
-            Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
-        }
-
-    }
-
-
-    public void saveCantidadDelivey(long id, int cantidad) {
-
-        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-        if (id != 0) {
-            double q = Double.valueOf(cantidad);
-            ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrdersDetail.withId(id));
-            builder.withValue(CustomOrdersDetailColumns.QUANTITY_CUSTOM_ORDER_DETAIL, cantidad);
-
-            batchOperations.add(builder.build());
-        }
-        try {
-
-            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-//            getLoaderManager().initLoader(TOTALES_LOADER, null, this);
-        } catch (RemoteException | OperationApplicationException e) {
-            Log.e(LOG_TAG, getString(R.string.InformeErrorApplyingBatchInsert), e);
-        }
-
-    }
-
-    public void saveFavorito(long id, boolean favorito) {
-
-        ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>(1);
-        if (id != 0) {
-            int myInt = (favorito) ? 1 : 0;
-            ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(LogisticaProvider.CustomOrdersDetail.withId(id));
-            builder.withValue(CustomOrdersDetailColumns.FAVORITE_CUSTOM_ORDER_DETAIL, myInt);
-            batchOperations.add(builder.build());
-        }
-        try {
-            getContext().getContentResolver().applyBatch(LogisticaProvider.AUTHORITY, batchOperations);
-//            getLoaderManager().restartLoader(TOTALES_LOADER, null, this);
-        } catch (RemoteException | OperationApplicationException e) {
-        }
-
-    }
 
 
     // this will find a bluetooth printer device
@@ -1939,8 +1907,23 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             //Label Legth  in dots 8dots/mm. (203 dpi)
 
 //            msg = "^LL600";
-            msg = "^LL1900";
+
+            int h = 50;
+            int i = 30;
+
+
+
+            Log.i(LOG_TAG, "printing product Key-mDataSanpshotPrinting " + mDataSanpshotPrinting.getChildrenCount());
+            Log.i(LOG_TAG, "printing product Key-mDataCabecerasParaCompensarPrinting " + mDataCabecerasParaCompensarPrinting.getChildrenCount());
+            Log.i(LOG_TAG, "printing product Key-mDataPagosSinCompensarPrinting " + mDataPagosSinCompensarPrinting.getChildrenCount());
+            Log.i(LOG_TAG, "printing product total " + i*(mDataSanpshotPrinting.getChildrenCount()+mDataCabecerasParaCompensarPrinting.getChildrenCount()+
+                    mDataPagosSinCompensarPrinting.getChildrenCount()));
+            msg = "^LL"+(i*(mDataSanpshotPrinting.getChildrenCount()+mDataCabecerasParaCompensarPrinting.getChildrenCount()+
+                    mDataPagosSinCompensarPrinting.getChildrenCount())+600);
+
             mmOutputStream.write(msg.getBytes());
+
+            Log.i(LOG_TAG, "printing msg " + msg);
 
 
             // FO x,y- x: margen derecho, y: distancia al origen.
@@ -1950,8 +1933,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             //  ADI:alto de letra,ancho de letra (letra horizontal - Invertida)
             //  ADB:alto de letra,ancho de letra (letra vertical-Mira al centro de la etiqueta)
 
-            int h = 50;
-            int i = 30;
+
 
 
 //            SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
@@ -2176,6 +2158,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             msg = "^XZ";
             mmOutputStream.write(msg.getBytes());
 
+            closeBT();
+
 //            msg="^FD";
 //            mmOutputStream.write(msg.getBytes());
 
@@ -2194,7 +2178,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             mmOutputStream.close();
             mmInputStream.close();
             mmSocket.close();
-//            myLabel.setText("Bluetooth Closed");
+            sendButton.setBackgroundColor(Color.TRANSPARENT);
         } catch (Exception e) {
             e.printStackTrace();
         }

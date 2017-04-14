@@ -1,11 +1,20 @@
 package com.nextnut.logistica;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.nextnut.logistica.modelos.Detalle;
+import com.nextnut.logistica.modelos.Producto;
+
+import static com.nextnut.logistica.CustomSelectionActivity.RESULTADO;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
+import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 
 /**
  * An activity representing a single Custom detail screen. This
@@ -115,6 +124,33 @@ public class MovimientosStockActivity extends ActivityBasic {
         }
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    public void onActivityResult(int requestCode,
+                                 int resultCode, Intent data) {
 
+
+        if (requestCode ==REQUEST_PRODUCT && resultCode == RESULT_OK) {
+            String res = data.getExtras().getString(RESULTADO);
+            MovimientosStockFragment movimientosStockFragment = (MovimientosStockFragment) getSupportFragmentManager().findFragmentById(R.id.movimietosStock_container);
+
+            if (movimientosStockFragment != null) {
+
+                Producto p= (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
+                Detalle detalle = new Detalle(0.0,p,null);
+                movimientosStockFragment.agregaProductoAlMovimiento(p.getCantidadDefault()*1.0,data.getExtras().getString(EXTRA_PRODUCT_KEY),detalle);
+
+//                        Producto p=(Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
+//                fragmentCustomOrder.abmDetalleDeOrden(
+//                        p.getCantidadDefault()*1.0,
+//                        data.getExtras().getString(EXTRA_PRODUCT_KEY),
+//                        p);
+
+            }
+
+
+        }
+
+
+    }
 
 }

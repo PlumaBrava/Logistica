@@ -32,7 +32,7 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
 
     public TextView mTotalPrice;
     public TextView mDate;
-    public ImageButton mpasarAPickingSelector;
+//    public ImageButton mpasarAPickingSelector;
 
     public CabeceraViewHolder(View view) {
         super(view);
@@ -43,7 +43,7 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
         mTotalPrice = (TextView) view.findViewById(R.id.totalPriceOrderCard);
         mDate = (TextView) view.findViewById(R.id.dateOrderCard);
         mBottonPhoto = (ImageButton) view.findViewById(R.id.phoneClallButton);
-        mpasarAPickingSelector = (ImageButton) view.findViewById(R.id.pasarPickingSelector);
+//        mpasarAPickingSelector = (ImageButton) view.findViewById(R.id.pasarPickingSelector);
         mBottonPhoto.setBackgroundColor(Color.TRANSPARENT);
     }
 
@@ -58,10 +58,8 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
         }
 
 
-//        mcursorId=cursor.getLong(0);
         mOrderNumber.setText(String.valueOf(cabeceraOrden.getNumeroDeOrden()));
         mApellidoyNombre.setText(cabeceraOrden.getCliente().getNombre()+" "+cabeceraOrden.getCliente().getApellido());
-//        mLastname.setText();
         NumberFormat format = NumberFormat.getCurrencyInstance();
 
         if(cabeceraOrden.getEstado()>= ORDEN_STATUS_EN_DELIVERY) {
@@ -70,12 +68,12 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
         }else{
         mTotalPrice.setText(format.format(cabeceraOrden.getTotales().getMontoEnOrdenes()));
         }
-//        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
         SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yy");
 
 
         mDate.setText(sfd.format(new Date(cabeceraOrden.getFechaDeCreacion())) );
-//        mCustomerRefContacto=cursor.getString(5);
+
 
 
 
@@ -108,7 +106,7 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
 
             mBottonPhoto.setVisibility(View.GONE);
             }}
-        ((View)mDate.getParent().getParent().getParent()) . setOnClickListener(cabeceraClickListener);
+        ((View)mApellidoyNombre.getParent().getParent().getParent()) . setOnClickListener(cabeceraClickListener);
 
     }
 }

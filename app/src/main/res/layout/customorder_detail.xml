@@ -108,16 +108,16 @@
 
 
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/botonSelecionCliente"
-            android:text="@string/boton_select_customer"
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/botonSelecionCliente"-->
+            <!--android:text="@string/boton_select_customer"-->
 
-            android:background="@color/button_material_light"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="16dp"
-            tools:ignore="ButtonStyle" />
+            <!--android:background="@color/button_material_light"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:layout_marginEnd="16dp"-->
+            <!--tools:ignore="ButtonStyle" />-->
 
 
             <Button

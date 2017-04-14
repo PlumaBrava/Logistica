@@ -19,8 +19,11 @@ public class Pago implements Parcelable {
     private String clienteKey;
     private Cliente cliente;
     private long fechaDePago;
+    private long numeroDePickingOrden;
     private String usuarioCreador;
     private Double monto;
+
+
     private Double saldoAcompensar;
 
 
@@ -114,7 +117,7 @@ public class Pago implements Parcelable {
         // Default constructor required for calls to DataSnapshot.getValue(CabeceraOrden.class)
     }
 
-    public Pago( String clienteKey,Cliente cliente, String tipoDePago, Double monto, String chequeBanco, long fechaDeCheque, String chequeEmisor, String chequeFotoPath, String chequeNumero,  String usuarioCreador) {
+    public Pago( String clienteKey,Cliente cliente, String tipoDePago, Double monto, String chequeBanco, long fechaDeCheque, String chequeEmisor, String chequeFotoPath, String chequeNumero,  String usuarioCreador,long nroPicking) {
         this.chequeBanco = chequeBanco;
         this.chequeEmisor = chequeEmisor;
         this.chequeFotoPath = chequeFotoPath;
@@ -126,6 +129,7 @@ public class Pago implements Parcelable {
         this.usuarioCreador = usuarioCreador;
         this.tipoDePago = tipoDePago;
         this.saldoAcompensar=monto;
+        this.numeroDePickingOrden=nroPicking;
 
     }
 
@@ -160,6 +164,15 @@ public class Pago implements Parcelable {
     public void setFechaDePago(long fechaDePago) {
         this.fechaDePago = fechaDePago;
     }
+
+    public long getNumeroDePickingOrden() {
+        return numeroDePickingOrden;
+    }
+
+    public void setNumeroDePickingOrden(long numeroDePickingOrden) {
+        this.numeroDePickingOrden = numeroDePickingOrden;
+    }
+
     public Boolean getSemaforo() {
         return semaforo;
     }
@@ -188,6 +201,7 @@ public class Pago implements Parcelable {
         result.put("clienteKey", clienteKey);
         result.put("cliente", cliente);
         result.put("fechaDePago", ServerValue.TIMESTAMP);
+        result.put("numeroDePickingOrden",numeroDePickingOrden);
         result.put("usuarioCreador", usuarioCreador);
         result.put("monto", monto);
         result.put("tipoDePago",tipoDePago);
@@ -238,6 +252,7 @@ public class Pago implements Parcelable {
 
         Log.d("Pago", "orden:onComplete: getCliente().getNombre() " + cliente.getNombre());
         parcel.writeLong(fechaDePago);
+        parcel.writeLong(numeroDePickingOrden);
         parcel.writeString(usuarioCreador);
         parcel.writeDouble(monto);
         parcel.writeDouble(saldoAcompensar);
@@ -294,6 +309,7 @@ public class Pago implements Parcelable {
         cliente=c;
         Log.d("pago read", "orden:onComplete: getNombre() " + cliente.getNombre());
         this.fechaDePago =in.readLong();
+        this.numeroDePickingOrden=in.readLong();
         this.usuarioCreador=in.readString();
         this.monto=in.readDouble();
         this.saldoAcompensar=in.readDouble();

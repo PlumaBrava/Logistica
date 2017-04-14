@@ -108,6 +108,7 @@
                 </android.support.design.widget.TextInputLayout>
 
 
+
             </LinearLayout>
         </LinearLayout>
         <!--Fecha-->
@@ -129,6 +130,24 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/fecha_pagos_fragment"
                     android:hint="@string/fecha_pagos_fragment"
+
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+
+                android:layout_height="wrap_content"
+                android:layout_width="150dp"
+                android:layout_margin="16dp">
+
+                <EditText
+                    android:id="@+id/ordenPicking"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/ordenPicking_pagos_fragment"
+                    android:hint="@string/ordenPicking_pagos_fragment"
 
                     android:paddingLeft="8dp"
                     android:paddingStart="8dp"

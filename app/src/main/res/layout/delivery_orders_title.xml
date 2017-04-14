@@ -2,30 +2,28 @@
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
 
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/deliveryOrderNumbertitleID"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginLeft="@dimen/custom_cardViewMarginLeft"
-    android:layout_marginStart="@dimen/custom_cardViewMarginLeft"
-    android:layout_marginRight="@dimen/custom_cardViewMarginRight"
-    android:layout_marginEnd="@dimen/custom_cardViewMarginRight"
-    android:layout_marginTop="@dimen/custom_cardViewtMarginTop"
     android:layout_marginBottom="@dimen/custom_cardViewMarginBottom"
-    android:elevation="@dimen/custom_cardViewElevation"
+    android:layout_marginEnd="@dimen/custom_cardViewMarginRight"
+    android:layout_marginLeft="@dimen/custom_cardViewMarginLeft"
+    android:layout_marginRight="@dimen/custom_cardViewMarginRight"
+    android:layout_marginStart="@dimen/custom_cardViewMarginLeft"
+    android:layout_marginTop="@dimen/custom_cardViewtMarginTop"
     android:clickable="true"
+    android:elevation="@dimen/custom_cardViewElevation"
     android:focusable="true"
-    android:id="@+id/deliveryOrderNumbertitleID"
     android:foreground="?selectableItemBackground"
-    app:cardBackgroundColor="@color/PickingCard_background"
-    >
-
-
+    app:cardBackgroundColor="@color/PickingCard_background">
 
 
     <LinearLayout
-        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="#FFCC00">
+        android:divider="#FFCC00"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,55 +31,117 @@
             android:orientation="horizontal">
 
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/pickng_card_order_number"
+                android:textStyle="bold" />
 
-        <TextView
-            android:text="@string/pickng_card_order_number"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:gravity="start"
-            android:textStyle="bold"
-            android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/titlepickingNumberOrderCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:transitionName="@string/custom_icon_transition_surname"
 
-        <TextView
-            android:id="@+id/titlepickingNumberOrderCard"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:gravity="start"
-            android:textStyle="bold"
-            android:layout_weight="1"
-            android:transitionName="@string/custom_icon_transition_surname"
-
-            />
+                />
 
             <ImageButton
                 android:id="@+id/save_picking_Button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
-                android:gravity="top|end"
-                android:layout_weight="1"
                 android:layout_marginTop="@dimen/fab_margin"
-                android:src="@android:drawable/ic_menu_save"
-                android:contentDescription="@string/picking_card_saveButton_contentDescription"
+                android:layout_weight="1"
                 android:adjustViewBounds="false"
+                android:backgroundTint="@android:color/transparent"
+                android:contentDescription="@string/picking_card_saveButton_contentDescription"
                 android:cropToPadding="false"
-                android:backgroundTint="@android:color/transparent" />
-
+                android:gravity="top|end"
+                android:src="@android:drawable/ic_menu_save" />
 
 
         </LinearLayout>
 
 
-                <TextView
-                    android:id="@+id/titlePicckinOder_creationdate"
-                    android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/titlePicckinOder_creationdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_margin="@dimen/text_margin" />
+        <!--android:layout_margin="@dimen/text_margin"-->
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal">-->
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+    <!--<android.support.design.widget.TextInputEditText-->
+
+                <!--android:layout_width="150dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="8dp">-->
+
+                <EditText
+                    android:id="@+id/montoRecaudado"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:layout_margin="@dimen/text_margin"
+                    android:contentDescription="@string/picking_card_montoRecaudado"
+                    android:hint="@string/picking_card_montoRecaudado"
+
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    app:layout_gravity="left"
                     />
-            <!--android:layout_margin="@dimen/text_margin"-->
+            <!--</android.support.design.widget.TextInputEditText>-->
+
+            <ImageButton
+                android:id="@+id/conectarImpresoraDelivey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="@dimen/fab_margin"
+
+                android:adjustViewBounds="false"
+                android:backgroundTint="@android:color/transparent"
+                android:contentDescription="@string/picking_card_saveButton_contentDescription"
+                android:cropToPadding="false"
+                android:gravity="top|end"
+                android:src="@android:drawable/stat_sys_upload_done" />
+        <!--android:layout_weight="1"-->
+
+            <ImageButton
+                android:id="@+id/ImprimirDelivey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="@dimen/fab_margin"
+
+                android:adjustViewBounds="false"
+                android:backgroundTint="@android:color/transparent"
+                android:contentDescription="@string/picking_card_saveButton_contentDescription"
+                android:cropToPadding="false"
+                android:gravity="top|end"
+                android:src="@drawable/impresora" />
+        <!--android:layout_weight="1"-->
+
+        </LinearLayout>
 
 
         <EditText
@@ -89,17 +149,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:inputType="textAutoCorrect"
-
-            android:hint="@string/picking_card_Text_Coment"
-            android:background="@drawable/edittext_bg"
             android:layout_margin="@dimen/text_margin"
-            android:layout_weight="1" />
+
+            android:layout_weight="1"
+            android:background="@drawable/edittext_bg"
+            android:hint="@string/picking_card_Text_Coment"
+            android:inputType="textAutoCorrect" />
 
 
 
-        </LinearLayout>
-
+    </LinearLayout>
 
 
 </android.support.v7.widget.CardView>

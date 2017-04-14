@@ -24,7 +24,7 @@ public class CabeceraPicking implements Parcelable {
     private long numeroDePickingOrden;
     private long fechaPicking;
     private String usuarioPicking;
-
+    private Double montoRecaudado;
     private long fechaEntrega;
     private String usuarioEntrega;
     private String comentario;
@@ -59,6 +59,7 @@ public class CabeceraPicking implements Parcelable {
         cabeceraPickingCopy.comentario=getComentario();
         cabeceraPickingCopy.estado=getEstado();
         cabeceraPickingCopy.semaforo=getSemaforo();
+        cabeceraPickingCopy.montoRecaudado=getMontoRecaudado();
         return cabeceraPickingCopy;
 
 
@@ -70,6 +71,15 @@ public class CabeceraPicking implements Parcelable {
         this.numeroDePickingOrden=numeroOrden;
         this.comentario="nueva orden";
         this.estado=estado;
+        this.montoRecaudado=0.0;
+    }
+
+    public Double getMontoRecaudado() {
+        return montoRecaudado;
+    }
+
+    public void setMontoRecaudado(Double montoRecaudado) {
+        this.montoRecaudado = montoRecaudado;
     }
 
     public int getEstado() {
@@ -186,6 +196,7 @@ public class CabeceraPicking implements Parcelable {
         result.put("comentario", comentario);
         result.put("estado", estado);
         result.put("semaforo", semaforo);
+        result.put("montoRecaudado", montoRecaudado);
 
 
         return result;
@@ -226,6 +237,7 @@ public class CabeceraPicking implements Parcelable {
         parcel.writeLong(fechaEntrega);
         parcel.writeString(usuarioEntrega);
         parcel.writeString(comentario);
+        parcel.writeDouble(montoRecaudado);
         parcel.writeInt(estado);
         parcel.writeByte((byte)(semaforo?1:0));
 
@@ -276,6 +288,7 @@ public class CabeceraPicking implements Parcelable {
         fechaEntrega=in.readLong();
         usuarioEntrega=in.readString();
         comentario=in.readString();
+        montoRecaudado=in.readDouble();
         estado=in.readInt();
         semaforo =(in.readByte()!=0);
 

@@ -178,6 +178,10 @@ public class MakeCall {
 
     public static Map<String, String> migrarTelefonosDelContactoAsociado(Activity aplication,String id) {
         Log.i(LOG_TAG, "migrarTelefonosDelContactoAsociado "+id);
+        if (id==null){
+            Log.i(LOG_TAG, "migrarTelefonosDelContactoAsociado retornar nulo ");
+            return null;
+        }
         mContext = aplication;
         mActivity = aplication;
         Map<String, String> telefonos = new HashMap<>();

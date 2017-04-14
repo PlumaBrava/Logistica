@@ -1,10 +1,15 @@
 package com.nextnut.logistica;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
@@ -33,6 +38,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.nextnut.logistica.modelos.CabeceraOrden;
 import com.nextnut.logistica.modelos.CabeceraPicking;
+import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Compensacion;
 import com.nextnut.logistica.modelos.Detalle;
 import com.nextnut.logistica.modelos.Pago;
@@ -44,11 +50,17 @@ import com.nextnut.logistica.viewholder.CabeceraPickingViewHolder;
 import com.nextnut.logistica.viewholder.CabeceraViewHolder;
 import com.nextnut.logistica.viewholder.DetalleDeliveryTotalProdutctosViewHolder;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
@@ -77,13 +89,9 @@ public class DeliveryListFragment extends FragmentBasic
 
     public static final String ARG_ITEM_ID = "item_id";
 
-    private long mCustomOrderIdSelected;
 
     View emptyViewTotalProducts;
     private Query totalProductos;
-    //    private PickingOrdersCursorAdapter mPickinOrdersAdapter;
-//    private PickingOrderProductsAdapter mCursorAdapterTotalProductos;
-//    private CustomsOrdersCursorAdapter mCustomsOrdersCursorAdapter;
     View emptyViewCustomOrder;
     private FirebaseRecyclerAdapter<CabeceraPicking, CabeceraPickingViewHolder> mPickinOrdersAdapter;
     private FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder> mCustomsOrdersCursorAdapter;
@@ -96,7 +104,11 @@ public class DeliveryListFragment extends FragmentBasic
     private CardView mDeliveryOrderTile;
     private TextView mTilePickingOrderNumber;
     private EditText mTilePickingComent;
+    private EditText mMontoRecaudado;
     private TextView mCreationDate;
+
+    private  ImageButton mConectarImpresoraButton;
+    private  ImageButton mImprimirButton;
 
     private ArrayList<Task> taskList = new ArrayList<Task>();
     private Task<Void> allTask;
@@ -104,6 +116,8 @@ public class DeliveryListFragment extends FragmentBasic
     private DataSnapshot mProductosEnOrdenDatos;
     private DataSnapshot mProductosEnTotalPickingDatos;
     private DataSnapshot mCaberasOrdenCerrarPickingDatos;
+    private DataSnapshot mDataPagoxPicking_Printing;
+
     private int mVentaProductosIndex;
     private int mCabeceraOrdenIndex;
 //    private ArrayList<ArrayList<Detalle>> mListaDetalleDeOrdenes =new ArrayList<>();
@@ -126,8 +140,25 @@ public class DeliveryListFragment extends FragmentBasic
     private static final String LOG_TAG = DeliveryListFragment.class.getSimpleName();
 
 
+
+    // android built in classes for bluetooth operations
+    BluetoothAdapter mBluetoothAdapter;
+    BluetoothSocket mmSocket;
+    BluetoothDevice mmDevice;
+
+    // needed for communication to bluetooth device / network
+    OutputStream mmOutputStream;
+    InputStream mmInputStream;
+    Thread workerThread;
+
+    byte[] readBuffer;
+    int readBufferPosition;
+    volatile boolean stopWorker;
+
+
     @Override
     public void onAttach(Context context) {
+        Log.i(LOG_TAG, "onAttach " );
         super.onAttach(context);
 
 
@@ -135,11 +166,13 @@ public class DeliveryListFragment extends FragmentBasic
 
     @Override
     public void onHiddenChanged(boolean hidden) {
+        Log.i(LOG_TAG, "onHiddenChanged " );
         super.onHiddenChanged(hidden);
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
+        Log.i(LOG_TAG, "osetUserVisibleHint " +isVisibleToUser);
         if (isVisibleToUser) {
         }
         super.setUserVisibleHint(isVisibleToUser);
@@ -147,6 +180,8 @@ public class DeliveryListFragment extends FragmentBasic
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i(LOG_TAG, " onCreate " );
+
         super.onCreate(savedInstanceState);
 
 
@@ -165,6 +200,7 @@ public class DeliveryListFragment extends FragmentBasic
 
 
         mDeliveryOrderTile = (CardView) rootView.findViewById(R.id.deliveryOrderNumbertitleID);
+
         mDeliveryOrderTile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -178,8 +214,33 @@ public class DeliveryListFragment extends FragmentBasic
             }
         });
         mDeliveryOrderTile.setVisibility(View.GONE);
+
+
+        mConectarImpresoraButton =(ImageButton ) mDeliveryOrderTile.findViewById(R.id.conectarImpresoraDelivey);
+        mConectarImpresoraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    findBT();
+                    openBT();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        mImprimirButton =(ImageButton ) mDeliveryOrderTile.findViewById(R.id.ImprimirDelivey);
+        mImprimirButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buscaDatosParaImprimirPicking();
+            }
+        });
+
         mTilePickingOrderNumber = (TextView) mDeliveryOrderTile.findViewById(R.id.titlepickingNumberOrderCard);
         mTilePickingComent = (EditText) mDeliveryOrderTile.findViewById(R.id.TitlepickingOrderComents);
+        mMontoRecaudado = (EditText) mDeliveryOrderTile.findViewById(R.id.montoRecaudado);
+
         mCreationDate = (TextView) mDeliveryOrderTile.findViewById(R.id.titlePicckinOder_creationdate);
 
         mLinearProductos = (LinearLayout) rootView.findViewById(R.id.linearProductos);
@@ -281,12 +342,14 @@ public class DeliveryListFragment extends FragmentBasic
         mLinearOrders.setVisibility(View.GONE);
         mLinearProductos.setVisibility(View.GONE);
 
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+//        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("Mis Preferencias", Context.MODE_PRIVATE);
 
 
         long nroPickingAlmacenado = sharedPref.getLong(getString(R.string.PickingOrderSeleccionada), 0);
-        String comentarioPickingAlmacenado = sharedPref.getString(getString(R.string.PickingOrderCommentSeleccionada), "");
-        String fechaPickingAlmacenado = sharedPref.getString(getString(R.string.PickingOrderFechaSeleccionada), "");
+//        String comentarioPickingAlmacenado = sharedPref.getString(getString(R.string.PickingOrderCommentSeleccionada), "");
+//        String fechaPickingAlmacenado = sharedPref.getString(getString(R.string.PickingOrderFechaSeleccionada), "");
+        Log.i(LOG_TAG, "nroPickingAlmacenado: " + nroPickingAlmacenado);
 
         if (nroPickingAlmacenado > 0) {
             refPicking_6(PICKING_STATUS_DELIVERY,nroPickingAlmacenado).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -294,11 +357,12 @@ public class DeliveryListFragment extends FragmentBasic
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     datosCabeceraPickingSeleccionada = dataSnapshot.getValue(CabeceraPicking.class);
 //                    datosCabeceraPickingSeleccionada.setComentario(comentarioPickingAlmacenado);
-// Todo: fecha de cabecera sin cargar.
+
 
                     mTilePickingComent.setText(datosCabeceraPickingSeleccionada.getComentario());
                     mTilePickingOrderNumber.setText(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()));
                     mTilePickingComent.setVisibility(View.VISIBLE);
+                    mMontoRecaudado.setText(datosCabeceraPickingSeleccionada.getMontoRecaudado().toString());
                     SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
                     mCreationDate.setText(sfd.format(new Date(datosCabeceraPickingSeleccionada.getFechaDeCreacion())));
@@ -380,7 +444,6 @@ public class DeliveryListFragment extends FragmentBasic
                                 intent.putExtra(EXTRA_CABECERA_ORDEN, model);
                                 Log.d(LOG_TAG, "muestraOrdenesEnPickin CabeceraPicking Nro: " + datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
                                 intent.putExtra(EXTRA_NRO_PICKIG, datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
-                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
                                 startActivity(intent);
                             }
                         }
@@ -484,11 +547,13 @@ public class DeliveryListFragment extends FragmentBasic
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Log.i(LOG_TAG, " oonViewCreated " );
         super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.i(LOG_TAG, " onActivityCreated " );
 
 
         super.onActivityCreated(savedInstanceState);
@@ -496,11 +561,13 @@ public class DeliveryListFragment extends FragmentBasic
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        Log.i(LOG_TAG, " onViewStateRestored " );
         super.onViewStateRestored(savedInstanceState);
     }
 
     @Override
     public void onStart() {
+        Log.i(LOG_TAG, " onStart" );
         super.onStart();
     }
 
@@ -581,11 +648,11 @@ public class DeliveryListFragment extends FragmentBasic
                             public void onSuccess(Void aVoid) {
                                 Log.i(LOG_TAG, "bloqueoPickingOffLine - OnSuccessListener");
                                 liberarArrayTaskCasoExitoso();
-                                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                                SharedPreferences sharedPref = getActivity().getSharedPreferences("Mis Preferencias", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPref.edit();
                                 editor.putLong(getString(R.string.PickingOrderSeleccionada), datosCabeceraPickingSeleccionada.getNumeroDePickingOrden());
-                                editor.putString(getString(R.string.PickingOrderCommentSeleccionada), datosCabeceraPickingSeleccionada.getComentario());
-                                editor.putString(getString(R.string.PickingOrderFechaSeleccionada), mCreationDate.getText().toString());
+//                                editor.putString(getString(R.string.PickingOrderCommentSeleccionada), datosCabeceraPickingSeleccionada.getComentario());
+//                                editor.putString(getString(R.string.PickingOrderFechaSeleccionada), mCreationDate.getText().toString());
                                 editor.commit();
 
 
@@ -748,11 +815,13 @@ public class DeliveryListFragment extends FragmentBasic
                         recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.GONE);
                         recyclerViewTotalProductos.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
-                        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+//                        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences sharedPref = getActivity().getSharedPreferences("Mis Preferencias", Context.MODE_PRIVATE);
+
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.remove(getString(R.string.PickingOrderSeleccionada));
-                        editor.remove(getString(R.string.PickingOrderCommentSeleccionada));
-                        editor.remove(getString(R.string.PickingOrderFechaSeleccionada));
+//                        editor.remove(getString(R.string.PickingOrderCommentSeleccionada));
+//                        editor.remove(getString(R.string.PickingOrderFechaSeleccionada));
                         editor.commit();
                     }
 
@@ -783,6 +852,9 @@ public class DeliveryListFragment extends FragmentBasic
 
 
     private void pasarOrdenAEntregadaParaCompensar(final CabeceraOrden cabeceraOrden) {
+        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- cabeceraOrden.getEstado() " + cabeceraOrden.getEstado());
+        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- ORDEN_STATUS_DELIVERED_PARA_COMPENSAR " + ORDEN_STATUS_DELIVERED_PARA_COMPENSAR);
+        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- ORDEN_STATUS_DELIVERED_PARA_COMPENSAR " + (cabeceraOrden.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR));
 
         if(cabeceraOrden.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR){
             muestraMensajeEnDialogo("Orden ya entregada");
@@ -859,6 +931,7 @@ public class DeliveryListFragment extends FragmentBasic
 
                                 //Actualizo el Monto total Entregado en el Picking
                                 datosCabeceraPickingSeleccionada.getTotales().setSumaMontoEntregado(cabeceraOrden.getTotales().getMontoEntregado());
+                                datosCabeceraPickingSeleccionada.setUsuarioEntrega(mUsuario.getUsername());
                                 childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY,String.valueOf ( datosCabeceraPickingSeleccionada.getNumeroDePickingOrden())), datosCabeceraPickingSeleccionada.toMap());
 
                                 //Actualizo las cabeceras de Ordenes
@@ -868,6 +941,11 @@ public class DeliveryListFragment extends FragmentBasic
                                 childUpdates.put(nodoCabeceraOrdenList_ParaCompensar(cabeceraOrden.getClienteKey(),cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
 //                                childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
                                 childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+
+                                Double iva=0.0;
+                                if(!cabeceraOrden.getCliente().getEspecial()){
+                                    iva=cabeceraOrden.getCliente().getIva();
+                                }
 
                                 if (saldo == null) {
                                     // di no existe esta estructura, se crea una en cero.
@@ -879,14 +957,15 @@ public class DeliveryListFragment extends FragmentBasic
                                     saldo.bloquear();
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = "+saldo.getTotales().getSaldo());
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar monto entreado = "+cabeceraOrden.getTotales().getMontoEntregado());
-                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + cabeceraOrden.getTotales().getMontoEntregado());
-                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + cabeceraOrden.getTotales().getMontoEntregado());
+
+                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrden.getTotales().getMontoEntregado()*(1+iva/100)));
+                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrden.getTotales().getMontoEntregado()*(1+iva/100)));
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= "+saldo.getTotales().getSaldo());
 
                                 } else {
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = "+saldo.getTotales().getSaldo());
-                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + cabeceraOrden.getTotales().getMontoEntregado());
-                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + cabeceraOrden.getTotales().getMontoEntregado());
+                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrden.getTotales().getMontoEntregado()*(1+iva/100)));
+                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrden.getTotales().getMontoEntregado()*(1+iva/100)));
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= "+saldo.getTotales().getSaldo());
 
                                 }
@@ -1525,6 +1604,8 @@ public void compensarCuentaOffine(String clienteKey){
 
     @Override
     public void onDestroy() {
+        Log.i(LOG_TAG, "onDestroy()");
+
         if(hayTareaEnProceso()){
             liberarRecusosTomados();
             return;
@@ -1532,4 +1613,554 @@ public void compensarCuentaOffine(String clienteKey){
 
         super.onDestroy();
     }
+
+    @Override
+    public void onResume() {
+        Log.i(LOG_TAG, "onResume()");
+
+        //        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("Mis Preferencias", Context.MODE_PRIVATE);
+
+
+        long nroPickingAlmacenado = sharedPref.getLong(getString(R.string.PickingOrderSeleccionada), 0);
+//        String comentarioPickingAlmacenado = sharedPref.getString(getString(R.string.PickingOrderCommentSeleccionada), "");
+//        String fechaPickingAlmacenado = sharedPref.getString(getString(R.string.PickingOrderFechaSeleccionada), "");
+        Log.i(LOG_TAG, "nroPickingAlmacenado: " + nroPickingAlmacenado);
+        if (nroPickingAlmacenado > 0) {
+            refPicking_6(PICKING_STATUS_DELIVERY,nroPickingAlmacenado).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    datosCabeceraPickingSeleccionada = dataSnapshot.getValue(CabeceraPicking.class);
+//                    datosCabeceraPickingSeleccionada.setComentario(comentarioPickingAlmacenado);
+
+
+                    mTilePickingComent.setText(datosCabeceraPickingSeleccionada.getComentario());
+                    mTilePickingOrderNumber.setText(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()));
+                    mTilePickingComent.setVisibility(View.VISIBLE);
+                    mMontoRecaudado.setText(datosCabeceraPickingSeleccionada.getMontoRecaudado().toString());
+                    SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+                    mCreationDate.setText(sfd.format(new Date(datosCabeceraPickingSeleccionada.getFechaDeCreacion())));
+
+
+
+                    mPickinOrdersAdapter.notifyDataSetChanged();
+
+                    muestraTotalesProductosDelivery();
+                    muestraOrdenesEnDelivey();
+
+                    mCursorAdapterTotalProductos.notifyDataSetChanged();
+                    recyclerViewCustomOrderInDeliveyOrder.setVisibility(View.VISIBLE);
+                    recyclerViewTotalProductos.setVisibility(View.VISIBLE);
+
+
+                    recyclerView.setVisibility(View.GONE);
+                    mLinearOrders.setVisibility(View.VISIBLE);
+                    mLinearProductos.setVisibility(View.VISIBLE);
+                    mDeliveryOrderTile.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+    }
+        super.onResume();
+    }
+
+
+
+
+    // this will find a bluetooth printer device
+    void findBT() {
+
+        try {
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+            if (mBluetoothAdapter == null) {
+//                myLabel.setText("No bluetooth adapter available");
+            }
+
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBluetooth, 0);
+            }
+
+            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            Log.i("zebra22", "size:" + pairedDevices.size());
+            if (pairedDevices.size() > 0) {
+                for (BluetoothDevice device : pairedDevices) {
+
+                    // RPP300 is the name of the bluetooth printer device
+                    // we got this name from the list of paired devices
+                    Log.i("zebra22", "name:" + device.getName());
+                    Log.i("zebra22", "getAddress():" + device.getAddress());
+                    Log.i("zebra22", "describeContents():" + device.describeContents());
+                    Log.i("zebra22", "BondState():" + device.getBondState());
+
+                    if (device.getName().equals("XXXXJ154501680")) {
+
+                        mmDevice = device;
+                        mImprimirButton.setBackgroundColor(Color.BLUE);
+                        break;
+                    }
+                }
+            }
+
+//            myLabel.setText("Bluetooth device found.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // tries to open a connection to the bluetooth printer device
+    void openBT() throws IOException {
+        try {
+
+            // Standard SerialPortService ID
+            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+            mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
+            mmSocket.connect();
+            mmOutputStream = mmSocket.getOutputStream();
+            mmInputStream = mmSocket.getInputStream();
+
+            beginListenForData();
+            Log.i("zebra22", "openBT() :");
+//            myLabel.setText("Bluetooth Opened");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
+ * after opening a connection to bluetooth printer device,
+ * we have to listen and check if a data were sent to be printed.
+ */
+    void beginListenForData() {
+        try {
+            final Handler handler = new Handler();
+            Log.i("zebra22", "beginListenForDat :");
+            // this is the ASCII code for a newline character
+            final byte delimiter = 10;
+
+            stopWorker = false;
+            readBufferPosition = 0;
+            readBuffer = new byte[1024];
+
+            workerThread = new Thread(new Runnable() {
+                public void run() {
+
+                    while (!Thread.currentThread().isInterrupted() && !stopWorker) {
+
+                        try {
+
+                            int bytesAvailable = mmInputStream.available();
+
+                            if (bytesAvailable > 0) {
+                                Log.i("zebra22", "beginListenForDat a:bytesAvailable > 0: " + bytesAvailable);
+                                byte[] packetBytes = new byte[bytesAvailable];
+                                mmInputStream.read(packetBytes);
+
+                                for (int i = 0; i < bytesAvailable; i++) {
+
+                                    byte b = packetBytes[i];
+                                    Log.i("zebra22", "beginListenForDat b-: " + (char) (b & 0xFF));
+                                    if (b == delimiter) {
+                                        Log.i("zebra22", "beginListenForDat b: " + "enter");
+                                        byte[] encodedBytes = new byte[readBufferPosition];
+                                        System.arraycopy(
+                                                readBuffer, 0,
+                                                encodedBytes, 0,
+                                                encodedBytes.length
+                                        );
+
+                                        // specify US-ASCII encoding
+                                        final String data = new String(encodedBytes, "US-ASCII");
+                                        Log.i("zebra22", "data received1x :");
+                                        Log.i("zebra22", data);
+//                                        Log.i("zebra22","data received1 :"+ data);
+                                        readBufferPosition = 0;
+
+                                        // tell the user data were sent to bluetooth printer device
+                                        handler.post(new Runnable() {
+                                            public void run() {
+//                                                myLabel.setText(data);
+                                                Log.i("zebra22", "data received2 :" + data);
+                                            }
+                                        });
+
+                                    } else {
+                                        readBuffer[readBufferPosition++] = b;
+                                    }
+                                }
+                            }
+//                            Log.i("zebra22","beginListenForDat :bytesAvailable <= 0");
+
+                        } catch (IOException ex) {
+                            Log.i("zebra22", "beginListenForDat :IOException ex");
+                            stopWorker = true;
+                        }
+
+                    }
+                }
+            });
+
+            workerThread.start();
+
+        } catch (Exception e) {
+            Log.i("zebra22", "beginListenForDat :IOException ex function");
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    public void buscaDatosParaImprimirPicking(){
+
+        refPagosxPickingList(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden())).addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Pagos asociados al Picking
+                mDataPagoxPicking_Printing = dataSnapshot;
+                try {
+                    sendData();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        }
+
+    // this will send text data to be printed by the bluetooth printer
+    void sendData() throws IOException {
+        try {
+            String msg = null;
+            // the text typed by the user
+//            String msg = myTextbox.getText().toString();
+//            msg += "\n";
+//
+//            mmOutputStream.write(msg.getBytes());
+//
+//              msg="! U1 setvar \"device.languages\" \"zpl\"";
+//            mmOutputStream.write(msg.getBytes());
+////
+//
+//
+//            msg="! U1 getvar \"allcv\"";
+//            msg="! U1 getvar \"device.languages\"";
+//            mmOutputStream.write(msg.getBytes());
+//            msg= "! U1 getvar \"zpl.system_error\"";
+
+            // comienzo de comando
+            msg = "^XA";
+            mmOutputStream.write(msg.getBytes());
+//            msg="^LT000";
+//            mmOutputStream.write(msg.getBytes());
+
+//            msg="^HH"; //return configuration Label
+//            mmOutputStream.write(msg.getBytes());
+
+
+//            msg="~WC"; //print configuration Label
+//            mmOutputStream.write(msg.getBytes());
+
+
+            //Label Legth  in dots 8dots/mm. (203 dpi)
+
+            msg = "^LL600";
+
+            int h = 50;
+            int i = 30;
+
+
+//
+//            Log.i(LOG_TAG, "printing product Key-mDataSanpshotPrinting " + mCaberasOrdenCerrarPickingDatos.getChildrenCount());
+//            Log.i(LOG_TAG, "printing product Key-mDataCabecerasParaCompensarPrinting " + mDataCabecerasParaCompensarPrinting.getChildrenCount());
+//            Log.i(LOG_TAG, "printing product Key-mDataPagosSinCompensarPrinting " + mDataPagosSinCompensarPrinting.getChildrenCount());
+//            Log.i(LOG_TAG, "printing product total " + i*(mDataSanpshotPrinting.getChildrenCount()+mDataCabecerasParaCompensarPrinting.getChildrenCount()+
+//                    mDataPagosSinCompensarPrinting.getChildrenCount()));
+//            msg = "^LL"+(i*(mDataSanpshotPrinting.getChildrenCount()+mDataCabecerasParaCompensarPrinting.getChildrenCount()+
+//                    mDataPagosSinCompensarPrinting.getChildrenCount())+600);
+
+            mmOutputStream.write(msg.getBytes());
+
+            Log.i(LOG_TAG, "printing msg " + msg);
+
+
+            // FO x,y- x: margen derecho, y: distancia al origen.
+
+            //  ADN:alto de letra,ancho de letra (letra horizontal- normal)
+            //  ADR:alto de letra,ancho de letra (letra vertical-Mira al Margen )
+            //  ADI:alto de letra,ancho de letra (letra horizontal - Invertida)
+            //  ADB:alto de letra,ancho de letra (letra vertical-Mira al centro de la etiqueta)
+
+
+
+
+//            SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
+            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yy");
+//            String formattedDate = df.format(new Date());
+            String formattedDate = df.format(datosCabeceraPickingSeleccionada.getFechaEntrega());
+
+
+            msg = "^FO310," + h + "^ADN,24,10^FD" + "feecha:" + formattedDate + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            h = h + i + i;
+
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Preparacion Nro: " + mDataPagoxPicking_Printing.getKey() + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+
+            h = h + i + i;
+            msg = "^FO5," + h + "^ADN,36,20^FD" + datosCabeceraPickingSeleccionada.getUsuarioEntrega() + " " + datosCabeceraPickingSeleccionada.getUsuarioPicking() + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+
+            h = h + i + i;
+            msg = "^FO5," + h + "^ADN,24,15^FD" + "Monto Recaudado: "+datosCabeceraPickingSeleccionada.getMontoRecaudado() + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+//            h = h + i + i;
+//            msg = "^FO5," + h + "^ADN,24,10^FD" + mCabeceraOrden.getCliente().getDireccionDeEntrega() + "^FS";
+//            mmOutputStream.write(msg.getBytes());
+//
+//            h = h + i - 5;
+//            msg = "^FO5," + h + "^ADN,24,10^FD" + mCabeceraOrden.getCliente().getCiudad() + "^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+            h = h + i;
+
+            msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + "Cliente" + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + "Tipo" + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+            msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + "Monto" + "^FS";
+            mmOutputStream.write(msg.getBytes());
+
+//            msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + "Total" + "^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+            h = h + i;
+            NumberFormat format = NumberFormat.getCurrencyInstance();
+            Double totalEspecial = 0.0;
+            Double totalComun = 0.0;
+
+
+            for (DataSnapshot data : mDataPagoxPicking_Printing.getChildren()) {
+
+                Log.i(LOG_TAG, "printing pago Key- " + data.getKey());
+                String pagoKey = data.getKey();
+                Pago pago = data.getValue(Pago.class);
+
+
+                Cliente cliente = pago.getCliente();
+                Double monto =pago.getMonto();
+
+                if(cliente.getEspecial()){
+                    totalEspecial=totalEspecial+monto;
+                }else{
+                    totalComun=totalComun+monto;
+                }
+
+
+
+
+                msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + cliente.getNombre()+" "+cliente.getApellido() + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + pago.getTipoDePago() + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + format.format(pago.getMonto()) + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                h = h + i;
+            }
+
+
+            h = h + i * 3;
+
+                msg = "^FO5," + h + "^ADN,24,15^FD" + "Total Especial: " + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+
+                msg = "^FO310," + h + "^ADN,24,15^FD" + format.format(totalEspecial) + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                h = h + i + i;
+
+                msg = "^FO5," + h + "^ADN,36,20^FD" + "Total Comun: " + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalComun) + "^FS";
+                mmOutputStream.write(msg.getBytes());
+
+                h = h + i + i;
+
+////            h = h - i;
+//            msg = "^FO5," + h + "^ADN,36,20^FD" + "Total: " + "^FS";
+//            mmOutputStream.write(msg.getBytes());
+//
+//            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalOrden * (1 + mIvaCalculo / 100)) + "^FS";
+//            mmOutputStream.write(msg.getBytes());
+//
+//            // Saldo
+//            h = h + i + i;
+//            msg = "^FO5," + h + "^ADN,36,20^FD" + "Saldo: " + "^FS";
+//            mmOutputStream.write(msg.getBytes());
+//
+//            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(mSaldoPrinting.getTotales().getSaldo()) + "^FS";
+//            mmOutputStream.write(msg.getBytes());
+//
+//// Recorro Ordenes sin Compensar
+//            for (DataSnapshot data : mDataCabecerasParaCompensarPrinting.getChildren()) {
+//
+//                Log.i(LOG_TAG, "mDataCabecerasParaCompensarPrinting- " + data.getKey());
+//                h = h + i;
+//                CabeceraOrden cabeceraOrden = data.getValue(CabeceraOrden.class);
+//
+//                msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + "orden" + "^FS";
+//                mmOutputStream.write(msg.getBytes());
+//
+//                msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + cabeceraOrden.getNumeroDeOrden() + "^FS";
+//                mmOutputStream.write(msg.getBytes());
+//
+//                msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + format.format(cabeceraOrden.getTotales().getMontoEntregado()) + "^FS";
+//                mmOutputStream.write(msg.getBytes());
+//
+//                msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + format.format(cabeceraOrden.getTotales().getSaldo()) + "^FS";
+//                mmOutputStream.write(msg.getBytes());
+//
+//
+//            }
+//
+//            // Recorro Pagos
+//            for (DataSnapshot data : mDataPagosSinCompensarPrinting.getChildren()) {
+//
+//                h = h + i;
+//                Log.i(LOG_TAG, "mDataPagosSinCompensarPrinting- " + data.getKey());
+//
+//                Pago pago = data.getValue(Pago.class);
+//
+//                msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + pago.getTipoDePago() + "^FS";
+//                mmOutputStream.write(msg.getBytes());
+//
+////                msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + cabeceraOrden.getNumeroDeOrden() + "^FS";
+////                mmOutputStream.write(msg.getBytes());
+//
+//                msg = "^FO310," + (h + i) + "^ADN,24,10^FD" + format.format(pago.getMonto()) + "^FS";
+//                mmOutputStream.write(msg.getBytes());
+//
+////                msg = "^FO430," + (h + i) + "^ADN,24,10^FD" + format.format(cabeceraOrden.getTotales().getSaldo()) + "^FS";
+////                mmOutputStream.write(msg.getBytes());
+//
+//            }
+
+
+            // Print a barCode
+//            msg="^B8N,100,Y,N";
+//            mmOutputStream.write(msg.getBytes());
+//
+//            msg="^FD1234567";
+//            mmOutputStream.write(msg.getBytes());
+
+
+//
+//            msg="^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+
+//            This prints a box one wide by one inch long and the thickness of the line is 2 dots.
+////            Width: 1.5 inch; Height: 1 inch; Thickness: 10; Color: default; Rounding: 5
+//            msg="^FO0,0^GB300,200,10,,5^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+
+////            Line. horizontal
+//            msg="^^FO50,300^GB400,1,4,^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+//            //            Print a vertical line.
+//            msg="^FO100,50^GB1,400,4^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+
+            // Imprime en inversa.
+
+//            msg="^PR1";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO100,100";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^GB70,70,70,,3^FS";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO200,100";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^GB70,70,70,,3^FS";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO300,100";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^GB70,70,70,,3^FS";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO400,100";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^GB70,70,70,,3^FS";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FO107,110^CF0,70,93";
+//            mmOutputStream.write(msg.getBytes());
+//            msg="^FR^FDREVERSE^FS";
+//            mmOutputStream.write(msg.getBytes());
+
+
+            // Fin  de comando
+
+            msg = "^XZ";
+            mmOutputStream.write(msg.getBytes());
+
+            closeBT();
+
+//            msg="^FD";
+//            mmOutputStream.write(msg.getBytes());
+
+            // tell the user data were sent
+//            myLabel.setText("Data sent.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // close the connection to bluetooth printer.
+    void closeBT() throws IOException {
+        try {
+            stopWorker = true;
+            mmOutputStream.close();
+            mmInputStream.close();
+            mmSocket.close();
+//            sendButton.setBackgroundColor(Color.TRANSPARENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
 }

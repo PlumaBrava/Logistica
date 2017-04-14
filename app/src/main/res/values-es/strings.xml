@@ -70,6 +70,8 @@
     <string name="menu_grupoConfiguracion">Configuracion</string>
     <string name="menu_grupoReportes">Reportes</string>
     <string name="menu_logout">Salir</string>
+    <string name="menu_migrarClientes">Migrar Clientes</string>
+    <string name="menu_settings">Configuracion</string>
     <string name="menu_empresa">Empresas</string>
     <string name="menu_empresaList">Lista de Empresas</string>
     <string name="menu_usuariosList">Lista de Usuarios</string>
@@ -184,6 +186,7 @@
     <!--Pagos Fragment-->
     <string name="title_pagos_fragment">Pagos</string>
     <string name="fecha_pagos_fragment">Fecha de Pago: </string>
+    <string name="ordenPicking_pagos_fragment">Orden Preparar: </string>
     <string name="Monto_pagos_fragment">Monto</string>
     <string name="TipoPago_pagos_fragment">Monto</string>
     <string name="Banco_pagos_fragment">Banco</string>
@@ -349,6 +352,7 @@
     <string name="picking_card_empty_custom_list">Sin nada para Prepar </string>
     <string name="picking_card_Text_Coment">Ingrese su Comentario </string>
     <string name="picking_card_saveButton_contentDescription">Boton Grabar</string>
+    <string name="picking_card_montoRecaudado">Recaudacion: </string>
 
 
     <!--Saldos Titulos(saldos_title.xml-->
@@ -422,9 +426,9 @@
     <!--<string name="specialPriceTitleListItem">Special Price header</string>-->
 
     <!-- picking_product_item -->
-    <string name="Orders">Orders</string>
-    <string name="Picking">Picking</string>
-    <string name="Delivery">Delivery"</string>
+    <string name="Orders">Orden</string>
+    <string name="Picking">Prepar</string>
+    <string name="Delivery">"Entregar"</string>
     <string name="quantityOrders">Cantidad en Ordenes"</string>
     <string name="quantityPicking">Cantidad en Preparacion"</string>
     <string name="quantityDelivered">Cantidad en Entrega"</string>

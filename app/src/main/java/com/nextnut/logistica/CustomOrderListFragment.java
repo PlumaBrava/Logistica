@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -18,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -49,6 +47,7 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_PICKING;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
+import static com.nextnut.logistica.util.MakeCall.makePhoneCallCliente;
 
 /**
  * An activity representing a list of CustomOrders. This activity
@@ -211,7 +210,7 @@ public class CustomOrderListFragment extends FragmentBasic {
 
 //                                intent.putExtra(EXTRA_PRODUCT_KEY, productKey);
 //                                intent.putExtra(EXTRA_PRODUCT, model.getProducto());
-                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
 
                                 startActivity(intent);
                             }
@@ -294,35 +293,43 @@ public class CustomOrderListFragment extends FragmentBasic {
                                 mCliente = model.getCliente();
                                 putExtraFirebase_Fragment(intent);
                                 intent.putExtra(EXTRA_CABECERA_ORDEN, model);
-                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
 
                                 startActivity(intent);
                             }
                         }
 
                 );
-                viewHolder.mpasarAPickingSelector.setOnClickListener(new View.OnClickListener() {
+                viewHolder.mBottonPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (mListadeOrdenesParaPasarApicking.isEmpty()) {
-                            view.setBackgroundColor(Color.RED);
-                            mListadeOrdenesParaPasarApicking.add(model);
-                            Toast.makeText(getContext(), "pasar a Picking", Toast.LENGTH_SHORT).show();
-
-                        } else {
-                            if (mListadeOrdenesParaPasarApicking != null && mListadeOrdenesParaPasarApicking.contains(model)) {
-                                view.setBackgroundColor(Color.TRANSPARENT);
-                                mListadeOrdenesParaPasarApicking.remove(model);
-                            } else {
-
-                                view.setBackgroundColor(Color.RED);
-                                mListadeOrdenesParaPasarApicking.add(model);
-                                Toast.makeText(getContext(), "pasar a Picking", Toast.LENGTH_SHORT).show();
-
-                            }
-                        }
+                        makePhoneCallCliente (MainActivity.getMainActivity(),model.getCliente());
                     }
                 });
+
+
+//                viewHolder.mpasarAPickingSelector.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        if (mListadeOrdenesParaPasarApicking.isEmpty()) {
+//                            view.setBackgroundColor(Color.RED);
+//                            mListadeOrdenesParaPasarApicking.add(model);
+//                            Toast.makeText(getContext(), "pasar a Picking", Toast.LENGTH_SHORT).show();
+//
+//                        } else {
+//                            if (mListadeOrdenesParaPasarApicking != null && mListadeOrdenesParaPasarApicking.contains(model)) {
+//                                view.setBackgroundColor(Color.TRANSPARENT);
+//                                mListadeOrdenesParaPasarApicking.remove(model);
+//                            } else {
+//
+//                                view.setBackgroundColor(Color.RED);
+//                                mListadeOrdenesParaPasarApicking.add(model);
+//                                Toast.makeText(getContext(), "pasar a Picking", Toast.LENGTH_SHORT).show();
+//
+//                            }
+//                        }
+//                    }
+//                });
             }
 
             @Override
@@ -853,19 +860,19 @@ public class CustomOrderListFragment extends FragmentBasic {
         Bundle arguments = new Bundle();
 
 //        arguments.putLong(CustomDetailFragment.ARG_ITEM_ID, mItem);
-        if (mItem != 0) {
-            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-        } else {
-            // go to the last order
-            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
-        }
+//        if (mItem != 0) {
+//            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
+//        } else {
+//            // go to the last order
+//            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//        }
         fragment.setArguments(arguments);
 
         getActivity().getSupportFragmentManager().beginTransaction()
                 .addToBackStack(null)
                 .replace(R.id.customorder_detail_container, fragment)
                 .commit();        // go to the last order
-        arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//        arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
     }
 
     public void changeSize(View view) {

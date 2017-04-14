@@ -18,6 +18,7 @@ public class Cliente implements Parcelable {
 
     private String nombre;
     private String apellido;
+    private String IndiceNombreApellido;
     private String telefono;
     private String fotoCliente;
     private String direccionDeEntrega;
@@ -46,6 +47,7 @@ public class Cliente implements Parcelable {
     public Cliente(String uid,String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, double iva, String cuit, Boolean especial,Map<String, String> telefonos) {
         this.nombre = nombre;
         this.apellido = apellido;
+        this.IndiceNombreApellido=nombre+apellido;
         this.telefono = telefono;
         this.fotoCliente = fotoCliente;
         this.direccionDeEntrega = direccionDeEntrega;
@@ -63,6 +65,7 @@ public class Cliente implements Parcelable {
         HashMap<String, Object> result = new HashMap<>();
         result.put("nombre", nombre);
         result.put("apellido", apellido);
+        result.put("IndiceNombreApellido",IndiceNombreApellido);
         result.put("fotoCliente", fotoCliente);
         result.put("direccionDeEntrega", direccionDeEntrega);
         result.put("ciudad", ciudad);
@@ -176,6 +179,7 @@ public class Cliente implements Parcelable {
 
         parcel.writeString(nombre);
         parcel.writeString(apellido);
+        parcel.writeString(IndiceNombreApellido);
         parcel.writeString(telefono);
         parcel.writeString(fotoCliente);
         parcel.writeString(direccionDeEntrega);
@@ -207,6 +211,7 @@ public class Cliente implements Parcelable {
     private Cliente(Parcel in) {
         nombre=in.readString();
         apellido=in.readString();
+        IndiceNombreApellido=in.readString();
         telefono =in.readString();
         fotoCliente= in.readString();
         direccionDeEntrega=in.readString();

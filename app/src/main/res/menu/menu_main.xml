@@ -85,8 +85,14 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_migrarClientes"
-        android:title="MigrarClientes"
+    android:id="@+id/action_migrarClientes"
+    android:title="@string/menu_migrarClientes"
+    android:visible="true"
+    app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/menu_settings"
         android:visible="true"
         app:showAsAction="never" />
 

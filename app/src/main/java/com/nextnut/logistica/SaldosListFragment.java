@@ -33,7 +33,8 @@ import java.text.NumberFormat;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
-import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PAGO;
+import static com.nextnut.logistica.util.Constantes.EXTRA_PAGO_KEY;
 
 public class SaldosListFragment extends FragmentBasic
 {
@@ -286,9 +287,9 @@ public class SaldosListFragment extends FragmentBasic
                                 intent.putExtra(EXTRA_CABECERA_ORDEN, model);
 //                                Log.d(LOG_TAG, "muestraOrdenesEnPickin CabeceraPicking Nro: "+datosCabeceraPickingSeleccionada.getNumeroDePickingOrden() );
 
-                                //todo: sacaar el 4 y evaluar agrupar las ordenes por cliente.
-                                intent.putExtra(EXTRA_NRO_PICKIG, 4);
-                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//                                todo: sacaar el 4 y evaluar agrupar las ordenes por cliente.
+//                                intent.putExtra(EXTRA_NRO_PICKIG, 4);
+//                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
                                 startActivity(intent);
                             }
                         }
@@ -364,12 +365,8 @@ public class SaldosListFragment extends FragmentBasic
                                 Intent intent = new Intent(getContext(), PagosActivity.class);
                                 mCliente = model.getCliente();
                                 putExtraFirebase_Fragment(intent);
-                                intent.putExtra(EXTRA_CABECERA_ORDEN, model);
-//                                Log.d(LOG_TAG, "muestraOrdenesEnPickin CabeceraPicking Nro: "+datosCabeceraPickingSeleccionada.getNumeroDePickingOrden() );
-
-                                //todo: sacaar el 4 y evaluar agrupar las ordenes por cliente.
-                                intent.putExtra(EXTRA_NRO_PICKIG, 4);
-                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+                                intent.putExtra(EXTRA_PAGO, model);
+                                intent.putExtra(EXTRA_PAGO_KEY, pagoKey);
                                 startActivity(intent);
                             }
                         }

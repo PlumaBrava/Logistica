@@ -24,13 +24,13 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_carga"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:windowSoftInputMode="adjustResize"
-        android:name="android.support.multidex.MultiDexApplication">
+        android:windowSoftInputMode="adjustResize">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -49,8 +49,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.MainActivity" />
         </activity>
-
-
         <activity
             android:name=".ProductDetailActivity"
             android:label="@string/title_product_detail"
@@ -91,7 +89,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.MainActivity" />
         </activity>
-
         <activity
             android:name=".CustomDetailActivity"
             android:label="@string/title_custom_detail"
@@ -110,7 +107,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.MainActivity" />
         </activity>
-
         <activity
             android:name=".AlmacenesDetailActivity"
             android:label="@string/title_almacenes_detail"
@@ -261,11 +257,23 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nextnut.logistica.UsuarioListActivity" />
-        </activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
-     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        </activity>
+        <!--
+ ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
+        -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nextnut.logistica.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

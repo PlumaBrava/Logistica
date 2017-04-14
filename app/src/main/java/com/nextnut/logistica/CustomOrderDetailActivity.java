@@ -51,10 +51,10 @@ public class CustomOrderDetailActivity extends ActivityBasic {
             // using a fragment transaction.
             Bundle arguments = new Bundle();
 
-            arguments.putLong(CustomOrderDetailFragment.ARG_ITEM_ID,
-                    getIntent().getLongExtra(CustomOrderDetailFragment.ARG_ITEM_ID,0));
-            int mAction = getIntent().getIntExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
-            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, mAction);
+//            arguments.putLong(CustomOrderDetailFragment.ARG_ITEM_ID,
+//                    getIntent().getLongExtra(CustomOrderDetailFragment.ARG_ITEM_ID,0));
+//            int mAction = getIntent().getIntExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
+//            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, mAction);
             CabeceraOrden cabeceraOrden= getIntent().getParcelableExtra(EXTRA_CABECERA_ORDEN);
 
             Long nroPicking=getIntent().getLongExtra(EXTRA_NRO_PICKIG,0);

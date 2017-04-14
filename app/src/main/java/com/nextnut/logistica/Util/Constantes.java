@@ -135,6 +135,8 @@ public class Constantes {
 
     public static String ESQUEMA_PAGOS = "pagos";
     public static String NODO_PAGOS ="/" + ESQUEMA_PAGOS+ "/";
+    public static String ESQUEMA_PAGOS_PICKING = "pagos_picking";
+    public static String NODO_PAGOS_PICKING ="/" + ESQUEMA_PAGOS_PICKING+ "/";
 
 
     // HISTORIAL DE Saldos
@@ -157,6 +159,9 @@ public class Constantes {
     public static String NODO_STOCK ="/" + ESQUEMA_STOCK+ "/";
 
 
+    public static String ESQUEMA_STOCK_MOVIMIENTOS = "stock_movimientos";
+    public static String NODO_STOCK_MOVIMIENTOS ="/" + ESQUEMA_STOCK_MOVIMIENTOS+ "/";
+
 
     // Constantes para pasar datos entre actividades.
     public static  final String EXTRA_FIREBASE_URL ="FIREBASE_URL";
@@ -169,6 +174,8 @@ public class Constantes {
     public static final String EXTRA_CLIENTE_KEY = "cliente_key";
     public static final String EXTRA_CLIENTE= "cliente";
     public static final String EXTRA_CABECERA_ORDEN = "cabeceraOrden";
+    public static final String EXTRA_PAGO = "pago";
+    public static final String EXTRA_PAGO_KEY = "pagoKey";
     public static final String EXTRA_KEYLIST = "keyList"; //listado de key de una orden
     public static final String EXTRA_NRO_PICKIG = "NroPicking"; //listado de key de una orden
     public static final String EXTRA_ALMACEN_KEY = "almacen_key"; //key de un almacen

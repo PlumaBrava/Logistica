@@ -30,7 +30,7 @@ public class ProductSectionActivity extends ActivityBasic {
     public static final String KEY_PRODUCTO_PRICE = "ProductPrice";
     public static final String KEY_PRODUCTO_PRICES_ESPECIAL = "ProductPriceEspecial";
     private static final String LOG_TAG = ProductSectionActivity.class.getSimpleName();
-    private long mItem;
+//    private long mItem;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +39,7 @@ public class ProductSectionActivity extends ActivityBasic {
         setSupportActionBar(toolbar);
         ArrayList<String> keys=new ArrayList<String>();
         keys = getIntent().getStringArrayListExtra(EXTRA_KEYLIST);
-        mItem = getIntent().getLongExtra("ITEM",-1);
+//        mItem = getIntent().getLongExtra("ITEM",-1);
 
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -262,7 +262,7 @@ public class ProductSectionActivity extends ActivityBasic {
 //            }
 //    }
     public Query getQuery(DatabaseReference databaseReference) {
-        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey);
+        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).orderByChild("nombreProducto");
     }
 
 }

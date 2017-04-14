@@ -67,7 +67,7 @@ public class DetallePickingViewHolder extends RecyclerView.ViewHolder  implement
 
 
 
-        ((View)mTextcantidadEnPicking.getParent()).setOnClickListener(detalleClickListener);
+        ((View)mTextcantidadEnPicking.getParent().getParent().getParent()).setOnClickListener(detalleClickListener);
 
     }
 

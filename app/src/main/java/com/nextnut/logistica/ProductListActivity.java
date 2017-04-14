@@ -281,7 +281,7 @@ public class ProductListActivity extends ActivityBasic {
 
         Log.i("Producto", "ESQUEMA_EMPRESA_PRODUCTOS)-->" + ESQUEMA_EMPRESA_PRODUCTOS+"/"+mEmpresaKey);
 
-        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey);
+        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS).child(mEmpresaKey).orderByChild("nombreProducto");
 //        return databaseReference.child(ESQUEMA_EMPRESA_PRODUCTOS);
     }
 

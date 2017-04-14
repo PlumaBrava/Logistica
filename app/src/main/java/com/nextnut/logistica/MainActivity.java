@@ -189,7 +189,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                 switch (position) {
                     case CUSTOM_ORDER_FRAGMENT: {
                         mFab.setVisibility(View.VISIBLE);
-                        mFabPasarAPicking.setVisibility(View.VISIBLE);
+                        mFabPasarAPicking.setVisibility(View.GONE);
                         break;
                     }
                     case PICKING_FRAGMENT: {
@@ -227,6 +227,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
 
         mFabPasarAPicking = (FloatingActionButton) findViewById(R.id.fab_pasarAPicking);
+        mFabPasarAPicking.setVisibility(View.GONE);
         mFabPasarAPicking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -347,7 +348,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                                 Intent intent = new Intent(getApplicationContext(), CustomOrderDetailActivity.class);
                                 putExtraFirebase(intent);
                                 intent.putExtra(EXTRA_CABECERA_ORDEN, cabeceraOrden);
-                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
+//                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
 
                                 startActivity(intent);
                             }
@@ -545,6 +546,13 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
         if (id == R.id.action_migrarClientes) {
             migracionClientes();
+
+            return true;
+        }
+
+        if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
 
             return true;
         }
@@ -918,15 +926,19 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                     null,
                     null,
                     null);
-            Log.i("migracionCliente", "cursor");
-
+            Log.i("migracionCliente", "data.getCount()"+data.getCount());
+int i=0;
             if (data != null && data.getCount() > 0) {
                 data.moveToFirst();
                 Log.i("migracionCliente", "cursor >0");
 
-
                 do {
-
+                    Log.i("migracionCliente", "cursor ID: " +data.getString(data.getColumnIndex(CustomColumns.ID_CUSTOM))+" - "+i);
+                    i++;
+                } while (data.moveToNext());
+                data.moveToFirst();
+                do {
+                    Log.i("migracionCliente", "cursor ID: " +data.getColumnIndex(CustomColumns.ID_CUSTOM));
                     writeNewCliente(
                             data.getString(data.getColumnIndex(CustomColumns.ID_CUSTOM)),
                             data.getString(data.getColumnIndex(CustomColumns.NAME_CUSTOM)),
@@ -935,7 +947,8 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                             data.getString(data.getColumnIndex(CustomColumns.IMAGEN_CUSTOM)),
                             data.getString(data.getColumnIndex(CustomColumns.DELIIVERY_ADDRES_CUSTOM)),
                             data.getString(data.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)),
-                            Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
+                            data.getDouble(data.getColumnIndex(CustomColumns.IVA_CUSTOM)),
+//                            Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
                             data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
                             data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
                             migrarTelefonosDelContactoAsociado(getMainActivity() ,data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM)))
@@ -950,6 +963,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
             }
 
         } catch (Exception e) {
+            Log.i("migracionCliente", "Exception e"+e.toString());
         }
     }
 
@@ -990,9 +1004,7 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
                     cuit,
                     especial, telefonos);
 
-            if (mClienteKey == null) {
-                mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();
-            }
+
 
             Map<String, Object> clienteValues = cliente.toMap();
             Map<String, Object> childUpdates = new HashMap<>();
