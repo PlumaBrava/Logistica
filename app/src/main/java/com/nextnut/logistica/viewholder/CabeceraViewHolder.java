@@ -26,7 +26,7 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
     Context mContext;
     public TextView mOrderNumber;
     public TextView mApellidoyNombre;
-//    public TextView mLastname;
+    //    public TextView mLastname;
     public ImageButton mBottonPhoto;
     public String mCustomerRefContacto;
 
@@ -36,7 +36,7 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
 
     public CabeceraViewHolder(View view) {
         super(view);
-        mContext=view.getContext();
+        mContext = view.getContext();
         mOrderNumber = (TextView) view.findViewById(R.id.numberOrderCard);
         mApellidoyNombre = (TextView) view.findViewById(R.id.ApellidoyNombreOrderCard);
 //        mLastname = (TextView) view.findViewById(R.id.latNameOrderCard);
@@ -48,37 +48,42 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToPost(final CabeceraOrden cabeceraOrden, View.OnClickListener cabeceraClickListener) {
-        if(cabeceraOrden.getEstado()>= ORDEN_STATUS_DELIVERED_PARA_COMPENSAR){
-            ((View )(mOrderNumber.getParent().getParent())).setBackgroundColor(Color.RED);
+        if (cabeceraOrden.getEstado() >= ORDEN_STATUS_DELIVERED_PARA_COMPENSAR) {
+            ((View) (mOrderNumber.getParent().getParent())).setBackgroundColor(Color.RED);
             mOrderNumber.setTextColor(Color.GREEN);
-        }else {
-            ((View )(mOrderNumber.getParent().getParent())).setBackgroundColor(
+        } else {
+            ((View) (mOrderNumber.getParent().getParent())).setBackgroundColor(
                     mContext.getResources().getColor(R.color.CustomOrderCard_background));
 
         }
 
 
         mOrderNumber.setText(String.valueOf(cabeceraOrden.getNumeroDeOrden()));
-        mApellidoyNombre.setText(cabeceraOrden.getCliente().getNombre()+" "+cabeceraOrden.getCliente().getApellido());
+        mApellidoyNombre.setText(cabeceraOrden.getCliente().getNombre() + " " + cabeceraOrden.getCliente().getApellido());
         NumberFormat format = NumberFormat.getCurrencyInstance();
 
-        if(cabeceraOrden.getEstado()>= ORDEN_STATUS_EN_DELIVERY) {
-            mTotalPrice.setText(format.format(cabeceraOrden.getTotales().getMontoEntregado()));
+        Double montoEntregado = cabeceraOrden.getTotales().getMontoEntregado();
+        Double montoEnOrden = cabeceraOrden.getTotales().getMontoEnOrdenes();
+        if (!cabeceraOrden.getCliente().getEspecial()) {
+            montoEntregado = montoEntregado * (1 + (cabeceraOrden.getCliente().getIva() / 100));
+            montoEnOrden = montoEnOrden * (1 + (cabeceraOrden.getCliente().getIva() / 100));
+        }
 
-        }else{
-        mTotalPrice.setText(format.format(cabeceraOrden.getTotales().getMontoEnOrdenes()));
+        if (cabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERY) {
+            mTotalPrice.setText(format.format(montoEntregado));
+
+        } else {
+            mTotalPrice.setText(format.format(montoEnOrden));
         }
 
         SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yy");
 
 
-        mDate.setText(sfd.format(new Date(cabeceraOrden.getFechaDeCreacion())) );
+        mDate.setText(sfd.format(new Date(cabeceraOrden.getFechaDeCreacion())));
 
 
+        if (cabeceraOrden.getCliente().getTelefonos() != null) {
 
-
-        if(cabeceraOrden.getCliente().getTelefonos()!=null){
-         
 
             ArrayList mData;
 
@@ -89,24 +94,25 @@ public class CabeceraViewHolder extends RecyclerView.ViewHolder {
 //
 //            Log.i("call", "cabeceraOrden.getCliente(). item - " +item.getKey()+" -- "+ item.getValue());
 //            Log.i("call", "cabeceraOrden.getCliente(). mData.isEmpty() - " +mData.isEmpty());
-            Log.i("call", "cabeceraOrden.getCliente(). mData.sie - " +mData.size());
-            Log.i("call", "cabeceraOrden.getCliente().getTelefono() - no nulo" );
-            Log.i("call", "cabeceraOrden.getCliente().getTelefono() - " +cabeceraOrden.getCliente().getTelefonos().toString());
-            Log.i("call", "cabeceraOrden.getCliente().getTelefono().isEmpty() - " +cabeceraOrden.getCliente().getTelefonos().isEmpty());
-            if(!cabeceraOrden.getCliente().getTelefonos().isEmpty()){
-        mBottonPhoto.setVisibility(View.VISIBLE);
+            Log.i("call", "cabeceraOrden.getCliente(). mData.sie - " + mData.size());
+            Log.i("call", "cabeceraOrden.getCliente().getTelefono() - no nulo");
+            Log.i("call", "cabeceraOrden.getCliente().getTelefono() - " + cabeceraOrden.getCliente().getTelefonos().toString());
+            Log.i("call", "cabeceraOrden.getCliente().getTelefono().isEmpty() - " + cabeceraOrden.getCliente().getTelefonos().isEmpty());
+            if (!cabeceraOrden.getCliente().getTelefonos().isEmpty()) {
+                mBottonPhoto.setVisibility(View.VISIBLE);
                 mBottonPhoto.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        makePhoneCallCliente (MainActivity.getMainActivity(),cabeceraOrden.getCliente());
+                        makePhoneCallCliente(MainActivity.getMainActivity(), cabeceraOrden.getCliente());
                     }
                 });
-        }else{
-            Log.i("call", "cabeceraOrden.getCliente().getTelefono() -  nulo" );
+            } else {
+                Log.i("call", "cabeceraOrden.getCliente().getTelefono() -  nulo");
 
-            mBottonPhoto.setVisibility(View.GONE);
-            }}
-        ((View)mApellidoyNombre.getParent().getParent().getParent()) . setOnClickListener(cabeceraClickListener);
+                mBottonPhoto.setVisibility(View.GONE);
+            }
+        }
+        ((View) mApellidoyNombre.getParent().getParent().getParent()).setOnClickListener(cabeceraClickListener);
 
     }
 }

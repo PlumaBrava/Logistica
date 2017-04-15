@@ -203,14 +203,10 @@ public class CustomOrderListFragment extends FragmentBasic {
                                 Log.d(LOG_TAG, "adapter:onClick model: " + model.getProducto().getNombreProducto());
                                 Log.d(LOG_TAG, "adapter:onClick");
                                 Intent intent = new Intent(getContext(), ProductosEnOrdenes.class);
-//                                mCliente=model.getCliente();
                                 mProducto = model.getProducto();
                                 mProductKey = productKey;
                                 putExtraFirebase_Fragment(intent);
 
-//                                intent.putExtra(EXTRA_PRODUCT_KEY, productKey);
-//                                intent.putExtra(EXTRA_PRODUCT, model.getProducto());
-//                                intent.putExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_NEW);
 
                                 startActivity(intent);
                             }
@@ -287,7 +283,7 @@ public class CustomOrderListFragment extends FragmentBasic {
                         {
                             @Override
                             public void onClick(View starView) {
-                                Log.d(LOG_TAG, "adapter:onClick model: " + model.getCliente().getNombre());
+                                Log.d(LOG_TAG, "adapter:onClick model: " + model.getCliente().getNombre()+model.getCliente().getPerfilDePrecios());
                                 Log.d(LOG_TAG, "adapter:onClick");
                                 Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
                                 mCliente = model.getCliente();

@@ -176,8 +176,8 @@ public class CabeceraPicking implements Parcelable {
     }
 
 
-    public void ingresaProductoEnOrden(Double cantidadOrden, String productKey, Producto producto, Boolean clienteEspecial) {
-        this.totales.ingresaProductoEnOrden(cantidadOrden,  producto, clienteEspecial);
+    public void ingresaProductoEnOrden(Double cantidadOrden, String productKey, Producto producto, Cliente cliente) {
+        this.totales.ingresaProductoEnOrden(cantidadOrden,  producto, cliente);
 
     }
 

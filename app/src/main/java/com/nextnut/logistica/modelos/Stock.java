@@ -147,28 +147,28 @@ public class Stock {
         this.producto = producto;
     }
 
-    // Metodos para modificar en detalle en Como Items.
-
-    public void ingresaProductoEnOrden(Double cantidadOrden,  Producto producto, Boolean clienteEspecial) {
-//        this.cantidadUnidadesEnStock = cantidadUnidadesEnStock;
-        setCantidadUnidadesEnStock(cantidadOrden);
-        Log.d("detalle2", "antes IngresaProductoenOrden-this.precio) " + this.precio);
-//        this.producto = producto;
-        setProducto(producto);
-        if (clienteEspecial) {
-            setPrecio( producto.getPrecioEspcecial());
-            Log.d("detalle2", "despues-especial IngresaProductoenOrden-this.precio) " + this.precio);
-//            this.kilosEnStock = cantidadUnidadesEnStock * producto.getPrecioEspcecial();
-            setKilosEnStock(cantidadOrden * producto.getPrecioEspcecial());
-        } else {
-            setPrecio(producto.getPrecio());
-            Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
-//            this.kilosEnStock = cantidadUnidadesEnStock * producto.getPrecio();
-            setKilosEnStock(cantidadOrden * producto.getPrecio());
-
-        }
-
-    }
+//    // Metodos para modificar en detalle en Como Items.
+//
+//    public void ingresaProductoEnOrden(Double cantidadOrden,  Producto producto, Boolean clienteEspecial) {
+////        this.cantidadUnidadesEnStock = cantidadUnidadesEnStock;
+//        setCantidadUnidadesEnStock(cantidadOrden);
+//        Log.d("detalle2", "antes IngresaProductoenOrden-this.precio) " + this.precio);
+////        this.producto = producto;
+//        setProducto(producto);
+//        if (clienteEspecial) {
+//            setPrecio( producto.getPrecioEspcecial());
+//            Log.d("detalle2", "despues-especial IngresaProductoenOrden-this.precio) " + this.precio);
+////            this.kilosEnStock = cantidadUnidadesEnStock * producto.getPrecioEspcecial();
+//            setKilosEnStock(cantidadOrden * producto.getPrecioEspcecial());
+//        } else {
+//            setPrecio(producto.getPrecio());
+//            Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
+////            this.kilosEnStock = cantidadUnidadesEnStock * producto.getPrecio();
+//            setKilosEnStock(cantidadOrden * producto.getPrecio());
+//
+//        }
+//
+//    }
     public void modificarCantidadEnTotalInicial(Stock detalleOrdenNuevo, Stock detalleOrdenAnterior) {
         Log.d("EnTotalInicial", "this.kilosEnStock) " + this.kilosEnStock);
         Log.d("EnTotalInicial", "detalleOrdenNuevo.getKilosEnStock() " + detalleOrdenNuevo.getKilosEnStock());
@@ -218,21 +218,21 @@ public class Stock {
     }
 
 
-    public void ingresaProductoEnEntrega(Double cantidad,  Producto producto, Boolean clienteEspecial) {
-        this.cantidadEntrega = cantidad;
-        Log.d("detalle2", "antes IngresaProductoenOrden-this.precio) " + this.precio);
-        this.producto = producto;
-        if (clienteEspecial) {
-            setPrecio( producto.getPrecioEspcecial());
-            Log.d("detalle2", "despues-especial IngresaProductoenOrden-this.precio) " + this.precio);
-            this.montoItemEntrega = cantidad * producto.getPrecioEspcecial();
-        } else {
-            setPrecio(producto.getPrecio());
-            Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
-            this.montoItemEntrega = cantidad * producto.getPrecio();
-        }
-
-    }
+//    public void ingresaProductoEnEntrega(Double cantidad,  Producto producto, Boolean clienteEspecial) {
+//        this.cantidadEntrega = cantidad;
+//        Log.d("detalle2", "antes IngresaProductoenOrden-this.precio) " + this.precio);
+//        this.producto = producto;
+//        if (clienteEspecial) {
+//            setPrecio( producto.getPrecioEspcecial());
+//            Log.d("detalle2", "despues-especial IngresaProductoenOrden-this.precio) " + this.precio);
+//            this.montoItemEntrega = cantidad * producto.getPrecioEspcecial();
+//        } else {
+//            setPrecio(producto.getPrecio());
+//            Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
+//            this.montoItemEntrega = cantidad * producto.getPrecio();
+//        }
+//
+//    }
 
 
 

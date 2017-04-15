@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -24,9 +27,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.nextnut.logistica.modelos.Precio;
 import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.util.CurrencyToDouble;
 import com.nextnut.logistica.util.NumberTextWatcher;
+import com.rey.material.widget.Button;
 import com.rey.material.widget.ProgressView;
 import com.rey.material.widget.Spinner;
 import com.squareup.picasso.Picasso;
@@ -76,6 +81,7 @@ public class ProductDetailFragment extends FragmentBasic
     private EditText mProductPriceSpecial;
     private com.rey.material.widget.Spinner mRubro;
     private com.rey.material.widget.Spinner mTipoUnidad;
+    private com.rey.material.widget.Button mBotonModificarPrecio;
     private EditText mCantidadMinima;
     private EditText mCantidadMaxima;
     private EditText mCantidadDefault;
@@ -84,7 +90,11 @@ public class ProductDetailFragment extends FragmentBasic
     public ProgressView spinner;
     public ArrayAdapter<CharSequence> mAdapterTipoUnidad;
     public ArrayAdapter<CharSequence> mAdapterRubro;
-
+    public ArrayAdapter<CharSequence> mAdapterPerfilDePrecios;
+    private com.rey.material.widget.Spinner mPerfilDePrecios;
+    private RecyclerView mListadePrecios;
+    private Map<String, Precio> mPrecios = new HashMap<>();
+    private MyAdapterPrecios mAdapterPrecios;
 
 
 //    String mCurrentPhotoPath = null;
@@ -164,11 +174,59 @@ public class ProductDetailFragment extends FragmentBasic
                                             }
         );
 
+        mPerfilDePrecios = (Spinner) rootView.findViewById(R.id.productPerfildePrecios);
 
+        mListadePrecios =(RecyclerView)  rootView.findViewById(R.id.listaPrecios);
+        // use a linear layout manager
+        mListadePrecios.setHasFixedSize(true);
+        mListadePrecios.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        mAdapterPerfilDePrecios = ArrayAdapter.createFromResource(getContext(),
+                R.array.perfiPrecios_array, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        mAdapterPerfilDePrecios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        mPerfilDePrecios.setAdapter(mAdapterPerfilDePrecios);
+        mPerfilDePrecios.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(Spinner parent, View view, int position, long id) {
+                Log.i("Producto", "parent " + parent.toString());
+                Log.i("Producto", "view: " + view.toString());
+                Log.i("Producto", "position: " + position);
+                Log.i("Producto", "id: " + id);
+                Log.i("Producto", "parent.getSelectedItem(): " + parent.getSelectedItem());
+                parent.getSelectedItem();
+            }
+        });
         mProductPrice = (EditText) rootView.findViewById(R.id.product_price);
         mProductPrice.addTextChangedListener(new NumberTextWatcher(mProductPrice));
         mProductPriceSpecial = (EditText) rootView.findViewById(R.id.product_pricespecial);
         mProductPriceSpecial.addTextChangedListener(new NumberTextWatcher(mProductPriceSpecial));
+        mBotonModificarPrecio=(Button) rootView.findViewById(R.id.botonModificarPrecio);
+        mBotonModificarPrecio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mProductPrice==null||  mProductPriceSpecial==null){
+                    muestraMensajeEnDialogo("Ingrese  precios");
+                    return;
+                }
+
+                Double [] t = new Double[2];
+                CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
+                CurrencyToDouble priceEspecial = new CurrencyToDouble(mProductPriceSpecial.getText().toString());
+
+
+                t[0]=price.convert();
+                t[1]=priceEspecial.convert();
+                Log.i("Producto", "(String) mPerfilDePrecios.getSelectedItem(): " +(String) mPerfilDePrecios.getSelectedItem());
+
+                mPrecios.put((String) mPerfilDePrecios.getSelectedItem(), new Precio( t[0],t[1]));
+                mProductPrice.setText("");
+                mProductPriceSpecial.setText("");
+                mAdapterPrecios.swap(mPrecios);
+//                mAdapterPrecios.swap(mPre);
+            }
+        });
         mProductDescription = (EditText) rootView.findViewById(R.id.product_description);
         mProductDescription.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
@@ -270,6 +328,9 @@ public class ProductDetailFragment extends FragmentBasic
         spinner.setVisibility(View.GONE);
 
 
+        mAdapterPrecios = new MyAdapterPrecios(mPrecios);
+        mListadePrecios.setAdapter(mAdapterPrecios);
+
         if (mAction == PRODUCT_NEW) {
             if (appBarLayout != null) {
                 appBarLayout.setTitle(getResources().getString(R.string.pruductDetailBar_NEW_PRODUCT));
@@ -300,8 +361,9 @@ public class ProductDetailFragment extends FragmentBasic
                     mProductName.setText(producto.getNombreProducto());
                     NumberFormat format = NumberFormat.getCurrencyInstance();
 
-                    mProductPrice.setText(format.format(producto.getPrecio()));
-                    mProductPriceSpecial.setText(format.format(producto.getPrecioEspcecial()));
+                    mPrecios=producto.getPrecios();
+//                    mProductPrice.setText(format.format(producto.getPrecio()));
+//                    mProductPriceSpecial.setText(format.format(producto.getPrecioEspcecial()));
 
                     mProductDescription.setText(producto.getDescripcionProducto());
 
@@ -330,6 +392,8 @@ public class ProductDetailFragment extends FragmentBasic
                     mCantidadMinima.setText(String.valueOf(producto.getCantidadMinima()));
                     mCantidadMaxima.setText(String.valueOf(producto.getCantidadMaxima()));
                     mCantidadDefault.setText(String.valueOf(producto.getCantidadDefault()));
+
+                    mAdapterPrecios.swap(producto.getPrecios());
 
                     if (appBarLayout != null) {
                         {
@@ -683,7 +747,7 @@ public class ProductDetailFragment extends FragmentBasic
             Log.i("producto", "writeNewProducto: uid " + uid);
             Log.i("producto", "writeNewProducto: mProductKey " + mProductKey);
 
-            Producto producto = new Producto(uid, nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto,
+            Producto producto = new Producto(uid, nombreProducto, mPrecios, descripcionProducto, fotoProducto,
                     rubro,
                     tipoUnidad,
                     cantidadMinima,
@@ -724,6 +788,104 @@ public class ProductDetailFragment extends FragmentBasic
 
     }
 
+    public class MyAdapterPrecios extends RecyclerView.Adapter<MyAdapterPrecios.ViewHolder> {
 
+
+        private  ArrayList mData;
+
+
+        // Provide a reference to the views for each data item
+        // Complex data items may need more than one view per item, and
+        // you provide access to all the views for a data item in a view holder
+        public  class ViewHolder extends RecyclerView.ViewHolder {
+            // each data item is just a string in this case
+            public View mView;
+            public  TextView mProductoPerfil;
+            public   TextView mProductoprecio;
+            public   TextView mProductoPrecioEspecial;
+
+            public ViewHolder(View v) {
+                super(v);
+                mView = v;
+                mProductoPerfil= (TextView) v.findViewById(R.id.productoPrecioPerfil);
+                mProductoprecio= (TextView) v.findViewById(R.id.productoprecioPrecio);
+                mProductoPrecioEspecial= (TextView) v.findViewById(R.id.productoprecioPrecioEspecial);
+
+            }
+        }
+
+        // Provide a suitable constructor (depends on the kind of dataset)
+        public MyAdapterPrecios(Map<String, Precio> map) {
+            Log.i("preciosdapter", "MyAdapterPrecios map"+ map.toString());
+            TextView mProductoPerfil;
+            TextView mProductoprecio;
+            TextView mProductoPrecioEspecial;
+            mData = new ArrayList();
+            mData.addAll(map.entrySet());
+
+
+        }
+
+        // Create new views (invoked by the layout manager)
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Log.i("preciosdapter", "onCreateViewHolder "+ viewType);
+
+            // create a new view
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.product_precio_item, parent, false);
+            // set the view's size, margins, paddings and layout parameters
+
+
+            ViewHolder vh = new ViewHolder( v);
+
+            return vh;
+        }
+
+        // Replace the contents of a view (invoked by the layout manager)
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            // - get element from your dataset at this position
+            // - replace the contents of the view with that element
+            final Map.Entry<String, Precio> item = (Map.Entry) mData.get(position);
+            final NumberFormat format = NumberFormat.getCurrencyInstance();
+            final  Precio t=(Precio)item.getValue();
+            holder.mProductoPerfil.setText(item.getKey());
+            holder.mProductoprecio.setText(format.format(t.getPrecio()));
+            holder.mProductoPrecioEspecial.setText(format.format(t.getPrecioEspecial()));
+            Log.i("preciosdapter", "getItem(position)" +position+" -+ "+ item.getValue().toString());
+//            holder.mTextView.setText(item.getKey()+" : "+format.format(t[0])+" - "+format.format(t[1]));
+            holder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i("preciosdapter", "gonClick- + "+ item.getValue().toString());
+                    int spinnerPerfil = mAdapterPerfilDePrecios.getPosition(item.getKey());
+                    Log.i("preciosdapter", "item.getKey()- + "+ item.getKey());
+                    Log.i("preciosdapter", "spinnerPerfil- + "+ spinnerPerfil);
+                    mPerfilDePrecios.setSelection(spinnerPerfil);
+                    Log.i("preciosdapter", "t[0].toString()- + "+ t.getPrecio());
+                    Log.i("preciosdapter", "t[1].toString()- + "+ t.getPrecioEspecial());
+
+                    mProductPrice.setText(format.format(t.getPrecio()));
+                    mProductPriceSpecial.setText(format.format(t.getPrecioEspecial()));
+                }
+            });
+
+        }
+
+        // Return the size of your dataset (invoked by the layout manager)
+        @Override
+        public int getItemCount() {
+            Log.i("preciosdapter", "getItemCount()- + "+ mData.size());
+            return mData.size();
+        }
+
+        public void swap(Map<String, Precio> map){
+            Log.i("preciosdapter", "swap  map- + "+ map.toString());
+            mData.clear();
+            mData.addAll(map.entrySet());
+            notifyDataSetChanged();
+        }
+    }
 
 }

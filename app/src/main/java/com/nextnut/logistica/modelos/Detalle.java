@@ -49,15 +49,24 @@ public class Detalle {
     }
 
     public Detalle(Double cantidadOrden, Producto producto, Cliente cliente) {
+
         this.cantidadOrden = cantidadOrden;
         this.producto = producto;
         if (cliente!=null){
+            Log.i("getPrecioDetalle", "perfil: "+cliente.getPerfilDePrecios());
             if(cliente.getEspecial()){
-                this.precio=producto.getPrecioEspcecial();
+                Log.i("getPrecioDetalle", "precio e: "+producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios()));
+                this.precio=producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios());
+//                this.precio=producto.getPrecioEspcecial();
             }else {
-                this.precio=producto.getPrecio();
+                Log.i("getPrecioDetalle", "precio e: "+producto.getPrecioParaPerfil(cliente.getPerfilDePrecios()));
+
+                this.precio=producto.getPrecioParaPerfil(cliente.getPerfilDePrecios());
             }
             this.montoItemOrden=cantidadOrden*this.precio;
+        }
+        else{
+            Log.i("getPrecioDetalle", "perfil: cliente Nulo ");
         }
     }
 
@@ -160,22 +169,22 @@ public class Detalle {
 
     // Metodos para modificar en detalle en Como Items.
 
-    public void ingresaProductoEnOrden(Double cantidadOrden,  Producto producto, Boolean clienteEspecial) {
+    public void ingresaProductoEnOrden(Double cantidadOrden,  Producto producto, Cliente cliente) {
 //        this.cantidadOrden = cantidadOrden;
         setCantidadOrden(cantidadOrden);
         Log.d("detalle2", "antes IngresaProductoenOrden-this.precio) " + this.precio);
 //        this.producto = producto;
         setProducto(producto);
-        if (clienteEspecial) {
-            setPrecio( producto.getPrecioEspcecial());
+        if (cliente.getEspecial()) {
+            setPrecio( producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios()));
             Log.d("detalle2", "despues-especial IngresaProductoenOrden-this.precio) " + this.precio);
 //            this.montoItemOrden = cantidadOrden * producto.getPrecioEspcecial();
-            setMontoItemOrden(cantidadOrden * producto.getPrecioEspcecial());
+            setMontoItemOrden(cantidadOrden * producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios()));
         } else {
-            setPrecio(producto.getPrecio());
+            setPrecio(producto.getPrecioParaPerfil(cliente.getPerfilDePrecios()));
             Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
 //            this.montoItemOrden = cantidadOrden * producto.getPrecio();
-            setMontoItemOrden(cantidadOrden * producto.getPrecio());
+            setMontoItemOrden(cantidadOrden * producto.getPrecioParaPerfil(cliente.getPerfilDePrecios()));
 
         }
 
@@ -229,18 +238,18 @@ public class Detalle {
     }
 
 
-    public void ingresaProductoEnEntrega(Double cantidad,  Producto producto, Boolean clienteEspecial) {
+    public void ingresaProductoEnEntrega(Double cantidad,  Producto producto, Cliente cliente) {
         this.cantidadEntrega = cantidad;
         Log.d("detalle2", "antes IngresaProductoenOrden-this.precio) " + this.precio);
         this.producto = producto;
-        if (clienteEspecial) {
-            setPrecio( producto.getPrecioEspcecial());
+        if (cliente.getEspecial()   ) {
+            setPrecio( producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios()));
             Log.d("detalle2", "despues-especial IngresaProductoenOrden-this.precio) " + this.precio);
-            this.montoItemEntrega = cantidad * producto.getPrecioEspcecial();
+            this.montoItemEntrega = cantidad * producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios());
         } else {
-            setPrecio(producto.getPrecio());
+            setPrecio(producto.getPrecioParaPerfil(cliente.getPerfilDePrecios()));
             Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
-            this.montoItemEntrega = cantidad * producto.getPrecio();
+            this.montoItemEntrega = cantidad * producto.getPrecioParaPerfil(cliente.getPerfilDePrecios());
         }
 
     }

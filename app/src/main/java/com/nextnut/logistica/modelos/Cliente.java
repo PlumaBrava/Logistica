@@ -2,6 +2,7 @@ package com.nextnut.logistica.modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
@@ -26,6 +27,7 @@ public class Cliente implements Parcelable {
     private double iva;
     private String cuit;
     private Boolean especial;
+    private String perfilDePrecios;
     private long fechaModificacion;
     private Map<String, String> telefonos= new HashMap<>();
     private String uid;
@@ -44,7 +46,7 @@ public class Cliente implements Parcelable {
         // Default constructor required for calls to DataSnapshot.getValue(Cliente.class)
     }
 
-    public Cliente(String uid,String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, double iva, String cuit, Boolean especial,Map<String, String> telefonos) {
+    public Cliente(String uid,String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, double iva, String cuit, Boolean especial,Map<String, String> telefonos,String perfilDePrecios) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.IndiceNombreApellido=nombre+apellido;
@@ -57,6 +59,7 @@ public class Cliente implements Parcelable {
         this.especial = especial;
         this.uid = uid;
         this.telefonos =telefonos;
+        this.perfilDePrecios=perfilDePrecios;
     }
 
     // [START post_to_map]
@@ -75,6 +78,7 @@ public class Cliente implements Parcelable {
         result.put("fechaModificacion", ServerValue.TIMESTAMP);
         result.put("uid", uid);
         result.put("telefonos",telefonos);
+        result.put("perfilDePrecios",perfilDePrecios);
 
         return result;
     }
@@ -169,6 +173,14 @@ public class Cliente implements Parcelable {
         this.uid = uid;
     }
 
+    public String getPerfilDePrecios() {
+        return perfilDePrecios;
+    }
+
+    public void setPerfilDePrecios(String perfilDePrecios) {
+        this.perfilDePrecios = perfilDePrecios;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -194,6 +206,8 @@ public class Cliente implements Parcelable {
             parcel.writeString(entry.getKey());
             parcel.writeString(entry.getValue());
         }
+        parcel.writeString(perfilDePrecios);
+        Log.d("cliente", "writeString perfilDePrecios "+perfilDePrecios);
     }
 
     // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
@@ -227,6 +241,10 @@ public class Cliente implements Parcelable {
             String value = in.readString();
             telefonos.put(key,value);
         }
+        perfilDePrecios=in.readString();
+        Log.d("cliente", "readString perfilDePrecios "+perfilDePrecios);
+
+
     }
 }
 

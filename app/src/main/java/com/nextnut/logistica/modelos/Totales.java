@@ -127,17 +127,18 @@ public class Totales implements Parcelable {
         this.montoImpuesto = montoImpuesto;
     }
 
-    public void ingresaProductoEnOrden(Double cantidadOrden, Producto producto, Boolean clienteEspecial){
+    public void ingresaProductoEnOrden(Double cantidadOrden, Producto producto, Cliente cliente){
         cantidadDeProductosDiferentes=cantidadDeProductosDiferentes+1;
         Log.d("Totales", "this.montoEnOrdenes " +this.montoEnOrdenes);
         Log.d("Totales", "cantidadOrden " +cantidadOrden);
+        Log.d("Totales", "cliente.getPerfilDePrecios() " +cliente.getPerfilDePrecios());
 
-        Log.d("Totales", "producto.getPrecioEspcecial() " +producto.getPrecioEspcecial());
-        Log.d("Totales", "producto.getPrecio " +producto.getPrecio());
-        if (clienteEspecial) {
-            this.montoEnOrdenes = this.montoEnOrdenes+cantidadOrden * producto.getPrecioEspcecial();
+        Log.d("Totales", "producto.getPrecioEspcecial() " +producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios()));
+        Log.d("Totales", "producto.getPrecio " +producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios()));
+        if (cliente.getEspecial()) {
+            this.montoEnOrdenes = this.montoEnOrdenes+cantidadOrden * producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios());
         } else {
-            this.montoEnOrdenes = this.montoEnOrdenes+ cantidadOrden * producto.getPrecio();
+            this.montoEnOrdenes = this.montoEnOrdenes+ cantidadOrden * producto.getPrecioParaPerfil(cliente.getPerfilDePrecios());
         }
     }
 

@@ -677,8 +677,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                                     Log.d(LOG_TAG, "orden:abmDetalleDeOrden 1c-NOT null");
                                     Detalle detalle = new Detalle();
-                                    detalle.ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
-                                    mCabeceraOrden.getTotales().ingresaProductoEnOrden(cantidad, producto, mCliente.getEspecial());
+                                    detalle.ingresaProductoEnOrden(cantidad, producto, mCliente);
+                                    mCabeceraOrden.getTotales().ingresaProductoEnOrden(cantidad, producto, mCliente);
 
                                     Map<String, Object> detalleOrdenValues = detalle.toMap();
 /*1c*/
@@ -689,7 +689,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                                     Log.i("ClienteViewHolder", "saveCustomOrderProductproductoKey" + productKey);
                                     Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Nombre" + producto.getNombreProducto());
-                                    Log.i("ClienteViewHolder", "saveCustomOrderProductproducto Precio" + producto.getPrecio());
                                     Log.i("informe", "det producto" + detalle.getProducto().getNombreProducto());
                                     Log.i("informe", "det cantidad" + detalle.getCantidadOrden());
 /*5 */
@@ -1147,10 +1146,10 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     Log.i(LOG_TAG, "abmDetalleDeOrden ingresa un nuevo producto ");
                     //Actualizo cabecera de Orden 1B ( Ingresa producto en orden suma 1 a la cantidad de Items y ajusta el monto total
                     // Se ajusta Totales
-                    cabeceraOrden.ingresaProductoEnOrden(mCantidadDato, mDetalleDato.getProducto(), mCabeceraOrden.getCliente().getEspecial());
+                    cabeceraOrden.ingresaProductoEnOrden(mCantidadDato, mDetalleDato.getProducto(), mCabeceraOrden.getCliente());
 
                     //Actualizo productos por Orden 5. Es necesario bloquear este esquema? o se puede planchar directamente???
-                    prductosxOrden.getDetalle().ingresaProductoEnOrden(mCantidadDato, mDetalleDato.getProducto(), mCabeceraOrden.getCliente().getEspecial());
+                    prductosxOrden.getDetalle().ingresaProductoEnOrden(mCantidadDato, mDetalleDato.getProducto(), mCabeceraOrden.getCliente());
 
                     //Actualizo Detalle de Orden para 1C y 4
                     nuevoDetalleOrden.modificarCantidadProductoDeOrden(mCantidadDato);
@@ -1169,7 +1168,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                     //Actualizo productos por Orden 5. Es necesario bloquear este esquema? o se puede planchar directamente???
                     //Idem al anterior, se plantacha
-                    prductosxOrden.getDetalle().ingresaProductoEnOrden(mCantidadDato, mDetalleDato.getProducto(), mCabeceraOrden.getCliente().getEspecial());
+                    prductosxOrden.getDetalle().ingresaProductoEnOrden(mCantidadDato, mDetalleDato.getProducto(), mCabeceraOrden.getCliente());
 
                     //Actualizo Detalle de Orden para 1C y 4
                     nuevoDetalleOrden.modificarCantidadProductoDeOrden(mCantidadDato);

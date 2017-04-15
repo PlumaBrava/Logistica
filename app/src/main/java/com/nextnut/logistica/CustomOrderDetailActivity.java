@@ -59,8 +59,11 @@ public class CustomOrderDetailActivity extends ActivityBasic {
 
             Long nroPicking=getIntent().getLongExtra(EXTRA_NRO_PICKIG,0);
             Log.d(LOG_TAG, "orden:onComplete: getClienteKey " + cabeceraOrden.getClienteKey());
+            Log.d(LOG_TAG, "orden:onComplete: orden Estatado " + cabeceraOrden.getEstado());
             Log.d(LOG_TAG, "orden:onComplete: getCliente().getNombre() " + cabeceraOrden.getCliente().getNombre());
             Log.d(LOG_TAG, "orden:onComplete: cabeceraOrden.getTotales().getCantidadDeOrdenesClientes() " + cabeceraOrden.getTotales().getCantidadDeOrdenesClientes());
+            Log.d(LOG_TAG, "orden:onComplete: cabeceraOrden.getCliente().Perfildeprecios " + cabeceraOrden.getCliente().getPerfilDePrecios());
+            Log.d(LOG_TAG, "orden:onComplete: mCliente.Perfildeprecios " + mCliente.getPerfilDePrecios());
 
 
             arguments=putBundleFirebase();

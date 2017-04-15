@@ -20,7 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="com.nextnut.logistica.ProductDetailFragment">
+        tools:context="com.nextnut.logistica.ProductDetailFragment"
+        tools:ignore="ExtraText">
 
 
         <LinearLayout
@@ -40,63 +41,17 @@
                     android:id="@+id/product_name_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:contentDescription="@string/product_name_text"
+                    android:cursorVisible="true"
                     android:hint="@string/product_name_text"
                     android:inputType="text"
                     android:maxLines="1"
                     android:padding="8dp"
                     android:transitionName="@string/detail_icon_transition_name"
-                    android:contentDescription="@string/product_name_text"
-                    app:layout_gravity="start"
-                    android:cursorVisible="true" />
+                    app:layout_gravity="start" />
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
-
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/product_price"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/product_price_text"
-                android:inputType="number|numberDecimal"
-                android:maxLength="@integer/productoPriceMaxLength"
-                android:padding="8dp"
-                android:transitionName="@string/detail_icon_transition_price"
-                android:contentDescription="@string/enter_price_message"
-                app:layout_gravity="left"
-                android:cursorVisible="true" />
-
-        </android.support.design.widget.TextInputLayout>
-
-
-        <LinearLayout
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/product_pricespecial"
-                    android:hint="@string/product_priceSpecal_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/enter_priceSpecia_message"
-                    android:inputType="number|numberDecimal"
-                    android:maxLength="@integer/productoPriceMaxLength"
-                    android:padding="8dp"
-                    app:layout_gravity="left" />
-            </android.support.design.widget.TextInputLayout>
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -111,13 +66,13 @@
 
                 <EditText
                     android:id="@+id/product_description"
-                    android:hint="@string/product_description_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/product_description_hint_text"
+                    android:hint="@string/product_description_text"
+                    android:inputType="text"
                     android:paddingLeft="8dp"
                     android:paddingStart="8dp"
-                    android:inputType="text"
                     app:layout_gravity="left"
 
                     />
@@ -134,16 +89,16 @@
 
             <!--&lt;!&ndash;Product Photo&ndash;&gt;-->
             <!--<Button-->
-                <!--android:id="@+id/product_imagen_button"-->
-                <!--style="?android:attr/titleTextStyle"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="16dp"-->
-                <!--android:layout_marginStart="16dp"-->
-                <!--android:contentDescription="@string/product_photo_text"-->
-                <!--android:padding="16dp"-->
-                <!--android:text="@string/product_photo_text"-->
-                <!--android:textStyle="bold" />-->
+            <!--android:id="@+id/product_imagen_button"-->
+            <!--style="?android:attr/titleTextStyle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginLeft="16dp"-->
+            <!--android:layout_marginStart="16dp"-->
+            <!--android:contentDescription="@string/product_photo_text"-->
+            <!--android:padding="16dp"-->
+            <!--android:text="@string/product_photo_text"-->
+            <!--android:textStyle="bold" />-->
 
             <!--android:layout_gravity="left"-->
             <LinearLayout
@@ -162,46 +117,43 @@
                 <!--android:padding="16dp"-->
 
                 <com.rey.material.widget.ProgressView
+                    android:id="@+id/progressBarProducto"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:id="@+id/progressBarProducto"
                     app:pv_autostart="true"
                     app:pv_circular="true"
-                    app:pv_progressStyle="@style/Material.Drawable.CircularProgress"
-                    app:pv_progressMode="indeterminate"/>
+                    app:pv_progressMode="indeterminate"
+                    app:pv_progressStyle="@style/Material.Drawable.CircularProgress" />
             </LinearLayout>
         </LinearLayout>
 
         /////
 
         <com.rey.material.widget.Spinner
+            android:id="@+id/productRubro"
             style="@style/Material.Widget.Spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:rd_style="@style/Material.Drawable.Ripple.Wave"
-            android:id="@+id/productRubro"
             android:contentDescription="@string/productRubro"
             android:hint="@string/productRubro"
             android:inputType="text"
             android:padding="8dp"
-            />
+            app:rd_style="@style/Material.Drawable.Ripple.Wave" />
 
-            <com.rey.material.widget.Spinner
-                style="@style/Material.Widget.Spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:rd_style="@style/Material.Drawable.Ripple.Wave"
-                android:id="@+id/product_TipoUnidad"
-                android:contentDescription="@string/productTipoUnidad"
-                android:hint="@string/productTipoUnidad"
-                android:inputType="text"
-                android:padding="8dp"
-                />
-
-
+        <com.rey.material.widget.Spinner
+            android:id="@+id/product_TipoUnidad"
+            style="@style/Material.Widget.Spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/productTipoUnidad"
+            android:hint="@string/productTipoUnidad"
+            android:inputType="text"
+            android:padding="8dp"
+            app:rd_style="@style/Material.Drawable.Ripple.Wave" />
 
 
         /////
+
         <LinearLayout
 
             android:layout_width="match_parent"
@@ -220,8 +172,7 @@
                     android:contentDescription="@string/productMinCantidadUnitaria"
                     android:hint="@string/productMinCantidadUnitaria"
                     android:inputType="number"
-                    android:padding="8dp"
-                  />
+                    android:padding="8dp" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -238,8 +189,7 @@
                     android:contentDescription="@string/productDefaultCantidadUnitaria"
                     android:hint="@string/productDefaultCantidadUnitaria"
                     android:inputType="number"
-                    android:padding="8dp"
-                    />
+                    android:padding="8dp" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -256,13 +206,103 @@
                     android:contentDescription="@string/productMaxCantidadUnitaria"
                     android:hint="@string/productMaxCantidadUnitaria"
                     android:inputType="number"
-                    android:padding="8dp"
-                    />
+                    android:padding="8dp" />
 
             </android.support.design.widget.TextInputLayout>
 
 
         </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/edittext_bg"
+            android:orientation="horizontal">
+
+
+            <LinearLayout
+
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.rey.material.widget.Spinner
+                    android:id="@+id/productPerfildePrecios"
+                    style="@style/Material.Widget.Spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/custom_PerfilDePrecios_text"
+                    android:hint="@string/custom_PerfilDePrecios_text"
+                    android:inputType="text"
+                    android:padding="8dp"
+                    app:rd_style="@style/Material.Drawable.Ripple.Wave" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/product_price"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/enter_price_message"
+                        android:cursorVisible="true"
+                        android:hint="@string/product_price_text"
+                        android:inputType="number|numberDecimal"
+                        android:maxLength="@integer/productoPriceMaxLength"
+                        android:padding="8dp"
+                        android:transitionName="@string/detail_icon_transition_price"
+                        app:layout_gravity="left" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/product_pricespecial"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/enter_priceSpecia_message"
+                        android:hint="@string/product_priceSpecal_text"
+                        android:inputType="number|numberDecimal"
+                        android:maxLength="@integer/productoPriceMaxLength"
+                        android:padding="8dp"
+                        app:layout_gravity="left" />
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <com.rey.material.widget.Button
+                android:id="@+id/botonModificarPrecio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:text="@string/custom_BotonModificarPrecio"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_margin="16dp"-->
+            <!--android:orientation="horizontal">-->
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/listaPrecios"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp">
+
+            </android.support.v7.widget.RecyclerView>
+        <!--</LinearLayout>-->
 
     </LinearLayout>
 

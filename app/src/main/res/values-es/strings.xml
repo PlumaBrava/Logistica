@@ -143,6 +143,14 @@
         <item>Rubro 3</item>
     </string-array>
 
+
+
+    <string-array name="perfiPrecios_array">
+        <item>Perfil 1</item>
+        <item>Perfil 2</item>
+        <item>Perfil 3</item>
+    </string-array>
+
     <string name="productRubro" >Rubro</string>
     <string name="productTipoUnidad" >Unidad</string>
     <string name="productMinCantidadUnitaria" >Cantidad Minima: </string>
@@ -231,6 +239,8 @@
     <string name="custom_city_text">Ciudad:</string>
     <string name="custom_city_hint_text">Ciudad</string>
     <string name="custom_Special_text">Especial</string>
+    <string name="custom_PerfilDePrecios_text">Perfil de Precios</string>
+    <string name="custom_BotonModificarPrecio">Modificar</string>
     <!--<string name="custom_city_hint_text">City</string>-->
     <string name="custom_Cuit_text">Cuit:</string>
     <string name="custom_Cuit_hint_text">Cuit:</string>
@@ -421,9 +431,13 @@
     <string name="priceListItem">Precio</string>
     <string name="SpecialpriceListItem">Precio Especial</string>
     <string name="photoListItem">Imagen de Prodcuto</string>
-    <!--<string name="productTitleListItem">Product header</string>-->
-    <!--<string name="priceTitleListItem">Price header</string>-->
-    <!--<string name="specialPriceTitleListItem">Special Price header</string>-->
+
+
+    <!-- product_precio_item -->
+    <string name="product_precio_perfil">Perfil</string>
+    <string name="product_precio_precio">Precio</string>
+    <string name="product_precio_precio_especial">Precio Especial</string>
+
 
     <!-- picking_product_item -->
     <string name="Orders">Orden</string>

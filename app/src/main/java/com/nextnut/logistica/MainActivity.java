@@ -39,6 +39,7 @@ import com.nextnut.logistica.data.ProductsColumns;
 import com.nextnut.logistica.modelos.CabeceraOrden;
 import com.nextnut.logistica.modelos.Cliente;
 import com.nextnut.logistica.modelos.Detalle;
+import com.nextnut.logistica.modelos.Precio;
 import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.modelos.ReporteClienteProducto;
 import com.nextnut.logistica.modelos.Totales;
@@ -951,7 +952,8 @@ int i=0;
 //                            Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
                             data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
                             data.getInt(data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
-                            migrarTelefonosDelContactoAsociado(getMainActivity() ,data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM)))
+                            migrarTelefonosDelContactoAsociado(getMainActivity() ,data.getString(data.getColumnIndex(CustomColumns.REFERENCE_CUSTOM))),
+                            "generico"
                     );
                 } while (data.moveToNext());
                 migracionProductos();
@@ -979,7 +981,8 @@ int i=0;
                                  Double iva,
                                  String cuit,
                                  Boolean especial,
-                                 Map<String, String> telefonos
+                                 Map<String, String> telefonos,
+                                 String perfilDePrecios
     ) {
         if (true) {//validar formulario
             Log.i("migracionCliente", "writeNewClient: nombre " + nombre);
@@ -1002,7 +1005,7 @@ int i=0;
                     ciudad,
                     iva,
                     cuit,
-                    especial, telefonos);
+                    especial, telefonos,perfilDePrecios);
 
 
 
@@ -1033,12 +1036,15 @@ int i=0;
 
 
                 do {
-
+                    Map<String, Precio> precios = null;
+                    Double[] t = new Double[2];
+                    t[0]=data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO));
+                    t[1]=data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_SPECIAL_PRODUCTO));
+                    precios.put("generico",new Precio (t[0],t[1]));
                     writeNewProducto(
                             data.getString(data.getColumnIndex(ProductsColumns._ID_PRODUCTO)),
                             data.getString(data.getColumnIndex(ProductsColumns.NOMBRE_PRODUCTO)),
-                            data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_PRODUCTO)),
-                            data.getDouble(data.getColumnIndex(ProductsColumns.PRECIO_SPECIAL_PRODUCTO)),
+                            precios,
                             data.getString(data.getColumnIndex(ProductsColumns.DESCRIPCION_PRODUCTO)),
                             "mCurrentPhotoPath",
                             mUserKey,
@@ -1064,7 +1070,7 @@ int i=0;
 
 
     // [START basic_write]
-    private void writeNewProducto(String Id,String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto, String uid,
+    private void writeNewProducto(String Id, String nombreProducto, Map<String, Precio> precios, String descripcionProducto, String fotoProducto, String uid,
                                   String rubro,
                                   String tipoUnidad,
                                   int cantidadMinima,
@@ -1074,14 +1080,11 @@ int i=0;
     ) {
         if (true) {//validar formulario
             Log.i("migracionProductos", "writeNewProducto: nombre " + nombreProducto);
-            Log.i("migracionProductos", "writeNewProducto: precio " + precio);
-            Log.i("migracionProductos", "writeNewProducto: precio " + precio);
-            Log.i("migracionProductos", "writeNewProducto: precioEspcecial " + precioEspcecial);
             Log.i("migracionProductos", "writeNewProducto: fotoProducto " + fotoProducto);
             Log.i("migracionProductos", "writeNewProducto: uid " + uid);
             Log.i("migracionProductos", "writeNewProducto: mProductKey " + mProductKey);
 
-            Producto producto = new Producto(uid, nombreProducto, precio, precioEspcecial, descripcionProducto, fotoProducto,
+            Producto producto = new Producto(uid, nombreProducto, precios , descripcionProducto, fotoProducto,
                     rubro,
                     tipoUnidad,
                     cantidadMinima,

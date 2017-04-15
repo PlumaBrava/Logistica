@@ -139,8 +139,8 @@ public class CabeceraOrden  implements Parcelable {
         this.usuarioPicking = usuarioPicking;
     }
 
-    public void ingresaProductoEnOrden(Double cantidadOrden,  Producto producto, Boolean clienteEspecial) {
-        this.totales.ingresaProductoEnOrden(cantidadOrden,  producto, clienteEspecial);
+    public void ingresaProductoEnOrden(Double cantidadOrden,  Producto producto, Cliente cliente) {
+        this.totales.ingresaProductoEnOrden(cantidadOrden,  producto, cliente);
 
     }
 
@@ -223,7 +223,8 @@ public class CabeceraOrden  implements Parcelable {
             parcel.writeString(entry.getKey());
             parcel.writeString(entry.getValue());
         }
-
+        parcel.writeString(cliente.getPerfilDePrecios());
+        Log.d("cliente", "writeString perfilDePrecios "+cliente.getPerfilDePrecios());
 
         Log.d("orden write cliente", "orden:onComplete: getCliente().getNombre() " + cliente.getNombre());
         parcel.writeLong(fechaDeCreacion);
@@ -289,6 +290,8 @@ public class CabeceraOrden  implements Parcelable {
             a.put(key,value);
         }
         c.setTelefonos(a);
+        c.setPerfilDePrecios(in.readString());
+        Log.d("cliente", "readString perfilDePrecios "+c.getPerfilDePrecios());
 
         cliente=c;
         Log.d("orden read", "orden:onComplete: getNombre() " + cliente.getNombre());

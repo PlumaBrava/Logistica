@@ -2,6 +2,7 @@ package com.nextnut.logistica.modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
@@ -18,9 +19,13 @@ import java.util.Map;
 public class Producto implements Parcelable {
 
     private String nombreProducto;
-    private Double precio;
-    private Double precioEspcecial;
+
+    private Map<String, Precio> precios = new HashMap<>();
+    //    private Double precio;
+//    private Double precioEspcecial;
     private String descripcionProducto;
+
+
     private String fotoProducto;
     private long fechaModificacion;
 
@@ -37,7 +42,7 @@ public class Producto implements Parcelable {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Producto(String uid, String nombreProducto, Double precio, Double precioEspcecial, String descripcionProducto, String fotoProducto,
+    public Producto(String uid, String nombreProducto, Map<String, Precio> precios, String descripcionProducto, String fotoProducto,
                     String rubro,
                     String tipoUnidad,
                     int cantidadMinima,
@@ -45,8 +50,8 @@ public class Producto implements Parcelable {
                     int cantidadDefault
     ) {
         this.nombreProducto = nombreProducto;
-        this.precio = precio;
-        this.precioEspcecial = precioEspcecial;
+        this.precios = precios;
+
         this.descripcionProducto = descripcionProducto;
         this.fotoProducto = fotoProducto;
 
@@ -66,8 +71,8 @@ public class Producto implements Parcelable {
         HashMap<String, Object> result = new HashMap<>();
 
         result.put("nombreProducto", nombreProducto);
-        result.put("precio", precio);
-        result.put("precioEspcecial", precioEspcecial);
+        result.put("precios", precios);
+//        result.put("precioEspcecial", precioEspcecial);
         result.put("descripcionProducto", descripcionProducto);
         result.put("fotoProducto", fotoProducto);
 
@@ -83,6 +88,39 @@ public class Producto implements Parcelable {
     }
     // [END post_to_map]
 
+    // [START post_to_map]
+    @Exclude
+    public Map<String, Object> preciosToMap(Map<String, Double[]> precios) {
+        HashMap<String, Object> result = new HashMap<>();
+
+        for (Map.Entry<String, Double[]> item : precios.entrySet()) {
+//            result.put(item.getKey(), item.getValue());
+
+            Double[] t = item.getValue();
+            result.put(item.getKey(), itemToMap(t));
+
+
+        }
+        return result;
+    }
+
+    @Exclude
+    public Map<String, Object> itemToMap(Double[] precio) {
+
+        HashMap<String, Object> result1 = new HashMap<>();
+
+        result1.put("precio", precio[0]);
+        result1.put("precioEspecial", precio[1]);
+        return result1;
+    }
+
+    public Map<String, Precio> getPrecios() {
+        return precios;
+    }
+
+    public void setPrecios(Map<String, Precio> precios) {
+        this.precios = precios;
+    }
 
     public int getCantidadDefault() {
         return cantidadDefault;
@@ -132,21 +170,21 @@ public class Producto implements Parcelable {
         this.nombreProducto = nombreProducto;
     }
 
-    public Double getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(Double precio) {
-        this.precio = precio;
-    }
-
-    public Double getPrecioEspcecial() {
-        return precioEspcecial;
-    }
-
-    public void setPrecioEspcecial(Double precioEspcecial) {
-        this.precioEspcecial = precioEspcecial;
-    }
+//    public Double getPrecio() {
+//        return precio;
+//    }
+//
+//    public void setPrecio(Double precio) {
+//        this.precio = precio;
+//    }
+//
+//    public Double getPrecioEspcecial() {
+//        return precioEspcecial;
+//    }
+//
+//    public void setPrecioEspcecial(Double precioEspcecial) {
+//        this.precioEspcecial = precioEspcecial;
+//    }
 
     public String getDescripcionProducto() {
         return descripcionProducto;
@@ -188,10 +226,20 @@ public class Producto implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(nombreProducto);
-        parcel.writeDouble(precio);
-        parcel.writeDouble(precioEspcecial);
         parcel.writeString(descripcionProducto);
         parcel.writeString(fotoProducto);
+        parcel.writeLong(precios.size());
+
+
+        for (Map.Entry<String, Precio> item : precios.entrySet()) {
+
+            parcel.writeString(item.getKey());
+            Precio t = item.getValue();
+            parcel.writeDouble(t.getPrecio());
+            parcel.writeDouble(t.getPrecioEspecial());
+
+        }
+        ;
 
 
         parcel.writeString(rubro);
@@ -219,21 +267,63 @@ public class Producto implements Parcelable {
     // example constructor that takes a Parcel and gives you an object populated with it's values
     private Producto(Parcel in) {
         nombreProducto = in.readString();
-        precio = in.readDouble();
-        precioEspcecial = in.readDouble();
         descripcionProducto = in.readString();
         fotoProducto = in.readString();
 
-        rubro=in.readString();
-        tipoUnidad=in.readString();
-        cantidadMinima= in.readInt();
-        cantidadMaxima= in.readInt();
-        cantidadDefault= in.readInt();
+
+        long tamano = in.readLong();
+
+        for (int a = 0; a < tamano; a++) {
+            String key = in.readString();
+            Double[] t = new Double[2];
+            t[0] = in.readDouble();
+            t[1] = in.readDouble();
+            precios.put(key, new Precio(t[0], t[1]));
+        }
+
+        rubro = in.readString();
+        tipoUnidad = in.readString();
+        cantidadMinima = in.readInt();
+        cantidadMaxima = in.readInt();
+        cantidadDefault = in.readInt();
 
 
         fechaModificacion = in.readLong();
         uid = in.readString();
 
+    }
+
+    public Double getPrecioParaPerfil(String perfil) {
+        Log.i("getPrecioParaPerfil", "perfil: "+perfil);
+        for (Map.Entry<String, Precio> item : precios.entrySet()) {
+            Log.i("getPrecioParaPerfil", "item.getKey(): "+item.getKey());
+
+            if (item.getKey().equals(perfil)) {
+                Precio t = item.getValue();
+                Log.i("getPrecioParaPerfil", "iguales:t.getPrecio() "+t.getPrecio());
+
+                return t.getPrecio();
+            }
+
+
+        }
+        return 0.0;
+    }
+
+    public Double getPrecioEspecialPerfil(String perfil) {
+        Log.i("getPrecioParaPerfilEs", "perfil: "+perfil);
+        for (Map.Entry<String, Precio> item : precios.entrySet()) {
+            Log.i("getPrecioParaPerfilEs", "item.getKey(): "+item.getKey());
+            if (item.getKey().equals(perfil)) {
+                Precio t = item.getValue();
+                Log.i("getPrecioParaPerfilEs", "iguales:t.getPrecio() "+t.getPrecio());
+
+                return t.getPrecioEspecial();
+            }
+
+
+        }
+        return 0.0;
     }
 }
 // [END blog_user_class]

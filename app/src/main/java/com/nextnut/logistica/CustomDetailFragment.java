@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,6 +39,7 @@ import com.nextnut.logistica.util.CustomTextWatcher;
 import com.nextnut.logistica.util.MakeCall;
 import com.rey.material.widget.CheckBox;
 import com.rey.material.widget.ProgressView;
+import com.rey.material.widget.Spinner;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -81,6 +83,8 @@ public class CustomDetailFragment extends FragmentBasic  {
     private EditText mTipoTelefono;
     private EditText mTelefono;
     private com.rey.material.widget.Button mBotonAgregarTelefono;
+    private com.rey.material.widget.Spinner mPerfilDePrecios;
+    public ArrayAdapter<CharSequence> mAdapterPerfilDePrecios;
     private RecyclerView mListadeTelefonos;
     private Map<String, String> mTelefonos = new HashMap<>();
     private MyAdapter mAdapterTelefonos;
@@ -122,6 +126,31 @@ public class CustomDetailFragment extends FragmentBasic  {
         View rootView = inflater.inflate(R.layout.custom_detail, container, false);
         mCustomName = (EditText) rootView.findViewById(R.id.custom_name_text);
         mLastName = (EditText) rootView.findViewById(R.id.product_Lastname);
+        mPerfilDePrecios = (Spinner) rootView.findViewById(R.id.customPerfildePrecios);
+
+
+
+        mAdapterPerfilDePrecios = ArrayAdapter.createFromResource(getContext(),
+                R.array.perfiPrecios_array, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        mAdapterPerfilDePrecios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        mPerfilDePrecios.setAdapter(mAdapterPerfilDePrecios);
+        mPerfilDePrecios.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(Spinner parent, View view, int position, long id) {
+                Log.i("Custom", "parent: " + parent.toString());
+                Log.i("Custom", "view: " + view.toString());
+                Log.i("Custom", "position: " + position);
+                Log.i("Custom", "id: " + id);
+                Log.i("Custom", "parent.getSelectedItem(): " + parent.getSelectedItem());
+                parent.getSelectedItem();
+            }
+        });
+
+
+
+
         buttonContactoAgendado = (Button) rootView.findViewById(R.id.contactoAgendado_button);
         buttonContactoAgendado.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -433,6 +462,10 @@ public class CustomDetailFragment extends FragmentBasic  {
 //                        mAdapterTelefonos.notifyDataSetChanged();
 //                        mAdapterTelefonos.notifyAll();
 
+                        int spinnerPositionPerfil = mAdapterPerfilDePrecios.getPosition(cliente.getPerfilDePrecios());
+
+                        mPerfilDePrecios.setSelection(spinnerPositionPerfil);
+
                         if (mIdContact != null){
                             buttonContactoAgendado.setBackgroundColor(Color.GREEN);
                             buttonContactoAgendado.setText(getUserName(getContext() ,mIdContact));
@@ -550,7 +583,8 @@ public class CustomDetailFragment extends FragmentBasic  {
                 Double.parseDouble(mIva.getText().toString()),
                 mCuit.getText().toString(),
                 mSpecial.isChecked(),
-                mTelefonos);
+                mTelefonos,
+                mPerfilDePrecios.getSelectedItem().toString());
     }
 
 
@@ -565,7 +599,8 @@ public class CustomDetailFragment extends FragmentBasic  {
              String ciudad,
              Double iva,
             String cuit,
-            Boolean especial,Map<String, String> telefonos
+            Boolean especial,Map<String, String> telefonos,
+                                 String perfilDePrecios
                                  ){
         if (true) {//validar formulario
             Log.i("producto", "writeNewClient: nombre " + nombre);
@@ -588,7 +623,7 @@ public class CustomDetailFragment extends FragmentBasic  {
             ciudad,
             iva,
             cuit,
-            especial,telefonos);
+            especial,telefonos,perfilDePrecios);
 
             if (mClienteKey == null) {
                 mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();

@@ -65,7 +65,7 @@ public class Migracion extends ActivityBasic implements LoaderManager.LoaderCall
                                 Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
                                 data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
                                 data.getInt (data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
-                                        null
+                                        null,"generico"
                         );
                     }
 
@@ -130,7 +130,7 @@ public class Migracion extends ActivityBasic implements LoaderManager.LoaderCall
                             Double.parseDouble(data.getString(data.getColumnIndex(CustomColumns.IVA_CUSTOM))),
                             data.getString(data.getColumnIndex(CustomColumns.CUIT_CUSTOM)),
                             data.getInt (data.getColumnIndex(CustomColumns.SPECIAL_CUSTOM)) > 0,
-                            null
+                            null,"genericos"
                     );
                 } while (data.moveToNext());
 
@@ -156,7 +156,8 @@ public class Migracion extends ActivityBasic implements LoaderManager.LoaderCall
                                  Double iva,
                                  String cuit,
                                  Boolean especial,
-                                 Map<String, String> telefonos
+                                 Map<String, String> telefonos,
+                                 String perfildePrecios
     ){
         if (true) {//validar formulario
             Log.i("migracionCliente", "writeNewClient: nombre " + nombre);
@@ -179,7 +180,7 @@ public class Migracion extends ActivityBasic implements LoaderManager.LoaderCall
                     ciudad,
                     iva,
                     cuit,
-                    especial,telefonos);
+                    especial,telefonos,perfildePrecios);
 
             if (mClienteKey == null) {
                 mClienteKey = mDatabase.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).push().getKey();

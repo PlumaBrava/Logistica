@@ -356,14 +356,13 @@ public class DeliveryListFragment extends FragmentBasic
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     datosCabeceraPickingSeleccionada = dataSnapshot.getValue(CabeceraPicking.class);
-//                    datosCabeceraPickingSeleccionada.setComentario(comentarioPickingAlmacenado);
 
 
                     mTilePickingComent.setText(datosCabeceraPickingSeleccionada.getComentario());
                     mTilePickingOrderNumber.setText(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()));
                     mTilePickingComent.setVisibility(View.VISIBLE);
-                    mMontoRecaudado.setText(datosCabeceraPickingSeleccionada.getMontoRecaudado().toString());
-                    SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+//                    mMontoRecaudado.setText(datosCabeceraPickingSeleccionada.getMontoRecaudado().toString());
+                    SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy");
 
                     mCreationDate.setText(sfd.format(new Date(datosCabeceraPickingSeleccionada.getFechaDeCreacion())));
 
@@ -436,7 +435,10 @@ public class DeliveryListFragment extends FragmentBasic
                         {
                             @Override
                             public void onClick(View starView) {
+                                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Numero de orden- " + model.getNumeroDeOrden());
+                                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Estado de orden- " + model.getEstado());
                                 Log.d(LOG_TAG, "muestraOrdenesEnPicking:onClick model: " + model.getCliente().getNombre());
+                                Log.d(LOG_TAG, "muestraOrdenesEnPicking:onClick model: " + model.getEstado());
                                 Log.d(LOG_TAG, "muestraOrdenesEnPicking:onClick");
                                 Intent intent = new Intent(getContext(), CustomOrderDetailActivity.class);
                                 mCliente = model.getCliente();
@@ -452,16 +454,18 @@ public class DeliveryListFragment extends FragmentBasic
             }
 
             @Override
-            protected void onItemDismissHolder(CabeceraOrden model, int position) {
-                Log.i(LOG_TAG, "muestraOrdenesEnPicking Modelo: Numero de orden- " + model.getNumeroDeOrden());
+            protected void onItemDismissHolder(final CabeceraOrden model,final int position) {
+                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Numero de orden- " + model.getNumeroDeOrden());
+                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Estado de orden- " + model.getEstado());
 
             }
 
             @Override
-            protected void onItemAcceptedHolder(CabeceraOrden model, int position) {
+            protected void onItemAcceptedHolder(final CabeceraOrden model,final int position) {
 
 
-                Log.i(LOG_TAG, "muestraOrdenesEndelivery Modelo: Numero de orden- " + model.getNumeroDeOrden());
+                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Numero de orden- " + model.getNumeroDeOrden());
+                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Estado de orden- " + model.getEstado());
                 pasarOrdenAEntregadaParaCompensar(model);
 
 
@@ -1631,14 +1635,12 @@ public void compensarCuentaOffine(String clienteKey){
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     datosCabeceraPickingSeleccionada = dataSnapshot.getValue(CabeceraPicking.class);
-//                    datosCabeceraPickingSeleccionada.setComentario(comentarioPickingAlmacenado);
-
 
                     mTilePickingComent.setText(datosCabeceraPickingSeleccionada.getComentario());
                     mTilePickingOrderNumber.setText(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()));
                     mTilePickingComent.setVisibility(View.VISIBLE);
                     mMontoRecaudado.setText(datosCabeceraPickingSeleccionada.getMontoRecaudado().toString());
-                    SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                    SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy");
 
                     mCreationDate.setText(sfd.format(new Date(datosCabeceraPickingSeleccionada.getFechaDeCreacion())));
 

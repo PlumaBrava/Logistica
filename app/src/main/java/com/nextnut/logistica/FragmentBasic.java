@@ -1984,8 +1984,9 @@ public abstract class FragmentBasic extends Fragment {
     @Override
     public void onDestroy() {
         if(hayTareaEnProceso()){
-            liberarRecusosTomados();
-            return;
+            muestraMensajeEnDialogo("Hay tareas al cambiar...Aguarde");
+//            liberarRecusosTomados();
+//            return;
         }
 
         super.onDestroy();
