@@ -39,13 +39,13 @@ public class ProductViewHolder extends RecyclerView.ViewHolder {
 
     public void bindToPost(Producto producto, View.OnClickListener starClickListener) {
         Log.i("ProductView", "bindToPost-nombre: " + producto.getNombreProducto());
-//        Log.i("ProductView", "bindToPost-precio: " + producto.getPrecio());
+//        Log.i("ProductView", "bindToPost-precio: " + producto.getPerfilDePrecio());
 //        Log.i("ProductView", "bindToPost-precioEspecial: " + producto.getPrecioEspcecial());
         Log.i("ProductView", "bindToPost-fotoProducto: " + producto.getFotoProducto());
         Log.i("ProductView", "bindToPost-descripcion: " + producto.getDescripcionProducto());
         nombreProducto.setText(producto.getNombreProducto());
         NumberFormat format = NumberFormat.getCurrencyInstance();
-//        precio.setText(format.format(producto.getPrecio()));
+//        precio.setText(format.format(producto.getPerfilDePrecio()));
 //        precioEspecial.setText(format.format(producto.getPrecioEspcecial()));
         descripcion.setText(producto.getDescripcionProducto());
 

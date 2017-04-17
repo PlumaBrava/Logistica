@@ -163,6 +163,11 @@ public class Constantes {
     public static String NODO_STOCK_MOVIMIENTOS ="/" + ESQUEMA_STOCK_MOVIMIENTOS+ "/";
 
 
+    // Listado de Perfil De Precios
+    public static String ESQUEMA_PERFIL_DE_PRECIOS = "perfil_precios";
+    public static String NODO_PERFIL_DE_PRECIOS = "/" + ESQUEMA_PERFIL_DE_PRECIOS + "/";
+
+
     // Constantes para pasar datos entre actividades.
     public static  final String EXTRA_FIREBASE_URL ="FIREBASE_URL";
     public static  final String EXTRA_USER_KEY ="user_key";

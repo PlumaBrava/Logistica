@@ -58,6 +58,7 @@ import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_CABECERA;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_DETALLE;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES_TOTAL_INICIAL;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PAGOS;
+import static com.nextnut.logistica.util.Constantes.ESQUEMA_PERFIL_DE_PRECIOS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PICKING;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PICKING_TOTAL;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_PRODUCTOS_EN_ORDENES_INICIAL;
@@ -2281,7 +2282,10 @@ public abstract class FragmentBasic extends Fragment {
     public String nodoStockProuctoEnAlmacen(String AlmacenKey,String productKey) {
         return NODO_STOCK + mEmpresaKey + "/" + AlmacenKey+ "/" + productKey;
     }
-
+    // Perfiles de Precios
+    public DatabaseReference refPerfilDePrecios() {
+        return mDatabase.child(ESQUEMA_PERFIL_DE_PRECIOS).child(mEmpresaKey);
+    }
 
 }
 

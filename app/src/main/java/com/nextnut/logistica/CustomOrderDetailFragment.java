@@ -765,15 +765,18 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                                     mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
                                                     mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                                                 }else{
-                                                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
-                                                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                                                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
+                                                            +" iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
+                                                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                                                    );
+                                                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
+                                                            +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
+                                                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                                                    );
                                                 }
 
 
-//                                                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-//                                                mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                                                 mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
-//                                            mKeyList.add(mproductKeyDato);
                                                 Log.i(LOG_TAG, "pasarOrdenAPickingl - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
 
                                             }
@@ -841,12 +844,18 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
             mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
         }else{
-            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
-            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+
+            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
+                    +" iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
+                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+            );
+            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
+                    +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
+                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+            );
+
         }
 
-//        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-//        mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
     }
 
 
@@ -1268,8 +1277,15 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                             mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
                             mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                         }else{
-                            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
-                            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
+                                    +" iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
+                                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                            );
+
+                            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
+                                    +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
+                                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                            );
                         }
 
                         liberarArrayTaskCasoExitoso();
@@ -1412,12 +1428,17 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
             mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
         }else{
-            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
-            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+            mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
+                    +" iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
+                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+            );
+            mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
+                    +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
+                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+            );
+
         }
 
-//        mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-//        mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
         Log.i(LOG_TAG, "abmDetalleDeEntrega UpDate ");
         Log.i(LOG_TAG, "abmDetalleDeEntrega mCabeceraOrden.getEstado() "+mCabeceraOrden.getEstado());
         mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
@@ -1532,12 +1553,17 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
                     mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                 }else{
-                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
-                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
+                            +" Iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
+                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                    );
+                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
+                            +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
+                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                    );
+
                 }
 
-//                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-//                mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                 mDetalleAdapter.notifyDataSetChanged();
             }
 
@@ -1621,13 +1647,15 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
                     mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                 }else{
-                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
-                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())+" - "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100))));
+                    mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
+                            +" Iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
+                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                    );
+                    mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
+                            +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
+                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                    );
                 }
-//
-//
-//                mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
-//                mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
                 mDetalleAdapter.notifyDataSetChanged();
             }
         });

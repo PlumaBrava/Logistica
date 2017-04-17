@@ -278,8 +278,17 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".SettingsActivity"
+        android:name=".SettingsActivity"
+        android:label="@string/title_activity_settings"
+        android:parentActivityName=".MainActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.nextnut.logistica.MainActivity" />
+    </activity>
+        <activity
+            android:name=".SettingsLogisticaActivity"
             android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme.NoActionBar">
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

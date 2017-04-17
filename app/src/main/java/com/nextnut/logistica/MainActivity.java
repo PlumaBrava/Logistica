@@ -546,13 +546,15 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         }
 
         if (id == R.id.action_migrarClientes) {
-            migracionClientes();
+            Log.i("ExtraccionTabla", "menu");
+            ExtraccionTabla();
 
             return true;
         }
 
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
+            Intent intent = new Intent(this, SettingsLogisticaActivity.class);
+            putExtraFirebase(intent);
             startActivity(intent);
 
             return true;
@@ -917,6 +919,79 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         }
 
     }
+
+
+    public void ExtraccionTabla() {
+        Log.i("ExtraccionTabla", "inicio");
+        try {
+            Cursor data = getContentResolver().query(LogisticaProvider.Products.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+            Log.i("migracionCliente", "data.getCount()"+data.getCount());
+            int i=0;
+            if (data != null && data.getCount() > 0) {
+                data.moveToFirst();
+                Log.i("migracionCliente", "cursor >0");
+                String msg="";
+
+                do {
+                    Log.i("migracionCliente,", ","+
+
+                    data.getInt(0)+" , "+
+                            data.getString(1)+" , "+
+                            data.getString(2)+" , "+
+                            data.getDouble(3)+" , "+
+                            data.getDouble(4)+" , "+
+                    data.getString(5)+" , "+
+                    data.getInt(6)+" , "+
+                    "\n" );
+
+//Custom Orders
+//                    data.getInt(0)+" , "+
+//                            data.getString(1)+" , "+
+//                            data.getInt(2)+" , "+
+//                            data.getInt(3)+" , "+
+//                            data.getString(4)+" , "+
+//                            data.getString(5)+" , "+
+//                            data.getDouble(6)+" , "+
+//                            data.getDouble(7)+" , "+
+//                            "\n" );
+
+
+//                    Detalles de Ordenes
+//                    data.getInt(0)+" , "+
+//                            data.getInt(1)+" , "+
+//                            data.getInt(2)+" , "+
+//                            data.getString(3)+" , "+
+//                            data.getInt(4)+" , "+
+//                            data.getInt(5)+" , "+
+//                            data.getDouble(6)+" , "+
+//                            data.getInt(7)+" , "+
+//                            "\n" );
+
+
+
+                    i++;
+                } while (data.moveToNext());
+
+                Log.i("migracionCliente", "reporte: " +msg);
+
+
+            } else {
+                Log.i("migracionCliente", "cursor <=0");
+
+            }
+
+        } catch (Exception e) {
+            Log.i("migracionCliente", "Exception e"+e.toString());
+        }
+    }
+
+
+
 
     public void migracionClientes() {
         Log.i("migracionCliente", "inicio");

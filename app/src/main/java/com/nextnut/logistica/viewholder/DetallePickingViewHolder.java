@@ -57,10 +57,10 @@ public class DetallePickingViewHolder extends RecyclerView.ViewHolder  implement
 
         mTextViewNombre.setText(detalle.getProducto().getNombreProducto());
 //        NumberFormat format = NumberFormat.getCurrencyInstance();
-//        mTextViewPrecio.setText(format.format(detalle.getPrecio()));
+//        mTextViewPrecio.setText(format.format(detalle.getPerfilDePrecio()));
         mTextcantidadEnOrden.setText(String.valueOf(detalle.getCantidadOrden()));
         mTextcantidadEnPicking.setText(String.valueOf(detalle.getCantidadPicking()));
-        Log.d("detallePicking", "antes saveDetalle-detalle.getPrecio()) " + detalle.getPrecio());
+        Log.d("detallePicking", "antes saveDetalle-detalle.getPerfilDePrecio()) " + detalle.getPrecio());
         Log.d("detallePicking", "Cantidad Orden " + detalle.getCantidadOrden());
         Log.d("detallePicking", "Cantidad Picking " + detalle.getCantidadPicking());
 

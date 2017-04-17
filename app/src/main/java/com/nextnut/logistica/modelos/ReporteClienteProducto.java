@@ -79,7 +79,7 @@ public class ReporteClienteProducto {
 //        Detalle d= (Detalle) result.get("detalle");
 //        Log.i("informe", "Producto x Orden map - D producto " + d.getProducto().getNombreProducto());
 //        Log.i("informe", "Producto x Orden map - D cantidad " + d.getCantidadUnidadesEnStock());
-//        Log.i("informe", "Producto x Orden map - D precio " + d.getPrecio());
+//        Log.i("informe", "Producto x Orden map - D precio " + d.getPerfilDePrecio());
 
         return result;
     }

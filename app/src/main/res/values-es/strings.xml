@@ -87,6 +87,10 @@
     <string name="title_stock">Stock</string>
 
 
+    <!--Section Process Titles-->
+    <string name="perfilDePrecios_txt">Perfil de Precios</string>
+    <string name="perfilDePrecios_Boton">Modificar</string>
+
     <!--Products List Activity List-->
     <!--<string name="empty_product_list">No Products to Show</string>-->
     <string name="empty_product_list">Sin Productos para mostrar</string>
@@ -121,7 +125,7 @@
     <string name="error_CantidadMaxima">Debe ser menora a : %d </string>
 
     <string name="product_priceSpecal_text">Precio Especial:</string>
-    <string name="enter_priceSpecia_message">Ingrese precio especial</string>
+    <string name="enter_priceSpecia_message">Ingrese perfilDePrecio especial</string>
     <string name="product_photo_text">Imagen</string>
     <string name="product_description_text">Descripcion:</string>
 
@@ -183,7 +187,8 @@
     <string name="theproductdesccantbenull" translatable="true">La descripcion No puede ser nula</string>
     <string name="theproductdescToLong" translatable="true">Descripcion muy larga</string>
 
-    <string name="priceError" translatable="true">El precio debe ser > 0 </string>
+    <string name="priceError" translatable="true">El perfilDePrecio debe ser > 0 </string>
+    <string name="priceErrorIngresePrecios" translatable="true">Ingrese Precios</string>
     <string name="title_custom_list">Clientes</string>
     <string name="title_custom_detail">Detalle de clientes</string>
 
@@ -222,12 +227,14 @@
     <string name="empty_Almacenes">Sin Almacenes Para Mostrar </string>
     <string name="almacen_StockTitle">Almacen: </string>
 
+    <!--Dialog Text Pickier-->
+    <string name="cantidad_text">Cantidad: </string>
 
     <!--Custom Detail Activity-->
 
     <string name="custom_Id_text">Cliente</string>
     <string name="custom_new">Nuevo Cliente </string>
-    <string name="custom_name_text">Nombre:</string>
+
     <string name="custom_name_text_hint_text">Nombre </string>
     <string name="custom_last_text">Apellido: </string>
     <string name="custom_last_hint_text">Apellido </string>

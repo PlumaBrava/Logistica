@@ -170,11 +170,11 @@ public class Producto implements Parcelable {
         this.nombreProducto = nombreProducto;
     }
 
-//    public Double getPrecio() {
+//    public Double getPerfilDePrecio() {
 //        return precio;
 //    }
 //
-//    public void setPrecio(Double precio) {
+//    public void setPerfilDePrecio(Double precio) {
 //        this.precio = precio;
 //    }
 //
@@ -300,7 +300,7 @@ public class Producto implements Parcelable {
 
             if (item.getKey().equals(perfil)) {
                 Precio t = item.getValue();
-                Log.i("getPrecioParaPerfil", "iguales:t.getPrecio() "+t.getPrecio());
+                Log.i("getPrecioParaPerfil", "iguales:t.getPerfilDePrecio() "+t.getPrecio());
 
                 return t.getPrecio();
             }
@@ -316,7 +316,7 @@ public class Producto implements Parcelable {
             Log.i("getPrecioParaPerfilEs", "item.getKey(): "+item.getKey());
             if (item.getKey().equals(perfil)) {
                 Precio t = item.getValue();
-                Log.i("getPrecioParaPerfilEs", "iguales:t.getPrecio() "+t.getPrecio());
+                Log.i("getPrecioParaPerfilEs", "iguales:t.getPerfilDePrecio() "+t.getPrecio());
 
                 return t.getPrecioEspecial();
             }

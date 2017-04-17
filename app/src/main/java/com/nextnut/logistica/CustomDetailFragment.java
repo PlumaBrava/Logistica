@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.nextnut.logistica.modelos.Cliente;
+import com.nextnut.logistica.modelos.PerfilDePrecio;
 import com.nextnut.logistica.util.CustomTextWatcher;
 import com.nextnut.logistica.util.MakeCall;
 import com.rey.material.widget.CheckBox;
@@ -44,6 +45,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
@@ -85,6 +87,7 @@ public class CustomDetailFragment extends FragmentBasic  {
     private com.rey.material.widget.Button mBotonAgregarTelefono;
     private com.rey.material.widget.Spinner mPerfilDePrecios;
     public ArrayAdapter<CharSequence> mAdapterPerfilDePrecios;
+    List<CharSequence> mPerfilDePreciosList = new ArrayList<CharSequence>();
     private RecyclerView mListadeTelefonos;
     private Map<String, String> mTelefonos = new HashMap<>();
     private MyAdapter mAdapterTelefonos;
@@ -127,26 +130,61 @@ public class CustomDetailFragment extends FragmentBasic  {
         mCustomName = (EditText) rootView.findViewById(R.id.custom_name_text);
         mLastName = (EditText) rootView.findViewById(R.id.product_Lastname);
         mPerfilDePrecios = (Spinner) rootView.findViewById(R.id.customPerfildePrecios);
-
-
-
-        mAdapterPerfilDePrecios = ArrayAdapter.createFromResource(getContext(),
-                R.array.perfiPrecios_array, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
-        mAdapterPerfilDePrecios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        mPerfilDePrecios.setAdapter(mAdapterPerfilDePrecios);
-        mPerfilDePrecios.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+        refPerfilDePrecios().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onItemSelected(Spinner parent, View view, int position, long id) {
-                Log.i("Custom", "parent: " + parent.toString());
-                Log.i("Custom", "view: " + view.toString());
-                Log.i("Custom", "position: " + position);
-                Log.i("Custom", "id: " + id);
-                Log.i("Custom", "parent.getSelectedItem(): " + parent.getSelectedItem());
-                parent.getSelectedItem();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i("Producto", "dataSnapshot.getChildrenCount()" + dataSnapshot.getChildrenCount());
+                if (dataSnapshot.getChildrenCount() < 1) {
+                    muestraMensajeEnDialogo("Configure el Prefil de Precios");
+
+                } else {
+                    for (DataSnapshot perfil : dataSnapshot.getChildren()) {
+                        PerfilDePrecio perfilDePrecio = perfil.getValue(PerfilDePrecio.class);
+                        mPerfilDePreciosList.add(perfilDePrecio.getPerfilDePrecio());
+                    }
+                    mAdapterPerfilDePrecios = new ArrayAdapter<CharSequence>(getContext(), android.R.layout.simple_spinner_item, mPerfilDePreciosList);
+
+// Specify the layout to use when the list of choices appears
+                    mAdapterPerfilDePrecios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+                    mPerfilDePrecios.setAdapter(mAdapterPerfilDePrecios);
+                    mPerfilDePrecios.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(Spinner parent, View view, int position, long id) {
+                            Log.i("Producto", "parent " + parent.toString());
+                            Log.i("Producto", "view: " + view.toString());
+                            Log.i("Producto", "position: " + position);
+                            Log.i("Producto", "id: " + id);
+                            Log.i("Producto", "parent.getSelectedItem(): " + parent.getSelectedItem());
+                            parent.getSelectedItem();
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.i("Producto", "ddatabaseError" + databaseError.toString());
             }
         });
+
+//
+//        mAdapterPerfilDePrecios = ArrayAdapter.createFromResource(getContext(),
+//                R.array.perfiPrecios_array, android.R.layout.simple_spinner_item);
+//// Specify the layout to use when the list of choices appears
+//        mAdapterPerfilDePrecios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//// Apply the adapter to the spinner
+//        mPerfilDePrecios.setAdapter(mAdapterPerfilDePrecios);
+//        mPerfilDePrecios.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(Spinner parent, View view, int position, long id) {
+//                Log.i("Custom", "parent: " + parent.toString());
+//                Log.i("Custom", "view: " + view.toString());
+//                Log.i("Custom", "position: " + position);
+//                Log.i("Custom", "id: " + id);
+//                Log.i("Custom", "parent.getSelectedItem(): " + parent.getSelectedItem());
+//                parent.getSelectedItem();
+//            }
+//        });
 
 
 

@@ -38,9 +38,6 @@ public class SaldosViewHolder extends RecyclerView.ViewHolder {
 
     public void bindToPost(CabeceraOrden cabeceraOrden, View.OnClickListener cabeceraClickListener) {
 
-                    mContext.getResources().getColor(R.color.SaldosCard_background);
-
-
 
         mName.setText(cabeceraOrden.getCliente().getNombre());
         mLastname.setText(cabeceraOrden.getCliente().getApellido());

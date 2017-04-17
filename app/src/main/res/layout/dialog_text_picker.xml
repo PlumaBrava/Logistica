@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <!--app:counterEnabled="true"-->
+        <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+        <EditText
+            android:id="@+id/cantidad_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/cantidad_text"
+            android:inputType="numberDecimal"
+            android:maxLength="@integer/customNameMaxLength"
+            android:padding="8dp"
+            />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+
+        android:text="@string/dialogNumebrPickerCancel"
+        android:layout_below="@+id/numberPicker1" />
+    <!--android:layout_toRightOf="@+id/numberPicker1"-->
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dialogNumebrPickerSet"
+        android:layout_alignTop="@+id/button2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

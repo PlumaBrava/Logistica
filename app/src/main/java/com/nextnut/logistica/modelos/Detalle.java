@@ -173,6 +173,7 @@ public class Detalle {
 //        this.cantidadOrden = cantidadOrden;
         setCantidadOrden(cantidadOrden);
         Log.d("detalle2", "antes IngresaProductoenOrden-this.precio) " + this.precio);
+        Log.d("detalle2", "antes IngresaProductoenOrden-cliente.getPerfilDePrecios()) " + cliente.getPerfilDePrecios());
 //        this.producto = producto;
         setProducto(producto);
         if (cliente.getEspecial()) {
@@ -183,7 +184,7 @@ public class Detalle {
         } else {
             setPrecio(producto.getPrecioParaPerfil(cliente.getPerfilDePrecios()));
             Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
-//            this.montoItemOrden = cantidadOrden * producto.getPrecio();
+//            this.montoItemOrden = cantidadOrden * producto.getPerfilDePrecio();
             setMontoItemOrden(cantidadOrden * producto.getPrecioParaPerfil(cliente.getPerfilDePrecios()));
 
         }

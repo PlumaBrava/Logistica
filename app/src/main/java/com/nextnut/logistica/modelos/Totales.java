@@ -134,7 +134,7 @@ public class Totales implements Parcelable {
         Log.d("Totales", "cliente.getPerfilDePrecios() " +cliente.getPerfilDePrecios());
 
         Log.d("Totales", "producto.getPrecioEspcecial() " +producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios()));
-        Log.d("Totales", "producto.getPrecio " +producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios()));
+        Log.d("Totales", "producto.getPerfilDePrecio " +producto.getPrecioParaPerfil(cliente.getPerfilDePrecios()));
         if (cliente.getEspecial()) {
             this.montoEnOrdenes = this.montoEnOrdenes+cantidadOrden * producto.getPrecioEspecialPerfil(cliente.getPerfilDePrecios());
         } else {

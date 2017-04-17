@@ -156,15 +156,15 @@ public class Stock {
 ////        this.producto = producto;
 //        setProducto(producto);
 //        if (clienteEspecial) {
-//            setPrecio( producto.getPrecioEspcecial());
+//            setPerfilDePrecio( producto.getPrecioEspcecial());
 //            Log.d("detalle2", "despues-especial IngresaProductoenOrden-this.precio) " + this.precio);
 ////            this.kilosEnStock = cantidadUnidadesEnStock * producto.getPrecioEspcecial();
 //            setKilosEnStock(cantidadOrden * producto.getPrecioEspcecial());
 //        } else {
-//            setPrecio(producto.getPrecio());
+//            setPerfilDePrecio(producto.getPerfilDePrecio());
 //            Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
-////            this.kilosEnStock = cantidadUnidadesEnStock * producto.getPrecio();
-//            setKilosEnStock(cantidadOrden * producto.getPrecio());
+////            this.kilosEnStock = cantidadUnidadesEnStock * producto.getPerfilDePrecio();
+//            setKilosEnStock(cantidadOrden * producto.getPerfilDePrecio());
 //
 //        }
 //
@@ -223,13 +223,13 @@ public class Stock {
 //        Log.d("detalle2", "antes IngresaProductoenOrden-this.precio) " + this.precio);
 //        this.producto = producto;
 //        if (clienteEspecial) {
-//            setPrecio( producto.getPrecioEspcecial());
+//            setPerfilDePrecio( producto.getPrecioEspcecial());
 //            Log.d("detalle2", "despues-especial IngresaProductoenOrden-this.precio) " + this.precio);
 //            this.montoItemEntrega = cantidad * producto.getPrecioEspcecial();
 //        } else {
-//            setPrecio(producto.getPrecio());
+//            setPerfilDePrecio(producto.getPerfilDePrecio());
 //            Log.d("detalle2", "despues -comun- IngresaProductoenOrden-this.precio) " + this.precio);
-//            this.montoItemEntrega = cantidad * producto.getPrecio();
+//            this.montoItemEntrega = cantidad * producto.getPerfilDePrecio();
 //        }
 //
 //    }

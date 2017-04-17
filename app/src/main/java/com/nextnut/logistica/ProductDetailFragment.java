@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.nextnut.logistica.modelos.PerfilDePrecio;
 import com.nextnut.logistica.modelos.Precio;
 import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.util.CurrencyToDouble;
@@ -39,6 +40,7 @@ import com.squareup.picasso.Picasso;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
@@ -92,6 +94,7 @@ public class ProductDetailFragment extends FragmentBasic
     public ArrayAdapter<CharSequence> mAdapterRubro;
     public ArrayAdapter<CharSequence> mAdapterPerfilDePrecios;
     private com.rey.material.widget.Spinner mPerfilDePrecios;
+    List<CharSequence> mPerfilDePreciosList = new ArrayList<CharSequence>();
     private RecyclerView mListadePrecios;
     private Map<String, Precio> mPrecios = new HashMap<>();
     private MyAdapterPrecios mAdapterPrecios;
@@ -176,51 +179,94 @@ public class ProductDetailFragment extends FragmentBasic
 
         mPerfilDePrecios = (Spinner) rootView.findViewById(R.id.productPerfildePrecios);
 
-        mListadePrecios =(RecyclerView)  rootView.findViewById(R.id.listaPrecios);
+        mListadePrecios = (RecyclerView) rootView.findViewById(R.id.listaPrecios);
         // use a linear layout manager
         mListadePrecios.setHasFixedSize(true);
         mListadePrecios.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mAdapterPerfilDePrecios = ArrayAdapter.createFromResource(getContext(),
-                R.array.perfiPrecios_array, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
-        mAdapterPerfilDePrecios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        mPerfilDePrecios.setAdapter(mAdapterPerfilDePrecios);
-        mPerfilDePrecios.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+        refPerfilDePrecios().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onItemSelected(Spinner parent, View view, int position, long id) {
-                Log.i("Producto", "parent " + parent.toString());
-                Log.i("Producto", "view: " + view.toString());
-                Log.i("Producto", "position: " + position);
-                Log.i("Producto", "id: " + id);
-                Log.i("Producto", "parent.getSelectedItem(): " + parent.getSelectedItem());
-                parent.getSelectedItem();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getChildrenCount() < 1) {
+                    muestraMensajeEnDialogo("Configure el Prefil de Precios");
+                } else {
+                    for (DataSnapshot perfil : dataSnapshot.getChildren()) {
+                        PerfilDePrecio perfilDePrecio = perfil.getValue(PerfilDePrecio.class);
+                        mPerfilDePreciosList.add(perfilDePrecio.getPerfilDePrecio());
+                    }
+                    mAdapterPerfilDePrecios = new ArrayAdapter<CharSequence>(getContext(), android.R.layout.simple_spinner_item, mPerfilDePreciosList);
+
+// Specify the layout to use when the list of choices appears
+                    mAdapterPerfilDePrecios.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+                    mPerfilDePrecios.setAdapter(mAdapterPerfilDePrecios);
+                    mPerfilDePrecios.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(Spinner parent, View view, int position, long id) {
+                            Log.i("Producto", "parent " + parent.toString());
+                            Log.i("Producto", "view: " + view.toString());
+                            Log.i("Producto", "position: " + position);
+                            Log.i("Producto", "id: " + id);
+                            Log.i("Producto", "parent.getSelectedItem(): " + parent.getSelectedItem());
+                            parent.getSelectedItem();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
+
         mProductPrice = (EditText) rootView.findViewById(R.id.product_price);
         mProductPrice.addTextChangedListener(new NumberTextWatcher(mProductPrice));
         mProductPriceSpecial = (EditText) rootView.findViewById(R.id.product_pricespecial);
         mProductPriceSpecial.addTextChangedListener(new NumberTextWatcher(mProductPriceSpecial));
-        mBotonModificarPrecio=(Button) rootView.findViewById(R.id.botonModificarPrecio);
+        mBotonModificarPrecio = (Button) rootView.findViewById(R.id.botonModificarPrecio);
         mBotonModificarPrecio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mProductPrice==null||  mProductPriceSpecial==null){
+                if (mProductPrice.equals("") || mProductPriceSpecial.equals("")) {
                     muestraMensajeEnDialogo("Ingrese  precios");
                     return;
+//                    Double price = new CurrencyToDouble(mProductPrice.getText().toString()).convert();
+//
+//            if (price == null) {
+//
+//                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
+//                // Show DialogFragment
+//                mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
+//                mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
+//                mProductPrice.requestFocus();
+//
+//                return false;
+//            } else if (price <= 0) {
+//
+//                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
+//                // Show DialogFragment
+//                mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
+//                mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
+//                mProductPrice.requestFocus();
+//
+//                return false;
+//            } else {
+//
+//                mProductPrice.setTextColor(getResources().getColor(R.color.ValidationOK));
+//
                 }
 
-                Double [] t = new Double[2];
+                Double[] t = new Double[2];
                 CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
                 CurrencyToDouble priceEspecial = new CurrencyToDouble(mProductPriceSpecial.getText().toString());
 
 
-                t[0]=price.convert();
-                t[1]=priceEspecial.convert();
-                Log.i("Producto", "(String) mPerfilDePrecios.getSelectedItem(): " +(String) mPerfilDePrecios.getSelectedItem());
+                t[0] = price.convert();
+                t[1] = priceEspecial.convert();
+                Log.i("Producto", "(String) mPerfilDePrecios.getSelectedItem(): " + (String) mPerfilDePrecios.getSelectedItem());
 
-                mPrecios.put((String) mPerfilDePrecios.getSelectedItem(), new Precio( t[0],t[1]));
+                mPrecios.put((String) mPerfilDePrecios.getSelectedItem(), new Precio(t[0], t[1]));
                 mProductPrice.setText("");
                 mProductPriceSpecial.setText("");
                 mAdapterPrecios.swap(mPrecios);
@@ -361,8 +407,8 @@ public class ProductDetailFragment extends FragmentBasic
                     mProductName.setText(producto.getNombreProducto());
                     NumberFormat format = NumberFormat.getCurrencyInstance();
 
-                    mPrecios=producto.getPrecios();
-//                    mProductPrice.setText(format.format(producto.getPrecio()));
+                    mPrecios = producto.getPrecios();
+//                    mProductPrice.setText(format.format(producto.getPerfilDePrecio()));
 //                    mProductPriceSpecial.setText(format.format(producto.getPrecioEspcecial()));
 
                     mProductDescription.setText(producto.getDescripcionProducto());
@@ -468,12 +514,12 @@ public class ProductDetailFragment extends FragmentBasic
 
         }
 
-        int c_min =0;
-        int c_def =0;
-        int c_max =0;
+        int c_min = 0;
+        int c_def = 0;
+        int c_max = 0;
         try {
             c_def = Integer.parseInt(String.valueOf(mCantidadDefault.getText().toString()));
-        }catch (Exception e){
+        } catch (Exception e) {
             mCantidadDefault.setError(getResources().getString(R.string.error_CantidadDefault));
             mCantidadDefault.requestFocus();
             return false;
@@ -482,34 +528,34 @@ public class ProductDetailFragment extends FragmentBasic
         try {
             c_min = Integer.parseInt(String.valueOf(mCantidadMinima.getText().toString()));
 
-        }catch (Exception e){
+        } catch (Exception e) {
             mCantidadMinima.setError(getResources().getString(R.string.error_CantidadMinima));
             mCantidadMinima.requestFocus();
             return false;
         }
         try {
             c_max = Integer.parseInt(String.valueOf(mCantidadMaxima.getText().toString()));
-        }catch (Exception e){
+        } catch (Exception e) {
             mCantidadMaxima.setError(
                     String.format(
-                    getResources().getString(R.string.error_CantidadMaxima),getResources().getInteger(R.integer.quantityMax)));
+                            getResources().getString(R.string.error_CantidadMaxima), getResources().getInteger(R.integer.quantityMax)));
             mCantidadMaxima.requestFocus();
             return false;
         }
 
-        if(c_min<getResources().getInteger(R.integer.quantityMin)){
+        if (c_min < getResources().getInteger(R.integer.quantityMin)) {
             mCantidadMinima.setError(getResources().getString(R.string.error_CantidadMinima));
             mCantidadMinima.requestFocus();
             verification = false;
         }
 
-        if( c_def<c_min||c_def>c_max){
+        if (c_def < c_min || c_def > c_max) {
             mCantidadDefault.setError(getResources().getString(R.string.error_CantidadDefault));
             mCantidadDefault.requestFocus();
             verification = false;
         }
-        if( c_max>getResources().getInteger(R.integer.quantityMax)){
-            mCantidadMaxima.setError(getResources().getString(R.string.error_CantidadMaxima)+getResources().getInteger(R.integer.quantityMax));
+        if (c_max > getResources().getInteger(R.integer.quantityMax)) {
+            mCantidadMaxima.setError(getResources().getString(R.string.error_CantidadMaxima) + getResources().getInteger(R.integer.quantityMax));
             mCantidadMaxima.requestFocus();
             verification = false;
         }
@@ -627,42 +673,20 @@ public class ProductDetailFragment extends FragmentBasic
 
     public boolean isthePriceCorrect() {
         Double price = null;
-        if (mProductPrice.getText().toString() == null) {
+        if (mPrecios.size() == 0) {
 
-            muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
+            muestraMensajeEnDialogo(getResources().getString(R.string.priceErrorIngresePrecios));
             // Show DialogFragment
             mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
             mProductPrice.setError(getResources().getString(R.string.price_error_cantBeNull));
             mProductPrice.requestFocus();
+
             return false;
 
         } else {
-            price = new CurrencyToDouble(mProductPrice.getText().toString()).convert();
 
-            if (price == null) {
-
-                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
-                // Show DialogFragment
-                mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
-                mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
-                mProductPrice.requestFocus();
-
-                return false;
-            } else if (price <= 0) {
-
-                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
-                // Show DialogFragment
-                mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
-                mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
-                mProductPrice.requestFocus();
-
-                return false;
-            } else {
-
-                mProductPrice.setTextColor(getResources().getColor(R.color.ValidationOK));
                 return true;
             }
-        }
     }
 
     public boolean istheSpecialPriceCorrect() {
@@ -791,32 +815,32 @@ public class ProductDetailFragment extends FragmentBasic
     public class MyAdapterPrecios extends RecyclerView.Adapter<MyAdapterPrecios.ViewHolder> {
 
 
-        private  ArrayList mData;
+        private ArrayList mData;
 
 
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
-        public  class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder {
             // each data item is just a string in this case
             public View mView;
-            public  TextView mProductoPerfil;
-            public   TextView mProductoprecio;
-            public   TextView mProductoPrecioEspecial;
+            public TextView mProductoPerfil;
+            public TextView mProductoprecio;
+            public TextView mProductoPrecioEspecial;
 
             public ViewHolder(View v) {
                 super(v);
                 mView = v;
-                mProductoPerfil= (TextView) v.findViewById(R.id.productoPrecioPerfil);
-                mProductoprecio= (TextView) v.findViewById(R.id.productoprecioPrecio);
-                mProductoPrecioEspecial= (TextView) v.findViewById(R.id.productoprecioPrecioEspecial);
+                mProductoPerfil = (TextView) v.findViewById(R.id.productoPrecioPerfil);
+                mProductoprecio = (TextView) v.findViewById(R.id.productoprecioPrecio);
+                mProductoPrecioEspecial = (TextView) v.findViewById(R.id.productoprecioPrecioEspecial);
 
             }
         }
 
         // Provide a suitable constructor (depends on the kind of dataset)
         public MyAdapterPrecios(Map<String, Precio> map) {
-            Log.i("preciosdapter", "MyAdapterPrecios map"+ map.toString());
+            Log.i("preciosdapter", "MyAdapterPrecios map" + map.toString());
             TextView mProductoPerfil;
             TextView mProductoprecio;
             TextView mProductoPrecioEspecial;
@@ -829,7 +853,7 @@ public class ProductDetailFragment extends FragmentBasic
         // Create new views (invoked by the layout manager)
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.i("preciosdapter", "onCreateViewHolder "+ viewType);
+            Log.i("preciosdapter", "onCreateViewHolder " + viewType);
 
             // create a new view
             View v = LayoutInflater.from(parent.getContext())
@@ -837,7 +861,7 @@ public class ProductDetailFragment extends FragmentBasic
             // set the view's size, margins, paddings and layout parameters
 
 
-            ViewHolder vh = new ViewHolder( v);
+            ViewHolder vh = new ViewHolder(v);
 
             return vh;
         }
@@ -849,22 +873,22 @@ public class ProductDetailFragment extends FragmentBasic
             // - replace the contents of the view with that element
             final Map.Entry<String, Precio> item = (Map.Entry) mData.get(position);
             final NumberFormat format = NumberFormat.getCurrencyInstance();
-            final  Precio t=(Precio)item.getValue();
+            final Precio t = (Precio) item.getValue();
             holder.mProductoPerfil.setText(item.getKey());
             holder.mProductoprecio.setText(format.format(t.getPrecio()));
             holder.mProductoPrecioEspecial.setText(format.format(t.getPrecioEspecial()));
-            Log.i("preciosdapter", "getItem(position)" +position+" -+ "+ item.getValue().toString());
+            Log.i("preciosdapter", "getItem(position)" + position + " -+ " + item.getValue().toString());
 //            holder.mTextView.setText(item.getKey()+" : "+format.format(t[0])+" - "+format.format(t[1]));
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.i("preciosdapter", "gonClick- + "+ item.getValue().toString());
+                    Log.i("preciosdapter", "gonClick- + " + item.getValue().toString());
                     int spinnerPerfil = mAdapterPerfilDePrecios.getPosition(item.getKey());
-                    Log.i("preciosdapter", "item.getKey()- + "+ item.getKey());
-                    Log.i("preciosdapter", "spinnerPerfil- + "+ spinnerPerfil);
+                    Log.i("preciosdapter", "item.getKey()- + " + item.getKey());
+                    Log.i("preciosdapter", "spinnerPerfil- + " + spinnerPerfil);
                     mPerfilDePrecios.setSelection(spinnerPerfil);
-                    Log.i("preciosdapter", "t[0].toString()- + "+ t.getPrecio());
-                    Log.i("preciosdapter", "t[1].toString()- + "+ t.getPrecioEspecial());
+                    Log.i("preciosdapter", "t[0].toString()- + " + t.getPrecio());
+                    Log.i("preciosdapter", "t[1].toString()- + " + t.getPrecioEspecial());
 
                     mProductPrice.setText(format.format(t.getPrecio()));
                     mProductPriceSpecial.setText(format.format(t.getPrecioEspecial()));
@@ -876,12 +900,12 @@ public class ProductDetailFragment extends FragmentBasic
         // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            Log.i("preciosdapter", "getItemCount()- + "+ mData.size());
+            Log.i("preciosdapter", "getItemCount()- + " + mData.size());
             return mData.size();
         }
 
-        public void swap(Map<String, Precio> map){
-            Log.i("preciosdapter", "swap  map- + "+ map.toString());
+        public void swap(Map<String, Precio> map) {
+            Log.i("preciosdapter", "swap  map- + " + map.toString());
             mData.clear();
             mData.addAll(map.entrySet());
             notifyDataSetChanged();
