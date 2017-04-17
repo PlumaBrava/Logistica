@@ -79,7 +79,6 @@ import static com.nextnut.logistica.util.SharePickingOrder.sharePickingOrder;
 public class PickingListFragment extends FragmentBasic {
 
 
-
     private FirebaseRecyclerAdapter<CabeceraPicking, CabeceraPickingViewHolder> mCursorAdapterPickingOrder;
     private FirebaseRecyclerAdapter<CabeceraOrden, CabeceraViewHolder> mCustomsOrdersCursorAdapter;
     private FirebaseRecyclerAdapter<Detalle, DetallePickingViewHolder> mCursorAdapterTotalProductos;
@@ -112,7 +111,6 @@ public class PickingListFragment extends FragmentBasic {
 //    private LinearLayout mLinearOrders;
 
     private PickingOrdersHandler mPickingOrdersHandler;
-
 
 
     private boolean mTwoPane;
@@ -278,7 +276,6 @@ public class PickingListFragment extends FragmentBasic {
         };
 
 
-
         recyclerViewPickingOrder.setAdapter(mCursorAdapterPickingOrder);
 
 
@@ -421,13 +418,13 @@ public class PickingListFragment extends FragmentBasic {
                 final String productKey = CabeceraRef.getKey();
                 Log.i(LOG_TAG, "adapter:orderKey: " + productKey);
 
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                                                           @Override
-                                                           public void onClick(View v) {
-
-                                                           }
-                                                       }
-                );
+//                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+//                                                           @Override
+//                                                           public void onClick(View v) {
+//
+//                                                           }
+//                                                       }
+//                );
 
                 viewHolder.bindToPost(model, new View.OnClickListener()
 
@@ -570,67 +567,106 @@ public class PickingListFragment extends FragmentBasic {
     }
 
 
-
-
     public void showDialogNumberPicker(final String productKey) {
 
-        {
 
-            final Dialog d = new Dialog(getContext());
-            d.setTitle(getString(R.string.quantityPicker));
-            d.setContentView(R.layout.dialog_number_picker);
-            Button b1 = (Button) d.findViewById(R.id.button1);
-            Button b2 = (Button) d.findViewById(R.id.button2);
-            final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
-            Log.d("Picker", "Default: " + mDetalleAnterior.getProducto().getCantidadDefault());
-            Log.d("Picker", "Man: " + mDetalleAnterior.getProducto().getCantidadMaxima());
-            Log.d("Picker", "Mix: " + mDetalleAnterior.getProducto().getCantidadMinima());
-            Log.d("Picker", "Picking: " + mDetalleAnterior.getCantidadPicking());
-            Log.d("Picker", "Orden: " + mDetalleAnterior.getCantidadOrden());
-            Log.d("Picker", "Entrega: " + mDetalleAnterior.getCantidadEntrega()) ;
+            Log.i("Picker", " KG o Metro " + mDetalleAnterior.getProducto().getTipoUnidad());
+            if (mDetalleAnterior.getProducto().getTipoUnidad().equals("Kg") || mDetalleAnterior.getProducto().getTipoUnidad().equals("Metro")) {
+                Log.i("Picker", " KG o Metro");
 
-            Log.d("Picker", "Picking: intValue " + mDetalleAnterior.getCantidadPicking().intValue());
-            Log.d("Picker", "Orden:intValue " + mDetalleAnterior.getCantidadOrden().intValue());
-            Log.d("Picker", "Entrega:intValue " + mDetalleAnterior.getCantidadEntrega().intValue());
+                final Dialog d = new Dialog(getContext());
+                d.setTitle(getString(R.string.quantityPicker));
+                d.setContentView(R.layout.dialog_text_picker);
+                Button b1 = (Button) d.findViewById(R.id.button1);
+                Button b2 = (Button) d.findViewById(R.id.button2);
+                final EditText np = (EditText) d.findViewById(R.id.cantidad_text);
+                if (mDetalleAnterior.getCantidadPicking() == 0.0) {
+                    Log.d("Picker", "mDetalleAnterior.getCantidadPicking() null ");
 
-            np.setMaxValue(mDetalleAnterior.getProducto().getCantidadMaxima());
-            if (mDetalleAnterior.getCantidadPicking() == 0.0) {
-                Log.d("Picker", "mDetalleAnterior.getCantidadPicking() null " );
+                    np.setText(String.valueOf(mDetalleAnterior.getCantidadOrden()));
+                } else {
+                    Log.d("Picker", "mDetalleAnterior.getCantidadPicking() != null ");
+                    np.setText(String.valueOf(mDetalleAnterior.getCantidadPicking()));
+                }
+                b1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("detalle1", "showDialogNumberPicker-detalle) " + mDetalleAnterior.getCantidadPicking());
+                        Log.d("detalle1", "showDialogNumberPicker-np.getValue() " + np.getText().toString());
+                        abmDetalleDePicking(Double.valueOf(np.getText().toString()), productKey, mDetalleAnterior);
 
-                np.setValue(mDetalleAnterior.getCantidadOrden().intValue());
-            } else {
-                Log.d("Picker", "mDetalleAnterior.getCantidadPicking() != null " );
-                np.setValue(mDetalleAnterior.getCantidadPicking().intValue());
+
+                        d.dismiss();
+                    }
+
+                });
+                b2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        d.dismiss();
+                    }
+                });
+                d.show();
+
+
+            } else if (mDetalleAnterior.getProducto().getTipoUnidad().equals("Unidad")) {
+
+                final Dialog d = new Dialog(getContext());
+                d.setTitle(getString(R.string.quantityPicker));
+                d.setContentView(R.layout.dialog_number_picker);
+                Button b1 = (Button) d.findViewById(R.id.button1);
+                Button b2 = (Button) d.findViewById(R.id.button2);
+                final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
+                Log.d("Picker", "Default: " + mDetalleAnterior.getProducto().getCantidadDefault());
+                Log.d("Picker", "Man: " + mDetalleAnterior.getProducto().getCantidadMaxima());
+                Log.d("Picker", "Mix: " + mDetalleAnterior.getProducto().getCantidadMinima());
+                Log.d("Picker", "Picking: " + mDetalleAnterior.getCantidadPicking());
+                Log.d("Picker", "Orden: " + mDetalleAnterior.getCantidadOrden());
+                Log.d("Picker", "Entrega: " + mDetalleAnterior.getCantidadEntrega());
+
+                Log.d("Picker", "Picking: intValue " + mDetalleAnterior.getCantidadPicking().intValue());
+                Log.d("Picker", "Orden:intValue " + mDetalleAnterior.getCantidadOrden().intValue());
+                Log.d("Picker", "Entrega:intValue " + mDetalleAnterior.getCantidadEntrega().intValue());
+
+                np.setMaxValue(mDetalleAnterior.getProducto().getCantidadMaxima());
+                if (mDetalleAnterior.getCantidadPicking() == 0.0) {
+                    Log.d("Picker", "mDetalleAnterior.getCantidadPicking() null ");
+
+                    np.setValue(mDetalleAnterior.getCantidadOrden().intValue());
+                } else {
+                    Log.d("Picker", "mDetalleAnterior.getCantidadPicking() != null ");
+                    np.setValue(mDetalleAnterior.getCantidadPicking().intValue());
+                }
+                np.setMinValue(mDetalleAnterior.getProducto().getCantidadMinima());
+                np.setWrapSelectorWheel(true);
+                np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                    @Override
+                    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                    }
+                });
+                b1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("detalle1", "showDialogNumberPicker-detalle) " + mDetalleAnterior.getCantidadPicking());
+                        Log.d("detalle1", "showDialogNumberPicker-np.getValue() " + np.getValue());
+                        abmDetalleDePicking((double) np.getValue(), productKey, mDetalleAnterior);
+
+
+                        d.dismiss();
+                    }
+
+                });
+                b2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        d.dismiss();
+                    }
+                });
+                d.show();
+
+
             }
-            np.setMinValue(mDetalleAnterior.getProducto().getCantidadMinima());
-            np.setWrapSelectorWheel(true);
-            np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-                @Override
-                public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                }
-            });
-            b1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("detalle1", "showDialogNumberPicker-detalle) " + mDetalleAnterior.getCantidadPicking());
-                    Log.d("detalle1", "showDialogNumberPicker-np.getValue() " + np.getValue());
-                    abmDetalleDePicking((double) np.getValue(), productKey, mDetalleAnterior);
 
-
-                    d.dismiss();
-                }
-
-            });
-            b2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    d.dismiss();
-                }
-            });
-            d.show();
-
-
-        }
     }
 
     // abmDetalleDeOrden
@@ -953,7 +989,7 @@ public class PickingListFragment extends FragmentBasic {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                liberarRecusosTomados( );
+                liberarRecusosTomados();
                 liberarArrayTaskConBloqueos();
                 muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
             }
@@ -962,7 +998,7 @@ public class PickingListFragment extends FragmentBasic {
 
     private void pasarPickingAEntrega(final CabeceraPicking cabeceraPicking) {
         Log.i(LOG_TAG, "pasarPickingAEntrega Numero de picking- " + cabeceraPicking.getNumeroDePickingOrden());
-        if (hayTareaEnProceso() ) {
+        if (hayTareaEnProceso()) {
             return;
         }
 
@@ -1011,111 +1047,112 @@ public class PickingListFragment extends FragmentBasic {
 
                                         readBlockPickingTotal(PICKING_STATUS_INICIAL, cabeceraPicking.getNumeroDePickingOrden(), productkey);
                                         taskList.add(mPickingTotalTask.get(i));
-                                        i++;}
+                                        i++;
+                                    }
 
-                                        allTask = Tasks.whenAll(taskList.toArray(new Task[taskList.size()]));
-                                        allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Log.i(LOG_TAG, "pasarPickingAEntrega Completo el bloqueo- ");
+                                    allTask = Tasks.whenAll(taskList.toArray(new Task[taskList.size()]));
+                                    allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.i(LOG_TAG, "pasarPickingAEntrega Completo el bloqueo- ");
 
-                                                Map<String, Object> childUpdates = new HashMap<>();
-                                                Map<String, Object> totalInicialDetalleValues = null;
-                                                Map<String, Object> pickingTotalValues = null;
-                                                int i = 0;
-                                                //Recorro el total de Productos en Picking (7)
+                                            Map<String, Object> childUpdates = new HashMap<>();
+                                            Map<String, Object> totalInicialDetalleValues = null;
+                                            Map<String, Object> pickingTotalValues = null;
+                                            int i = 0;
+                                            //Recorro el total de Productos en Picking (7)
 
-                                                for (DataSnapshot productoEnOrden : mProductosEnOrdenDatos.getChildren()) {
-                                                    // busca el producto dentro de la orden
-                                                    String productKey = productoEnOrden.getKey();
-                                                    Detalle pickingTotal = productoEnOrden.getValue(Detalle.class);
-                                                    pickingTotal.liberar();
-                                                    // cambio de estado el total de picking 7
-                                                    childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_INICIAL, cabeceraPicking.getNumeroDePickingOrden(), productKey), null);
-                                                    childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden(), productKey), pickingTotal.toMap());
-                                                    Log.i(LOG_TAG, "pasarPickingAEntrega Product key- " + productKey + " " + pickingTotal.getProducto().getNombreProducto());
+                                            for (DataSnapshot productoEnOrden : mProductosEnOrdenDatos.getChildren()) {
+                                                // busca el producto dentro de la orden
+                                                String productKey = productoEnOrden.getKey();
+                                                Detalle pickingTotal = productoEnOrden.getValue(Detalle.class);
+                                                pickingTotal.liberar();
+                                                // cambio de estado el total de picking 7
+                                                childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_INICIAL, cabeceraPicking.getNumeroDePickingOrden(), productKey), null);
+                                                childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden(), productKey), pickingTotal.toMap());
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega Product key- " + productKey + " " + pickingTotal.getProducto().getNombreProducto());
 
-                                                }
+                                            }
 
-                                                // Actualizacion de Cabecera de Picking (6)
-                                                CabeceraPicking cabeceraPicking = ((DataSnapshot) mPickingTask.getResult()).getValue(CabeceraPicking.class);
-                                                Log.i(LOG_TAG, "pasarPickingAEntrega mPickingTask-isSuccessful(): " + mPickingTask.isSuccessful());
-                                                Log.i(LOG_TAG, "pasarPickingAEntrega mPickingTask-getKey(): " + ((DataSnapshot) mPickingTask.getResult()).getKey());
-                                                Log.i(LOG_TAG, "pasarPickingAEntrega mPickingTask-getREF(): " + ((DataSnapshot) mPickingTask.getResult()).getRef());
+                                            // Actualizacion de Cabecera de Picking (6)
+                                            CabeceraPicking cabeceraPicking = ((DataSnapshot) mPickingTask.getResult()).getValue(CabeceraPicking.class);
+                                            Log.i(LOG_TAG, "pasarPickingAEntrega mPickingTask-isSuccessful(): " + mPickingTask.isSuccessful());
+                                            Log.i(LOG_TAG, "pasarPickingAEntrega mPickingTask-getKey(): " + ((DataSnapshot) mPickingTask.getResult()).getKey());
+                                            Log.i(LOG_TAG, "pasarPickingAEntrega mPickingTask-getREF(): " + ((DataSnapshot) mPickingTask.getResult()).getRef());
 
-                                                if (cabeceraPicking == null) {
-                                                    // si es nulo se trataria de un error puesto que existe
+                                            if (cabeceraPicking == null) {
+                                                // si es nulo se trataria de un error puesto que existe
 
-                                                    Log.i(LOG_TAG, "pasarPickingAEntrega TotalInicial Detalle = NuLL- ");
-                                                } else {
-                                                    cabeceraPicking.liberar();
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega TotalInicial Detalle = NuLL- ");
+                                            } else {
+                                                cabeceraPicking.liberar();
 
-                                                }
+                                            }
 
                                             /*6 */
-                                                childUpdates.put(nodoPicking_6(PICKING_STATUS_INICIAL, String.valueOf(cabeceraPicking.getNumeroDePickingOrden())), null);
-                                                childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY, String.valueOf(cabeceraPicking.getNumeroDePickingOrden())), cabeceraPicking.toMap());
+                                            childUpdates.put(nodoPicking_6(PICKING_STATUS_INICIAL, String.valueOf(cabeceraPicking.getNumeroDePickingOrden())), null);
+                                            childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY, String.valueOf(cabeceraPicking.getNumeroDePickingOrden())), cabeceraPicking.toMap());
 
-                                                for (int a = 0; a < mCabeceraOrdenTask.size(); a++) {
-                                                    DataSnapshot cabeceraOrdenes = ((DataSnapshot) mCabeceraOrdenTask.get(a).getResult());
-                                                    Log.i(LOG_TAG, "pasarPickingAEntrega cabeceraOrdenes key = " + cabeceraOrdenes.getKey());
-                                                    Log.i(LOG_TAG, "pasarPickingAEntrega cabeceraOrdenes ref = " + cabeceraOrdenes.getRef());
+                                            for (int a = 0; a < mCabeceraOrdenTask.size(); a++) {
+                                                DataSnapshot cabeceraOrdenes = ((DataSnapshot) mCabeceraOrdenTask.get(a).getResult());
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega cabeceraOrdenes key = " + cabeceraOrdenes.getKey());
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega cabeceraOrdenes ref = " + cabeceraOrdenes.getRef());
 
-                                                    String nroDeOrden = cabeceraOrdenes.getKey();
-                                                    CabeceraOrden cabeceraOrden = cabeceraOrdenes.getValue(CabeceraOrden.class);
-                                                    Log.i(LOG_TAG, "pasarPickingAEntrega nroDeOrden = " + nroDeOrden);
-                                                    Log.i(LOG_TAG, "pasarPickingAEntrega nroDeOrden = " + cabeceraOrden.getNumeroDeOrden());
+                                                String nroDeOrden = cabeceraOrdenes.getKey();
+                                                CabeceraOrden cabeceraOrden = cabeceraOrdenes.getValue(CabeceraOrden.class);
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega nroDeOrden = " + nroDeOrden);
+                                                Log.i(LOG_TAG, "pasarPickingAEntrega nroDeOrden = " + cabeceraOrden.getNumeroDeOrden());
 
                                     /*2 */
-                                                    cabeceraOrden.setEstado(ORDEN_STATUS_EN_DELIVERY);
-                                                    cabeceraOrden.liberar();
-                                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_PICKING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), null);
+                                                cabeceraOrden.setEstado(ORDEN_STATUS_EN_DELIVERY);
+                                                cabeceraOrden.liberar();
+                                                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_PICKING, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), null);
 
-                                                    childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), cabeceraOrden.toMap());
+                                                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, cabeceraOrden.getNumeroDeOrden(), cabeceraPicking.getNumeroDePickingOrden()), cabeceraOrden.toMap());
 //                                        childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_EN_DELIVERY, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
-                                                    childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+                                                childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+
+                                            }
+
+                                            mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+
+                                                    Log.i(LOG_TAG, "pasarPickingAEntrega updateChildren-onFailure " + e.toString());
+                                                    liberarRecusosTomados();
+                                                    liberarArrayTaskConBloqueos();
+                                                    muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
 
                                                 }
-
-                                                mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-
-                                                        Log.i(LOG_TAG, "pasarPickingAEntrega updateChildren-onFailure " + e.toString());
-                                                        liberarRecusosTomados();
-                                                        liberarArrayTaskConBloqueos();
-                                                        muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
-
-                                                    }
-                                                }).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                             @Override
-                                                                             public void onComplete(@NonNull Task<Void> task) {
-                                                                                 liberarArrayTaskCasoExitoso();
-                                                                                 Log.i(LOG_TAG, "pasarPickingAEntrega - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
-
-                                                                             }
-                                                                         }
-
-                                                );
-                                            }
-                                        });
-                                        allTask.addOnFailureListener(new OnFailureListener() {
+                                            }).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                          @Override
-                                                                         public void onFailure(@NonNull Exception e) {
-                                                                             liberarRecusosTomados();
-                                                                             liberarArrayTaskConBloqueos();
-                                                                             muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                                                         public void onComplete(@NonNull Task<Void> task) {
+                                                                             liberarArrayTaskCasoExitoso();
+                                                                             Log.i(LOG_TAG, "pasarPickingAEntrega - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
+
                                                                          }
                                                                      }
 
-                                        );
+                                            );
+                                        }
+                                    });
+                                    allTask.addOnFailureListener(new OnFailureListener() {
+                                                                     @Override
+                                                                     public void onFailure(@NonNull Exception e) {
+                                                                         liberarRecusosTomados();
+                                                                         liberarArrayTaskConBloqueos();
+                                                                         muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
+                                                                     }
+                                                                 }
 
-                                    }
+                                    );
+
+                                }
 
 
                                 @Override // Listado de Picking... Listen for single value
                                 public void onCancelled(DatabaseError databaseError) {
-                                    liberarRecusosTomados( );
+                                    liberarRecusosTomados();
                                     liberarArrayTaskConBloqueos();
                                     muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                                 }
@@ -1138,7 +1175,7 @@ public class PickingListFragment extends FragmentBasic {
         }).addOnFailureListener(new OnFailureListener() { // bloqueo de la orden de Picking.
             @Override
             public void onFailure(@NonNull Exception e) {
-                liberarRecusosTomados( );
+                liberarRecusosTomados();
                 liberarArrayTaskConBloqueos();
                 muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Orden");
             }

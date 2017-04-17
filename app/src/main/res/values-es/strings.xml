@@ -135,7 +135,7 @@
     <string name="detail_icon_transition_imagen" translatable="false">TN_DetailIcon</string>
     <string name="pruductDetailBar_NEW_PRODUCT" translatable="false">Nuevo Producto</string>
 
-    <string-array name="productTipoUnidad_array">
+    <string-array name="productTipoUnidad_array">//Si se modifica este Array corregir CustomOrderDetailFragment.
         <item>Unidad</item>
         <item>Kg</item>
         <item>Metro</item>

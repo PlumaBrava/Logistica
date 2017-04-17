@@ -461,12 +461,12 @@ public class DeliveryListFragment extends FragmentBasic
             }
 
             @Override
-            protected void onItemAcceptedHolder(final CabeceraOrden model,final int position) {
+            protected void onItemAcceptedHolder(final CabeceraOrden model1,final int position) {
 
 
-                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Numero de orden- " + model.getNumeroDeOrden());
-                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Estado de orden- " + model.getEstado());
-                pasarOrdenAEntregadaParaCompensar(model);
+                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Numero de orden- " + model1.getNumeroDeOrden());
+                Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Estado de orden- " + model1.getEstado());
+                pasarOrdenAEntregadaParaCompensar(model1);
 
 
             }
@@ -855,12 +855,12 @@ public class DeliveryListFragment extends FragmentBasic
     }
 
 
-    private void pasarOrdenAEntregadaParaCompensar(final CabeceraOrden cabeceraOrden) {
-        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- cabeceraOrden.getEstado() " + cabeceraOrden.getEstado());
+    private void pasarOrdenAEntregadaParaCompensar(final CabeceraOrden cabeceraOrdenParaCompensar) {
+        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- cabeceraOrden.getEstado() " + cabeceraOrdenParaCompensar.getEstado());
         Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- ORDEN_STATUS_DELIVERED_PARA_COMPENSAR " + ORDEN_STATUS_DELIVERED_PARA_COMPENSAR);
-        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- ORDEN_STATUS_DELIVERED_PARA_COMPENSAR " + (cabeceraOrden.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR));
+        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- ORDEN_STATUS_DELIVERED_PARA_COMPENSAR " + (cabeceraOrdenParaCompensar.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR));
 
-        if(cabeceraOrden.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR){
+        if(cabeceraOrdenParaCompensar.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR){
             muestraMensajeEnDialogo("Orden ya entregada");
             return;
         }
@@ -870,7 +870,7 @@ public class DeliveryListFragment extends FragmentBasic
         }
 
 
-        refDetalleOrden_4_ListaXOrden(cabeceraOrden.getNumeroDeOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
+        refDetalleOrden_4_ListaXOrden(cabeceraOrdenParaCompensar.getNumeroDeOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mProductosEnOrdenDatos = dataSnapshot;
@@ -880,7 +880,7 @@ public class DeliveryListFragment extends FragmentBasic
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         mProductosEnTotalPickingDatos = dataSnapshot;
 
-                        refSaldoTotalClientes_10(cabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        refSaldoTotalClientes_10(cabeceraOrdenParaCompensar.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 CabeceraOrden saldo = dataSnapshot.getValue(CabeceraOrden.class);
@@ -915,7 +915,7 @@ public class DeliveryListFragment extends FragmentBasic
                                             Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking modificado" +detalleTotalPicking.getCantidadEntrega());
                                             Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking Actualizada" +detalleTotalPicking.getCantidadEntrega());
                                             //Actualizo los totales entregado por producto en la orden de Picking
-                                            childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraOrden.getNumeroDePickingOrden(), productKey), detalleTotalPicking.toMap());
+                                            childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraOrdenParaCompensar.getNumeroDePickingOrden(), productKey), detalleTotalPicking.toMap());
                                             break;
 
                                         }
@@ -925,7 +925,7 @@ public class DeliveryListFragment extends FragmentBasic
                                           detalleTotalPicking.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
                                         Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking Actualizada" +detalleTotalPicking.getCantidadEntrega());
                                         //Actualizo los totales entregado por producto en la orden de Picking
-                                        childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraOrden.getNumeroDePickingOrden(), productKey), detalleTotalPicking.toMap());
+                                        childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraOrdenParaCompensar.getNumeroDePickingOrden(), productKey), detalleTotalPicking.toMap());
 
                                     }
 
@@ -934,21 +934,21 @@ public class DeliveryListFragment extends FragmentBasic
 
 
                                 //Actualizo el Monto total Entregado en el Picking
-                                datosCabeceraPickingSeleccionada.getTotales().setSumaMontoEntregado(cabeceraOrden.getTotales().getMontoEntregado());
+                                datosCabeceraPickingSeleccionada.getTotales().setSumaMontoEntregado(cabeceraOrdenParaCompensar.getTotales().getMontoEntregado());
                                 datosCabeceraPickingSeleccionada.setUsuarioEntrega(mUsuario.getUsername());
                                 childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY,String.valueOf ( datosCabeceraPickingSeleccionada.getNumeroDePickingOrden())), datosCabeceraPickingSeleccionada.toMap());
 
                                 //Actualizo las cabeceras de Ordenes
-                                cabeceraOrden.setEstado(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR);
-                                cabeceraOrden.bloquear();
-                                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, cabeceraOrden.getNumeroDeOrden(), cabeceraOrden.getNumeroDePickingOrden()),cabeceraOrden.toMap());
-                                childUpdates.put(nodoCabeceraOrdenList_ParaCompensar(cabeceraOrden.getClienteKey(),cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+                                cabeceraOrdenParaCompensar.setEstado(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR);
+                                cabeceraOrdenParaCompensar.bloquear();
+                                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, cabeceraOrdenParaCompensar.getNumeroDeOrden(), cabeceraOrdenParaCompensar.getNumeroDePickingOrden()),cabeceraOrdenParaCompensar.toMap());
+                                childUpdates.put(nodoCabeceraOrdenList_ParaCompensar(cabeceraOrdenParaCompensar.getClienteKey(),cabeceraOrdenParaCompensar.getNumeroDeOrden()), cabeceraOrdenParaCompensar.toMap());
 //                                childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
-                                childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
+                                childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrdenParaCompensar.getNumeroDeOrden()), cabeceraOrdenParaCompensar.toMap());
 
                                 Double iva=0.0;
-                                if(!cabeceraOrden.getCliente().getEspecial()){
-                                    iva=cabeceraOrden.getCliente().getIva();
+                                if(!cabeceraOrdenParaCompensar.getCliente().getEspecial()){
+                                    iva=cabeceraOrdenParaCompensar.getCliente().getIva();
                                 }
 
                                 if (saldo == null) {
@@ -956,27 +956,27 @@ public class DeliveryListFragment extends FragmentBasic
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldosTotal= NULL");
 
                                     Totales totales = new Totales(0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-                                    saldo = new CabeceraOrden(cabeceraOrden.getClienteKey(), cabeceraOrden.getCliente(), ORDEN_STATUS_INICIAL, totales, "Sistema", 00);
+                                    saldo = new CabeceraOrden(cabeceraOrdenParaCompensar.getClienteKey(), cabeceraOrdenParaCompensar.getCliente(), ORDEN_STATUS_INICIAL, totales, "Sistema", 00);
                                     saldo.setUsuarioCreador("Sistema");
                                     saldo.bloquear();
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = "+saldo.getTotales().getSaldo());
-                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar monto entreado = "+cabeceraOrden.getTotales().getMontoEntregado());
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar monto entreado = "+cabeceraOrdenParaCompensar.getTotales().getMontoEntregado());
 
-                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrden.getTotales().getMontoEntregado()*(1+iva/100)));
-                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrden.getTotales().getMontoEntregado()*(1+iva/100)));
+                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado()*(1+iva/100)));
+                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado()*(1+iva/100)));
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= "+saldo.getTotales().getSaldo());
 
                                 } else {
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = "+saldo.getTotales().getSaldo());
-                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrden.getTotales().getMontoEntregado()*(1+iva/100)));
-                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrden.getTotales().getMontoEntregado()*(1+iva/100)));
+                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado()*(1+iva/100)));
+                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado()*(1+iva/100)));
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= "+saldo.getTotales().getSaldo());
 
                                 }
-                                childUpdates.put(nodoSaldoTotalClientes_10(cabeceraOrden.getClienteKey()), saldo.toMap());
+                                childUpdates.put(nodoSaldoTotalClientes_10(cabeceraOrdenParaCompensar.getClienteKey()), saldo.toMap());
 
-                                mClienteKey = cabeceraOrden.getClienteKey();
-                                mCliente = cabeceraOrden.getCliente();
+                                mClienteKey = cabeceraOrdenParaCompensar.getClienteKey();
+                                mCliente = cabeceraOrdenParaCompensar.getCliente();
 
                                 Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar - : abro pagos" );
                                 Intent intent = new Intent(getContext(), PagosActivity.class);

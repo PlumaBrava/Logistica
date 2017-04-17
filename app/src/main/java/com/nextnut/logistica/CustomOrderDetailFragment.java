@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -862,7 +863,68 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     public void showDialogNumberPicker(final String productKey) {
 
         {
-            Log.i("Picker", " - " + System.currentTimeMillis());
+            if(mDetalleAnterior.getProducto().getTipoUnidad().equals("Kg")||mDetalleAnterior.getProducto().getTipoUnidad().equals("Metro")){
+
+                Log.i("Picker", " KG o Metro");
+
+
+                final Dialog d = new Dialog(getContext());
+                d.setTitle(getString(R.string.quantityPicker));
+                d.setContentView(R.layout.dialog_text_picker);
+                Button b1 = (Button) d.findViewById(R.id.button1);
+                Button b2 = (Button) d.findViewById(R.id.button2);
+                final EditText np = (EditText) d.findViewById(R.id.cantidad_text);
+                if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
+                    Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
+
+                    np.setText(String.valueOf( mDetalleAnterior.getCantidadOrden()));
+
+                } else {
+                    Log.i("Picker", "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
+
+                    if (mDetalleAnterior.getCantidadOrden() == null) {
+                        np.setText(String.valueOf( mDetalleAnterior.getProducto().getCantidadDefault()));
+                    } else {
+                        np.setText(String.valueOf( mDetalleAnterior.getCantidadOrden()));
+                    }
+                }
+                b1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i("Picker", "b1.setOnClickListener");
+                        d.dismiss();
+                        if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
+                            Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
+                            Log.i("Picker", "abmDetalleDeOrdenDelivery");
+                            abmDetalleDeOrdenDelivery( Double.valueOf( np.getText().toString()), productKey, mDetalleAnterior);
+
+                        } else {
+
+                            abmDetalleDeOrden(Double.valueOf( np.getText().toString()), productKey, mDetalleAnterior);
+
+
+                        }
+
+                    }
+                });
+                b2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        d.dismiss();
+                    }
+                });
+                Log.i("Picker", "b2.setOnClickListener");
+
+                d.show();
+
+
+            } else if(mDetalleAnterior.getProducto().getTipoUnidad().equals("Unidad")){
+
+                Log.i("Picker", " Unidad");
+
+
+
+                Log.i("Picker", " - " + System.currentTimeMillis());
 
 //            SimpleDateFormat aamm = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
@@ -914,32 +976,10 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                         Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
                         Log.i("Picker", "abmDetalleDeOrdenDelivery");
                         abmDetalleDeOrdenDelivery((double) np.getValue(), productKey, mDetalleAnterior);
-//                        ca();
-//                        
-//                        vh.mUnidadesSolicitadas.setText(String.valueOf(np.getValue()));
-//                        CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecioDelivery.getText().toString());
-//                        double total = np.getValue() * price.convert();
-//                        NumberFormat format = NumberFormat.getCurrencyInstance();
-//                        vh.mKgSolicitados.setText(format.format(total));
-//                        saveCantidad(vh.mDetalleOrderId, Integer.valueOf(np.getValue()));
-//
-//                        d.dismiss();
 
                     } else {
-                        Log.i("Picker", "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
-
-                        Log.d("Picker", "showDialogNumberPicker-detalle) " + mDetalleAnterior.getCantidadOrden());
-                        Log.d("Picker", "showDialogNumberPicker-np.getValue() " + np.getValue());
-                        Log.i("Picker", "abmDetalleDeOrden");
 
                         abmDetalleDeOrden((double) np.getValue(), productKey, mDetalleAnterior);
-//                        modificarCantidadDeProductoEnOrden(np.getValue(), productKey);
-//                        vh.mUnidadesEnStock.setText(String.valueOf(np.getValue()));
-//                        CurrencyToDouble price = new CurrencyToDouble(vh.mTextViewPrecio.getText().toString());
-//                        double total = np.getValue() * price.convert();
-//                        NumberFormat format = NumberFormat.getCurrencyInstance();
-//                        vh.mKgEnStock.setText(format.format(total));
-//                        saveCantidad(vh.mDetalleOrderId, Integer.valueOf(np.getValue()));
 
 
                     }
@@ -957,7 +997,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             d.show();
 
 
-        }
+        }}
     }
 
 
