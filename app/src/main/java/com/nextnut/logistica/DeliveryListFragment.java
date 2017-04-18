@@ -105,10 +105,11 @@ public class DeliveryListFragment extends FragmentBasic
     private TextView mTilePickingOrderNumber;
     private EditText mTilePickingComent;
     private EditText mMontoRecaudado;
+    private EditText mMontoEntregado;
     private TextView mCreationDate;
 
-    private  ImageButton mConectarImpresoraButton;
-    private  ImageButton mImprimirButton;
+    private ImageButton mConectarImpresoraButton;
+    private ImageButton mImprimirButton;
 
     private ArrayList<Task> taskList = new ArrayList<Task>();
     private Task<Void> allTask;
@@ -120,11 +121,10 @@ public class DeliveryListFragment extends FragmentBasic
 
     private int mVentaProductosIndex;
     private int mCabeceraOrdenIndex;
-//    private ArrayList<ArrayList<Detalle>> mListaDetalleDeOrdenes =new ArrayList<>();
-    private ArrayList<DataSnapshot> mListaDetalleDeOrdenes =new ArrayList<>();
+    //    private ArrayList<ArrayList<Detalle>> mListaDetalleDeOrdenes =new ArrayList<>();
+    private ArrayList<DataSnapshot> mListaDetalleDeOrdenes = new ArrayList<>();
 
     private CabeceraPicking datosCabeceraPickingSeleccionada;// Tiene los datos de la cabecera de picking, cuando se hace click en un Picking
-
 
 
     private LinearLayout mLinearProductos;
@@ -138,7 +138,6 @@ public class DeliveryListFragment extends FragmentBasic
     private boolean mTwoPane;
 
     private static final String LOG_TAG = DeliveryListFragment.class.getSimpleName();
-
 
 
     // android built in classes for bluetooth operations
@@ -158,7 +157,7 @@ public class DeliveryListFragment extends FragmentBasic
 
     @Override
     public void onAttach(Context context) {
-        Log.i(LOG_TAG, "onAttach " );
+        Log.i(LOG_TAG, "onAttach ");
         super.onAttach(context);
 
 
@@ -166,13 +165,13 @@ public class DeliveryListFragment extends FragmentBasic
 
     @Override
     public void onHiddenChanged(boolean hidden) {
-        Log.i(LOG_TAG, "onHiddenChanged " );
+        Log.i(LOG_TAG, "onHiddenChanged ");
         super.onHiddenChanged(hidden);
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        Log.i(LOG_TAG, "osetUserVisibleHint " +isVisibleToUser);
+        Log.i(LOG_TAG, "osetUserVisibleHint " + isVisibleToUser);
         if (isVisibleToUser) {
         }
         super.setUserVisibleHint(isVisibleToUser);
@@ -180,7 +179,7 @@ public class DeliveryListFragment extends FragmentBasic
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(LOG_TAG, " onCreate " );
+        Log.i(LOG_TAG, " onCreate ");
 
         super.onCreate(savedInstanceState);
 
@@ -204,7 +203,7 @@ public class DeliveryListFragment extends FragmentBasic
         mDeliveryOrderTile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i(LOG_TAG, "mDeliveryOrderTile: on click " );
+                Log.i(LOG_TAG, "mDeliveryOrderTile: on click ");
                 desbloqueoPickingParaTrabajoOffLine();
 //
 //                mDeliveryOrderTile.setVisibility(View.GONE);
@@ -216,7 +215,7 @@ public class DeliveryListFragment extends FragmentBasic
         mDeliveryOrderTile.setVisibility(View.GONE);
 
 
-        mConectarImpresoraButton =(ImageButton ) mDeliveryOrderTile.findViewById(R.id.conectarImpresoraDelivey);
+        mConectarImpresoraButton = (ImageButton) mDeliveryOrderTile.findViewById(R.id.conectarImpresoraDelivey);
         mConectarImpresoraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -229,7 +228,7 @@ public class DeliveryListFragment extends FragmentBasic
             }
         });
 
-        mImprimirButton =(ImageButton ) mDeliveryOrderTile.findViewById(R.id.ImprimirDelivey);
+        mImprimirButton = (ImageButton) mDeliveryOrderTile.findViewById(R.id.ImprimirDelivey);
         mImprimirButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -240,6 +239,7 @@ public class DeliveryListFragment extends FragmentBasic
         mTilePickingOrderNumber = (TextView) mDeliveryOrderTile.findViewById(R.id.titlepickingNumberOrderCard);
         mTilePickingComent = (EditText) mDeliveryOrderTile.findViewById(R.id.TitlepickingOrderComents);
         mMontoRecaudado = (EditText) mDeliveryOrderTile.findViewById(R.id.montoRecaudado);
+        mMontoEntregado = (EditText) mDeliveryOrderTile.findViewById(R.id.montoEntregado);
 
         mCreationDate = (TextView) mDeliveryOrderTile.findViewById(R.id.titlePicckinOder_creationdate);
 
@@ -247,7 +247,7 @@ public class DeliveryListFragment extends FragmentBasic
         mLinearOrders = (LinearLayout) rootView.findViewById(R.id.linearOrders);
 
 
-       final View emptyViewPicking = rootView.findViewById(R.id.recyclerview_pickingOrders_empty);
+        final View emptyViewPicking = rootView.findViewById(R.id.recyclerview_pickingOrders_empty);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
@@ -272,6 +272,10 @@ public class DeliveryListFragment extends FragmentBasic
                             datosCabeceraPickingSeleccionada = model.Copy();
                             mTilePickingComent.setText(model.getComentario());
                             mTilePickingOrderNumber.setText(String.valueOf(model.getNumeroDePickingOrden()));
+                            NumberFormat format = NumberFormat.getCurrencyInstance();
+                            mMontoEntregado.setText(format.format(model.getTotales().getMontoEntregado()+model.getTotales().getMontoImpuesto()));
+                            mMontoRecaudado.setText(format.format(model.getMontoRecaudado()));
+
                             mTilePickingComent.setVisibility(View.VISIBLE);
                             SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
@@ -310,7 +314,7 @@ public class DeliveryListFragment extends FragmentBasic
         fab_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i(LOG_TAG, "fab_save: on click " );
+                Log.i(LOG_TAG, "fab_save: on click ");
 
                 if (isNetworkAvailable(getContext())) {
 
@@ -338,7 +342,6 @@ public class DeliveryListFragment extends FragmentBasic
         emptyViewCustomOrder = rootView.findViewById(R.id.recyclerview_custom_empty);
 
 
-
         mLinearOrders.setVisibility(View.GONE);
         mLinearProductos.setVisibility(View.GONE);
 
@@ -352,20 +355,22 @@ public class DeliveryListFragment extends FragmentBasic
         Log.i(LOG_TAG, "nroPickingAlmacenado: " + nroPickingAlmacenado);
 
         if (nroPickingAlmacenado > 0) {
-            refPicking_6(PICKING_STATUS_DELIVERY,nroPickingAlmacenado).addListenerForSingleValueEvent(new ValueEventListener() {
+            refPicking_6(PICKING_STATUS_DELIVERY, nroPickingAlmacenado).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     datosCabeceraPickingSeleccionada = dataSnapshot.getValue(CabeceraPicking.class);
 
 
                     mTilePickingComent.setText(datosCabeceraPickingSeleccionada.getComentario());
+                    NumberFormat format = NumberFormat.getCurrencyInstance();
                     mTilePickingOrderNumber.setText(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()));
                     mTilePickingComent.setVisibility(View.VISIBLE);
-//                    mMontoRecaudado.setText(datosCabeceraPickingSeleccionada.getMontoRecaudado().toString());
+                    mMontoEntregado.setText(format.format(datosCabeceraPickingSeleccionada.getTotales().getMontoEntregado()+datosCabeceraPickingSeleccionada.getTotales().getMontoImpuesto()));
+                    mMontoRecaudado.setText(format.format(datosCabeceraPickingSeleccionada.getMontoRecaudado()));
+
                     SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy");
 
                     mCreationDate.setText(sfd.format(new Date(datosCabeceraPickingSeleccionada.getFechaDeCreacion())));
-
 
 
                     mPickinOrdersAdapter.notifyDataSetChanged();
@@ -389,7 +394,6 @@ public class DeliveryListFragment extends FragmentBasic
 
                 }
             });
-
 
 
         }
@@ -454,14 +458,14 @@ public class DeliveryListFragment extends FragmentBasic
             }
 
             @Override
-            protected void onItemDismissHolder(final CabeceraOrden model,final int position) {
+            protected void onItemDismissHolder(final CabeceraOrden model, final int position) {
                 Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Numero de orden- " + model.getNumeroDeOrden());
                 Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Estado de orden- " + model.getEstado());
 
             }
 
             @Override
-            protected void onItemAcceptedHolder(final CabeceraOrden model1,final int position) {
+            protected void onItemAcceptedHolder(final CabeceraOrden model1, final int position) {
 
 
                 Log.i(LOG_TAG, "OrdenesEndelivery Modelo: Numero de orden- " + model1.getNumeroDeOrden());
@@ -546,18 +550,15 @@ public class DeliveryListFragment extends FragmentBasic
     }
 
 
-
-
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Log.i(LOG_TAG, " oonViewCreated " );
+        Log.i(LOG_TAG, " oonViewCreated ");
         super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(LOG_TAG, " onActivityCreated " );
+        Log.i(LOG_TAG, " onActivityCreated ");
 
 
         super.onActivityCreated(savedInstanceState);
@@ -565,13 +566,13 @@ public class DeliveryListFragment extends FragmentBasic
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        Log.i(LOG_TAG, " onViewStateRestored " );
+        Log.i(LOG_TAG, " onViewStateRestored ");
         super.onViewStateRestored(savedInstanceState);
     }
 
     @Override
     public void onStart() {
-        Log.i(LOG_TAG, " onStart" );
+        Log.i(LOG_TAG, " onStart");
         super.onStart();
     }
 
@@ -625,7 +626,7 @@ public class DeliveryListFragment extends FragmentBasic
                         Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockCabeceraOrden tiene children: " + dataSnapshot.hasChildren());
 
                         int i = 0;
-                        int j=0;
+                        int j = 0;
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             CabeceraOrden cab = (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
                             Log.i(LOG_TAG, "bloqueoPickingOffLine - readBlockCabeceraOrden:" + cab.getNumeroDeOrden());
@@ -633,12 +634,12 @@ public class DeliveryListFragment extends FragmentBasic
                             taskList.add(mCabeceraOrdenTask.get(i));
                             // bloqueo el saldo si no fue anteriormente bloqueado por otra orden
                             Log.i(LOG_TAG, "bloqueoPickingOffLine - SaldoNoRepetido Index:" + mSaldosTotalIndex.indexOf(cab.getClienteKey()));
-                            if(!(mSaldosTotalIndex.indexOf(cab.getClienteKey())>-1)){
+                            if (!(mSaldosTotalIndex.indexOf(cab.getClienteKey()) > -1)) {
                                 Log.i(LOG_TAG, "bloqueoPickingOffLine - SaldoNoRepetido:" + cab.getNumeroDeOrden());
                                 Log.i(LOG_TAG, "bloqueoPickingOffLine - SaldoNoRepetido:" + cab.getClienteKey());
-                            readBlockSaldosTotal(cab.getClienteKey());
+                                readBlockSaldosTotal(cab.getClienteKey());
                                 Log.i(LOG_TAG, "bloqueoPickingOffLine - SaldoNoRepetido Index after:" + mSaldosTotalIndex.indexOf(cab.getClienteKey()));
-                            taskList.add(mSaldosTotalTask.get(j));
+                                taskList.add(mSaldosTotalTask.get(j));
                                 j++;
                             }
                             i++;
@@ -769,7 +770,7 @@ public class DeliveryListFragment extends FragmentBasic
                             mLiberarSemaforoCabeceraOrden = true;
                             Log.i(LOG_TAG, "desbloqueoPickingOffLine - SaldoNoRepetido Index antes:" + mSaldosTotalIndexLiberar.indexOf(cab.getClienteKey()));
 
-                            if(!(mSaldosTotalIndexLiberar.indexOf(cab.getClienteKey())>-1)){
+                            if (!(mSaldosTotalIndexLiberar.indexOf(cab.getClienteKey()) > -1)) {
                                 Log.i(LOG_TAG, "desbloqueoPickingOffLine - SaldoNoRepetido Nro Orden:" + cab.getNumeroDeOrden());
                                 Log.i(LOG_TAG, "desbloqueoPickingOffLine - SaldoNoRepetido cliente Key:" + cab.getClienteKey());
                                 mSaldosTotalIndexLiberar.add(cab.getClienteKey());
@@ -858,9 +859,9 @@ public class DeliveryListFragment extends FragmentBasic
     private void pasarOrdenAEntregadaParaCompensar(final CabeceraOrden cabeceraOrdenParaCompensar) {
         Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- cabeceraOrden.getEstado() " + cabeceraOrdenParaCompensar.getEstado());
         Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- ORDEN_STATUS_DELIVERED_PARA_COMPENSAR " + ORDEN_STATUS_DELIVERED_PARA_COMPENSAR);
-        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- ORDEN_STATUS_DELIVERED_PARA_COMPENSAR " + (cabeceraOrdenParaCompensar.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR));
+        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- ORDEN_STATUS_DELIVERED_PARA_COMPENSAR " + (cabeceraOrdenParaCompensar.getEstado() >= ORDEN_STATUS_DELIVERED_PARA_COMPENSAR));
 
-        if(cabeceraOrdenParaCompensar.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR){
+        if (cabeceraOrdenParaCompensar.getEstado() >= ORDEN_STATUS_DELIVERED_PARA_COMPENSAR) {
             muestraMensajeEnDialogo("Orden ya entregada");
             return;
         }
@@ -888,6 +889,11 @@ public class DeliveryListFragment extends FragmentBasic
                                 Map<String, Object> childUpdates = new HashMap<>();
                                 Map<String, Object> productosEnTotalPickingValues = null;
                                 int i = 0;
+                                Double iva = 0.0;
+                                if (!cabeceraOrdenParaCompensar.getCliente().getEspecial()) {
+                                    iva = cabeceraOrdenParaCompensar.getCliente().getIva() / 100;
+                                }
+
                                 for (DataSnapshot productoEnOrden : mProductosEnOrdenDatos.getChildren()) {
                                     Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- " + productoEnOrden.getKey());
                                     // busca el producto dentro de la orden
@@ -898,7 +904,9 @@ public class DeliveryListFragment extends FragmentBasic
                                     detalleOrdenAux.modificarCantidadProductoDeOrden(0.0); // modificamos la cantidad a Cero para usarla para el calculo de Total
                                     detalleOrdenAux.modificarCantidadProductoDeEntrega(0.0); // modificamos la cantidad a Cero para usarla para el calculo de Total
                                     Boolean encontroLaLLave = false;
-                                    Detalle detalleTotalPicking=null;
+                                    Detalle detalleTotalPicking = null;
+
+
                                     for (DataSnapshot productoEnTotalPicking : mProductosEnTotalPickingDatos.getChildren()) {
                                         String productTotalPickingKey = productoEnTotalPicking.getKey();
 
@@ -907,13 +915,14 @@ public class DeliveryListFragment extends FragmentBasic
                                         if (productKey.equals(productTotalPickingKey)) {
                                             Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- producto" + detalleOrden.getProducto().getNombreProducto());
                                             Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad endtregada Orden" + detalleOrden.getCantidadEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking" +detalleTotalPicking.getCantidadEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking" + detalleTotalPicking.getCantidadEntrega());
 
                                             //Actualizar totales de picking
                                             encontroLaLLave = true;
                                             detalleTotalPicking.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
-                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking modificado" +detalleTotalPicking.getCantidadEntrega());
-                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking Actualizada" +detalleTotalPicking.getCantidadEntrega());
+                                            detalleTotalPicking.setMontoImpuesto(detalleTotalPicking.getMontoImpuesto() + (detalleOrden.getMontoItemEntrega() * iva));
+                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking modificado" + detalleTotalPicking.getCantidadEntrega());
+                                            Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking Actualizada" + detalleTotalPicking.getCantidadEntrega());
                                             //Actualizo los totales entregado por producto en la orden de Picking
                                             childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraOrdenParaCompensar.getNumeroDePickingOrden(), productKey), detalleTotalPicking.toMap());
                                             break;
@@ -921,9 +930,11 @@ public class DeliveryListFragment extends FragmentBasic
                                         }
                                     }
                                     if (!encontroLaLLave) {
-                                          detalleTotalPicking = new Detalle(0.0, detalleOrden.getProducto(), null);
-                                          detalleTotalPicking.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
-                                        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking Actualizada" +detalleTotalPicking.getCantidadEntrega());
+                                        detalleTotalPicking = new Detalle(0.0, detalleOrden.getProducto(), null);
+                                        detalleTotalPicking.modificarCantidadEnTotalDelivey(detalleOrden, detalleOrdenAux);
+                                        detalleTotalPicking.setMontoImpuesto(detalleTotalPicking.getMontoImpuesto() + (detalleOrden.getMontoItemEntrega() * iva));
+
+                                        Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar- Cantidad entregada Picking Actualizada" + detalleTotalPicking.getCantidadEntrega());
                                         //Actualizo los totales entregado por producto en la orden de Picking
                                         childUpdates.put(nodoPickingTotal_7(PICKING_STATUS_DELIVERY, cabeceraOrdenParaCompensar.getNumeroDePickingOrden(), productKey), detalleTotalPicking.toMap());
 
@@ -934,22 +945,20 @@ public class DeliveryListFragment extends FragmentBasic
 
 
                                 //Actualizo el Monto total Entregado en el Picking
-                                datosCabeceraPickingSeleccionada.getTotales().setSumaMontoEntregado(cabeceraOrdenParaCompensar.getTotales().getMontoEntregado());
+//                                datosCabeceraPickingSeleccionada.getTotales().setSumaMontoEntregado(cabeceraOrdenParaCompensar.getTotales().getMontoEntregado() * (1 + iva));
+                                datosCabeceraPickingSeleccionada.getTotales().setSumaMontoEntregado(cabeceraOrdenParaCompensar);
                                 datosCabeceraPickingSeleccionada.setUsuarioEntrega(mUsuario.getUsername());
-                                childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY,String.valueOf ( datosCabeceraPickingSeleccionada.getNumeroDePickingOrden())), datosCabeceraPickingSeleccionada.toMap());
+                                childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY, String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden())), datosCabeceraPickingSeleccionada.toMap());
 
                                 //Actualizo las cabeceras de Ordenes
                                 cabeceraOrdenParaCompensar.setEstado(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR);
+                                cabeceraOrdenParaCompensar.setUsuarioEntrega(mUsuario.getUsername());
                                 cabeceraOrdenParaCompensar.bloquear();
-                                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, cabeceraOrdenParaCompensar.getNumeroDeOrden(), cabeceraOrdenParaCompensar.getNumeroDePickingOrden()),cabeceraOrdenParaCompensar.toMap());
-                                childUpdates.put(nodoCabeceraOrdenList_ParaCompensar(cabeceraOrdenParaCompensar.getClienteKey(),cabeceraOrdenParaCompensar.getNumeroDeOrden()), cabeceraOrdenParaCompensar.toMap());
+                                childUpdates.put(nodoCabeceraOrden_2Status(ORDEN_STATUS_EN_DELIVERY, cabeceraOrdenParaCompensar.getNumeroDeOrden(), cabeceraOrdenParaCompensar.getNumeroDePickingOrden()), cabeceraOrdenParaCompensar.toMap());
+                                childUpdates.put(nodoCabeceraOrdenList_ParaCompensar(cabeceraOrdenParaCompensar.getClienteKey(), cabeceraOrdenParaCompensar.getNumeroDeOrden()), cabeceraOrdenParaCompensar.toMap());
 //                                childUpdates.put(nodoCabeceraOrden_2(ORDEN_STATUS_DELIVERED_PARA_COMPENSAR, cabeceraOrden.getNumeroDeOrden()), cabeceraOrden.toMap());
                                 childUpdates.put(nodoCabeceraOrden_1B(cabeceraOrdenParaCompensar.getNumeroDeOrden()), cabeceraOrdenParaCompensar.toMap());
 
-                                Double iva=0.0;
-                                if(!cabeceraOrdenParaCompensar.getCliente().getEspecial()){
-                                    iva=cabeceraOrdenParaCompensar.getCliente().getIva();
-                                }
 
                                 if (saldo == null) {
                                     // di no existe esta estructura, se crea una en cero.
@@ -959,18 +968,18 @@ public class DeliveryListFragment extends FragmentBasic
                                     saldo = new CabeceraOrden(cabeceraOrdenParaCompensar.getClienteKey(), cabeceraOrdenParaCompensar.getCliente(), ORDEN_STATUS_INICIAL, totales, "Sistema", 00);
                                     saldo.setUsuarioCreador("Sistema");
                                     saldo.bloquear();
-                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = "+saldo.getTotales().getSaldo());
-                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar monto entreado = "+cabeceraOrdenParaCompensar.getTotales().getMontoEntregado());
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = " + saldo.getTotales().getSaldo());
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar monto entreado = " + cabeceraOrdenParaCompensar.getTotales().getMontoEntregado());
 
-                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado()*(1+iva/100)));
-                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado()*(1+iva/100)));
-                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= "+saldo.getTotales().getSaldo());
+                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado() * (1 + iva / 100)));
+                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado() * (1 + iva)));
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= " + saldo.getTotales().getSaldo());
 
                                 } else {
-                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = "+saldo.getTotales().getSaldo());
-                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado()*(1+iva/100)));
-                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado()*(1+iva/100)));
-                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= "+saldo.getTotales().getSaldo());
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos = " + saldo.getTotales().getSaldo());
+                                    saldo.getTotales().setMontoEntregado(saldo.getTotales().getMontoEntregado() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado() * (1 + iva / 100)));
+                                    saldo.getTotales().setSaldo(saldo.getTotales().getSaldo() + (cabeceraOrdenParaCompensar.getTotales().getMontoEntregado() * (1 + iva)));
+                                    Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar saldos actualizado= " + saldo.getTotales().getSaldo());
 
                                 }
                                 childUpdates.put(nodoSaldoTotalClientes_10(cabeceraOrdenParaCompensar.getClienteKey()), saldo.toMap());
@@ -978,7 +987,7 @@ public class DeliveryListFragment extends FragmentBasic
                                 mClienteKey = cabeceraOrdenParaCompensar.getClienteKey();
                                 mCliente = cabeceraOrdenParaCompensar.getCliente();
 
-                                Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar - : abro pagos" );
+                                Log.i(LOG_TAG, "pasarOrdenAEntregadaParaCompensar - : abro pagos");
                                 Intent intent = new Intent(getContext(), PagosActivity.class);
                                 putExtraFirebase_Fragment(intent);
                                 startActivity(intent);
@@ -995,8 +1004,6 @@ public class DeliveryListFragment extends FragmentBasic
                                 }).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-
-
 
 
                                     }
@@ -1024,56 +1031,55 @@ public class DeliveryListFragment extends FragmentBasic
             }
         });
 
-        }
+    }
 
-public void compensarCuentaOffine(String clienteKey){
-    refCabeceraOrdenList_ParaCompensar(clienteKey).addListenerForSingleValueEvent(new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            final DataSnapshot ordenesSinCompensar=dataSnapshot;
+    public void compensarCuentaOffine(String clienteKey) {
+        refCabeceraOrdenList_ParaCompensar(clienteKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final DataSnapshot ordenesSinCompensar = dataSnapshot;
 
-            refPagosListado_11(mClienteKey,String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    DataSnapshot pagosSinCompensar=dataSnapshot;
+                refPagosListado_11(mClienteKey, String.valueOf(PAGO_STATUS_INICIAL_SIN_COMPENSAR)).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        DataSnapshot pagosSinCompensar = dataSnapshot;
 
-                   for( DataSnapshot ordenCabecera : ordenesSinCompensar.getChildren()){
-                    String nroOrden = ordenCabecera.getKey();
-                    CabeceraOrden orden = ordenCabecera.getValue(CabeceraOrden.class);
+                        for (DataSnapshot ordenCabecera : ordenesSinCompensar.getChildren()) {
+                            String nroOrden = ordenCabecera.getKey();
+                            CabeceraOrden orden = ordenCabecera.getValue(CabeceraOrden.class);
 
-                       if(orden.sepuedeModificar()){
-                       for( DataSnapshot pago : pagosSinCompensar.getChildren()){
-                           String pagoKey = ordenCabecera.getKey();
-                           Pago p = pago.getValue(Pago.class);
+                            if (orden.sepuedeModificar()) {
+                                for (DataSnapshot pago : pagosSinCompensar.getChildren()) {
+                                    String pagoKey = ordenCabecera.getKey();
+                                    Pago p = pago.getValue(Pago.class);
 
-                           Compensacion compesacion=new Compensacion(orden,p,pagoKey,mUserKey);
-
-
-                       }
-                       }else{
-                           continue;
-                       }
-                   }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+                                    Compensacion compesacion = new Compensacion(orden, p, pagoKey, mUserKey);
 
 
-        }
+                                }
+                            } else {
+                                continue;
+                            }
+                        }
+                    }
 
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-        }
-    });
+                    }
+                });
 
 
-}
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
 
 
     private void pasarPickingAInicial(final CabeceraPicking cabeceraPicking) {
@@ -1104,8 +1110,8 @@ public void compensarCuentaOffine(String clienteKey){
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden Ref " + dataSnapshot.getRef());
                             Log.i(LOG_TAG, "pasarPickingAEntrega Bloqueo Orden ChildrenCount" + dataSnapshot.getChildrenCount());
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                              CabeceraOrden cabeceraOrden= (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
-                                if (cabeceraOrden.getEstado()>= ORDEN_STATUS_EN_DELIVERY){
+                                CabeceraOrden cabeceraOrden = (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
+                                if (cabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERY) {
                                     Log.i(LOG_TAG, "pasarPickingAEntrega Hay Ordenes Entregadas" + cabeceraOrden.getNumeroDeOrden());
 
                                     muestraMensajeEnDialogo("Ya existen ordenes Entregadas, no se puede regresar a Preparar");
@@ -1282,7 +1288,7 @@ public void compensarCuentaOffine(String clienteKey){
         taskList.clear();
         // leo y bloqueo picking
         readBlockPicking(PICKING_STATUS_DELIVERY, cabeceraPicking.getNumeroDePickingOrden());
-        final String aamm =(new SimpleDateFormat("yyyy-MM").format(new Date(System.currentTimeMillis()))).toString();
+        final String aamm = (new SimpleDateFormat("yyyy-MM").format(new Date(System.currentTimeMillis()))).toString();
 
         mPickingTask.addOnCompleteListener(new OnCompleteListener() {
             @Override
@@ -1293,28 +1299,27 @@ public void compensarCuentaOffine(String clienteKey){
 //                    final SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
 
 
-
                     Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo Orden key lee cabeceras");
                     //leo las ordenes asociadas al picking y las bloqueo
                     refCabeceraOrden_2_List(ORDEN_STATUS_EN_DELIVERY, cabeceraPicking.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            mCaberasOrdenCerrarPickingDatos=dataSnapshot;
+                            mCaberasOrdenCerrarPickingDatos = dataSnapshot;
                             Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo Orden lee cabeceras Llegaron los datos");
                             Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo Orden key " + dataSnapshot.getKey());
                             Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo Orden Ref " + dataSnapshot.getRef());
                             Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo Orden ChildrenCount" + dataSnapshot.getChildrenCount());
 
                             int i = 0;
-                           mVentaProductosIndex =0;
+                            mVentaProductosIndex = 0;
                             for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 String nroOrden = snapshot.getKey();
-                                final CabeceraOrden cabeceraOrden= (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
+                                final CabeceraOrden cabeceraOrden = (CabeceraOrden) snapshot.getValue(CabeceraOrden.class);
 
                                 readBlockCabeceraOrden(Long.parseLong(nroOrden));
                                 taskList.add(mCabeceraOrdenTask.get(i));
                                 i++;
-                                final ArrayList<Detalle> listadeDetalles= new ArrayList<Detalle>();
+                                final ArrayList<Detalle> listadeDetalles = new ArrayList<Detalle>();
                                 refDetalleOrden_4_ListaXOrden(Long.parseLong(nroOrden)).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -1338,18 +1343,18 @@ public void compensarCuentaOffine(String clienteKey){
 
                                             if (!mReporteVentasClienteIndex.isEmpty()) {
                                                 if (mReporteVentasClienteIndex.indexOf(cabeceraOrden.getClienteKey() + productkey + aamm) > -1) {
-                                                   Log.i(LOG_TAG, "pasarPickingACerrado la clave ya existe: "+cabeceraOrden.getClienteKey() + productkey + aamm );
+                                                    Log.i(LOG_TAG, "pasarPickingACerrado la clave ya existe: " + cabeceraOrden.getClienteKey() + productkey + aamm);
 
                                                     continue;
                                                 } else {
-                                                    Log.i(LOG_TAG, "pasarPickingACerrado la clave nueva: " +cabeceraOrden.getClienteKey() + productkey + aamm);
+                                                    Log.i(LOG_TAG, "pasarPickingACerrado la clave nueva: " + cabeceraOrden.getClienteKey() + productkey + aamm);
 
                                                     readBlockReporteVentasCliente(cabeceraOrden.getClienteKey(), productkey, aamm);
                                                     taskList.add(mReporteVentasClienteTask.get(mVentaProductosIndex));
                                                     mVentaProductosIndex++;
                                                 }
                                             } else {
-                                                Log.i(LOG_TAG, "pasarPickingACerrado la clave vacia: "+cabeceraOrden.getClienteKey() + productkey + aamm );
+                                                Log.i(LOG_TAG, "pasarPickingACerrado la clave vacia: " + cabeceraOrden.getClienteKey() + productkey + aamm);
                                                 readBlockReporteVentasCliente(cabeceraOrden.getClienteKey(), productkey, aamm);
                                                 taskList.add(mReporteVentasClienteTask.get(mVentaProductosIndex));
                                                 mVentaProductosIndex++;
@@ -1370,7 +1375,6 @@ public void compensarCuentaOffine(String clienteKey){
                                 });
 
 
-
                             }
 
                             //leo los totales de productos asociadas al picking y las bloqueo
@@ -1382,8 +1386,8 @@ public void compensarCuentaOffine(String clienteKey){
                                     mProductosEnOrdenDatos = dataSnapshot;
                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                         String productkey = snapshot.getKey();
-                                        Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo venta Producto " + productkey+" - "+aamm);
-                                        readBlockReporteVentasProducto(productkey,aamm);
+                                        Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo venta Producto " + productkey + " - " + aamm);
+                                        readBlockReporteVentasProducto(productkey, aamm);
                                         taskList.add(mReporteVentasProductoTask.get(i));
 //                                        for (DataSnapshot cabeceraOrdenSnapshot : mCaberasOrdenCerrarPickingDatos.getChildren()) {
 //                                            CabeceraOrden cabeceraOrden= (CabeceraOrden) cabeceraOrdenSnapshot.getValue(CabeceraOrden.class);
@@ -1410,8 +1414,6 @@ public void compensarCuentaOffine(String clienteKey){
                                             Map<String, Object> pickingTotalValues = null;
 
 
-
-
                                             //Recorro el total de Productos en Picking (7)
                                             int i = 0;
                                             for (DataSnapshot productoEnOrden : mProductosEnOrdenDatos.getChildren()) {
@@ -1432,11 +1434,12 @@ public void compensarCuentaOffine(String clienteKey){
                                                 }
                                                 detalleReporteProducto.setCantidadEntrega(detalleReporteProducto.getCantidadEntrega() + pickingTotal.getCantidadEntrega());
                                                 detalleReporteProducto.setMontoItemEntrega(detalleReporteProducto.getMontoItemEntrega() + pickingTotal.getMontoItemEntrega());
+                                                detalleReporteProducto.setMontoImpuesto(detalleReporteProducto.getMontoImpuesto() + pickingTotal.getMontoImpuesto());
                                                 detalleReporteProducto.liberar();
                                                 childUpdates.put(nodoReporteVentasProducto_8(productKey, aamm), detalleReporteProducto.toMap());
 
-                                                Log.i(LOG_TAG, "pasarPickingACerrado Reporte Producto total picking- " + productKey + " " + pickingTotal.getProducto().getNombreProducto()+" - "+pickingTotal.getCantidadEntrega());
-                                                Log.i(LOG_TAG, "pasarPickingACerrado Product Infome " + productKey + " " +detalleReporteProducto.getProducto().getNombreProducto() +" - "+detalleReporteProducto.getMontoItemEntrega());
+                                                Log.i(LOG_TAG, "pasarPickingACerrado Reporte Producto total picking- " + productKey + " " + pickingTotal.getProducto().getNombreProducto() + " - " + pickingTotal.getCantidadEntrega());
+                                                Log.i(LOG_TAG, "pasarPickingACerrado Product Infome " + productKey + " " + detalleReporteProducto.getProducto().getNombreProducto() + " - " + detalleReporteProducto.getMontoItemEntrega());
                                                 i++;
                                             }
 
@@ -1467,18 +1470,18 @@ public void compensarCuentaOffine(String clienteKey){
                                             Log.i(LOG_TAG, "pasarPickingACerrado ------------------------------------ ");
 
 
-                                            for (int h=0;h<mReporteVentasClienteIndex.size();h++) {
+                                            for (int h = 0; h < mReporteVentasClienteIndex.size(); h++) {
 
-                                                Log.i(LOG_TAG, "pasarPickingACerrado RRRRRRRRRRRReproteVentas " +h);
-                                                Log.i(LOG_TAG, "pasarPickingACerrado RRRRRRRRRRRReproteVentas " +h);
-                                                Log.i(LOG_TAG, "pasarPickingACerrado RRRRRRRRRRRReproteVentas " +h);
+                                                Log.i(LOG_TAG, "pasarPickingACerrado RRRRRRRRRRRReproteVentas " + h);
+                                                Log.i(LOG_TAG, "pasarPickingACerrado RRRRRRRRRRRReproteVentas " + h);
+                                                Log.i(LOG_TAG, "pasarPickingACerrado RRRRRRRRRRRReproteVentas " + h);
 
                                                 DataSnapshot reporteventaclienteSnap = ((DataSnapshot) mReporteVentasClienteTask.get(h).getResult());
                                                 ReporteClienteProducto detalleReporteCliente = reporteventaclienteSnap.getValue(ReporteClienteProducto.class);
 
-                                                if(detalleReporteCliente==null){
-                                                    Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente: null " );
-                                                }else{
+                                                if (detalleReporteCliente == null) {
+                                                    Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente: null ");
+                                                } else {
                                                     Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente: " + detalleReporteCliente.getDetalle().getProducto().getNombreProducto() + " - " +
                                                             detalleReporteCliente.getDetalle().getCantidadEntrega());
                                                 }
@@ -1488,19 +1491,19 @@ public void compensarCuentaOffine(String clienteKey){
                                                     DataSnapshot cabeceraOrdenes = ((DataSnapshot) mCabeceraOrdenTask.get(a).getResult());
                                                     CabeceraOrden cabeceraOrden = cabeceraOrdenes.getValue(CabeceraOrden.class);
                                                     String nroDeOrden = String.valueOf(cabeceraOrden.getNumeroDeOrden());
-                                                    Log.i(LOG_TAG, "pasarPickingACerrado nroDeOrden = " + nroDeOrden+" cliente: "+ cabeceraOrden.getCliente().getNombre()+" - "+cabeceraOrden.getClienteKey());
+                                                    Log.i(LOG_TAG, "pasarPickingACerrado nroDeOrden = " + nroDeOrden + " cliente: " + cabeceraOrden.getCliente().getNombre() + " - " + cabeceraOrden.getClienteKey());
 
                                                     DataSnapshot listaDetallesOrdenes = mListaDetalleDeOrdenes.get(a);
-                                                    Log.i(LOG_TAG, "pasarPickingACerrado mListaDetalleDeOrdenes : "+a+ " = "+ mListaDetalleDeOrdenes.get(a));
+                                                    Log.i(LOG_TAG, "pasarPickingACerrado mListaDetalleDeOrdenes : " + a + " = " + mListaDetalleDeOrdenes.get(a));
 
                                                     detallesFor:
                                                     for (DataSnapshot detallesDeOrdenSnap : listaDetallesOrdenes.getChildren()) {
                                                         String productKey = detallesDeOrdenSnap.getKey();
                                                         Detalle detalleOrden = detallesDeOrdenSnap.getValue(Detalle.class);
-                                                        Log.i(LOG_TAG, "pasarPickingACerrado listaDetallesOrdenes Nro Orden = " +detallesDeOrdenSnap.getRef().getParent().getKey() );
-                                                        Log.i(LOG_TAG, "pasarPickingACerrado listaDetallesOrdenes  = " + detalleOrden.getProducto().getNombreProducto()+" - "+productKey+" - "+detalleOrden.getCantidadEntrega());
+                                                        Log.i(LOG_TAG, "pasarPickingACerrado listaDetallesOrdenes Nro Orden = " + detallesDeOrdenSnap.getRef().getParent().getKey());
+                                                        Log.i(LOG_TAG, "pasarPickingACerrado listaDetallesOrdenes  = " + detalleOrden.getProducto().getNombreProducto() + " - " + productKey + " - " + detalleOrden.getCantidadEntrega());
 //                                                        int index = mReporteVentasClienteIndex.indexOf(cabeceraOrden.getClienteKey() + productKey + aamm);
-                                                        if (!mReporteVentasClienteIndex.get(h).equals(cabeceraOrden.getClienteKey() + productKey + aamm)){
+                                                        if (!mReporteVentasClienteIndex.get(h).equals(cabeceraOrden.getClienteKey() + productKey + aamm)) {
                                                             Log.i(LOG_TAG, "pasarPickingACerrado distintos");
 
                                                             continue detallesFor;
@@ -1509,21 +1512,21 @@ public void compensarCuentaOffine(String clienteKey){
                                                             // di no existe esta estructura, se crea una en cero.
                                                             Log.i(LOG_TAG, "pasarPickingACerrado ventasCliente = NULL");
                                                             Detalle det = new Detalle(0.0, detalleOrden.getProducto(), cabeceraOrden.getCliente());
-                                                            detalleReporteCliente = new ReporteClienteProducto(cabeceraOrden.getCliente(),det);
+                                                            detalleReporteCliente = new ReporteClienteProducto(cabeceraOrden.getCliente(), det);
 
                                                         } else {
                                                             Log.i(LOG_TAG, "pasarPickingACerrado ventasCliente != NULL");
                                                         }
-                                                            detalleReporteCliente.getDetalle().setCantidadEntrega(detalleReporteCliente.getDetalle().getCantidadEntrega() + detalleOrden.getCantidadEntrega());
-                                                            detalleReporteCliente.getDetalle().setMontoItemEntrega(detalleReporteCliente.getDetalle().getMontoItemEntrega() + detalleOrden.getMontoItemEntrega());
-                                                            detalleReporteCliente.liberar();
-                                                            childUpdates.put(nodoReporteVentasClientes_9(cabeceraOrden.getClienteKey(), productKey, aamm), detalleReporteCliente.toMap());
-                                                            Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente.getCantidadEntrega() "+detalleReporteCliente.getDetalle().getCantidadEntrega());
-                                                            Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente.getMontoEntrega() "+detalleReporteCliente.getDetalle().getMontoItemEntrega());
-                                                            Log.i(LOG_TAG, "pasarPickingACerrado XXXXXXXXXXXXXXXXXXXXXXXXXX");
-                                                            Log.i(LOG_TAG, "pasarPickingACerrado XXXXXXXXXXXXXXXXXXXXXXXXXX");
-                                                            Log.i(LOG_TAG, "pasarPickingACerrado XXXXXXXXXXXXXXXXXXXXXXXXXX");
-
+                                                        detalleReporteCliente.getDetalle().setCantidadEntrega(detalleReporteCliente.getDetalle().getCantidadEntrega() + detalleOrden.getCantidadEntrega());
+                                                        detalleReporteCliente.getDetalle().setMontoItemEntrega(detalleReporteCliente.getDetalle().getMontoItemEntrega() + detalleOrden.getMontoItemEntrega());
+                                                        detalleReporteCliente.getDetalle().setMontoImpuesto(detalleReporteCliente.getDetalle().getMontoImpuesto() + detalleOrden.getMontoImpuesto());
+                                                        detalleReporteCliente.liberar();
+                                                        childUpdates.put(nodoReporteVentasClientes_9(cabeceraOrden.getClienteKey(), productKey, aamm), detalleReporteCliente.toMap());
+                                                        Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente.getCantidadEntrega() " + detalleReporteCliente.getDetalle().getCantidadEntrega());
+                                                        Log.i(LOG_TAG, "pasarPickingACerrado detalleReporteCliente.getMontoEntrega() " + detalleReporteCliente.getDetalle().getMontoItemEntrega());
+                                                        Log.i(LOG_TAG, "pasarPickingACerrado XXXXXXXXXXXXXXXXXXXXXXXXXX");
+                                                        Log.i(LOG_TAG, "pasarPickingACerrado XXXXXXXXXXXXXXXXXXXXXXXXXX");
+                                                        Log.i(LOG_TAG, "pasarPickingACerrado XXXXXXXXXXXXXXXXXXXXXXXXXX");
 
 
                                                     } // Cierre For que recorre Detalles
@@ -1573,10 +1576,11 @@ public void compensarCuentaOffine(String clienteKey){
                                 }
 
 
-                                @Override // Listado de Totales de  Picking... Listen for single value
+                                @Override
+                                // Listado de Totales de  Picking... Listen for single value
                                 public void onCancelled(DatabaseError databaseError) {
-                                    Log.i(LOG_TAG, "pasarPickingACerrado lectura de Totales de Picking - onCancelled "+databaseError.toString());
-                                    liberarRecusosTomados( );
+                                    Log.i(LOG_TAG, "pasarPickingACerrado lectura de Totales de Picking - onCancelled " + databaseError.toString());
+                                    liberarRecusosTomados();
                                     liberarArrayTaskConBloqueos();
                                     muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
                                 }
@@ -1585,7 +1589,7 @@ public void compensarCuentaOffine(String clienteKey){
 
                         @Override // Listado de cabceras... Listen for single value
                         public void onCancelled(DatabaseError databaseError) {
-                            Log.i(LOG_TAG, "pasarPickingACerrado lectura de cabecera Orden - onCancelled "+databaseError.toString());
+                            Log.i(LOG_TAG, "pasarPickingACerrado lectura de cabecera Orden - onCancelled " + databaseError.toString());
                             liberarRecusosTomados();
                             liberarArrayTaskConBloqueos();
                             muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
@@ -1599,7 +1603,7 @@ public void compensarCuentaOffine(String clienteKey){
         }).addOnFailureListener(new OnFailureListener() { // bloqueo de la orden de Picking.
             @Override
             public void onFailure(@NonNull Exception e) {//Lectura y Bloqueo de Picking fallo
-                liberarRecusosTomados( );
+                liberarRecusosTomados();
                 liberarArrayTaskConBloqueos();
                 muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR) + " Picking");
             }
@@ -1610,7 +1614,7 @@ public void compensarCuentaOffine(String clienteKey){
     public void onDestroy() {
         Log.i(LOG_TAG, "onDestroy()");
 
-        if(hayTareaEnProceso()){
+        if (hayTareaEnProceso()) {
             liberarRecusosTomados();
             return;
         }
@@ -1631,7 +1635,7 @@ public void compensarCuentaOffine(String clienteKey){
 //        String fechaPickingAlmacenado = sharedPref.getString(getString(R.string.PickingOrderFechaSeleccionada), "");
         Log.i(LOG_TAG, "nroPickingAlmacenado: " + nroPickingAlmacenado);
         if (nroPickingAlmacenado > 0) {
-            refPicking_6(PICKING_STATUS_DELIVERY,nroPickingAlmacenado).addListenerForSingleValueEvent(new ValueEventListener() {
+            refPicking_6(PICKING_STATUS_DELIVERY, nroPickingAlmacenado).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     datosCabeceraPickingSeleccionada = dataSnapshot.getValue(CabeceraPicking.class);
@@ -1639,11 +1643,14 @@ public void compensarCuentaOffine(String clienteKey){
                     mTilePickingComent.setText(datosCabeceraPickingSeleccionada.getComentario());
                     mTilePickingOrderNumber.setText(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden()));
                     mTilePickingComent.setVisibility(View.VISIBLE);
-                    mMontoRecaudado.setText(datosCabeceraPickingSeleccionada.getMontoRecaudado().toString());
+                    NumberFormat format = NumberFormat.getCurrencyInstance();
+                    mMontoRecaudado.setText(format.format(datosCabeceraPickingSeleccionada.getMontoRecaudado()));
+                    mMontoEntregado.setText(
+                            format.format( datosCabeceraPickingSeleccionada.getTotales().getMontoEntregado()+
+                            datosCabeceraPickingSeleccionada.getTotales().getMontoImpuesto()));
                     SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy");
 
                     mCreationDate.setText(sfd.format(new Date(datosCabeceraPickingSeleccionada.getFechaDeCreacion())));
-
 
 
                     mPickinOrdersAdapter.notifyDataSetChanged();
@@ -1669,11 +1676,9 @@ public void compensarCuentaOffine(String clienteKey){
             });
 
 
-    }
+        }
         super.onResume();
     }
-
-
 
 
     // this will find a bluetooth printer device
@@ -1821,9 +1826,7 @@ public void compensarCuentaOffine(String clienteKey){
     }
 
 
-
-
-    public void buscaDatosParaImprimirPicking(){
+    public void buscaDatosParaImprimirPicking() {
 
         refPagosxPickingList(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden())).addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -1845,7 +1848,7 @@ public void compensarCuentaOffine(String clienteKey){
 
             }
         });
-        }
+    }
 
     // this will send text data to be printed by the bluetooth printer
     void sendData() throws IOException {
@@ -1911,8 +1914,6 @@ public void compensarCuentaOffine(String clienteKey){
             //  ADB:alto de letra,ancho de letra (letra vertical-Mira al centro de la etiqueta)
 
 
-
-
 //            SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
             SimpleDateFormat df = new SimpleDateFormat("dd-MM-yy");
 //            String formattedDate = df.format(new Date());
@@ -1934,7 +1935,7 @@ public void compensarCuentaOffine(String clienteKey){
 
 
             h = h + i + i;
-            msg = "^FO5," + h + "^ADN,24,15^FD" + "Monto Recaudado: "+datosCabeceraPickingSeleccionada.getMontoRecaudado() + "^FS";
+            msg = "^FO5," + h + "^ADN,24,15^FD" + "Monto Recaudado: " + datosCabeceraPickingSeleccionada.getMontoRecaudado() + "^FS";
             mmOutputStream.write(msg.getBytes());
 
 //            h = h + i + i;
@@ -1973,18 +1974,16 @@ public void compensarCuentaOffine(String clienteKey){
 
 
                 Cliente cliente = pago.getCliente();
-                Double monto =pago.getMonto();
+                Double monto = pago.getMonto();
 
-                if(cliente.getEspecial()){
-                    totalEspecial=totalEspecial+monto;
-                }else{
-                    totalComun=totalComun+monto;
+                if (cliente.getEspecial()) {
+                    totalEspecial = totalEspecial + monto;
+                } else {
+                    totalComun = totalComun + monto;
                 }
 
 
-
-
-                msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + cliente.getNombre()+" "+cliente.getApellido() + "^FS";
+                msg = "^FO5," + (h + i) + "^ADN,24,10^FD" + cliente.getNombre() + " " + cliente.getApellido() + "^FS";
                 mmOutputStream.write(msg.getBytes());
 
                 msg = "^FO190," + (h + i) + "^ADN,24,10^FD" + pago.getTipoDePago() + "^FS";
@@ -1999,22 +1998,22 @@ public void compensarCuentaOffine(String clienteKey){
 
             h = h + i * 3;
 
-                msg = "^FO5," + h + "^ADN,24,15^FD" + "Total Especial: " + "^FS";
-                mmOutputStream.write(msg.getBytes());
+            msg = "^FO5," + h + "^ADN,24,15^FD" + "Total Especial: " + "^FS";
+            mmOutputStream.write(msg.getBytes());
 
 
-                msg = "^FO310," + h + "^ADN,24,15^FD" + format.format(totalEspecial) + "^FS";
-                mmOutputStream.write(msg.getBytes());
+            msg = "^FO310," + h + "^ADN,24,15^FD" + format.format(totalEspecial) + "^FS";
+            mmOutputStream.write(msg.getBytes());
 
-                h = h + i + i;
+            h = h + i + i;
 
-                msg = "^FO5," + h + "^ADN,36,20^FD" + "Total Comun: " + "^FS";
-                mmOutputStream.write(msg.getBytes());
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Total Comun: " + "^FS";
+            mmOutputStream.write(msg.getBytes());
 
-                msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalComun) + "^FS";
-                mmOutputStream.write(msg.getBytes());
+            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalComun) + "^FS";
+            mmOutputStream.write(msg.getBytes());
 
-                h = h + i + i;
+            h = h + i + i;
 
 ////            h = h - i;
 //            msg = "^FO5," + h + "^ADN,36,20^FD" + "Total: " + "^FS";
@@ -2160,9 +2159,6 @@ public void compensarCuentaOffine(String clienteKey){
             e.printStackTrace();
         }
     }
-
-
-
 
 
 }

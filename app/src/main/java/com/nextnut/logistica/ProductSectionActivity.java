@@ -24,11 +24,6 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
 public class ProductSectionActivity extends ActivityBasic {
     private FirebaseRecyclerAdapterDistinct<Producto, ProductViewHolder> mAdapter;
 //   ProductCursorAdapter mAdapter;
-    private static final int CURSOR_LOADER_ID = 0;
-    public static final String KEY_RefPRODUCTO = "refProducto";
-    public static final String KEY_PRODUCTO_NAME = "ProductoName";
-    public static final String KEY_PRODUCTO_PRICE = "ProductPrice";
-    public static final String KEY_PRODUCTO_PRICES_ESPECIAL = "ProductPriceEspecial";
     private static final String LOG_TAG = ProductSectionActivity.class.getSimpleName();
 //    private long mItem;
     @Override
@@ -39,7 +34,6 @@ public class ProductSectionActivity extends ActivityBasic {
         setSupportActionBar(toolbar);
         ArrayList<String> keys=new ArrayList<String>();
         keys = getIntent().getStringArrayListExtra(EXTRA_KEYLIST);
-//        mItem = getIntent().getLongExtra("ITEM",-1);
 
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

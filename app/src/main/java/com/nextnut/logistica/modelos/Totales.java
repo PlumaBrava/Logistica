@@ -175,8 +175,11 @@ public class Totales implements Parcelable {
 
     }
 
-    public void setSumaMontoEntregado(Double monto){
-        this.montoEntregado=this.montoEntregado+monto;
+    public void setSumaMontoEntregado(CabeceraOrden cabeceraOrden) {
+        this.montoEntregado = this.montoEntregado + cabeceraOrden.getTotales().getMontoEntregado();
+        if (!cabeceraOrden.getCliente().getEspecial()){
+            this.montoImpuesto = this.montoImpuesto + cabeceraOrden.getTotales().getMontoImpuesto();
+    }
     }
 
 

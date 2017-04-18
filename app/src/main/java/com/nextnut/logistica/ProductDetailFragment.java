@@ -228,49 +228,39 @@ public class ProductDetailFragment extends FragmentBasic
         mBotonModificarPrecio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mProductPrice.equals("") || mProductPriceSpecial.equals("")) {
-                    muestraMensajeEnDialogo("Ingrese  precios");
+
+
+                Double price = new CurrencyToDouble(mProductPrice.getText().toString()).convert();
+                Double priceEspecial = new CurrencyToDouble(mProductPriceSpecial.getText().toString()).convert();
+                Boolean error=false;
+                if (mProductPrice.getText().toString().equals("") || price == 0.0) {
+                    mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
+                    mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                    mProductPrice.requestFocus();
+                    error=true;
+
+                } else if (mProductPriceSpecial.getText().toString().equals("") || priceEspecial == 0.0) {
+                    mProductPriceSpecial.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
+                    mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
+                    mProductPriceSpecial.requestFocus();
+                    error=true;
+                }
+                if(error){
+                    muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
                     return;
-//                    Double price = new CurrencyToDouble(mProductPrice.getText().toString()).convert();
-//
-//            if (price == null) {
-//
-//                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
-//                // Show DialogFragment
-//                mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
-//                mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
-//                mProductPrice.requestFocus();
-//
-//                return false;
-//            } else if (price <= 0) {
-//
-//                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
-//                // Show DialogFragment
-//                mProductPrice.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
-//                mProductPrice.setTextColor(getResources().getColor(R.color.ValidationERROR));
-//                mProductPrice.requestFocus();
-//
-//                return false;
-//            } else {
-//
-//                mProductPrice.setTextColor(getResources().getColor(R.color.ValidationOK));
-//
                 }
 
                 Double[] t = new Double[2];
-                CurrencyToDouble price = new CurrencyToDouble(mProductPrice.getText().toString());
-                CurrencyToDouble priceEspecial = new CurrencyToDouble(mProductPriceSpecial.getText().toString());
 
 
-                t[0] = price.convert();
-                t[1] = priceEspecial.convert();
+                t[0] = price;
+                t[1] = priceEspecial;
                 Log.i("Producto", "(String) mPerfilDePrecios.getSelectedItem(): " + (String) mPerfilDePrecios.getSelectedItem());
 
                 mPrecios.put((String) mPerfilDePrecios.getSelectedItem(), new Precio(t[0], t[1]));
                 mProductPrice.setText("");
                 mProductPriceSpecial.setText("");
                 mAdapterPrecios.swap(mPrecios);
-//                mAdapterPrecios.swap(mPre);
             }
         });
         mProductDescription = (EditText) rootView.findViewById(R.id.product_description);
@@ -506,9 +496,6 @@ public class ProductDetailFragment extends FragmentBasic
         if (!isthePriceCorrect()) {
             verification = false;
         }
-        if (!istheSpecialPriceCorrect()) {
-            verification = false;
-        }
         if (!isDescriptionMaxLengthCorrect(mProductDescription.getText().toString())) {
             verification = false;
 
@@ -572,6 +559,8 @@ public class ProductDetailFragment extends FragmentBasic
         }
 
     }
+
+
 
     public void existeProductName(String productName) {
 
@@ -685,48 +674,10 @@ public class ProductDetailFragment extends FragmentBasic
 
         } else {
 
-                return true;
-            }
-    }
-
-    public boolean istheSpecialPriceCorrect() {
-        Double specialPrice = null;
-        if (mProductPriceSpecial.getText().toString() == null) {
-
-            muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
-            // Show DialogFragment
-            mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
-            mProductPriceSpecial.setError(getResources().getString(R.string.price_error_cantBeNull));
-            mProductPriceSpecial.requestFocus();
-
-            return false;
-
-        } else {
-            specialPrice = new CurrencyToDouble(mProductPriceSpecial.getText().toString()).convert();
-
-            if (specialPrice == null) {
-
-                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
-                // Show DialogFragment
-                mProductPriceSpecial.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
-                mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
-                mProductPriceSpecial.requestFocus();
-                return false;
-            } else if (specialPrice <= 0) {
-
-                muestraMensajeEnDialogo(getResources().getString(R.string.priceError));
-                // Show DialogFragment
-                mProductPriceSpecial.setError(getResources().getString(R.string.price_error_mustBegraterthan0));
-                mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationERROR));
-                mProductPriceSpecial.requestFocus();
-                return false;
-            } else {
-
-                mProductPriceSpecial.setTextColor(getResources().getColor(R.color.ValidationOK));
-                return true;
-            }
+            return true;
         }
     }
+
 
     public void fireBaseSaveProducto() {
         Log.i("producto", "fireBaseSaveProducto");

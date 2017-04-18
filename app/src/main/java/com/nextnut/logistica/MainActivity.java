@@ -397,15 +397,25 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
         if (requestCode == REQUEST_PRODUCT && resultCode == RESULT_OK) {
 
             CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+            Producto p = (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
 
+            Log.d(LOG_TAG, "perf Llego Producto");
+            Log.d(LOG_TAG, "perf Llego getPrecioParaPerfil "+p.getPrecioParaPerfil(mCliente.getPerfilDePrecios()));
+            Log.d(LOG_TAG, "perf Llego getPrecioEspecialPerfil "+p.getPrecioEspecialPerfil(mCliente.getPerfilDePrecios()));
+            Log.d(LOG_TAG, "perf Llego mCliente.getEspecial()" +mCliente.getEspecial());
+            Log.d(LOG_TAG, "perf Llego mCliente.getNombre()" +mCliente.getNombre());
 
             if (fragmentCustomOrder != null) {
-                Producto p = (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
-                Detalle detalle = new Detalle(0.0, p, mCliente);
-                fragmentCustomOrder.abmDetalleDeOrden(p.getCantidadDefault() * 1.0, data.getExtras().getString(EXTRA_PRODUCT_KEY), detalle
+                if((p.getPrecioParaPerfil(mCliente.getPerfilDePrecios())==0&&!mCliente.getEspecial())||
+                        p.getPrecioEspecialPerfil(mCliente.getPerfilDePrecios())==0&&mCliente.getEspecial()){
+                    Log.d(LOG_TAG, "perf Prducto mal pefil");
 
-                );
-
+                    fragmentCustomOrder. muestraMensaje("Revise el Perfil de Precios");
+                }else {
+                    Log.d(LOG_TAG, "pef Prducto buen pefil");
+                    Detalle detalle = new Detalle(0.0, p, mCliente);
+                    fragmentCustomOrder.abmDetalleDeOrden(p.getCantidadDefault() * 1.0, data.getExtras().getString(EXTRA_PRODUCT_KEY), detalle);
+                }
             }
 
 

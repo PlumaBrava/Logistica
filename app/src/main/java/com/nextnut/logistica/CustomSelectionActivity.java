@@ -274,6 +274,7 @@ public class CustomSelectionActivity extends ActivityBasic  {
 
 
     public Query getQuery(DatabaseReference databaseReference) {
+
         return databaseReference.child(ESQUEMA_EMPRESA_CLIENTES).child(mEmpresaKey).orderByChild("IndiceNombreApellido");
     }
 

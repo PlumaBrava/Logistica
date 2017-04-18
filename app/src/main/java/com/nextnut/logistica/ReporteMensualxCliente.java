@@ -1,6 +1,5 @@
 package com.nextnut.logistica;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -10,24 +9,9 @@ import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.nextnut.logistica.data.CustomColumns;
-import com.nextnut.logistica.data.CustomOrdersColumns;
-import com.nextnut.logistica.data.CustomOrdersDetailColumns;
-import com.nextnut.logistica.data.LogisticaDataBase;
-import com.nextnut.logistica.data.LogisticaProvider;
-import com.nextnut.logistica.data.ProductsColumns;
-import com.nextnut.logistica.modelos.Cliente;
-import com.nextnut.logistica.modelos.Detalle;
-import com.nextnut.logistica.modelos.Producto;
 import com.nextnut.logistica.modelos.ReporteClienteProducto;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
-import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_PRODUCTOS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_REPORTE_VENTAS_CLIENTE;
-import static com.nextnut.logistica.util.Constantes.NODO_REPORTE_VENTAS_CLIENTE;
 
 public class ReporteMensualxCliente extends ActivityBasic {
 
@@ -77,7 +61,7 @@ public class ReporteMensualxCliente extends ActivityBasic {
                                 texto=texto+ "\n"+ClienteText+ "\n";
                             }
                             producto = reporte.getDetalle().getProducto().getNombreProducto() + "\n";
-                            detalle = detalle + aamm + " " + reporte.getDetalle().getProducto().getNombreProducto() + " " + reporte.getDetalle().getCantidadEntrega() + " " + reporte.getDetalle().getMontoItemEntrega() + "\n";
+                            detalle = detalle + aamm + " " + reporte.getDetalle().getProducto().getNombreProducto() + " " + reporte.getDetalle().getCantidadEntrega() + " " + reporte.getDetalle().getMontoItemEntrega() +" " + reporte.getDetalle().getMontoImpuesto() + "\n";
                             Log.i("reporteMes", "nombreProducto " + reporte.getDetalle().getProducto().getNombreProducto());
                             Log.i("reporteMes", "Cantidad Entrega " + reporte.getDetalle().getCantidadEntrega());
                             Log.i("reporteMes", "Monto Entrega " + reporte.getDetalle().getMontoItemEntrega());

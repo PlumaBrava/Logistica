@@ -38,7 +38,6 @@ public class CustomOrderDetailActivity extends ActivityBasic {
         setSupportActionBar(toolbar);
 
 
-
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -55,9 +54,9 @@ public class CustomOrderDetailActivity extends ActivityBasic {
 //                    getIntent().getLongExtra(CustomOrderDetailFragment.ARG_ITEM_ID,0));
 //            int mAction = getIntent().getIntExtra(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, CustomOrderDetailFragment.CUSTOM_ORDER_SELECTION);
 //            arguments.putInt(CustomOrderDetailFragment.CUSTOM_ORDER_ACTION, mAction);
-            CabeceraOrden cabeceraOrden= getIntent().getParcelableExtra(EXTRA_CABECERA_ORDEN);
+            CabeceraOrden cabeceraOrden = getIntent().getParcelableExtra(EXTRA_CABECERA_ORDEN);
 
-            Long nroPicking=getIntent().getLongExtra(EXTRA_NRO_PICKIG,0);
+            Long nroPicking = getIntent().getLongExtra(EXTRA_NRO_PICKIG, 0);
             Log.d(LOG_TAG, "orden:onComplete: getClienteKey " + cabeceraOrden.getClienteKey());
             Log.d(LOG_TAG, "orden:onComplete: orden Estatado " + cabeceraOrden.getEstado());
             Log.d(LOG_TAG, "orden:onComplete: getCliente().getNombre() " + cabeceraOrden.getCliente().getNombre());
@@ -66,9 +65,9 @@ public class CustomOrderDetailActivity extends ActivityBasic {
             Log.d(LOG_TAG, "orden:onComplete: mCliente.Perfildeprecios " + mCliente.getPerfilDePrecios());
 
 
-            arguments=putBundleFirebase();
-            arguments.putParcelable(EXTRA_CABECERA_ORDEN , cabeceraOrden);
-            arguments.putLong(EXTRA_NRO_PICKIG,nroPicking);
+            arguments = putBundleFirebase();
+            arguments.putParcelable(EXTRA_CABECERA_ORDEN, cabeceraOrden);
+            arguments.putLong(EXTRA_NRO_PICKIG, nroPicking);
             CustomOrderDetailFragment fragment = new CustomOrderDetailFragment();
 
             fragment.setArguments(arguments);
@@ -100,7 +99,7 @@ public class CustomOrderDetailActivity extends ActivityBasic {
                                  int resultCode, Intent data) {
 
         ////////////////// UPDATE CUSTOMER /////////
-        if (requestCode ==UPDATE_CUSTOMER && resultCode == RESULT_OK) {
+        if (requestCode == UPDATE_CUSTOMER && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
 
             if (bundle != null) {
@@ -110,22 +109,34 @@ public class CustomOrderDetailActivity extends ActivityBasic {
 
                     CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
                     if (fragmentCustomOrder != null) {
-                         fragmentCustomOrder.upDateCustomer(customRef);
+                        fragmentCustomOrder.upDateCustomer(customRef);
                     } else {
                     }
                 }
             }
         }
 
-        if (requestCode ==REQUEST_PRODUCT && resultCode == RESULT_OK) {
-            String res = data.getExtras().getString(RESULTADO);
+        if (requestCode == REQUEST_PRODUCT && resultCode == RESULT_OK) {
             CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+            Producto p = (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
+            Log.d(LOG_TAG, "perf Llego Producto");
+            Log.d(LOG_TAG, "perf Llego getPrecioParaPerfil " + p.getPrecioParaPerfil(mCliente.getPerfilDePrecios()));
+            Log.d(LOG_TAG, "perf Llego getPrecioEspecialPerfil " + p.getPrecioEspecialPerfil(mCliente.getPerfilDePrecios()));
+            Log.d(LOG_TAG, "perf Llego mCliente.getEspecial()" + mCliente.getEspecial());
+            Log.d(LOG_TAG, "perf Llego mCliente.getNombre()" + mCliente.getNombre());
 
             if (fragmentCustomOrder != null) {
+                if ((p.getPrecioParaPerfil(mCliente.getPerfilDePrecios()) == 0 && !mCliente.getEspecial()) ||
+                        p.getPrecioEspecialPerfil(mCliente.getPerfilDePrecios()) == 0 && mCliente.getEspecial()) {
+                    Log.d(LOG_TAG, "perf Prducto mal pefil");
 
-                Producto p= (Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
-                Detalle detalle = new Detalle(0.0,p,mCliente);
-                fragmentCustomOrder.abmDetalleDeOrden(p.getCantidadDefault()*1.0,data.getExtras().getString(EXTRA_PRODUCT_KEY),detalle);
+                    fragmentCustomOrder.muestraMensaje("Revise el Perfil de Precios para "+p.getNombreProducto() +" y "+ mCliente.getNombre());
+                } else {
+                    if (fragmentCustomOrder != null) {
+
+
+                        Detalle detalle = new Detalle(0.0, p, mCliente);
+                        fragmentCustomOrder.abmDetalleDeOrden(p.getCantidadDefault() * 1.0, data.getExtras().getString(EXTRA_PRODUCT_KEY), detalle);
 
 //                        Producto p=(Producto) data.getExtras().getParcelable(EXTRA_PRODUCT);
 //                fragmentCustomOrder.abmDetalleDeOrden(
@@ -133,8 +144,9 @@ public class CustomOrderDetailActivity extends ActivityBasic {
 //                        data.getExtras().getString(EXTRA_PRODUCT_KEY),
 //                        p);
 
+                    }
+                }
             }
-
 
         }
 

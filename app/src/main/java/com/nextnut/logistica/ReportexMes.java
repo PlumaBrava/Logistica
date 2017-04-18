@@ -58,7 +58,7 @@ public class ReportexMes extends ActivityBasic {
                         }
                         aamm=sn.getKey();
 
-                        detalle=detalle+" "+aamm+" "+ detalleOrden.getCantidadEntrega()+" "+detalleOrden.getMontoItemEntrega()+"\n";
+                        detalle=detalle+" "+aamm+" "+ detalleOrden.getCantidadEntrega()+" "+detalleOrden.getMontoItemEntrega()+" "+detalleOrden.getMontoImpuesto()+"\n";
                         Log.i("reporteMes", "nombreProducto " + detalleOrden.getProducto().getNombreProducto());
                         Log.i("reporteMes", "Cantidad Entrega " + detalleOrden.getCantidadEntrega());
                         Log.i("reporteMes", "Monto Entrega " + detalleOrden.getMontoItemEntrega());

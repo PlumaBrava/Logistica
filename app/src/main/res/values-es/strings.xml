@@ -370,6 +370,7 @@
     <string name="picking_card_Text_Coment">Ingrese su Comentario </string>
     <string name="picking_card_saveButton_contentDescription">Boton Grabar</string>
     <string name="picking_card_montoRecaudado">Recaudacion: </string>
+    <string name="picking_card_montoEntregado">Entregado: </string>
 
 
     <!--Saldos Titulos(saldos_title.xml-->

@@ -109,6 +109,8 @@
                     android:paddingStart="8dp"
                     app:layout_gravity="left"
                     />
+
+
             <!--</android.support.design.widget.TextInputEditText>-->
 
             <ImageButton
@@ -143,7 +145,17 @@
 
         </LinearLayout>
 
+        <EditText
+            android:id="@+id/montoEntregado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/picking_card_montoEntregado"
+            android:hint="@string/picking_card_montoEntregado"
 
+            android:paddingLeft="8dp"
+            android:paddingStart="8dp"
+            app:layout_gravity="left"
+            />
         <EditText
             android:id="@+id/TitlepickingOrderComents"
             android:layout_width="match_parent"

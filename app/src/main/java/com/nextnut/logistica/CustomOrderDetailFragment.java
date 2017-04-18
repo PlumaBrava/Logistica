@@ -218,6 +218,9 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
     }
 
+    public void muestraMensaje(String mensaje){
+        muestraMensajeEnDialogo(mensaje);
+    }
 
     @Override
     public void onResume() {
@@ -460,7 +463,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                             for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
                                 mKeyList.add(messageSnapshot.getKey());
                                 Log.d(LOG_TAG, "mKeyList added" + messageSnapshot.getKey());
-                                mDatabase.child("copy").setValue(dataSnapshot.getValue());
+//                                mDatabase.child("copy").setValue(dataSnapshot.getValue());
                                 mBotonSeleccionProduto.setVisibility(mCabeceraOrden.getEstado() == ORDEN_STATUS_INICIAL ? View.VISIBLE : View.GONE);
 
                             }
@@ -1366,73 +1369,20 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         mproductKeyDato = productoKey;
         mDetalleDato = detalle; // tiene los valores del detalle que se quiere modificar
 
-//        Log.i(LOG_TAG, "abmDetalleDeEntrega Nro Pickign " + mNroPicking);
         Log.i(LOG_TAG, "abmDetalleDeEntrega cantidad " + cantidad + " productokey " + productoKey + " Producto " + detalle.getProducto().getNombreProducto());
 
-//        // leo y bloqueo Cabecera de Orden 1B
-//        readBlockCabeceraOrden(mCabeceraOrden.getNumeroDeOrden());
-//
-//        // leo y bloqueo Detalle
-//        readBlockPickingTotal(PICKING_STATUS_DELIVERY, mNroPicking, productoKey);/*7*/
-//
-//        Task<Void> allTask;
-//        allTask = Tasks.whenAll(mCabeceraOrdenTask.get(0), mPickingTotalTask.get(0));
-//        allTask.addOnSuccessListener(new OnSuccessListener<Void>() {
-//            @Override
-//            public void onSuccess(Void aVoid) {
-//
-//                CabeceraOrden cabeceraOrden;
-//                Detalle totalInicialDetalle;
-//                Detalle nuevoDetalleOrden = mDetalleDato.copy();
-//
-//                DataSnapshot dataCabecera = (DataSnapshot) mCabeceraOrdenTask.get(0).getResult();
-//
-//                // do something with db data?
-//                if (dataCabecera.exists()) {
-//                    dataCabecera.getKey();
-//                    cabeceraOrden = dataCabecera.getValue(CabeceraOrden.class);
-//                    Log.i(LOG_TAG, "aabmDetalleDeEntrega mProductosEnOrdenesTask =" + dataCabecera.getKey() + "- monto cab" + dataCabecera.getValue(CabeceraOrden.class).getTotales().getMontoEnOrdenes());
-//
-//                } else {
-//                    //Debe existir, de lo contrario es un error.
-//                    Log.i(LOG_TAG, "abmDetalleDeEntrega mProductosEnOrdenesTask = NuLL- ");
-//                    return;
-//                }
-//
-//                // Actualizacion de totales en Picking (7)
-//
-//                Detalle detallePickingTotal = ((DataSnapshot) mPickingTotalTask.get(0).getResult()).getValue(Detalle.class);
-//
-//                if (detallePickingTotal == null) {
-//                    // si es nulo se trataria de un error puesto que existe en la orden y deberia estar sumado en el total
-//                    Log.i(LOG_TAG, "abmDetalleDeEntrega etallePickingTotal  Detalle = NuLL- ");
-//                } else {
-////                    detallePickingTotal.modificarCantidadEnTotalInicial(detalleOrdenAux, detalleOrden);
-////                    if (detallePickingTotal.getCantidadUnidadesEnStock() == 0) {
-////                        pickingTotalValues = null;
-////                    } else {
-////                        detallePickingTotal.liberar();
-////                        pickingTotalValues = detallePickingTotal.toMap();
-////                    }
-//
-//                }
 
         mCabeceraOrden.getTotales().modificarCantidadProductoDeEntrega(mCantidadDato, mDetalleDato);
+        mCabeceraOrden.getTotales().setMontoImpuesto(mCabeceraOrden.getTotales().getMontoEntregado()*mCabeceraOrden.getCliente().getIva()/100);
         mDetalleAnterior.modificarCantidadProductoDeEntrega(mCantidadDato);
+        if(!mCabeceraOrden.getCliente().getEspecial()) {
+            mDetalleAnterior.setMontoImpuesto(mDetalleAnterior.getMontoItemEntrega() * mCabeceraOrden.getCliente().getIva() / 100);
+        }
 
-
-//                mCabeceraOrden.setTotales(cabeceraOrden.getTotales());
-//                detallePickingTotal.modificarCantidadEnTotalDelivey(nuevoDetalleOrden, mDetalleDato);
-
-//
-//                cabeceraOrden.liberar();
-//                nuevoDetalleOrden.liberar();
-//                detallePickingTotal.liberar();
 
 
         Map<String, Object> cabeceraOrdenValues = null;
         Map<String, Object> detalleOrdenValues = null;
-//                Map<String, Object> detallePickingTotalValues = null;
 
         if (mCabeceraOrden != null) {
             cabeceraOrdenValues = mCabeceraOrden.toMap();
@@ -1441,9 +1391,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             detalleOrdenValues = mDetalleAnterior.toMap();
         }
 
-//                if (detallePickingTotal != null) {
-//                    detallePickingTotalValues = detallePickingTotal.toMap();
-//                }
 
         Map<String, Object> childUpdates = new HashMap<>();
 
@@ -1481,38 +1428,22 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
         Log.i(LOG_TAG, "abmDetalleDeEntrega UpDate ");
         Log.i(LOG_TAG, "abmDetalleDeEntrega mCabeceraOrden.getEstado() "+mCabeceraOrden.getEstado());
+
         mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
 
                 Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren-onFailure " + e.toString());
-//                        liberarRecusosTomados();
-//                        liberarArrayTaskConBloqueos();
-//                        muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_ESCRIBIR));
             }
         }).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 
 
-//                        liberarArrayTaskCasoExitoso();
                 Log.i(LOG_TAG, "abmDetalleDeEntrega updateChildren - OnCompleteListener task.isSuccessful():" + task.isSuccessful());
 
             }
         });
-//
-
-//            }
-//        });
-//        allTask.addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Log.i(LOG_TAG, "abmDetalleDeOrden addOnFailureListener= allTask" + e.toString());
-//                liberarRecusosTomados();
-//                liberarArrayTaskConBloqueos();
-//                muestraMensajeEnDialogo(getResources().getString(R.string.ERROR_NO_SE_PUDO_BLOQUEAR));
-//            }
-//        });
 
 
     }
