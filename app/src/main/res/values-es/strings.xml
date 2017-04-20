@@ -166,6 +166,8 @@
     <string name="BotonModificarSettings" >Modificar</string>
     <string name="SeleccioneImpresoraSettings" >Seleccione Impresora</string>
     <string name="BTPreferenica" >BTPreferenica</string>
+    <string name="NoSePudoConectarImpresora" >"No se pudo conectar la impresora, Asegurese que este encendida"</string>
+    <string name="ErrorEnNombreImpresora" >"El nombre de la Impresora Configurada no se pudo conectar"</string>
 
 
     <string name="TituloMovimiento">Movimentos: </string>

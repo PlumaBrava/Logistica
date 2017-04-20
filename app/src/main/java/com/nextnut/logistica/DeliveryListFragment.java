@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -62,6 +61,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static android.bluetooth.BluetoothDevice.BOND_BONDED;
+import static android.bluetooth.BluetoothDevice.BOND_BONDING;
+import static android.bluetooth.BluetoothDevice.BOND_NONE;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_CABECERA_ORDEN_EN_DELIVEY;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
@@ -71,8 +73,10 @@ import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_PICKING;
 import static com.nextnut.logistica.util.Constantes.PAGO_STATUS_INICIAL_SIN_COMPENSAR;
+import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_CERRADA;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.PICKING_STATUS_INICIAL;
+import static com.nextnut.logistica.util.Constantes.REQUEST_ENABLE_BT;
 import static com.nextnut.logistica.util.Network.isNetworkAvailable;
 
 /**
@@ -229,7 +233,8 @@ public class DeliveryListFragment extends FragmentBasic
         mImprimirButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                buscaDatosParaImprimirPicking();
+                findBT();
+//                buscaDatosParaImprimirPicking();
             }
         });
 
@@ -1276,7 +1281,10 @@ public class DeliveryListFragment extends FragmentBasic
 
     private void pasarPickingACerrado(final CabeceraPicking cabeceraPicking) {
 
-
+        if(cabeceraPicking.getEstado()>=PICKING_STATUS_CERRADA){
+            muestraMensajeEnDialogo("Ya esta cerrado!");
+            return;
+        }
         Log.i(LOG_TAG, "pasarPickingACerrado Numero de picking- " + cabeceraPicking.getNumeroDePickingOrden());
         if (hayTareaEnProceso() && isNetworkAvailable(getContext())) {
             return;
@@ -1448,10 +1456,12 @@ public class DeliveryListFragment extends FragmentBasic
                                                 Log.i(LOG_TAG, "pasarPickingACerrado TotalInicial Detalle = NuLL- ");
                                             } else {
                                                 cabeceraPicking.liberar();
+                                                cabeceraPicking.setEstado(PICKING_STATUS_CERRADA);
 
                                             }
 
                                             /*6 */
+                                            // todo: Cambiar el nodo donde se exponen los pickings cerrados.
                                             childUpdates.put(nodoPicking_6(PICKING_STATUS_INICIAL, String.valueOf(cabeceraPicking.getNumeroDePickingOrden())), null);
                                             childUpdates.put(nodoPicking_6(PICKING_STATUS_DELIVERY, String.valueOf(cabeceraPicking.getNumeroDePickingOrden())), cabeceraPicking.toMap());
                                             Log.i(LOG_TAG, "pasarPickingACerrado ------------------------------------ ");
@@ -1669,7 +1679,6 @@ public class DeliveryListFragment extends FragmentBasic
         super.onResume();
     }
 
-
     // this will find a bluetooth printer device
     void findBT() {
 
@@ -1677,45 +1686,80 @@ public class DeliveryListFragment extends FragmentBasic
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
             if (mBluetoothAdapter == null) {
-//                myLabel.setText("No bluetooth adapter available");
+                Log.i("zebra22", "size:mBluetoothAdapter Null" + mBluetoothAdapter);
             }
+            Log.i("zebra22", "size:mBluetoothAdapter  mBluetoothAdapter.isEnabled() " + mBluetoothAdapter.isEnabled());
 
             if (!mBluetoothAdapter.isEnabled()) {
+                Log.i("zebra22", "Activa Bluetooth ");
+
                 Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBluetooth, 0);
+                getActivity().startActivityForResult(enableBluetooth, REQUEST_ENABLE_BT);
             }
 
-            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-            Log.i("zebra22", "size:" + pairedDevices.size());
-            if (pairedDevices.size() > 0) {
-                for (BluetoothDevice device : pairedDevices) {
 
-                    // RPP300 is the name of the bluetooth printer device
-                    // we got this name from the list of paired devices
-                    Log.i("zebra22", "name:" + device.getName());
-                    Log.i("zebra22", "getAddress():" + device.getAddress());
-                    Log.i("zebra22", "describeContents():" + device.describeContents());
-                    Log.i("zebra22", "BondState():" + device.getBondState());
-
-                    if (device.getName().equals("XXXXJ154501680")) {
-
-                        mmDevice = device;
-                        mImprimirButton.setBackgroundColor(Color.BLUE);
-                        break;
-                    }
-                }
-            }
-
-//            myLabel.setText("Bluetooth device found.");
+            conectaLaImpresoraSeleccionada();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void conectaLaImpresoraSeleccionada(){
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        Log.i("zebra22","size:"+pairedDevices.size());
+        if(pairedDevices.size()>0)
+
+        {
+            for (BluetoothDevice device : pairedDevices) {
+
+                // RPP300 is the name of the bluetooth printer device
+                // we got this name from the list of paired devices
+                Log.i("zebra22", "name:" + device.getName());
+                Log.i("zebra22", "getAddress():" + device.getAddress());
+                Log.i("zebra22", "describeContents():" + device.describeContents());
+                Log.i("zebra22", "BondState():" + device.getBondState());
+
+                SharedPreferences sharedPref = getActivity().getSharedPreferences("Mis Preferencias", Context.MODE_PRIVATE);
+                String BTseleccionado = sharedPref.getString(getString(R.string.BTPreferenica), "Sin sileccionar");
+                Log.i("zebra22", "BTseleccionado:" + BTseleccionado);
+
+                if (device.getName().equals(BTseleccionado)) {
+
+                    mmDevice = device;
+                    try {
+                        openBT();
+                    } catch (IOException e) {
+                        Log.i("zebra22", "BTseleccionado: IOException e" + e.toString());
+                        muestraMensajeEnDialogo(getResources().getString(R.string.ErrorEnNombreImpresora));
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+        }
+
+    }
+
     // tries to open a connection to the bluetooth printer device
-    void openBT() throws IOException {
+    public void openBT() throws IOException {
         try {
+
+            int estadoBT = mmDevice.getBondState();
+            Log.i("zebra22", "estadoBT :" + estadoBT);
+            switch (estadoBT) {
+                case BOND_BONDED:
+                    Log.i("zebra22", "BOND_BONDED :" + estadoBT);
+                    break;
+                case BOND_BONDING:
+                    Log.i("zebra22", "BOND_BONDING :" + estadoBT);
+                    break;
+                case BOND_NONE:
+                    Log.i("zebra22", "BOND_NONE :" + estadoBT);
+                    break;
+
+            }
+
 
             // Standard SerialPortService ID
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
@@ -1724,11 +1768,14 @@ public class DeliveryListFragment extends FragmentBasic
             mmOutputStream = mmSocket.getOutputStream();
             mmInputStream = mmSocket.getInputStream();
 
-            beginListenForData();
+//            beginListenForData();
             Log.i("zebra22", "openBT() :");
 //            myLabel.setText("Bluetooth Opened");
 
         } catch (Exception e) {
+            Log.i("zebra22", "openBT() Exception :"+e);
+            muestraMensajeEnDialogo(getResources().getString(R.string.NoSePudoConectarImpresora));
+
             e.printStackTrace();
         }
     }
@@ -1807,6 +1854,7 @@ public class DeliveryListFragment extends FragmentBasic
             });
 
             workerThread.start();
+            buscaDatosParaImprimirPicking();
 
         } catch (Exception e) {
             Log.i("zebra22", "beginListenForDat :IOException ex function");
@@ -1814,8 +1862,23 @@ public class DeliveryListFragment extends FragmentBasic
         }
     }
 
+    // close the connection to bluetooth printer.
+    public void closeBT() throws IOException {
+        Log.i("zebra22", "  closeBT())");
+
+        try {
+            stopWorker = true;
+            mmOutputStream.close();
+            mmInputStream.close();
+            mmSocket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void buscaDatosParaImprimirPicking() {
+        Log.i("zebra22", " buscaDatosParaImprimirPicking()");
 
         refPagosxPickingList(String.valueOf(datosCabeceraPickingSeleccionada.getNumeroDePickingOrden())).addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -1841,6 +1904,8 @@ public class DeliveryListFragment extends FragmentBasic
 
     // this will send text data to be printed by the bluetooth printer
     void sendData() throws IOException {
+        Log.i("zebra22", " sendData()");
+
         try {
             String msg = null;
             // the text typed by the user
@@ -1900,7 +1965,7 @@ public class DeliveryListFragment extends FragmentBasic
 //            String formattedDate = df.format(new Date());
             String formattedDate = df.format(datosCabeceraPickingSeleccionada.getFechaEntrega());
 
-
+            h=h+i;
             msg = "^FO310," + h + "^ADN,24,10^FD" + "feecha:" + formattedDate + "^FS";
             mmOutputStream.write(msg.getBytes());
 
@@ -1911,7 +1976,7 @@ public class DeliveryListFragment extends FragmentBasic
 
 
             h = h + i + i;
-            msg = "^FO5," + h + "^ADN,36,20^FD" + datosCabeceraPickingSeleccionada.getUsuarioEntrega() + " " + datosCabeceraPickingSeleccionada.getUsuarioPicking() + "^FS";
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Usuarios:  " + datosCabeceraPickingSeleccionada.getUsuarioPicking() + "^FS";
             mmOutputStream.write(msg.getBytes());
 
 
@@ -1979,16 +2044,16 @@ public class DeliveryListFragment extends FragmentBasic
 
             h = h + i * 3;
 
-            msg = "^FO5," + h + "^ADN,24,15^FD" + "Total Especial: " + "^FS";
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Especial: " + "^FS";
             mmOutputStream.write(msg.getBytes());
 
 
-            msg = "^FO310," + h + "^ADN,24,15^FD" + format.format(totalEspecial) + "^FS";
+            msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalEspecial) + "^FS";
             mmOutputStream.write(msg.getBytes());
 
             h = h + i + i;
 
-            msg = "^FO5," + h + "^ADN,36,20^FD" + "Total Comun: " + "^FS";
+            msg = "^FO5," + h + "^ADN,36,20^FD" + "Comun: " + "^FS";
             mmOutputStream.write(msg.getBytes());
 
             msg = "^FO310," + h + "^ADN,36,20^FD" + format.format(totalComun) + "^FS";
@@ -2128,18 +2193,7 @@ public class DeliveryListFragment extends FragmentBasic
         }
     }
 
-    // close the connection to bluetooth printer.
-    void closeBT() throws IOException {
-        try {
-            stopWorker = true;
-            mmOutputStream.close();
-            mmInputStream.close();
-            mmSocket.close();
-//            sendButton.setBackgroundColor(Color.TRANSPARENT);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 
 
 }

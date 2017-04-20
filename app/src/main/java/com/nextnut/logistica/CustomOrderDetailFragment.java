@@ -187,7 +187,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     int readBufferPosition;
     volatile boolean stopWorker = true;
 
-    Button openButton;
     Button sendButton;
 
     Cursor mCursorTotales;
@@ -254,96 +253,16 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.customorder_detail, container, false);
 
-        openButton = (Button) mRootView.findViewById(R.id.open);
         sendButton = (Button) mRootView.findViewById(R.id.send);
 
         // open bluetooth connection
-        openButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                try {
-                    findBT();
-                    openBT();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
 
         // send data typed by the user to be printed
         sendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
-                // me fijo los productos cargados. si hay, los envio a imprimir.
-                refDetalleOrden_4_ListaXOrden(mCabeceraOrden.getNumeroDeOrden())
-
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                Log.d(LOG_TAG, "onClick Print Cantidad de getChildrenCount: " + dataSnapshot.getChildrenCount());
-                                Log.d(LOG_TAG, "onClick Print Cantidad de getRef(): " + dataSnapshot.getRef());
-                                Log.d(LOG_TAG, "onClick Print Cantidad de getKey(): " + dataSnapshot.getKey());
-                                Log.d(LOG_TAG, "onClick Print Cantidad de exists(): " + dataSnapshot.exists());
-                                Log.d(LOG_TAG, "onClick Print Cantidad de hasChildren(): " + dataSnapshot.hasChildren());
-
-                                if (dataSnapshot.exists()) {
-                                    mDataSanpshotPrinting = dataSnapshot;
-
-                                    refCabeceraOrdenList_ParaCompensar(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            // ordenes para compensar
-                                            mDataCabecerasParaCompensarPrinting = dataSnapshot;
-
-                                            refPagosInicialSinCompensarList(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                                    // pagos Para Compensar
-                                                    mDataPagosSinCompensarPrinting = dataSnapshot;
+                findBT();
 
 
-                                                    refSaldoTotalClientes_10(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                                            mSaldoPrinting = dataSnapshot.getValue(CabeceraOrden.class);
-                                                            try {
-                                                                sendData();
-                                                            } catch (IOException ex) {
-                                                                ex.printStackTrace();
-                                                            }
-
-                                                        }
-
-                                                        @Override
-                                                        public void onCancelled(DatabaseError databaseError) {
-
-                                                        }
-                                                    });
-
-                                                }
-
-                                                @Override
-                                                public void onCancelled(DatabaseError databaseError) {
-
-                                                }
-                                            });
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                Log.d(LOG_TAG, "onClick onCancell Error: " + databaseError.toString());
-
-                            }
-                        });
 
 
             }
@@ -466,10 +385,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     }
                 });
         if (mCabeceraOrden.getEstado() >= ORDEN_STATUS_EN_DELIVERY) {
-            openButton.setVisibility(View.VISIBLE);
             sendButton.setVisibility(View.VISIBLE);
         } else {
-            openButton.setVisibility(View.GONE);
             sendButton.setVisibility(View.GONE);
         }
         mDetalleAdapter = new FirebaseRecyclerAdapter<Detalle, DetalleViewHolder>(Detalle.class, R.layout.order_detail_item,
@@ -557,6 +474,80 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         mItemTouchHelper.attachToRecyclerView(mDetalleRecyclerView);
 
         return mRootView;
+    }
+
+    public void lecturaDeDatosParaImprimir(){
+        // me fijo los productos cargados. si hay, los envio a imprimir.
+        refDetalleOrden_4_ListaXOrden(mCabeceraOrden.getNumeroDeOrden())
+
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(LOG_TAG, "onClick Print Cantidad de getChildrenCount: " + dataSnapshot.getChildrenCount());
+                        Log.d(LOG_TAG, "onClick Print Cantidad de getRef(): " + dataSnapshot.getRef());
+                        Log.d(LOG_TAG, "onClick Print Cantidad de getKey(): " + dataSnapshot.getKey());
+                        Log.d(LOG_TAG, "onClick Print Cantidad de exists(): " + dataSnapshot.exists());
+                        Log.d(LOG_TAG, "onClick Print Cantidad de hasChildren(): " + dataSnapshot.hasChildren());
+
+                        if (dataSnapshot.exists()) {
+                            mDataSanpshotPrinting = dataSnapshot;
+
+                            refCabeceraOrdenList_ParaCompensar(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    // ordenes para compensar
+                                    mDataCabecerasParaCompensarPrinting = dataSnapshot;
+
+                                    refPagosInicialSinCompensarList(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            // pagos Para Compensar
+                                            mDataPagosSinCompensarPrinting = dataSnapshot;
+
+
+                                            refSaldoTotalClientes_10(mCabeceraOrden.getClienteKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    mSaldoPrinting = dataSnapshot.getValue(CabeceraOrden.class);
+                                                    try {
+                                                        sendData();
+                                                    } catch (IOException ex) {
+                                                        ex.printStackTrace();
+                                                    }
+
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                }
+                                            });
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(LOG_TAG, "onClick onCancell Error: " + databaseError.toString());
+
+                    }
+                });
     }
 
     public void onFavorite(final DetalleViewHolder viewHolder, final Detalle model, final String productKey) {
@@ -1800,6 +1791,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                 try {
                     openBT();
                 } catch (IOException e) {
+                    Log.i("zebra22", "BTseleccionado: IOException e" + e.toString());
+                    muestraMensajeEnDialogo(getResources().getString(R.string.ErrorEnNombreImpresora));
                     e.printStackTrace();
                 }
                 break;
@@ -1836,11 +1829,14 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             mmOutputStream = mmSocket.getOutputStream();
             mmInputStream = mmSocket.getInputStream();
 
-            beginListenForData();
+//            beginListenForData();
             Log.i("zebra22", "openBT() :");
 //            myLabel.setText("Bluetooth Opened");
 
         } catch (Exception e) {
+            Log.i("zebra22", "openBT() Exception :"+e);
+            muestraMensajeEnDialogo(getResources().getString(R.string.NoSePudoConectarImpresora));
+
             e.printStackTrace();
         }
     }
@@ -1919,6 +1915,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             });
 
             workerThread.start();
+            lecturaDeDatosParaImprimir();
 
         } catch (Exception e) {
             Log.i("zebra22", "beginListenForDat :IOException ex function");
@@ -2225,7 +2222,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     }
 
     // close the connection to bluetooth printer.
-    void closeBT() throws IOException {
+   public void closeBT() throws IOException {
         try {
             stopWorker = true;
             mmOutputStream.close();

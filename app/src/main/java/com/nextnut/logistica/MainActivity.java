@@ -1,6 +1,11 @@
 package com.nextnut.logistica;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -65,6 +70,7 @@ import static com.nextnut.logistica.util.Constantes.NODO_REPORTE_VENTAS_PRODUCTO
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
 import static com.nextnut.logistica.util.Constantes.REQUEST_CUSTOMER;
 import static com.nextnut.logistica.util.Constantes.REQUEST_EMPRESA;
+import static com.nextnut.logistica.util.Constantes.REQUEST_ENABLE_BT;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
 import static com.nextnut.logistica.util.MakeCall.migrarTelefonosDelContactoAsociado;
@@ -275,12 +281,69 @@ public class MainActivity extends ActivityBasic implements PickingListFragment.P
 
         }
 
+        // Registra el receiver para la conexion del bluetooth impresora.
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        this.registerReceiver(mReceiver, filter);
     }
+    //The BroadcastReceiver that listens for bluetooth broadcasts
+    private  BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_FOUND :");
+            }
+            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_ACL_CONNECTED :");
+//                DeliveryListFragment fragment = (DeliveryListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + (R.id.container) + ":" + mViewPager.getCurrentItem());
+                DeliveryListFragment fragment = (DeliveryListFragment) getSupportFragmentManager().findFragmentById(R.id.delivery_list_fragment_Layout);
+
+                if (fragment != null) {
+                    Log.i("zebra22-Receiver", "DeliveryListFragment not Null :");
+
+                    fragment.beginListenForData();;
+                } else {
+                    Log.i("zebra22-Receiver", "DeliveryListFragment  Null :");
+
+                }
+
+            }
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothAdapter.ACTION_DISCOVERY_FINISHED :");
+
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED");
+
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_ACL_DISCONNECTED ");
+
+            }
+            else if (BluetoothDevice.ACTION_PAIRING_REQUEST.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_PAIRING_REQUEST ");
+
+            }
+        }
+    };
     @Override
     public void onActivityResult(int requestCode,
                                  int resultCode, Intent data) {
+        if (requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK)
+        {
+            Log.d(LOG_TAG, "zebra22 ActivityResult REQUEST_ENABLE_BT "+resultCode);
+            DeliveryListFragment fragment = (DeliveryListFragment) getSupportFragmentManager().findFragmentById(R.id.delivery_list_fragment_Layout);
+            if (fragment != null) {
+                fragment.conectaLaImpresoraSeleccionada();
+            } else {
+            }
 
+
+        }
 
         ////////////////// CUSTOMER for a new Order /////////
 

@@ -24,10 +24,12 @@ public class CabeceraPickingViewHolder extends RecyclerView.ViewHolder {
     public TextView mpickingOrderComents;
     public TextView mCreationDate;
     public TextView mCreationUser;
+    public View mView;
     public ImageButton mSharePickingOrder;
 
     public CabeceraPickingViewHolder(View view) {
         super(view);
+        mView=view;
         mContext=view.getContext();
         mPickingOrderNumber = (TextView) view.findViewById(R.id.pickingNumberOrderCard);
         mpickingOrderComents = (TextView) view.findViewById(R.id.pickingOrderComents);
@@ -40,7 +42,8 @@ public class CabeceraPickingViewHolder extends RecyclerView.ViewHolder {
 
     public void bindToPost(CabeceraPicking cabeceraPicking, View.OnClickListener clickListener) {
         if (cabeceraPicking.getEstado() == PICKING_STATUS_CERRADA) {
-            ((View) mPickingOrderNumber.getParent().getParent()).setBackgroundColor(Color.RED);
+//            ((View) mPickingOrderNumber.getParent().getParent()).setBackgroundColor(Color.RED);
+            mView.setBackgroundColor(Color.RED);
 
         } else {
             ((View) (mPickingOrderNumber.getParent().getParent())).setBackgroundColor(

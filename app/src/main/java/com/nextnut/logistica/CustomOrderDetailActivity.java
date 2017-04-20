@@ -84,11 +84,11 @@ public class CustomOrderDetailActivity extends ActivityBasic {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+//        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-        filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+//        filter.addAction(BluetoothDevice.ACTION_FOUND);
+//        filter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+//        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
     }
 
