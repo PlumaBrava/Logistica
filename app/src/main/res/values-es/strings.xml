@@ -155,11 +155,17 @@
         <item>Perfil 3</item>
     </string-array>
 
+
     <string name="productRubro" >Rubro</string>
     <string name="productTipoUnidad" >Unidad</string>
     <string name="productMinCantidadUnitaria" >Cantidad Minima: </string>
     <string name="productMaxCantidadUnitaria" >Cantidad Máxima: </string>
     <string name="productDefaultCantidadUnitaria" >Cantidad Default: </string>
+
+<!--Logistica Activity Settings-->
+    <string name="BotonModificarSettings" >Modificar</string>
+    <string name="SeleccioneImpresoraSettings" >Seleccione Impresora</string>
+    <string name="BTPreferenica" >BTPreferenica</string>
 
 
     <string name="TituloMovimiento">Movimentos: </string>

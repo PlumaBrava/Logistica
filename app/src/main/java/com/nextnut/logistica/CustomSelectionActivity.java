@@ -7,11 +7,13 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.nextnut.logistica.modelos.Cliente;
-import com.nextnut.logistica.ui.FirebaseRecyclerAdapter;
+import com.nextnut.logistica.ui.FirebaseRecyclerAdapterContiene;
 import com.nextnut.logistica.viewholder.ClienteViewHolder;
 
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_EMPRESA_CLIENTES;
@@ -19,7 +21,9 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE;
 import static com.nextnut.logistica.util.Constantes.EXTRA_CLIENTE_KEY;
 
 public class CustomSelectionActivity extends ActivityBasic  {
-    private FirebaseRecyclerAdapter<Cliente, ClienteViewHolder> mAdapter;
+    private FirebaseRecyclerAdapterContiene<Cliente, ClienteViewHolder> mAdapter;
+    private EditText mCustomFilter;
+    private TextView emptyView;
 
 
 //    Adapter mAdapter;
@@ -34,29 +38,26 @@ public class CustomSelectionActivity extends ActivityBasic  {
         setSupportActionBar(toolbar);
 
 
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.content_custom_selection);
+        EditText mCustomFilter = (EditText)findViewById(R.id.custom_name_filter);
+         emptyView = (TextView) findViewById(R.id.empty_filter);
 
-//        recyclerView.setLayoutManager(new LinearLayoutManager( getContext());
+        emptyView.setVisibility(View.VISIBLE);
 
 
         StaggeredGridLayoutManager sglm =
                 new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(sglm);
 
-//        mAdapter = new Adapter(null);
-//        assert recyclerView != null;
-//        setupRecyclerView((RecyclerView) recyclerView);
 
-        // Set up FirebaseRecyclerAdapter with the Query
         Query clientesQuery = getQuery(mDatabase);
-        mAdapter = new FirebaseRecyclerAdapter<Cliente, ClienteViewHolder>(Cliente.class, R.layout.custom_list_item,
-                ClienteViewHolder.class, clientesQuery) {
+        mAdapter = new FirebaseRecyclerAdapterContiene<Cliente, ClienteViewHolder>(Cliente.class, R.layout.custom_list_item,
+                ClienteViewHolder.class, clientesQuery,mCustomFilter,emptyView) {
             @Override
             protected void populateViewHolder(final ClienteViewHolder viewHolder, final Cliente model, final int position) {
                 final DatabaseReference postRef = getRef(position);
-//                emptyView.setVisibility(View.GONE);
+//                if(model.equals(null)){ emptyView.setVisibility(View.VISIBLE);}else{ emptyView.setVisibility(View.GONE);};
                 Log.i("ClienteViewHolder", "populateViewHolder(postRef)" + postRef.toString());
 
                 // Set click listener for the whole post view
@@ -123,15 +124,7 @@ public class CustomSelectionActivity extends ActivityBasic  {
                 );
             }
 
-            @Override
-            protected void onItemDismissHolder(Cliente model, int position) {
 
-            }
-
-            @Override
-            protected void onItemAcceptedHolder(Cliente model, int position) {
-
-            }
         }
 
         ;
@@ -141,136 +134,6 @@ public class CustomSelectionActivity extends ActivityBasic  {
     }
 
 
-//    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-//
-//        StaggeredGridLayoutManager sglm =
-//                new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-//        recyclerView.setLayoutManager(sglm);
-//
-//        recyclerView.setAdapter(mAdapter);
-//    }
-
-
-
-
-
-//    public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
-//
-//        private Cursor mCursor;
-//        private DataSetObserver mDataSetObserver;
-//        private boolean mDataIsValid;
-//        private int mRowIdColumn;
-//
-//        public Adapter(Cursor cursor) {
-//            mCursor = cursor;
-//        }
-//
-//
-//        @Override
-//        public long getItemId(int position) {
-//            mCursor.moveToPosition(position);
-//            return mCursor.getLong(mCursor.getColumnIndex(CustomColumns.ID_CUSTOM));
-//        }
-//
-//        @Override
-//        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//            View view = LayoutInflater.from(parent.getContext())
-//                    .inflate(R.layout.spiner_custom_layout, parent, false);
-//            return new ViewHolder(view);
-//        }
-//
-//        @Override
-//        public void onBindViewHolder(final ViewHolder holder, int position) {
-//
-//
-//            if (mCursor == null) {
-//            } else {
-//
-//                mCursor.moveToPosition(position);
-//
-//                holder.customCity.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.DELIVERY_CITY_CUSTOM)));
-//                holder.custonName.setText(mCursor.getString(mCursor.getColumnIndex(CustomColumns.NAME_CUSTOM)) + " " +
-//                        mCursor.getString(mCursor.getColumnIndex(CustomColumns.LASTNAME_CUSTOM)));
-//
-//                Drawable drawable = dimensiona(CustomSelectionActivity.this, R.drawable.ic_action_action_redeem);
-//                Picasso.with(CustomSelectionActivity.this)
-//
-//                        .load(mCursor.getString(mCursor.getColumnIndex(CustomColumns.IMAGEN_CUSTOM)))
-//                        .resize(holder.photoCliente.getMaxWidth(), holder.photoCliente.getMaxHeight())
-//                        .placeholder(drawable)
-//                        .centerCrop()
-//                        .into(holder.photoCliente);
-//
-//
-//                holder.mView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//
-//                        Intent intent = new Intent();
-//                        intent.putExtra(RESULTADO, getItemId(holder.getAdapterPosition()));
-//                        setResult(RESULT_OK, intent);
-//                        finish();
-//
-//
-//                    }
-//                });
-//
-//            }
-//        }
-//
-//        @Override
-//        public int getItemCount() {
-//            int cantidad = 0;
-//            if (mCursor != null) {
-//                cantidad = mCursor.getCount();
-//            }
-//            return cantidad;
-//        }
-//
-//        public class ViewHolder extends RecyclerView.ViewHolder {
-//            public final View mView;
-//
-//            public final ImageView photoCliente;
-//            public final TextView customCity;
-//            public final TextView custonName;
-//
-//
-//            public ViewHolder(View view) {
-//
-//                super(view);
-//                mView = view;
-//                photoCliente = (ImageView) view.findViewById(R.id.photoCliente);
-//                customCity = (TextView) view.findViewById(R.id.customCity);
-//                custonName = (TextView) view.findViewById(R.id.customNameSpinner);
-//
-//            }
-//
-//        }
-//
-//        public Cursor swapCursor(Cursor newCursor) {
-//            if (newCursor == mCursor) {
-//                return null;
-//            }
-//            final Cursor oldCursor = mCursor;
-//            if (oldCursor != null && mDataSetObserver != null) {
-//                oldCursor.unregisterDataSetObserver(mDataSetObserver);
-//            }
-//            mCursor = newCursor;
-//            if (mCursor != null) {
-//                if (mDataSetObserver != null) {
-//                    mCursor.registerDataSetObserver(mDataSetObserver);
-//                }
-//                mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
-//                mDataIsValid = true;
-//                notifyDataSetChanged();
-//            } else {
-//                mRowIdColumn = -1;
-//                mDataIsValid = false;
-//                notifyDataSetChanged();
-//            }
-//            return oldCursor;
-//        }
-//    }
 
 
     public Query getQuery(DatabaseReference databaseReference) {

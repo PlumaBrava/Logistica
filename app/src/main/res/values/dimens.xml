@@ -8,6 +8,7 @@
     <dimen name="app_bar_height_report">80dp</dimen>
     <dimen name="item_width">0dp</dimen>
     <dimen name="text_margin">8dp</dimen>
+    <dimen name="card_left_margin">2dp</dimen>
 
     <!--Product Dimens-->
     <dimen name="foto_margin">0dp</dimen>

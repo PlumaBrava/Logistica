@@ -116,12 +116,9 @@ public class DeliveryListFragment extends FragmentBasic
 
     private DataSnapshot mProductosEnOrdenDatos;
     private DataSnapshot mProductosEnTotalPickingDatos;
-    private DataSnapshot mCaberasOrdenCerrarPickingDatos;
     private DataSnapshot mDataPagoxPicking_Printing;
 
     private int mVentaProductosIndex;
-    private int mCabeceraOrdenIndex;
-    //    private ArrayList<ArrayList<Detalle>> mListaDetalleDeOrdenes =new ArrayList<>();
     private ArrayList<DataSnapshot> mListaDetalleDeOrdenes = new ArrayList<>();
 
     private CabeceraPicking datosCabeceraPickingSeleccionada;// Tiene los datos de la cabecera de picking, cuando se hace click en un Picking
@@ -1304,7 +1301,6 @@ public class DeliveryListFragment extends FragmentBasic
                     refCabeceraOrden_2_List(ORDEN_STATUS_EN_DELIVERY, cabeceraPicking.getNumeroDePickingOrden()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            mCaberasOrdenCerrarPickingDatos = dataSnapshot;
                             Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo Orden lee cabeceras Llegaron los datos");
                             Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo Orden key " + dataSnapshot.getKey());
                             Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo Orden Ref " + dataSnapshot.getRef());
@@ -1389,13 +1385,6 @@ public class DeliveryListFragment extends FragmentBasic
                                         Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo venta Producto " + productkey + " - " + aamm);
                                         readBlockReporteVentasProducto(productkey, aamm);
                                         taskList.add(mReporteVentasProductoTask.get(i));
-//                                        for (DataSnapshot cabeceraOrdenSnapshot : mCaberasOrdenCerrarPickingDatos.getChildren()) {
-//                                            CabeceraOrden cabeceraOrden= (CabeceraOrden) cabeceraOrdenSnapshot.getValue(CabeceraOrden.class);
-//                                            Log.i(LOG_TAG, "pasarPickingACerrado Bloqueo venta Client:"+ cabeceraOrden.getClienteKey()+"Producto " + productkey+" - "+aamm.toStrin/g());
-//                                            readBlockReporteVentasCliente(cabeceraOrden.getClienteKey(),productkey,aamm.toString());
-//                                            taskList.add(mReporteVentasProductoTask.get(mVentaProductosIndex));
-//                                           mVentaProductosIndex++;
-//                                        }
                                         i++;
                                     }
 
@@ -1892,14 +1881,6 @@ public class DeliveryListFragment extends FragmentBasic
             int i = 30;
 
 
-//
-//            Log.i(LOG_TAG, "printing product Key-mDataSanpshotPrinting " + mCaberasOrdenCerrarPickingDatos.getChildrenCount());
-//            Log.i(LOG_TAG, "printing product Key-mDataCabecerasParaCompensarPrinting " + mDataCabecerasParaCompensarPrinting.getChildrenCount());
-//            Log.i(LOG_TAG, "printing product Key-mDataPagosSinCompensarPrinting " + mDataPagosSinCompensarPrinting.getChildrenCount());
-//            Log.i(LOG_TAG, "printing product total " + i*(mDataSanpshotPrinting.getChildrenCount()+mDataCabecerasParaCompensarPrinting.getChildrenCount()+
-//                    mDataPagosSinCompensarPrinting.getChildrenCount()));
-//            msg = "^LL"+(i*(mDataSanpshotPrinting.getChildrenCount()+mDataCabecerasParaCompensarPrinting.getChildrenCount()+
-//                    mDataPagosSinCompensarPrinting.getChildrenCount())+600);
 
             mmOutputStream.write(msg.getBytes());
 

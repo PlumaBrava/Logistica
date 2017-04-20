@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,6 +27,8 @@ public class ClienteViewHolder extends RecyclerView.ViewHolder {
     private ImageView mphotoCustomer;
     private TextView mDeliveryAddress;
     private TextView mCity;
+    private CheckBox  mSpecial;
+    private TextView mPerfilDePrecios;
 
     public ClienteViewHolder(View itemView) {
         super(itemView);
@@ -35,7 +38,10 @@ public class ClienteViewHolder extends RecyclerView.ViewHolder {
         mSurename = (TextView) itemView.findViewById(R.id.surenameCustom_listContent);
         mDeliveryAddress = (TextView) itemView.findViewById(R.id.deliveryAddress_listContent);
         mCity = (TextView) itemView.findViewById(R.id.cityCustom_listContent);
+        mPerfilDePrecios = (TextView) itemView.findViewById(R.id.perfilDePrecios_listContent);
+        mSpecial = (CheckBox) itemView.findViewById(R.id.custom_special);
     }
+
 
     public void bindToPost(Cliente cliente, View.OnClickListener starClickListener) {
         Log.i("ClienteViewHolder", "bindToPost-apellido: " + cliente.getApellido());
@@ -43,6 +49,8 @@ public class ClienteViewHolder extends RecyclerView.ViewHolder {
         Log.i("ClienteViewHolder", "bindToPost-nombre: " + cliente.getNombre());
         mName.setText(cliente.getNombre());
         mphotString=cliente.getFotoCliente();
+        mSpecial.setChecked(cliente.getEspecial());
+        mPerfilDePrecios.setText(cliente.getPerfilDePrecios()==null?"Definir":cliente.getPerfilDePrecios());
         Drawable drawable = dimensiona(itemView.getContext(), R.drawable.ic_action_image_timer_auto);
         Picasso.with(mphotoCustomer.getContext())
 

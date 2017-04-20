@@ -32,62 +32,7 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <!--&lt;!&ndash;xmlns:android="http://schemas.android.com/apk/res/android"&ndash;&gt;-->
-    <!--&lt;!&ndash;xmlns:tools="http://schemas.android.com/tools"&ndash;&gt;-->
 
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:orientation="vertical">-->
-
-
-        <!--<LinearLayout-->
-
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_weight="2"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal">-->
-
-            <!--<android.support.design.widget.TextInputLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content">-->
-
-                <!--<EditText-->
-                    <!--android:id="@+id/perfilText"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:contentDescription="@string/perfilDePrecios_txt"-->
-                    <!--android:hint="@string/perfilDePrecios_txt"-->
-                    <!--android:inputType="text"-->
-                    <!--android:padding="8dp"-->
-                    <!--/>-->
-
-            <!--</android.support.design.widget.TextInputLayout>-->
-
-
-
-            <!--<com.rey.material.widget.Button-->
-                <!--android:id="@+id/botonModificarPerfil"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="16dp"-->
-                <!--android:layout_marginStart="16dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:text="@string/perfilDePrecios_Boton"-->
-                <!--android:textStyle="bold" />-->
-
-        <!--</LinearLayout>-->
-    <!--</LinearLayout>-->
-        <!--<android.support.v7.widget.RecyclerView-->
-
-            <!--android:id="@+id/recycler_PerfilDePrecios"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_alignParentTop="true"-->
-            <!--android:clipToPadding="false"-->
-            <!--android:padding="5dp"-->
-            <!--android:scrollbars="vertical"-->
-            <!--/>-->
 
 
 

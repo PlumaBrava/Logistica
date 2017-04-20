@@ -1,6 +1,11 @@
 package com.nextnut.logistica;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
@@ -16,6 +21,7 @@ import static com.nextnut.logistica.util.Constantes.EXTRA_CABECERA_ORDEN;
 import static com.nextnut.logistica.util.Constantes.EXTRA_NRO_PICKIG;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.EXTRA_PRODUCT_KEY;
+import static com.nextnut.logistica.util.Constantes.REQUEST_ENABLE_BT;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.UPDATE_CUSTOMER;
 
@@ -75,7 +81,54 @@ public class CustomOrderDetailActivity extends ActivityBasic {
                     .add(R.id.customorder_detail_container, fragment)
                     .commit();
         }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        this.registerReceiver(mReceiver, filter);
     }
+
+    //The BroadcastReceiver that listens for bluetooth broadcasts
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_FOUND :");
+            }
+            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_ACL_CONNECTED :");
+                CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+                if (fragmentCustomOrder != null) {
+                    fragmentCustomOrder.beginListenForData();;
+                } else {
+                }
+
+            }
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothAdapter.ACTION_DISCOVERY_FINISHED :");
+
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED");
+
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_ACL_DISCONNECTED ");
+
+            }
+            else if (BluetoothDevice.ACTION_PAIRING_REQUEST.equals(action)) {
+                Log.i("zebra22-Receiver", "BluetoothDevice.ACTION_PAIRING_REQUEST ");
+
+            }
+        }
+    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -98,6 +151,20 @@ public class CustomOrderDetailActivity extends ActivityBasic {
     public void onActivityResult(int requestCode,
                                  int resultCode, Intent data) {
 
+        Log.d(LOG_TAG, "zebra22 ActivityResult requestCode "+requestCode);
+        Log.d(LOG_TAG, "zebra22 ActivityResult resultCode "+resultCode);
+
+        if (requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK)
+        {
+            Log.d(LOG_TAG, "zebra22 ActivityResult REQUEST_ENABLE_BT "+resultCode);
+            CustomOrderDetailFragment fragmentCustomOrder = (CustomOrderDetailFragment) getSupportFragmentManager().findFragmentById(R.id.customorder_detail_container);
+            if (fragmentCustomOrder != null) {
+                fragmentCustomOrder.conectaLaImpresoraSeleccionada();
+            } else {
+            }
+
+
+        }
         ////////////////// UPDATE CUSTOMER /////////
         if (requestCode == UPDATE_CUSTOMER && resultCode == RESULT_OK) {
             Bundle bundle = data.getExtras();
@@ -151,5 +218,11 @@ public class CustomOrderDetailActivity extends ActivityBasic {
         }
 
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        this.unregisterReceiver(mReceiver);
+        super.onDestroy();
     }
 }

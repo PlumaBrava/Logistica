@@ -191,6 +191,7 @@ public class Constantes {
     public static final int REQUEST_CUSTOMER = 1234;// Se para elegir al cliente en la creacion de una orden
     public static final int UPDATE_CUSTOMER = 1236;// Se para elegir al cliente en la Modificación de una orden
     public static final int REQUEST_PRODUCT = 12345;// Se para elegir productos en la creacion de una orden
+    public static final int REQUEST_ENABLE_BT = 47;// Habilitar el Bluethooth
 
 
     // Estado de Ordenes

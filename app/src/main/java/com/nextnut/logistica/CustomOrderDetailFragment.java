@@ -5,8 +5,10 @@ import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -68,6 +70,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static android.bluetooth.BluetoothDevice.BOND_BONDED;
+import static android.bluetooth.BluetoothDevice.BOND_BONDING;
+import static android.bluetooth.BluetoothDevice.BOND_NONE;
 import static com.nextnut.logistica.util.Constantes.ADAPTER_DETALLE_ORDEN;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_FAVORITOS;
 import static com.nextnut.logistica.util.Constantes.ESQUEMA_ORDENES;
@@ -81,6 +86,7 @@ import static com.nextnut.logistica.util.Constantes.NODO_ORDENES_DETALLE;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_DELIVERED_PARA_COMPENSAR;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_EN_DELIVERY;
 import static com.nextnut.logistica.util.Constantes.ORDEN_STATUS_INICIAL;
+import static com.nextnut.logistica.util.Constantes.REQUEST_ENABLE_BT;
 import static com.nextnut.logistica.util.Constantes.REQUEST_PRODUCT;
 import static com.nextnut.logistica.util.Constantes.detalleOrdenRef_1C;
 import static com.nextnut.logistica.util.Constantes.detalleOrdenRef_4;
@@ -105,9 +111,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
      */
 //    private long mItem;
     private long mCustomRef = 0;
-    private long mIdDetailCustomOrder_for_favorite = 0;
-    private CheckBox mCheckBox_for_favorite;
-    private Cursor c_favorite;
+
 
     private Detalle mDetalleAnterior;
     private Detalle mDetalleDato;//Tiene los datos a ser cargados en una operacion
@@ -148,9 +152,8 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
     ArrayList<Task> taskList = new ArrayList<Task>();
     Task<Void> allTask;
-//    private Button mBotonSeleccionCliente;
+    //    private Button mBotonSeleccionCliente;
     private Button mBotonSeleccionProduto;
-
 
 
     // This paramenter is use the define the acction we need to do.
@@ -161,7 +164,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
     public static final int CUSTOM_ORDER_SELECTION = 3; // A order was selected.
     public static final int ACTION_CUSTOM_ORDER_DELIVERY = 104;
-
 
 
     CollapsingToolbarLayout appBarLayout;
@@ -183,7 +185,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
     byte[] readBuffer;
     int readBufferPosition;
-    volatile boolean stopWorker;
+    volatile boolean stopWorker = true;
 
     Button openButton;
     Button sendButton;
@@ -218,28 +220,13 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
     }
 
-    public void muestraMensaje(String mensaje){
+    public void muestraMensaje(String mensaje) {
         muestraMensajeEnDialogo(mensaje);
     }
 
     @Override
     public void onResume() {
-//        switch (mAction) {
-//            case CUSTOM_ORDER_NEW: // Go to the last order
-//                getLoaderManager().restartLoader(CUSTOM_LOADER_NEW, null, this);
-//                break;
-//
-//            case CUSTOM_ORDER_SELECTION: // Go to the mItem order.
-//                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
-//                getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-//                break;
-//            case ACTION_CUSTOM_ORDER_DELIVERY: // Process Delivery state
-//                getLoaderManager().restartLoader(CUSTOM_ORDER_LOADER, null, this);
-//                getLoaderManager().restartLoader(PRODUCTS_LOADER, null, this);
-//                break;
-//            default:
-//                break;
-//        }
+
 
         super.onResume();
     }
@@ -527,7 +514,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                             @Override
                             public void onClick(View view) {
 
-                                if(mCabeceraOrden.getEstado()>=ORDEN_STATUS_DELIVERED_PARA_COMPENSAR){
+                                if (mCabeceraOrden.getEstado() >= ORDEN_STATUS_DELIVERED_PARA_COMPENSAR) {
                                     muestraMensajeEnDialogo("Orden ya entregada");
                                     return;
                                 }
@@ -559,7 +546,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                 Log.d(LOG_TAG, "onItemAcceptedHolder: " + model.getProducto().getNombreProducto() + " pos: " + position);
             }
         };
-
 
 
         assert mDetalleRecyclerView != null;
@@ -764,18 +750,25 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                                                 liberarArrayTaskCasoExitoso();
                                                 mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
                                                 NumberFormat format = NumberFormat.getCurrencyInstance();
+                                                if (mCabeceraOrden.getEstado() < ORDEN_STATUS_EN_DELIVERY) {
+                                                    mMontoTotal.setVisibility(View.VISIBLE);
+                                                    mMontoTotalDelivey.setVisibility(View.GONE);
+                                                } else {
+                                                    mMontoTotal.setVisibility(View.GONE);
+                                                    mMontoTotalDelivey.setVisibility(View.VISIBLE);
+                                                }
 
-                                                if(mCabeceraOrden.getCliente().getEspecial()) {
+                                                if (mCabeceraOrden.getCliente().getEspecial()) {
                                                     mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
                                                     mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
-                                                }else{
+                                                } else {
                                                     mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
-                                                            +" iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
-                                                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                                                            + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * ((mCabeceraOrden.getCliente().getIva() / 100)))
+                                                            + " = " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
                                                     );
                                                     mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
-                                                            +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
-                                                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                                                            + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (mCabeceraOrden.getCliente().getIva() / 100))
+                                                            + " = " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
                                                     );
                                                 }
 
@@ -844,18 +837,26 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         mIsSpecialCustom.setChecked(mCliente.getEspecial());
         mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
         NumberFormat format = NumberFormat.getCurrencyInstance();
-        if(mCabeceraOrden.getCliente().getEspecial()) {
+        if (mCabeceraOrden.getEstado() < ORDEN_STATUS_EN_DELIVERY) {
+            mMontoTotal.setVisibility(View.VISIBLE);
+            mMontoTotalDelivey.setVisibility(View.GONE);
+        } else {
+            mMontoTotal.setVisibility(View.GONE);
+            mMontoTotalDelivey.setVisibility(View.VISIBLE);
+        }
+
+        if (mCabeceraOrden.getCliente().getEspecial()) {
             mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
             mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
-        }else{
+        } else {
 
             mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
-                    +" iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
-                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                    + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * ((mCabeceraOrden.getCliente().getIva() / 100)))
+                    + " = " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
             );
             mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
-                    +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
-                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                    + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (mCabeceraOrden.getCliente().getIva() / 100))
+                    + " = " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
             );
 
         }
@@ -866,7 +867,7 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     public void showDialogNumberPicker(final String productKey) {
 
         {
-            if(mDetalleAnterior.getProducto().getTipoUnidad().equals("Kg")||mDetalleAnterior.getProducto().getTipoUnidad().equals("Metro")){
+            if (mDetalleAnterior.getProducto().getTipoUnidad().equals("Kg") || mDetalleAnterior.getProducto().getTipoUnidad().equals("Metro")) {
 
                 Log.i("Picker", " KG o Metro");
 
@@ -880,15 +881,15 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                 if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
                     Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
 
-                    np.setText(String.valueOf( mDetalleAnterior.getCantidadOrden()));
+                    np.setText(String.valueOf(mDetalleAnterior.getCantidadOrden()));
 
                 } else {
                     Log.i("Picker", "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
 
                     if (mDetalleAnterior.getCantidadOrden() == null) {
-                        np.setText(String.valueOf( mDetalleAnterior.getProducto().getCantidadDefault()));
+                        np.setText(String.valueOf(mDetalleAnterior.getProducto().getCantidadDefault()));
                     } else {
-                        np.setText(String.valueOf( mDetalleAnterior.getCantidadOrden()));
+                        np.setText(String.valueOf(mDetalleAnterior.getCantidadOrden()));
                     }
                 }
                 b1.setOnClickListener(new View.OnClickListener() {
@@ -899,11 +900,11 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                         if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
                             Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
                             Log.i("Picker", "abmDetalleDeOrdenDelivery");
-                            abmDetalleDeOrdenDelivery( Double.valueOf( np.getText().toString()), productKey, mDetalleAnterior);
+                            abmDetalleDeOrdenDelivery(Double.valueOf(np.getText().toString()), productKey, mDetalleAnterior);
 
                         } else {
 
-                            abmDetalleDeOrden(Double.valueOf( np.getText().toString()), productKey, mDetalleAnterior);
+                            abmDetalleDeOrden(Double.valueOf(np.getText().toString()), productKey, mDetalleAnterior);
 
 
                         }
@@ -921,86 +922,86 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                 d.show();
 
 
-            } else if(mDetalleAnterior.getProducto().getTipoUnidad().equals("Unidad")){
+            } else if (mDetalleAnterior.getProducto().getTipoUnidad().equals("Unidad")) {
 
                 Log.i("Picker", " Unidad");
-
 
 
                 Log.i("Picker", " - " + System.currentTimeMillis());
 
 //            SimpleDateFormat aamm = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-            SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
-            aamm.format(new Date(System.currentTimeMillis()));
-            Log.i("Picker", "pasarOrdenEntrega TIMESTAMP- " + aamm.format(new Date(System.currentTimeMillis())));
+                SimpleDateFormat aamm = new SimpleDateFormat("yyyy-MM");
+                aamm.format(new Date(System.currentTimeMillis()));
+                Log.i("Picker", "pasarOrdenEntrega TIMESTAMP- " + aamm.format(new Date(System.currentTimeMillis())));
 //            Log.i(LOG_TAG, "pasarOrdenEntrega TIMESTAMP- " + aamm);
 
 
-            final Dialog d = new Dialog(getContext());
-            d.setTitle(getString(R.string.quantityPicker));
-            d.setContentView(R.layout.dialog_number_picker);
-            Button b1 = (Button) d.findViewById(R.id.button1);
-            Button b2 = (Button) d.findViewById(R.id.button2);
-            final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
-            Log.d("Picker", "Default: " + mDetalleAnterior.getProducto().getCantidadDefault());
-            Log.d("Picker", "Man: " + mDetalleAnterior.getProducto().getCantidadMaxima());
-            Log.d("Picker", "Mix: " + mDetalleAnterior.getProducto().getCantidadMinima());
-            Log.d("Picker", "ordenCantidad: " + mDetalleAnterior.getCantidadOrden());
+                final Dialog d = new Dialog(getContext());
+                d.setTitle(getString(R.string.quantityPicker));
+                d.setContentView(R.layout.dialog_number_picker);
+                Button b1 = (Button) d.findViewById(R.id.button1);
+                Button b2 = (Button) d.findViewById(R.id.button2);
+                final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
+                Log.d("Picker", "Default: " + mDetalleAnterior.getProducto().getCantidadDefault());
+                Log.d("Picker", "Man: " + mDetalleAnterior.getProducto().getCantidadMaxima());
+                Log.d("Picker", "Mix: " + mDetalleAnterior.getProducto().getCantidadMinima());
+                Log.d("Picker", "ordenCantidad: " + mDetalleAnterior.getCantidadOrden());
 
-            np.setMaxValue(mDetalleAnterior.getProducto().getCantidadMaxima());
-            np.setMinValue(mDetalleAnterior.getProducto().getCantidadMinima());
-            np.setWrapSelectorWheel(true);
+                np.setMaxValue(mDetalleAnterior.getProducto().getCantidadMaxima());
+                np.setMinValue(mDetalleAnterior.getProducto().getCantidadMinima());
+                np.setWrapSelectorWheel(true);
 
-            if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
-                Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
+                if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
+                    Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
 
-                np.setValue(mDetalleAnterior.getCantidadOrden().intValue());
-
-            } else {
-                Log.i("Picker", "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
-
-                if (mDetalleAnterior.getCantidadOrden() == null) {
-                    np.setValue(mDetalleAnterior.getProducto().getCantidadDefault());
-                } else {
                     np.setValue(mDetalleAnterior.getCantidadOrden().intValue());
-                }
-            }
-            np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-                @Override
-                public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                }
-            });
-            b1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i("Picker", "b1.setOnClickListener");
-                    d.dismiss();
-                    if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
-                        Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
-                        Log.i("Picker", "abmDetalleDeOrdenDelivery");
-                        abmDetalleDeOrdenDelivery((double) np.getValue(), productKey, mDetalleAnterior);
 
+                } else {
+                    Log.i("Picker", "mCabeceraOrden.getEstado() distinto = ORDEN_STATUS_EN_DELIVERY");
+
+                    if (mDetalleAnterior.getCantidadOrden() == null) {
+                        np.setValue(mDetalleAnterior.getProducto().getCantidadDefault());
                     } else {
+                        np.setValue(mDetalleAnterior.getCantidadOrden().intValue());
+                    }
+                }
+                np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                    @Override
+                    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                    }
+                });
+                b1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i("Picker", "b1.setOnClickListener");
+                        d.dismiss();
+                        if (mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY) {
+                            Log.i("Picker", "mCabeceraOrden.getEstado() == ORDEN_STATUS_EN_DELIVERY");
+                            Log.i("Picker", "abmDetalleDeOrdenDelivery");
+                            abmDetalleDeOrdenDelivery((double) np.getValue(), productKey, mDetalleAnterior);
 
-                        abmDetalleDeOrden((double) np.getValue(), productKey, mDetalleAnterior);
+                        } else {
 
+                            abmDetalleDeOrden((double) np.getValue(), productKey, mDetalleAnterior);
+
+
+                        }
 
                     }
+                });
+                b2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        d.dismiss();
+                    }
+                });
+                Log.i("Picker", "b2.setOnClickListener");
 
-                }
-            });
-            b2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    d.dismiss();
-                }
-            });
-            Log.i("Picker", "b2.setOnClickListener");
-
-            d.show();
+                d.show();
 
 
-        }}
+            }
+        }
     }
 
 
@@ -1013,8 +1014,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
         recyclerView.setAdapter(mDetalleAdapter);
     }
-
-
 
 
     public void reportTotalesXProductoy() {
@@ -1316,18 +1315,26 @@ public class CustomOrderDetailFragment extends FragmentBasic {
                     public void onComplete(@NonNull Task<Void> task) {
                         mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
                         NumberFormat format = NumberFormat.getCurrencyInstance();
-                        if(mCabeceraOrden.getCliente().getEspecial()) {
+
+                        if (mCabeceraOrden.getEstado() < ORDEN_STATUS_EN_DELIVERY) {
+                            mMontoTotal.setVisibility(View.VISIBLE);
+                            mMontoTotalDelivey.setVisibility(View.GONE);
+                        } else {
+                            mMontoTotal.setVisibility(View.GONE);
+                            mMontoTotalDelivey.setVisibility(View.VISIBLE);
+                        }
+                        if (mCabeceraOrden.getCliente().getEspecial()) {
                             mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
                             mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
-                        }else{
+                        } else {
                             mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
-                                    +" iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
-                                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                                    + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * ((mCabeceraOrden.getCliente().getIva() / 100)))
+                                    + " = " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
                             );
 
                             mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
-                                    +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
-                                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                                    + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (mCabeceraOrden.getCliente().getIva() / 100))
+                                    + " = " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
                             );
                         }
 
@@ -1373,12 +1380,11 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
 
         mCabeceraOrden.getTotales().modificarCantidadProductoDeEntrega(mCantidadDato, mDetalleDato);
-        mCabeceraOrden.getTotales().setMontoImpuesto(mCabeceraOrden.getTotales().getMontoEntregado()*mCabeceraOrden.getCliente().getIva()/100);
+        mCabeceraOrden.getTotales().setMontoImpuesto(mCabeceraOrden.getTotales().getMontoEntregado() * mCabeceraOrden.getCliente().getIva() / 100);
         mDetalleAnterior.modificarCantidadProductoDeEntrega(mCantidadDato);
-        if(!mCabeceraOrden.getCliente().getEspecial()) {
+        if (!mCabeceraOrden.getCliente().getEspecial()) {
             mDetalleAnterior.setMontoImpuesto(mDetalleAnterior.getMontoItemEntrega() * mCabeceraOrden.getCliente().getIva() / 100);
         }
-
 
 
         Map<String, Object> cabeceraOrdenValues = null;
@@ -1410,24 +1416,30 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
         mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
         NumberFormat format = NumberFormat.getCurrencyInstance();
-
-        if(mCabeceraOrden.getCliente().getEspecial()) {
+        if (mCabeceraOrden.getEstado() < ORDEN_STATUS_EN_DELIVERY) {
+            mMontoTotal.setVisibility(View.VISIBLE);
+            mMontoTotalDelivey.setVisibility(View.GONE);
+        } else {
+            mMontoTotal.setVisibility(View.GONE);
+            mMontoTotalDelivey.setVisibility(View.VISIBLE);
+        }
+        if (mCabeceraOrden.getCliente().getEspecial()) {
             mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
             mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
-        }else{
+        } else {
             mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
-                    +" iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
-                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                    + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * ((mCabeceraOrden.getCliente().getIva() / 100)))
+                    + " = " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
             );
             mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
-                    +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
-                    +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                    + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (mCabeceraOrden.getCliente().getIva() / 100))
+                    + " = " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
             );
 
         }
 
         Log.i(LOG_TAG, "abmDetalleDeEntrega UpDate ");
-        Log.i(LOG_TAG, "abmDetalleDeEntrega mCabeceraOrden.getEstado() "+mCabeceraOrden.getEstado());
+        Log.i(LOG_TAG, "abmDetalleDeEntrega mCabeceraOrden.getEstado() " + mCabeceraOrden.getEstado());
 
         mDatabase.updateChildren(childUpdates).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -1520,17 +1532,24 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                 mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
                 NumberFormat format = NumberFormat.getCurrencyInstance();
-                if(mCabeceraOrden.getCliente().getEspecial()) {
+                if (mCabeceraOrden.getEstado() < ORDEN_STATUS_EN_DELIVERY) {
+                    mMontoTotal.setVisibility(View.VISIBLE);
+                    mMontoTotalDelivey.setVisibility(View.GONE);
+                } else {
+                    mMontoTotal.setVisibility(View.GONE);
+                    mMontoTotalDelivey.setVisibility(View.VISIBLE);
+                }
+                if (mCabeceraOrden.getCliente().getEspecial()) {
                     mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
                     mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
-                }else{
+                } else {
                     mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
-                            +" Iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
-                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                            + " Iva: " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * ((mCabeceraOrden.getCliente().getIva() / 100)))
+                            + " = " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
                     );
                     mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
-                            +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
-                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                            + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (mCabeceraOrden.getCliente().getIva() / 100))
+                            + " = " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
                     );
 
                 }
@@ -1613,18 +1632,24 @@ public class CustomOrderDetailFragment extends FragmentBasic {
 
                 mCantidadTotal.setText("Items: " + String.valueOf(mCabeceraOrden.getTotales().getCantidadDeProductosDiferentes()));
                 NumberFormat format = NumberFormat.getCurrencyInstance();
-
-                if(mCabeceraOrden.getCliente().getEspecial()) {
+                if (mCabeceraOrden.getEstado() < ORDEN_STATUS_EN_DELIVERY) {
+                    mMontoTotal.setVisibility(View.VISIBLE);
+                    mMontoTotalDelivey.setVisibility(View.GONE);
+                } else {
+                    mMontoTotal.setVisibility(View.GONE);
+                    mMontoTotalDelivey.setVisibility(View.VISIBLE);
+                }
+                if (mCabeceraOrden.getCliente().getEspecial()) {
                     mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()));
                     mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado()));
-                }else{
+                } else {
                     mMontoTotal.setText("Monto Orden" + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes())
-                            +" Iva: "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*((mCabeceraOrden.getCliente().getIva()/100)))
-                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                            + " Iva: " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * ((mCabeceraOrden.getCliente().getIva() / 100)))
+                            + " = " + format.format(mCabeceraOrden.getTotales().getMontoEnOrdenes() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
                     );
                     mMontoTotalDelivey.setText("Monto Entregado" + format.format(mCabeceraOrden.getTotales().getMontoEntregado())
-                            +" iva: "+ format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(mCabeceraOrden.getCliente().getIva()/100))
-                            +" = "+format.format(mCabeceraOrden.getTotales().getMontoEntregado()*(1+(mCabeceraOrden.getCliente().getIva()/100)))
+                            + " iva: " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (mCabeceraOrden.getCliente().getIva() / 100))
+                            + " = " + format.format(mCabeceraOrden.getTotales().getMontoEntregado() * (1 + (mCabeceraOrden.getCliente().getIva() / 100)))
                     );
                 }
                 mDetalleAdapter.notifyDataSetChanged();
@@ -1723,7 +1748,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
     }
 
 
-
     // this will find a bluetooth printer device
     void findBT() {
 
@@ -1731,45 +1755,79 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
             if (mBluetoothAdapter == null) {
-//                myLabel.setText("No bluetooth adapter available");
+                Log.i("zebra22", "size:mBluetoothAdapter Null" + mBluetoothAdapter);
             }
+            Log.i("zebra22", "size:mBluetoothAdapter  mBluetoothAdapter.isEnabled() " + mBluetoothAdapter.isEnabled());
 
             if (!mBluetoothAdapter.isEnabled()) {
+                Log.i("zebra22", "Activa Bluetooth ");
+
                 Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBluetooth, 0);
+                getActivity().startActivityForResult(enableBluetooth, REQUEST_ENABLE_BT);
             }
 
-            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-            Log.i("zebra22", "size:" + pairedDevices.size());
-            if (pairedDevices.size() > 0) {
-                for (BluetoothDevice device : pairedDevices) {
 
-                    // RPP300 is the name of the bluetooth printer device
-                    // we got this name from the list of paired devices
-                    Log.i("zebra22", "name:" + device.getName());
-                    Log.i("zebra22", "getAddress():" + device.getAddress());
-                    Log.i("zebra22", "describeContents():" + device.describeContents());
-                    Log.i("zebra22", "BondState():" + device.getBondState());
-
-                    if (device.getName().equals("XXXXJ154501680")) {
-
-                        mmDevice = device;
-                        sendButton.setBackgroundColor(Color.BLUE);
-                        break;
-                    }
-                }
-            }
-
-//            myLabel.setText("Bluetooth device found.");
+            conectaLaImpresoraSeleccionada();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void conectaLaImpresoraSeleccionada(){
+    Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            Log.i("zebra22","size:"+pairedDevices.size());
+            if(pairedDevices.size()>0)
+
+    {
+        for (BluetoothDevice device : pairedDevices) {
+
+            // RPP300 is the name of the bluetooth printer device
+            // we got this name from the list of paired devices
+            Log.i("zebra22", "name:" + device.getName());
+            Log.i("zebra22", "getAddress():" + device.getAddress());
+            Log.i("zebra22", "describeContents():" + device.describeContents());
+            Log.i("zebra22", "BondState():" + device.getBondState());
+
+            SharedPreferences sharedPref = getActivity().getSharedPreferences("Mis Preferencias", Context.MODE_PRIVATE);
+            String BTseleccionado = sharedPref.getString(getString(R.string.BTPreferenica), "Sin sileccionar");
+            Log.i("zebra22", "BTseleccionado:" + BTseleccionado);
+
+            if (device.getName().equals(BTseleccionado)) {
+
+                mmDevice = device;
+                sendButton.setBackgroundColor(Color.BLUE);
+                try {
+                    openBT();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+    }
+
+}
+
     // tries to open a connection to the bluetooth printer device
-    void openBT() throws IOException {
+   public void openBT() throws IOException {
         try {
+
+            int estadoBT = mmDevice.getBondState();
+            Log.i("zebra22", "estadoBT :" + estadoBT);
+            switch (estadoBT) {
+                case BOND_BONDED:
+                    Log.i("zebra22", "BOND_BONDED :" + estadoBT);
+                    break;
+                case BOND_BONDING:
+                    Log.i("zebra22", "BOND_BONDING :" + estadoBT);
+                    break;
+                case BOND_NONE:
+                    Log.i("zebra22", "BOND_NONE :" + estadoBT);
+                    break;
+
+            }
+
 
             // Standard SerialPortService ID
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
@@ -1910,14 +1968,13 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             int i = 30;
 
 
-
             Log.i(LOG_TAG, "printing product Key-mDataSanpshotPrinting " + mDataSanpshotPrinting.getChildrenCount());
             Log.i(LOG_TAG, "printing product Key-mDataCabecerasParaCompensarPrinting " + mDataCabecerasParaCompensarPrinting.getChildrenCount());
             Log.i(LOG_TAG, "printing product Key-mDataPagosSinCompensarPrinting " + mDataPagosSinCompensarPrinting.getChildrenCount());
-            Log.i(LOG_TAG, "printing product total " + i*(mDataSanpshotPrinting.getChildrenCount()+mDataCabecerasParaCompensarPrinting.getChildrenCount()+
+            Log.i(LOG_TAG, "printing product total " + i * (mDataSanpshotPrinting.getChildrenCount() + mDataCabecerasParaCompensarPrinting.getChildrenCount() +
                     mDataPagosSinCompensarPrinting.getChildrenCount()));
-            msg = "^LL"+(i*(mDataSanpshotPrinting.getChildrenCount()+mDataCabecerasParaCompensarPrinting.getChildrenCount()+
-                    mDataPagosSinCompensarPrinting.getChildrenCount())+600);
+            msg = "^LL" + (i * (mDataSanpshotPrinting.getChildrenCount() + mDataCabecerasParaCompensarPrinting.getChildrenCount() +
+                    mDataPagosSinCompensarPrinting.getChildrenCount()) + 600);
 
             mmOutputStream.write(msg.getBytes());
 
@@ -1930,8 +1987,6 @@ public class CustomOrderDetailFragment extends FragmentBasic {
             //  ADR:alto de letra,ancho de letra (letra vertical-Mira al Margen )
             //  ADI:alto de letra,ancho de letra (letra horizontal - Invertida)
             //  ADB:alto de letra,ancho de letra (letra vertical-Mira al centro de la etiqueta)
-
-
 
 
 //            SimpleDateFormat df = new SimpleDateFormat(getResources().getString(R.string.dateFormat));
@@ -2186,6 +2241,24 @@ public class CustomOrderDetailFragment extends FragmentBasic {
         Log.d(LOG_TAG, "favorito getQuery Cantidad de mEmpresaKey: " + mEmpresaKey);
         Log.d(LOG_TAG, "favorito getQuerymCabeceraOrden.getNumeroDeOrden(): " + mCabeceraOrden.getNumeroDeOrden());
         return databaseReference.child(ESQUEMA_ORDENES_DETALLE).child(mEmpresaKey).child(String.valueOf(mCabeceraOrden.getNumeroDeOrden()));
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        if (!stopWorker) {
+
+            try {
+                stopWorker = true;
+                mmInputStream.close();
+                mmSocket.close();
+                mmOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        super.onDestroyView();
     }
 
 

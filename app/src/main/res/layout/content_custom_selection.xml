@@ -1,26 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:id="@+id/content_custom_selection"
-
-    android:layout_margin="@dimen/content_custom_selection_margin"
-
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:layout_marginLeft="16dp"
-android:layout_marginRight="16dp"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:orientation="vertical">
+
+
+<android.support.design.widget.TextInputLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <!--app:counterEnabled="true"-->
+    <!--app:counterMaxLength="@integer/customNameMaxLength"-->
+    <EditText
+        android:id="@+id/custom_name_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/custom_name_text"
+        android:hint="@string/custom_name_text"
+        android:inputType="text"
+        android:maxLength="@integer/customNameMaxLength"
+        android:padding="8dp"
+        android:transitionName="@string/detail_icon_transition_name" />
+
+</android.support.design.widget.TextInputLayout>
+
+    <TextView
+        android:id="@+id/empty_filter"
+        android:text="@string/empty_custom_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/custom_name_text"
+        android:inputType="text"
+
+        android:padding="8dp"
+        />
+
+<android.support.v7.widget.RecyclerView
+    android:id="@+id/content_custom_selection"
+
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/content_custom_selection_margin"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+
     tools:context="com.nextnut.logistica.CustomSelectionActivity"
     tools:showIn="@layout/activity_custom_selection"
 
-/>
+    />
 
-<!--tools:listitem="@layout/content_custom_selectiont" -->
-<!--tools:listitem="@layout/customorder_list_content" />-->
-    <!--tools:showIn="@layout/activity_custom_selection"-->
+    </LinearLayout>
 
-    <!--android:name="com.nextnut.logistica.CustomOrderListFragment"-->
-    <!--tools:context="com.nextnut.logistica.CustomSelectionActivity"-->
-    <!--app:layoutManager="LinearLayoutManager"-->

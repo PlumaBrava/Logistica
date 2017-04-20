@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?><!--<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:app="http://schemas.android.com/apk/res-auto"--><!--xmlns:tools="http://schemas.android.com/tools"--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent"--><!--app:layout_behavior="@string/appbar_scrolling_view_behavior"--><!--tools:context="com.nextnut.logistica.EmpresasListActivity"--><!--tools:showIn="@layout/activity_empesas_list">-->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -14,35 +16,66 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/perfilText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/perfilDePrecios_txt"
-            android:hint="@string/perfilDePrecios_txt"
-            android:inputType="text"
-            android:padding="8dp"
-            />
-
-    </android.support.design.widget.TextInputLayout>
+            android:orientation="horizontal">
 
 
+            <TextView
 
-    <com.rey.material.widget.Button
-        android:id="@+id/botonModificarPerfil"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/product_description_text"
+                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
+                android:text="@string/SeleccioneImpresoraSettings"
 
-        android:text="@string/custom_BotonModificarPrecio"
-        android:textStyle="bold" />
+                />
 
+            <com.rey.material.widget.Spinner
+                android:id="@+id/nombreImpresora"
+                style="@style/Material.Widget.Spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/SeleccioneImpresoraSettings"
+                android:hint="@string/SeleccioneImpresoraSettings"
+                android:inputType="text"
+                android:padding="8dp"
+
+                app:rd_style="@style/Material.Drawable.Ripple.Wave" />
+            <!--android:spinnerMode="dialog"-->
         </LinearLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/perfilText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/perfilDePrecios_txt"
+                android:hint="@string/perfilDePrecios_txt"
+                android:inputType="text"
+                android:padding="8dp" />
+
+        </android.support.design.widget.TextInputLayout>
+
+
+        <com.rey.material.widget.Button
+            android:id="@+id/botonModificarPerfil"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+
+            android:text="@string/BotonModificarSettings"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
 
@@ -52,8 +85,7 @@
         android:layout_alignParentTop="true"
         android:clipToPadding="false"
         android:padding="5dp"
-        android:scrollbars="vertical"
-    />
+        android:scrollbars="vertical" />
 
 
 </LinearLayout>

@@ -26,6 +26,11 @@ public class Cliente implements Parcelable {
     private String ciudad;
     private double iva;
     private String cuit;
+
+    public String getIndiceNombreApellido() {
+        return IndiceNombreApellido;
+    }
+
     private Boolean especial;
     private String perfilDePrecios;
     private long fechaModificacion;
@@ -49,7 +54,7 @@ public class Cliente implements Parcelable {
     public Cliente(String uid,String nombre, String apellido, String telefono, String fotoCliente, String direccionDeEntrega, String ciudad, double iva, String cuit, Boolean especial,Map<String, String> telefonos,String perfilDePrecios) {
         this.nombre = nombre;
         this.apellido = apellido;
-        this.IndiceNombreApellido=nombre+apellido;
+        this.IndiceNombreApellido=(nombre+apellido).toLowerCase();
         this.telefono = telefono;
         this.fotoCliente = fotoCliente;
         this.direccionDeEntrega = direccionDeEntrega;
