@@ -113,19 +113,19 @@
 
             <!--</android.support.design.widget.TextInputEditText>-->
 
-            <ImageButton
-                android:id="@+id/conectarImpresoraDelivey"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="@dimen/fab_margin"
+            <!--<ImageButton-->
+                <!--android:id="@+id/conectarImpresoraDelivey"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="top|end"-->
+                <!--android:layout_marginTop="@dimen/fab_margin"-->
 
-                android:adjustViewBounds="false"
-                android:backgroundTint="@android:color/transparent"
-                android:contentDescription="@string/picking_card_saveButton_contentDescription"
-                android:cropToPadding="false"
-                android:gravity="top|end"
-                android:src="@android:drawable/stat_sys_upload_done" />
+                <!--android:adjustViewBounds="false"-->
+                <!--android:backgroundTint="@android:color/transparent"-->
+                <!--android:contentDescription="@string/picking_card_saveButton_contentDescription"-->
+                <!--android:cropToPadding="false"-->
+                <!--android:gravity="top|end"-->
+                <!--android:src="@android:drawable/stat_sys_upload_done" />-->
         <!--android:layout_weight="1"-->
 
             <ImageButton

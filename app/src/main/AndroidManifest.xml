@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nextnut.logistica">
+    package="com.abuseret.logistica">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -33,28 +33,28 @@
         android:windowSoftInputMode="adjustResize">
         <!--"adjustPan"-->
         <activity
-            android:name=".MainActivity"
+            android:name="com.abuseret.logistica.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:launchMode="singleTop"
-                android:value="com.nextnut.logistica.LoginActivity" />
+                android:value="com.abuseret.logistica.LoginActivity" />
         </activity>
         <activity
-            android:name=".ProductListActivity"
+            android:name="com.abuseret.logistica.ProductListActivity"
             android:label="@string/title_product_list"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".ProductDetailActivity"
+            android:name="com.abuseret.logistica.ProductDetailActivity"
             android:label="@string/title_product_detail"
-            android:parentActivityName=".ProductListActivity"
+            android:parentActivityName="com.abuseret.logistica.ProductListActivity"
             android:theme="@style/AppTheme.Dialog_NoActionBar"
             android:windowSoftInputMode="adjustPan">// pone el campo en edicion siempre en la pantalla
             <!--android:windowSoftInputMode="adjustResize"-->
@@ -72,7 +72,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.ProductListActivity" />
+                android:value="com.abuseret.logistica.ProductListActivity" />
         </activity>
 
         <provider
@@ -85,57 +85,57 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
         <activity
-            android:name=".CustomListActivity"
+            android:name="com.abuseret.logistica.CustomListActivity"
             android:label="@string/title_custom_list"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".CustomDetailActivity"
+            android:name="com.abuseret.logistica.CustomDetailActivity"
             android:label="@string/title_custom_detail"
-            android:parentActivityName=".CustomListActivity"
+            android:parentActivityName="com.abuseret.logistica.CustomListActivity"
             android:theme="@style/AppTheme.Dialog_NoActionBar"
             android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.CustomListActivity" />
+                android:value="com.abuseret.logistica.CustomListActivity" />
         </activity>
         <activity
-            android:name=".AlmacenesListActivity"
+            android:name="com.abuseret.logistica.AlmacenesListActivity"
             android:label="@string/title_almacenes_list"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".AlmacenesDetailActivity"
+            android:name="com.abuseret.logistica.AlmacenesDetailActivity"
             android:windowSoftInputMode="adjustPan"
             android:label="@string/title_almacenes_detail"
-            android:parentActivityName=".CustomListActivity"
+            android:parentActivityName="com.abuseret.logistica.CustomListActivity"
             android:theme="@style/AppTheme.Dialog_NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.AlmacenesListActivity" />
+                android:value="com.abuseret.logistica.AlmacenesListActivity" />
         </activity>
         <activity
-            android:name=".CustomOrderDetailActivity"
+            android:name="com.abuseret.logistica.CustomOrderDetailActivity"
             android:windowSoftInputMode="adjustPan"
             android:label="@string/title_customorder_detail"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.Dialog_NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name="com.abuseret.logistica.LoginActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.abuseret.logistica.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -153,70 +153,70 @@
         <!-- android:theme="@android:style/Theme.Translucent.NoTitleBar" -->
         <!-- android:label="@string/app_name" -->
         <activity
-            android:name=".CustomSelectionActivity"
+            android:name="com.abuseret.logistica.CustomSelectionActivity"
             android:label="@string/title_activity_custom_selection"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.Dialog">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".ProductSectionActivity"
+            android:name="com.abuseret.logistica.ProductSectionActivity"
             android:label="@string/title_activity_product_section"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".ProductosEnOrdenes"
+            android:name="com.abuseret.logistica.ProductosEnOrdenes"
             android:label="@string/title_activity_productos_en_ordenes"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".PagosActivity"
+            android:name="com.abuseret.logistica.PagosActivity"
             android:windowSoftInputMode="adjustPan"
             android:label="@string/title_pagos_activity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.Dialog_NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".MovimientosStockActivity"
+            android:name="com.abuseret.logistica.MovimientosStockActivity"
             android:windowSoftInputMode="adjustPan"
             android:label="@string/TituloMovimiento"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.Dialog_NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".ReporteMensualxCliente"
-            android:parentActivityName=".MainActivity"
+            android:name="com.abuseret.logistica.ReporteMensualxCliente"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".ReportexMes"
-            android:parentActivityName=".MainActivity"
+            android:name="com.abuseret.logistica.ReportexMes"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
 
-        <receiver android:name=".widget.LogisticaWidget">
+        <receiver android:name="com.abuseret.logistica.widget.LogisticaWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -227,47 +227,47 @@
         </receiver>
 
         <service
-            android:name=".widget.LogisticaWidgetService"
+            android:name="com.abuseret.logistica.widget.LogisticaWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <activity
-            android:name=".EmpresasActivity"
+            android:name="com.abuseret.logistica.EmpresasActivity"
             android:windowSoftInputMode="adjustPan"
             android:label="@string/title_activity_empresas"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".EmpresasListActivity"
+            android:name="com.abuseret.logistica.EmpresasListActivity"
             android:label="@string/title_activity_empesas_list"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".UsuarioListActivity"
+            android:name="com.abuseret.logistica.UsuarioListActivity"
             android:label="@string/title_usuario_list"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.abuseret.logistica.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
         <activity
-            android:name=".UsuarioDetailActivity"
+            android:name="com.abuseret.logistica.UsuarioDetailActivity"
             android:windowSoftInputMode="adjustPan"
             android:label="@string/title_usuario_detail"
-            android:parentActivityName=".UsuarioListActivity"
+            android:parentActivityName="com.abuseret.logistica.UsuarioListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.UsuarioListActivity" />
+                android:value="com.abuseret.logistica.UsuarioListActivity" />
         </activity>
         <!--
  ATTENTION: This was auto-generated to add Google Play services to your project for
@@ -278,21 +278,21 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-        android:name=".SettingsActivity"
+        android:name="com.abuseret.logistica.SettingsActivity"
         android:label="@string/title_activity_settings"
-        android:parentActivityName=".MainActivity">
+        android:parentActivityName="com.abuseret.logistica.MainActivity">
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.nextnut.logistica.MainActivity" />
+            android:value="com.abuseret.logistica.MainActivity" />
     </activity>
         <activity
-            android:name=".SettingsLogisticaActivity"
+            android:name="com.abuseret.logistica.SettingsLogisticaActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.NoActionBar">
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nextnut.logistica.MainActivity" />
+                android:value="com.abuseret.logistica.MainActivity" />
         </activity>
     </application>
 

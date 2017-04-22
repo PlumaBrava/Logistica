@@ -48,7 +48,7 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
 
-    tools:context="com.nextnut.logistica.CustomSelectionActivity"
+    tools:context="com.abuseret.logistica.CustomSelectionActivity"
     tools:showIn="@layout/activity_custom_selection"
 
     />

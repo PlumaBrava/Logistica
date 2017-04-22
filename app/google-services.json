@@ -19,7 +19,7 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.nextnut.logistica",
-            "certificate_hash": "4E59E47AFD1006A8BBAA34D5714A510057897E2E"
+            "certificate_hash": "4e59e47afd1006a8bbaa34d5714a510057897e2e"
           }
         },
         {
@@ -70,6 +70,138 @@
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378485183737:android:d3ee8bf11736cac7",
+        "android_client_info": {
+          "package_name": "com.nextnut.logistica.paid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "378485183737-0rknnj5dulrkqnb8khbjbks0a3k2iecf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nextnut.logistica.paid",
+            "certificate_hash": "4e59e47afd1006a8bbaa34d5714a510057897e2e"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATFHPOvPIszswYY0tCgJ06rlyQ24WHDCA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378485183737:android:a0af7b49936c5d29",
+        "android_client_info": {
+          "package_name": "com.abusert.logistica"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378485183737-lia8pal4snveitjvdq2d3jqun810j61u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.abusert.logistica",
+            "certificate_hash": "4e59e47afd1006a8bbaa34d5714a510057897e2e"
+          }
+        },
+        {
+          "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATFHPOvPIszswYY0tCgJ06rlyQ24WHDCA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378485183737:android:878f5c157d39f893",
+        "android_client_info": {
+          "package_name": "com.abuseret.logistica"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "378485183737-v4k7pmgrc7up5573u87gmhjhu4okbghc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.abuseret.logistica",
+            "certificate_hash": "4e59e47afd1006a8bbaa34d5714a510057897e2e"
+          }
+        },
+        {
+          "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATFHPOvPIszswYY0tCgJ06rlyQ24WHDCA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "378485183737-6djl7rv6dda1rsaa0fbo8uq699s57126.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

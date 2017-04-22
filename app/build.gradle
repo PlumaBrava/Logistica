@@ -16,13 +16,17 @@ android {
     }
     compileSdkVersion 25
     buildToolsVersion '25.0.2'
+//    lintOptions{                    // verifica los errores antes del build, eliminarlo para la publicacion final. Verifica los Strings...
+//        checkReleaseBuilds false
+//        abortOnError false
+//    }
     defaultConfig {
-        applicationId "com.nextnut.logistica"
+        applicationId 'com.abuseret.logistica'
 
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 2
-        versionName "1.1"
+        versionCode 1
+        versionName '1'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -36,20 +40,6 @@ android {
         }
     }
     productFlavors {
-        free {
-            applicationId = "com.nextnut.logistica"
-            versionName "1.1-free"
-            minSdkVersion 16
-            signingConfig signingConfigs.LogisticaKey
-            targetSdkVersion 25
-        }
-        paid {
-            applicationId = "com.nextnut.logistica.paid"
-            versionName "1.1-paid"
-            minSdkVersion 16
-            signingConfig signingConfigs.LogisticaKey
-            targetSdkVersion 25
-        }
     }
     packagingOptions {
         exclude 'META-INF/LICENSE'

@@ -1,11 +1,11 @@
-package com.nextnut.logistica.free;
+package com.abuseret.logistica.free;
 
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.nextnut.logistica.MainActivity;
-import com.nextnut.logistica.R;
+import com.abuseret.logistica.MainActivity;
+import com.abuseret.logistica.R;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,11 +21,11 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static com.nextnut.logistica.util.Util.atPosition;
-import static com.nextnut.logistica.util.Util.mYswipeRight;
-import static com.nextnut.logistica.util.Util.pauseTestFor;
-import static com.nextnut.logistica.util.Util.setNumberPicker;
-import static com.nextnut.logistica.util.Util.withRecyclerView;
+import static com.abuseret.logistica.util.Util.atPosition;
+import static com.abuseret.logistica.util.Util.mYswipeRight;
+import static com.abuseret.logistica.util.Util.pauseTestFor;
+import static com.abuseret.logistica.util.Util.setNumberPicker;
+import static com.abuseret.logistica.util.Util.withRecyclerView;
 import static org.hamcrest.Matchers.allOf;
 
 //import android.support.test.uiautomator.UiDevice;

@@ -33,7 +33,7 @@
     android:layout_marginRight="16dp"
 
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.nextnut.logistica.ProductListActivity"
+    tools:context="com.abuseret.logistica.ProductListActivity"
      tools:listitem="@layout/product_list_item" />
 
     <!--android:name="com.nextnut.logistica.ProductListFragment"-->

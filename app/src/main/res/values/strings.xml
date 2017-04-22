@@ -491,4 +491,286 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
 
+    <!--Todo Revisar desde aca-->
+
+    <string name="MensajeErrorTituloRegistro">Error al Registrar Mail</string>
+    <string name="MensajeErrorTituloLoggin">Error al Ingresar</string>
+    <string name="MensajeErrorOK">OK</string>
+    <string name="DebeTenerMailCorrecto">El email no es correcto</string>
+    <string name="DebeTenerMayusculas">Debe contener Mayusculas</string>
+    <string name="DebeTenerMinusculas">Debe contener Minusculas</string>
+    <string name="DebeTenerNumeros">Debe contener Numeros</string>
+    <string name="DebeTenerCantidad">Debe tener 8 Caracteres</string>
+    <string name="DebeTenerSignosEspeciales">Debe contener Signos especiales</string>
+    <string name="error_usuario">Error al buscar datos del usuario</string>
+    <string name="error_perfil">Error al buscar datos del perfil- Contacte al administrador</string>
+    <string name="error_empresa">Error al buscar datos de la empresa - Contacte al administrador</string>
+
+
+    <!--Perfiles de Usuarios-->
+    <string name="usuario_email">Email</string>
+    <string name="usuario_emailConfirmacion">Conrfirmar Email</string>
+    <string name="usuario_emailConfirmacionError">Email tiene que ser igual a su comfirmación</string>
+    <string name="usuario_emailyaExisite">Ese Email ya Existe !</string>
+
+
+    <!--Menu Options-->
+    <string name="almacenes">Almacenes</string>
+    <string name="menu_grupoConfiguracion">Configuracion</string>
+    <string name="menu_grupoReportes">Reportes</string>
+    <string name="menu_migrarClientes">Migrar Clientes</string>
+    <string name="menu_settings">Configuracion</string>
+    <string name="menu_usuarios">Usuarios</string>
+
+    <!--Section Process Titles-->
+    <string name="title_pagos">Pagos</string>
+    <string name="title_stock">Stock</string>
+
+
+    <!--Section Process Titles-->
+    <string name="perfilDePrecios_txt">Perfil de Precios</string>
+    <string name="perfilDePrecios_Boton">Modificar</string>
+
+    <!--Products List Activity List-->
+    <!--<string name="empty_product_list">No Products to Show</string>-->
+
+
+    <!--Saldos List Fragment-->
+    <string name="empty_ordenes_saldos_list">Sin Ordenes para mostrar</string>
+    <string name="empty_pagos_saldos_list">Sin Pagos para mostrar</string>
+    <string name="empty_saldos_list">Sin Saldos Para Mostrar</string>
+    <string name="empty_custom_ssOrder_list">Sisss</string>
+
+
+
+    <!--Products Detail Activity-->
+
+    <!--<string name="product_Id_text">Product Number:</string>-->
+
+    <string name="error_CantidadMinima">Debe ser mayor que cero</string>
+    <string name="error_CantidadDefault">Debe estar entre Minimo y Máximo</string>
+    <string name="error_CantidadMaxima">Debe ser menora a : %d </string>
+
+
+    <string-array name="productTipoUnidad_array">//Si se modifica este Array corregir CustomOrderDetailFragment.
+        <item>Unidad</item>
+        <item>Kg</item>
+        <item>Metro</item>
+    </string-array>
+
+    <string-array name="productRubro_array">
+        <item>Rubro 1</item>
+        <item>Rubro 2</item>
+        <item>Rubro 3</item>
+    </string-array>
+
+
+
+    <string-array name="perfiPrecios_array">
+        <item>Perfil 1</item>
+        <item>Perfil 2</item>
+        <item>Perfil 3</item>
+    </string-array>
+
+
+    <string name="productRubro" >Rubro</string>
+    <string name="productTipoUnidad" >Unidad</string>
+    <string name="productMinCantidadUnitaria" >Cantidad Minima: </string>
+    <string name="productMaxCantidadUnitaria" >Cantidad Máxima: </string>
+    <string name="productDefaultCantidadUnitaria" >Cantidad Default: </string>
+
+    <!--Logistica Activity Settings-->
+    <string name="BotonModificarSettings" >Modificar</string>
+    <string name="SeleccioneImpresoraSettings" >Seleccione Impresora</string>
+    <string name="BTPreferenica" >BTPreferenica</string>
+    <string name="NoSePudoConectarImpresora" >"No se pudo conectar la impresora, Asegurese que este encendida"</string>
+    <string name="ErrorEnNombreImpresora" >"El nombre de la Impresora Configurada no se pudo conectar"</string>
+
+
+    <string name="TituloMovimiento">Movimentos: </string>
+    <string name="tipoMovimiento">Tipo: </string>
+    <string-array name="tipoMovimiento_array">
+        <item>Fabricación</item>
+        <item>Traslado</item>
+        <item>Salida x Picking</item>
+        <item>Salida para Consumo</item>
+        <item>Baja x Diferencia de Inventario</item>
+    </string-array>
+    <string name="origenMovimiento">Origen: </string>
+    <string name="destinoMovimiento">Destino: </string>
+    <string name="productoMovimiento">Producto: </string>
+    <string name="cantidadMovimiento">Cantidad: </string>
+    <string name="fechaMovimiento">Fecha: </string>
+    <string name="usuarioMovimiento">usuario: </string>
+
+
+    <!--Verifications Message In Product-->
+    <string name="priceErrorIngresePrecios" translatable="true">Ingrese Precios</string>
+
+    <!--Custom Detail Activity-->
+    <string name="title_pagos_activity">Pagos</string>
+
+
+    <!--Pagos Fragment-->
+    <string name="title_pagos_fragment">Pagos</string>
+    <string name="fecha_pagos_fragment">Fecha de Pago: </string>
+    <string name="ordenPicking_pagos_fragment">Orden Preparar: </string>
+    <string name="Monto_pagos_fragment">Monto</string>
+    <string name="TipoPago_pagos_fragment">Monto</string>
+    <string name="Banco_pagos_fragment">Banco</string>
+    <string name="FechaDeCheque_pagos_fragment">Fecha Cheque</string>
+    <string name="NumeroDeCheque_pagos_fragment">Numero Cheque</string>
+    <string name="EmisorDeCheque_pagos_fragment">Emisor del Cheque</string>
+    <string name="FotoDeCheque_pagos_fragment">Foto del Cheque</string>
+    <string-array name="tipoDePago_array">
+        <item>Efectivo</item>
+        <item>Cheque</item>
+        <item>Nota de Credito</item>
+        <item>Nota de Debito</item>
+    </string-array>
+    <string name="NuevoPago_pagos_fragment">Nuevo Pago</string>
+    <string name="dayFormat">dd-MM-yyyy</string>
+
+    <string name="validacionMonto_pagos_fragment">El Monto debe ser > 0 </string>
+    <string name="validacionBanco_pagos_fragment">Requerido </string>
+    <string name="validacionFecha_pagos_fragment">Verifique la Fecha </string>
+    <string name="validacionEmisor_pagos_fragment">Emisor del cheque </string>
+    <string name="validacionNumeroCheque_pagos_fragment">Ingrese Nro de cheque </string>
+    <string name="validacionNumeroFoto_pagos_fragment">Foto del cheque </string>
+
+    <!-- Stock List Fragment -->
+    <string name="empty_Stock">Almacen sin Stock </string>
+    <string name="empty_Almacenes">Sin Almacenes Para Mostrar </string>
+    <string name="almacen_StockTitle">Almacen: </string>
+
+    <!--Dialog Text Pickier-->
+    <string name="cantidad_text">Cantidad: </string>
+
+    <!--Custom Detail Activity-->
+
+
+    <string name="custom_agenda_text">Agendada</string>
+    <string name="custom_PerfilDePrecios_text">Perfil de Precios</string>
+    <string name="custom_BotonModificarPrecio">Modificar</string>
+    <!--<string name="custom_city_hint_text">City</string>-->
+
+    <string name="custom_TipoTelefono_text">Tipo:</string>
+    <string name="custom_NumeroTelefono_text">Numero:</string>
+    <string name="custom_AgregarTelefono_text">Agregar</string>
+
+
+    <!--Almacen ViewHolder- Almacenes_list_item.xml-->
+    <string name="title_almacenes_list">Almacenes</string>
+    <string name="title_almacenes_detail">Almacenes Detalle</string>
+    <string name="almacen_foto_text">Foto Almacen</string>
+    <string name="almacen_nombre">Nombre</string>
+    <string name="almacen_ciudad">Ciudad</string>
+    <string name="almacen_direccion">Direccion</string>
+    <string name="almacen_tipo">Tipo de Almacen</string>
+    <string name="almacen_responsable">Responsable del Almacen</string>
+    <string name="almacen_telefono">Telefono del Almacen</string>
+    <string name="almacen_nuevo">Nuevo Almacen</string>
+    <string name="almacen_titulo">Almacen:</string>
+
+    <!--Almacen List Activity - almacenes_list.xml -->
+
+
+    <!--Almacen Detail Fragmen - almacenes_list.xml -->
+
+
+
+    <string name="almacen_sinAlmacenesParaMostrar">Sin Almacenes para Mostrar</string>
+
+    <!--Verificar si se usa-->
+
+
+
+
+
+
+    <!--Share Picking Order-->
+    <string name="PickingOrderSeleccionada">NroPickingOrdenSeleccionada</string>
+    <string name="PickingOrderCommentSeleccionada">ComentarioPickingOrdenSeleccionada</string>
+    <string name="PickingOrderFechaSeleccionada">FechaPickingOrdenSeleccionada</string>
+
+
+
+
+
+
+
+
+    <string name="custom_card_monto">Monto</string>
+
+
+
+    <string name="picking_card_montoRecaudado">Recaudacion: </string>
+    <string name="picking_card_montoEntregado">Entregado: </string>
+
+
+    <!--Saldos Titulos(saldos_title.xml-->
+    <string name="cliente_SaldoTitle">Cliente: </string>
+    <string name="saldo_SaldoTitle">Saldo: </string>
+
+
+    <!--Saldos viewHolder(saldos_list_content.xml-->
+    <string name="cliente_SaldoViewHolder">Cliente: </string>
+    <string name="saldo_SaldoViewHolder">Saldo: </string>
+
+    <!--Pagos viewHolder(pagos_list_content.xml-->
+    <string name="tipoDePago_PagoViewHolder">Tipo: </string>
+    <string name="monto_PagoViewHolder">Monto: </string>
+    <string name="fecha_PagoViewHolder">Fecha: </string>
+
+
+
+
+    <!--  picking_total_item -->
+    <string name="cantidad">Cantidad</string>
+    <string name="EnOrdenes">Ordenes</string>
+    <string name="EnPicking">Preparar</string>
+
+
+
+
+
+
+    <!-- product_precio_item -->
+    <string name="product_precio_perfil">Perfil</string>
+    <string name="product_precio_precio">Precio</string>
+    <string name="product_precio_precio_especial">Precio Especial</string>
+
+
+
+    <!-- Stock_item -->
+    <string name="blancoStockItem"></string>
+    <string name="cantidadUnidadesStockItem">Unidades</string>
+    <string name="cantidadKgStockItem">Kg</string>
+    <string name="enStockStockItem">Stock</string>
+    <string name="SolicitadoStockItem">Solicitado</string>
+
+
+>
+
+
+
+
+
+    // Empresas List Activity
+    <string name="Texto_EmpresasList">Seleccione la empresa con la que trabajará o cree una nueva.</string>
+
+
+
+
+    // Mensajes de error Firebase
+
+    <string name="ERROR_NO_SE_PUDO_BLOQUEAR">Recursos Ocupados. Intente Nuevamente </string>
+    <string name="ERROR_NO_SE_PUDO_ESCRIBIR">No se pudo escribir</string>
+
+    <bool name="is_app_free">false</bool>
+    <!--<string name="app_name">Logistica Paid</string>-->
+    <string name="banner_ad_unit_id">ca-app-pub-1583094035439130/2883257645</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-1583094035439130/4359990840</string>
+
+
 </resources>

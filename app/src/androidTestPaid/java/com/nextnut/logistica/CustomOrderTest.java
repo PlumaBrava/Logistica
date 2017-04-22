@@ -1,4 +1,4 @@
-package com.nextnut.logistica;
+package com.abuseret.logistica;
 
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
@@ -17,9 +17,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static com.nextnut.logistica.util.Util.pauseTestFor;
-import static com.nextnut.logistica.util.Util.recyclerClick;
-import static com.nextnut.logistica.util.Util.setNumberPicker;
+import static com.abuseret.logistica.util.Util.pauseTestFor;
+import static com.abuseret.logistica.util.Util.recyclerClick;
+import static com.abuseret.logistica.util.Util.setNumberPicker;
 
 //import android.support.test.uiautomator.UiDevice;
 

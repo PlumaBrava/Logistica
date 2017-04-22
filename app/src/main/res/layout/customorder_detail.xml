@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
 
         android:orientation="vertical"
-        tools:context="com.nextnut.logistica.ProductDetailFragment"
+        tools:context="com.abuseret.logistica.ProductDetailFragment"
         android:weightSum="1"
         android:background="@color/CustomOrderCard_background"
         android:backgroundTintMode="src_in"

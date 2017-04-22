@@ -130,10 +130,6 @@
     <string name="product_description_text">Descripcion:</string>
 
     <string name="product_description_hint_text">Descripcion del Producto</string>
-    <string name="detail_icon_transition_name" translatable="false">TN_DetailName</string>
-    <string name="detail_icon_transition_price" translatable="false">TN_DetailPrice</string>
-    <string name="detail_icon_transition_imagen" translatable="false">TN_DetailIcon</string>
-    <string name="pruductDetailBar_NEW_PRODUCT" translatable="false">Nuevo Producto</string>
 
     <string-array name="productTipoUnidad_array">//Si se modifica este Array corregir CustomOrderDetailFragment.
         <item>Unidad</item>
@@ -219,6 +215,7 @@
         <item>Efectivo</item>
         <item>Cheque</item>
         <item>Nota de Credito</item>
+        <item>Nota de Debito</item>
     </string-array>
     <string name="NuevoPago_pagos_fragment">Nuevo Pago</string>
     <string name="dayFormat">dd-MM-yyyy</string>
@@ -266,9 +263,6 @@
     <string name="custom_IVA_text">Iva:</string>
     <string name="custom_IVA_hint_text">% del impuesto</string>
 
-    <string name="custom_icon_transition_name" translatable="false">TN_CustomName</string>
-    <string name="custom_icon_transition_surname" translatable="false">TN_CustomSurname</string>
-    <string name="custom_icon_transition_imagen" translatable="false">TN_CustomIcon</string>
 
     <!--Almacen ViewHolder- Almacenes_list_item.xml-->
     <string name="title_almacenes_list">Almacenes</string>
@@ -293,7 +287,6 @@
     <string name="almacen_sinAlmacenesParaMostrar">Sin Almacenes para Mostrar</string>
 
     <!--Verificar si se usa-->
-    <string name="custom_DetailBar_NEW_PRODUCT" translatable="false">Nuevo Producto</string>
 
     <!--Products List Activity List-->
     <string name="empty_custom_list">Sin Clientes para mostrar</string>
@@ -529,5 +522,115 @@
 
     <string name="ERROR_NO_SE_PUDO_BLOQUEAR">Recursos Ocupados. Intente Nuevamente </string>
     <string name="ERROR_NO_SE_PUDO_ESCRIBIR">No se pudo escribir</string>
+
+
+
+    //todo: esto se copio de la version free....
+    <bool name="is_app_free">false</bool>
+    <!--<string name="app_name">Logistica Paid</string>-->
+    <string name="banner_ad_unit_id">ca-app-pub-1583094035439130/2883257645</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-1583094035439130/4359990840</string>
+    <!--//Logistica Paid-->
+    <!--<string name="server_client_id">378485183737-0rknnj5dulrkqnb8khbjbks0a3k2iecf.apps.googleusercontent.com</string>-->
+
+
+    <!--todo: revisar este desde aca -->
+
+
+
+    <!--Perfiles de Usuarios-->
+    <string name="perfil_usuarios">Usuarios</string>
+
+
+
+
+    <string name="productTitleListItem">Product header</string>
+    <string name="priceTitleListItem">Price header</string>
+    <string name="specialPriceTitleListItem">Special Price header</string>
+
+
+
+
+    <string name="title_usuario_list">Usuarios</string>
+    <string name="title_usuario_detail">Usuarios</string>
+    <string name="email_Distinto_emailConfirmation">Maril</string>
+
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+
+    <string name="custom_name_text">Name:</string>
+    <string name="custom_photo_text">custom photo</string>
+    <string name="large_text">EmpesasListActivity</string>
 
 </resources>

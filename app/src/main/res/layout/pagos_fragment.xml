@@ -20,7 +20,7 @@
         android:layout_height="match_parent"
         android:layout_margin="@dimen/custom_cardViewMarginRight"
         android:orientation="vertical"
-        tools:context="com.nextnut.logistica.ProductDetailFragment">
+        tools:context="com.abuseret.logistica.ProductDetailFragment">
 
         <LinearLayout
 
