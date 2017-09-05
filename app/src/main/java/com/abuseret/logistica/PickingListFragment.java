@@ -169,6 +169,7 @@ public class PickingListFragment extends FragmentBasic {
         super.onResume();
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -305,6 +306,40 @@ public class PickingListFragment extends FragmentBasic {
 //        mLinearOrders.setVisibility(View.GONE);
 //        mLinearProductos.setVisibility(View.GONE);
 
+        if(savedInstanceState!=null && MainActivity.getmPickingOrderSelected()>0){
+//            mTilePickingComent.setText(model.getComentario());
+            mTilePickingOrderNumber.setText(String.valueOf(MainActivity.getmPickingOrderSelected()));
+            mTilePickingComent.setVisibility(View.VISIBLE);
+            mTilePickingComent.setText(savedInstanceState.getString("comentario"));
+            mCreationDate.setText(savedInstanceState.getString("fecha"));
+
+
+
+            Log.i(LOG_TAG, "savedInstanceStatePicking:  " + savedInstanceState.toString());
+
+            SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+//            mCreationDate.setText(sfd.format(new Date(model.getFechaDeCreacion())));
+
+//            mPickingOrdersHandler.onPickingOrderSelected(model.getNumeroDePickingOrden());
+
+            mCursorAdapterPickingOrder.notifyDataSetChanged();
+//                        mCursorAdapterTotalProductos.notifyDataSetChanged();
+            recyclerViewPickingOrder.setVisibility(View.GONE);
+
+//                            mLinearOrders.setVisibility(View.VISIBLE);
+//                            mLinearProductos.setVisibility(View.VISIBLE);
+//                        totalProductos = refPickingTotal_7_List(PICKING_STATUS_INICIAL, MainActivity.getmPickingOrderSelected());
+            muestraTotalesPicking();
+            muestraOrdenesEnPicking();
+            mCursorAdapterTotalProductos.notifyDataSetChanged();
+            recyclerViewCustomOrderInPickingOrder.setVisibility(View.VISIBLE);
+            recyclerViewTotalProductos.setVisibility(View.VISIBLE);
+            mPickingOrderTile.setVisibility(View.VISIBLE);
+
+
+        }
+
         if (rootView.findViewById(R.id.customorder_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -314,6 +349,7 @@ public class PickingListFragment extends FragmentBasic {
         }
         return rootView;
     }
+
 
 
     public void muestraOrdenesEnPicking() {
@@ -418,13 +454,7 @@ public class PickingListFragment extends FragmentBasic {
                 final String productKey = CabeceraRef.getKey();
                 Log.i(LOG_TAG, "adapter:orderKey: " + productKey);
 
-//                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-//                                                           @Override
-//                                                           public void onClick(View v) {
-//
-//                                                           }
-//                                                       }
-//                );
+
 
                 viewHolder.bindToPost(model, new View.OnClickListener()
 
@@ -487,6 +517,17 @@ public class PickingListFragment extends FragmentBasic {
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
 
         super.onViewStateRestored(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Log.i(LOG_TAG, "onSaveInstanceState write ");
+
+
+        outState.putString("comentario", mTilePickingComent.getText().toString());
+        outState.putString("fecha", mCreationDate.getText().toString());
     }
 
     @Override

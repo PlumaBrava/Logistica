@@ -20,7 +20,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:weightSum="1">
 
 
             <TextView
@@ -37,14 +39,15 @@
             <com.rey.material.widget.Spinner
                 android:id="@+id/nombreImpresora"
                 style="@style/Material.Widget.Spinner"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/SeleccioneImpresoraSettings"
+
                 android:hint="@string/SeleccioneImpresoraSettings"
                 android:inputType="text"
                 android:padding="8dp"
 
-                app:rd_style="@style/Material.Drawable.Ripple.Wave" />
+                app:rd_style="@style/Material.Drawable.Ripple.Wave"
+                android:layout_weight="0.73" />
             <!--android:spinnerMode="dialog"-->
         </LinearLayout>
 

@@ -241,6 +241,37 @@ public abstract class FragmentBasic extends Fragment {
         mDatabase = getDatabase().getReference();
 
 
+        if(savedInstanceState!=null){
+            Log.i(LOG_TAG, "onSaveInstanceState read " );
+//todo verificar si funciona, falta el testing
+
+            savedInstanceState.getBoolean("mLiberarSemaforoTotalInicial", mLiberarSemaforoTotalInicial);
+            savedInstanceState.getBoolean("mLiberarSemaforoTotalInicial", mLiberarSemaforoCabeceraOrden);
+            savedInstanceState.getBoolean("mLiberarSemaforoPicking", mLiberarSemaforoPicking);
+            savedInstanceState.getInt("mPickingEstado", mPickingEstado);
+            savedInstanceState.getLong("mPickingNumero", mPickingNumero);
+
+            savedInstanceState.getBoolean("mLiberarSemaforoPickingTotal", mLiberarSemaforoPickingTotal);
+            savedInstanceState.getInt("mPickingTotalEstado", mPickingTotalEstado);
+            savedInstanceState.getLong("mPickingTotalNumero", mPickingTotalNumero);
+
+
+            savedInstanceState.getBoolean("mLiberarSemaforoReporteVentasProducto", mLiberarSemaforoReporteVentasProducto);
+            savedInstanceState.getBoolean("mLiberarSemaforoReporteVentasCliente", mLiberarSemaforoReporteVentasCliente);
+            savedInstanceState.getBoolean("mLiberarSemaforoSaldoTotal", mLiberarSemaforoSaldoTotal);
+
+
+             mTotalInicialIndexLiberar=savedInstanceState.getStringArrayList("mTotalInicialIndexLiberar");
+            mCabeceraOrdenLiberar=savedInstanceState.getStringArrayList("mCabeceraOrdenLiberar");
+            mPickingTotalIndexLiberar=savedInstanceState.getStringArrayList("mPickingTotalIndexLiberar");
+            mReporteVentasProductoIndexLiberar=savedInstanceState.getStringArrayList("mReporteVentasProductoIndexLiberar" );
+            mReporteVentasClienteClienteKeyIndexLiberar=  savedInstanceState.getStringArrayList("mReporteVentasClienteClienteKeyIndexLiberar");
+            mSaldosTotalIndexLiberar=savedInstanceState.getStringArrayList("mSaldosTotalIndexLiberar" );
+
+
+
+        }
+
     }
 
 
@@ -959,13 +990,7 @@ public abstract class FragmentBasic extends Fragment {
     }
 
 
-    public void limpiarTodosLosSemaforosLiberar() {
-        mLiberarSemaforoTotalInicial = false;
-        mLiberarSemaforoCabeceraOrden = false;
-        mLiberarSemaforoProductosEnOrdenes = false;
-        mLiberarSemaforoPicking = false;
-        mLiberarSemaforoPickingTotal = false;
-    }
+
 
 
     public void readBlockPicking(int estado, Long numeroPicking) {
@@ -2016,10 +2041,7 @@ public abstract class FragmentBasic extends Fragment {
             //1B multiples ordenes.
             liberarCabeceraOrden();
         }
-//        if (mLiberarSemaforoProductosEnOrdenes) {
-            //5--un producto
-//            liberarProductosEnOrdenes(nomeroDeOrden, mProductKey);
-//        }
+
         if (mLiberarSemaforoPicking) {
             //6
             liberarPicking(mPickingEstado, mPickingNumero);
@@ -2287,7 +2309,50 @@ public abstract class FragmentBasic extends Fragment {
         return mDatabase.child(ESQUEMA_PERFIL_DE_PRECIOS).child(mEmpresaKey);
     }
 
-}
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Log.i(LOG_TAG, "onSaveInstanceState write " );
+
+
+        outState.putBoolean("mLiberarSemaforoTotalInicial", mLiberarSemaforoTotalInicial);
+        outState.putBoolean("mLiberarSemaforoTotalInicial", mLiberarSemaforoCabeceraOrden);
+        outState.putBoolean("mLiberarSemaforoPicking", mLiberarSemaforoPicking);
+        outState.putInt("mPickingEstado", mPickingEstado);
+        outState.putLong("mPickingNumero", mPickingNumero);
+
+        outState.putBoolean("mLiberarSemaforoPickingTotal", mLiberarSemaforoPickingTotal);
+        outState.putInt("mPickingTotalEstado", mPickingTotalEstado);
+        outState.putLong("mPickingTotalNumero", mPickingTotalNumero);
+
+
+        outState.putBoolean("mLiberarSemaforoReporteVentasProducto", mLiberarSemaforoReporteVentasProducto);
+        outState.putBoolean("mLiberarSemaforoReporteVentasCliente", mLiberarSemaforoReporteVentasCliente);
+        outState.putBoolean("mLiberarSemaforoSaldoTotal", mLiberarSemaforoSaldoTotal);
+
+
+        outState.putStringArrayList("mTotalInicialIndexLiberar", mTotalInicialIndexLiberar);
+        outState.putStringArrayList("mCabeceraOrdenLiberar", mCabeceraOrdenLiberar);
+        outState.putStringArrayList("mPickingTotalIndexLiberar", mPickingTotalIndexLiberar);
+        outState.putStringArrayList("mReporteVentasProductoIndexLiberar", mReporteVentasProductoIndexLiberar);
+        outState.putStringArrayList("mReporteVentasClienteClienteKeyIndexLiberar", mReporteVentasClienteClienteKeyIndexLiberar);
+        outState.putStringArrayList("mSaldosTotalIndexLiberar", mSaldosTotalIndexLiberar);
+
+
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+}
 
 

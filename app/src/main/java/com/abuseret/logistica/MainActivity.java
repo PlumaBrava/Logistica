@@ -1529,15 +1529,22 @@ int i=0;
     }
 
     @Override
+    protected void onResume() {
+        Log.i("zebra22", "onResume() main" );
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        this.registerReceiver(mReceiver, filter);
+        super.onResume();
+    }
+
+    @Override
     protected void onStart() {
 
         Log.i("zebra22", "onStart() Main" );
 
         // Registra el receiver para la conexion del bluetooth impresora.
-    IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-        this.registerReceiver(mReceiver, filter);
+
         super.onStart();
     }
 }
